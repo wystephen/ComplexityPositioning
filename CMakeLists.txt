@@ -84,3 +84,6 @@ link_directories(
         ${LAPACK_LIBRARIES}
         ./include
 )
+
+
+add_executable(DualFeetLocalization GraphOptimization/src/DualFeetLocalization.cpp)
