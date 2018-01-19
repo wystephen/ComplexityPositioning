@@ -9,8 +9,11 @@
 
 #include <thread>
 
+#include "AWF.h"
+
 
 int main(int argc, char *argv[]){
 
+    std::cout << "hellow World" << std::endl;
 
 }

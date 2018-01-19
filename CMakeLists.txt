@@ -74,6 +74,7 @@ include_directories(
         ${Cholmod_INCLUDE_DIR}
         ${SuiteSparse_INCLUDE_DIR}
         ${GTSAM_INCLUDE_DIR}
+        /home/steve/Code/AlgorithmWorkFlowTools/
 )
 
 link_directories(
