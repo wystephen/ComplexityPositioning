@@ -88,3 +88,5 @@ link_directories(
 
 
 add_executable(DualFeetLocalization GraphOptimization/src/DualFeetLocalization.cpp)
+
+add_executable(KalmanFilterTester BayesStateEstimate/Test/KalmanFilterTester.cpp)
