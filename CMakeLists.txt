@@ -55,7 +55,7 @@ SET(G2O_LIBS g2o_cli g2o_ext_freeglut_minimal g2o_simulator
         g2o_types_sba g2o_types_slam3d g2o_csparse_extension g2o_opengl_helper
         g2o_solver_dense g2o_stuff g2o_types_sclam2d g2o_parser g2o_solver_pcg
         g2o_types_data g2o_types_sim3 cxsparse
-        g2o_types_slam3d_addons g2o_solver_cholmod cholmod )
+        g2o_types_slam3d_addons g2o_solver_cholmod cholmod)
 
 ######  include and library directories.
 include_directories(
@@ -90,3 +90,5 @@ link_directories(
 add_executable(DualFeetLocalization GraphOptimization/src/DualFeetLocalization.cpp)
 
 add_executable(KalmanFilterTester BayesStateEstimate/Test/KalmanFilterTester.cpp)
+
+add_executable(KalmanFilterSimulatorTester BayesStateEstimate/Test/KalmanFilterSimulatorTester.cpp)

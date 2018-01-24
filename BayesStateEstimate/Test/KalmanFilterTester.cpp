@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
             right_foot_file(dir_name + "RIGHT_FOOT.data"),
             head_imu_file(dir_name + "HEAD.data"),
-            uwb_file(dir_name + "HEAD_UWB.data"),
+            uwb_file(dir_name + "uwb_result.csv"),
             beacon_set_file(dir_name + "beaconSet.csv");
 
     auto left_imu_data = left_foot_file.extractDoulbeMatrix(",");
