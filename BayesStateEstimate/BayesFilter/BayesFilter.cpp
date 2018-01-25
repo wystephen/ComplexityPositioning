@@ -3,3 +3,8 @@
 //
 
 #include "BayesFilter.h"
+
+
+namespace BSE{
+
+}
