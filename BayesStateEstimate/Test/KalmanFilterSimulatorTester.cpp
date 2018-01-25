@@ -14,8 +14,15 @@
 
 int main(){
 
-    auto K = Eigen::Matrix<double,10,10>::Identity();
-    std::cout << K << std::endl;
+    auto imu_reader = AWF::FileReader("./test/imu.csv");
+    auto ground_truth_reader =AWF::FileReader("./test/groundtruth.csv");
+
+    auto imu_data = imu_reader.extractDoulbeMatrix(",");
+    auto g_trace = ground_truth_reader.extractDoulbeMatrix(",");
+
+    std::cout << imu_data << std::endl;
+
+    std::cout << g_trace << std::endl;
 
 
 }
