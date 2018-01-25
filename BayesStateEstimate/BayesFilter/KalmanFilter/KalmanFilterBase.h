@@ -40,9 +40,11 @@ namespace BSE {
         KalmanFilterBase(Eigen::Matrix<double, InputNumber, 1> process_noise_vec,
                          Eigen::Matrix<double, MeasurementNumber, 1> measurement_noise_vec,
                          Eigen::Matrix<double, StateNumber, 1> initial_probability_vec) :
+                state_(StateType::Identity()),
                 Q_(ProcessNoiseMatrixType::Identity() * process_noise_vec),
                 R_(MeasurementNoiseMatrixType::Identity() * measurement_noise_vec),
                 state_probability_(StateProbabilityType::Identity() * initial_probability_vec) {
+
 
         }
 
