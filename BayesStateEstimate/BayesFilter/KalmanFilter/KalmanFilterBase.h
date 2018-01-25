@@ -28,6 +28,20 @@ namespace BSE {
 
 
     protected:
+        /**
+         * X_i=A*X_{i-1}+B*u_i+w_i
+         * z_i=H*X_i+v_i
+         * w_i \in Q
+         * v_i \in R
+         */
+        StateTransMatrixType A_;
+        InputGainMatrixType B_;
+        OutputGainMatrixType H_;
+
+        ProcessNoiseMatrixType Q_;
+        MeasurementNoiseMatrixType R_;
+
+        KMatrixType K_;
 
 
 
