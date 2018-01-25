@@ -5,6 +5,7 @@
 #ifndef COMPLEXITYPOSITIONING_KALMANFILTERBASE_H
 #define COMPLEXITYPOSITIONING_KALMANFILTERBASE_H
 
+#include <unsupported/Eigen/AutoDiff>
 #include <iostream>
 #include "../BayesFilter.h"
 
@@ -53,6 +54,12 @@ namespace BSE {
             }
         }
 
+
+        /**
+         *  measurement state
+         * @param m  measurement state.
+         * @return
+         */
         virtual bool MeasurementState(const MeasurementType &m) {
             try {
                 K_ = state_probability_ * H_.transpose() *
