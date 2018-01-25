@@ -31,13 +31,18 @@ namespace BSE {
 //        typedef std::function<StateType(StateType,InputType)> StateTransFunc;
 //        typedef std::function<MeasurementType(MeasurementType,)
 
+        /**
+         * Initial Kalman Filter
+         * @param process_noise_vec process noise vector
+         * @param measurement_noise_vec measurement noise vector
+         * @param initial_probability_vec state probability vector
+         */
         KalmanFilterBase(Eigen::Matrix<double, InputNumber, 1> process_noise_vec,
                          Eigen::Matrix<double, MeasurementNumber, 1> measurement_noise_vec,
-        Eigen::Matrix<double,StateNumber,1> initial_probability_vec) :
+                         Eigen::Matrix<double, StateNumber, 1> initial_probability_vec) :
                 Q_(ProcessNoiseMatrixType::Identity() * process_noise_vec),
                 R_(MeasurementNoiseMatrixType::Identity() * measurement_noise_vec),
-                state_probability_(StateProbabilityType::Identity() * initial_probability_vec)
-        {
+                state_probability_(StateProbabilityType::Identity() * initial_probability_vec) {
 
         }
 
