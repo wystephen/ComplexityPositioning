@@ -8,12 +8,24 @@
 #include <Eigen/Dense>
 
 namespace BSE {
-    template<int StateNum, int InputNumber, int MeasurementNumber,typename T>
+    template<int StateNum,
+            int InputNum,
+            int MeasurementNum,
+            typename T>
     class BayesFilter {
     public:
-        typedef Eigen::Matrix<T,StateNum,1> StateType;
-        typedef Eigen::Matrix<T,InputNumber,1> InputType;
-        typedef Eigen::Matrix<T,MeasurementNumber,1> MeasurementType;
+        typedef Eigen::Matrix<T, StateNum, 1> StateType;
+        typedef Eigen::Matrix<T, StateNum, StateNum> StateProbabilityType;
+        typedef Eigen::Matrix<T, InputNum, 1> InputType;
+        typedef Eigen::Matrix<T, MeasurementNum, 1> MeasurementType;
+
+
+
+        /**
+         *
+         */
+        virtual void initial(){
+        }
 
         /**
          * use state transaction equation
@@ -54,10 +66,25 @@ namespace BSE {
             BayesFilter::state_ = state_;
         }
 
+        /**
+         *
+         * @return
+         */
+        const StateProbabilityType &getState_probability_() const {
+            return state_probability_;
+        }
+
+        /**
+         *
+         * @param state_probability_
+         */
+        void setState_probability_(const StateProbabilityType &state_probability_) {
+            BayesFilter::state_probability_ = state_probability_;
+        }
+
     protected:
         StateType state_;
-
-
+        StateProbabilityType state_probability_;
 
 
     };
