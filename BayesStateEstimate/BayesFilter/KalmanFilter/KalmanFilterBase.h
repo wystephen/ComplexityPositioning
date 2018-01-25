@@ -31,28 +31,23 @@ namespace BSE {
 //        typedef std::function<StateType(StateType,InputType)> StateTransFunc;
 //        typedef std::function<MeasurementType(MeasurementType,)
 
+        KalmanFilterBase(Eigen::Matrix<double, InputNumber, 1> process_noise_vec,
+                         Eigen::Matrix<double, MeasurementNumber, 1> measurement_noise_vec,
+        Eigen::Matrix<double,StateNumber,1> initial_probability_vec) :
+                Q_(ProcessNoiseMatrixType::Identity() * process_noise_vec),
+                R_(MeasurementNoiseMatrixType::Identity() * measurement_noise_vec),
+                state_probability_(StateProbabilityType::Identity() * initial_probability_vec)
+        {
+
+        }
+
+
         /**
          *
          * @param input
          * @return
          */
-        virtual bool StateTransaction(const InputType &input) {
-            try {
-                state_ = A_ * state_ + B_ * input;
-                state_probability_ = A_ * state_probability_ * A_.transpose() + Q_;
-                return true;
-            } catch (std::exception &e) {
-                std::cout << __FILE__
-                          << ":"
-                          << __LINE__
-                          << ":"
-                          << __FUNCTION__
-                          << ":"
-                          << e.what()
-                          << std::endl;
-                return false;
-            }
-        }
+        virtual bool StateTransaction(const InputType &input);
 
 
         /**
@@ -60,26 +55,7 @@ namespace BSE {
          * @param m  measurement state.
          * @return
          */
-        virtual bool MeasurementState(const MeasurementType &m) {
-            try {
-                K_ = state_probability_ * H_.transpose() *
-                     (H_ * state_probability_ * H_.transpose()).inverse();
-                state_ = state_ + (K_ * (m - H_ * state_));
-                state_probability_ = (StateProbabilityType::Identity() - (K_ * H_))
-                                     * state_probability_;
-                return true;
-            } catch (std::exception &e) {
-                std::cout << __FILE__
-                          << ":"
-                          << __LINE__
-                          << ":"
-                          << __FUNCTION__
-                          << ":"
-                          << e.what()
-                          << std::endl;
-                return false;
-            }
-        }
+        virtual bool MeasurementState(const MeasurementType &m);
 
 
     protected:
@@ -89,16 +65,16 @@ namespace BSE {
          * w_i \in Q
          * v_i \in R
          */
-        StateTransMatrixType A_;
-        InputGainMatrixType B_;
-        OutputGainMatrixType H_;
+        StateTransMatrixType A_ = StateTransMatrixType::Identity();
+        InputGainMatrixType B_ = InputGainMatrixType::Identity();
+        OutputGainMatrixType H_ = OutputGainMatrixType::Identity();
 
         ProcessNoiseMatrixType Q_;
         MeasurementNoiseMatrixType R_;
 
-        KMatrixType K_;
+        KMatrixType K_ = KMatrixType::Identity();
 
-        StateType dX_;
+        StateType dX_ = StateType::Zero();
 
 
     };
