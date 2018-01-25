@@ -10,7 +10,12 @@
 
 #include "AWF.h"
 
+#include <Eigen/Dense>
 
 int main(){
+
+    auto K = Eigen::Matrix<double,10,10>::Identity();
+    std::cout << K << std::endl;
+
 
 }
