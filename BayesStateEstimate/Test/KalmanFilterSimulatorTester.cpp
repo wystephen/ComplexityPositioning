@@ -19,7 +19,7 @@ int main(){
 
 
     auto imu_data = imu_reader.extractDoulbeMatrix(",");
-    Eigen::MatrixXd tmp_imu_data = imu_data
+//    Eigen::MatrixXd tmp_imu_data = imu_data
 
     auto g_trace = ground_truth_reader.extractDoulbeMatrix(",");
 
