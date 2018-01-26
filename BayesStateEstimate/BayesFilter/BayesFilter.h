@@ -20,11 +20,10 @@ namespace BSE {
         typedef Eigen::Matrix<T, MeasurementNum, 1> MeasurementType;
 
 
-
         /**
          *
          */
-        virtual void initial(){
+        virtual void initial() {
         }
 
         /**
@@ -32,14 +31,14 @@ namespace BSE {
          * @param input
          * @return
          */
-        virtual bool StateTransaction(const InputType& input);
+        virtual bool StateTransaction(const InputType &input);
 
         /**
          * use measurement equation update the probability and value of system state.
          * @param m
          * @return
          */
-        virtual bool MeasurementState(const MeasurementType& m);
+        virtual bool MeasurementState(const MeasurementType &m);
 
         /**
          * iterator use the measurement equation.
@@ -47,8 +46,8 @@ namespace BSE {
          * @param times times of use @MeasurementState
          * @return
          */
-        virtual bool MeasurementState(const MeasurementType& m, int times){
-            for(int i(0);i<times;++i){
+        virtual bool MeasurementState(const MeasurementType &m, int times) {
+            for (int i(0); i < times; ++i) {
                 MeasurementState(m);
             }
         }

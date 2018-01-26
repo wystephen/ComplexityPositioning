@@ -12,10 +12,10 @@
 
 #include <Eigen/Dense>
 
-int main(){
+int main() {
 
     auto imu_reader = AWF::FileReader("./test/imu.csv");
-    auto ground_truth_reader =AWF::FileReader("./test/groundtruth.csv");
+    auto ground_truth_reader = AWF::FileReader("./test/groundtruth.csv");
 
 
     auto imu_data = imu_reader.extractDoulbeMatrix(",");
