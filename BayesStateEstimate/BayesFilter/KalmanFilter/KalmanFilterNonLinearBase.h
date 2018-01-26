@@ -28,6 +28,21 @@ namespace BSE {
                                   const Eigen::Matrix<double, StateNumber, 1> &initial_probability_vec)
                 : KalmanFilterBase(process_noise_vec, measurement_noise_vec, initial_probability_vec) {}
 
+        /**
+         *
+         * @param input
+         * @return
+         */
+        virtual bool StateTransaction(const InputType &input);
+
+
+        /**
+         *  measurement state
+         * @param m  measurement state.
+         * @return
+         */
+        virtual bool MeasurementState(const MeasurementType &m);
+
     protected:
         std::function<void(decltype(A_) & ,
                            decltype(B_) & ,
@@ -36,7 +51,8 @@ namespace BSE {
 
         std::function<void(decltype(H_) & ,
                            decltype(state_) & ,
-                           decltype(m_) & )> *MeasurementEquation = nullptr;
+                           decltype(m_) & ,
+                           decltype(dX_) & )> *MeasurementEquation = nullptr;
 
 
 //        std::function<bool(StateTransMatrixType ,

@@ -26,9 +26,13 @@ namespace BSE {
 
     bool KalmanFilterBase::MeasurementState(const MeasurementType &m) {
         try {
+
+            dX_ = m - H_ * state_;
+            state_ = state_ + (K_ * (m - H_ * state_));
+
             K_ = state_probability_ * H_.transpose() *
                  (H_ * state_probability_ * H_.transpose()).inverse();
-            state_ = state_ + (K_ * (m - H_ * state_));
+
             state_probability_ = (StateProbabilityType::Identity() - (K_ * H_))
                                  * state_probability_;
             return true;
