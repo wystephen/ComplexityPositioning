@@ -21,13 +21,22 @@ namespace BSE {
                     MeasurementNumber,
                     T> {
     public:
+
+
         KalmanFilterNonLinearBase(const Eigen::Matrix<double, InputNumber, 1> &process_noise_vec,
                                   const Eigen::Matrix<double, MeasurementNumber, 1> &measurement_noise_vec,
                                   const Eigen::Matrix<double, StateNumber, 1> &initial_probability_vec)
                 : KalmanFilterBase(process_noise_vec, measurement_noise_vec, initial_probability_vec) {}
 
     protected:
-//        std::function<StateTransMatrixType(Stete>
+//        std::function<bool(decltype(A_),
+//                           decltype(B_),
+//                           decltype(state_),
+//                           decltype(input_))> *StateTransactionEquation;
+        std::function<bool(StateTransMatrixType,
+                           InputGainMatrixType,
+                           StateType,
+                           InputType)> *stateTransactionEquation;
 
 
     };

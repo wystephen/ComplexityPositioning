@@ -8,16 +8,16 @@
 #include <Eigen/Dense>
 
 namespace BSE {
-    template<int StateNum,
-            int InputNum,
-            int MeasurementNum,
+    template<int StateNumber,
+            int InputNumber,
+            int MeasurementNumber,
             typename T>
     class BayesFilter {
     public:
-        typedef Eigen::Matrix<T, StateNum, 1> StateType;
-        typedef Eigen::Matrix<T, StateNum, StateNum> StateProbabilityType;
-        typedef Eigen::Matrix<T, InputNum, 1> InputType;
-        typedef Eigen::Matrix<T, MeasurementNum, 1> MeasurementType;
+        using StateType =  Eigen::Matrix<T, StateNumber, 1>;
+        using StateProbabilityType=Eigen::Matrix<T, StateNumber, StateNumber>;
+        using InputType=Eigen::Matrix<T, InputNumber, 1>;
+        using MeasurementType=Eigen::Matrix<T, MeasurementNumber, 1>;
 
 
         /**
@@ -88,6 +88,7 @@ namespace BSE {
     protected:
         StateType state_;
         StateProbabilityType state_probability_;
+        InputType input_;
 
 
     };

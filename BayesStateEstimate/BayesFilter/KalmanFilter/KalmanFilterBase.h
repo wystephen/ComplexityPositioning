@@ -20,13 +20,13 @@ namespace BSE {
                     MeasurementNumber,
                     T> {
     public:
-        typedef Eigen::Matrix<T, StateNumber, StateNumber> StateTransMatrixType;
-        typedef Eigen::Matrix<T, StateNumber, InputNumber> InputGainMatrixType;
-        typedef Eigen::Matrix<T, MeasurementNumber, StateNumber> OutputGainMatrixType;
+        using StateTransMatrixType=Eigen::Matrix<T, StateNumber, StateNumber>;
+        using InputGainMatrixType=Eigen::Matrix<T, StateNumber, InputNumber>;
+        using OutputGainMatrixType=Eigen::Matrix<T, MeasurementNumber, StateNumber>;
 
-        typedef Eigen::Matrix<T, StateNumber, StateNumber> ProcessNoiseMatrixType;
-        typedef Eigen::Matrix<T, MeasurementNumber, MeasurementNumber> MeasurementNoiseMatrixType;
-        typedef Eigen::Matrix<T, StateNumber, MeasurementNumber> KMatrixType;
+        using ProcessNoiseMatrixType=Eigen::Matrix<T, StateNumber, StateNumber>;
+        using MeasurementNoiseMatrixType=Eigen::Matrix<T, MeasurementNumber, MeasurementNumber>;
+        using KMatrixType=Eigen::Matrix<T, StateNumber, MeasurementNumber>;
 
 //        typedef std::function<StateType(StateType,InputType)> StateTransFunc;
 //        typedef std::function<MeasurementType(MeasurementType,)
