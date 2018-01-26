@@ -65,6 +65,21 @@ namespace BSE {
         virtual bool MeasurementState(const MeasurementType &m);
 
 
+        /**
+         * Setter and getter for A,B&C.
+         */
+        const StateTransMatrixType &getA_() const;
+
+        void setA_(const StateTransMatrixType &A_);
+
+        const InputGainMatrixType &getB_() const;
+
+        void setB_(const InputGainMatrixType &B_);
+
+        const OutputGainMatrixType &getH_() const;
+
+        void setH_(const OutputGainMatrixType &H_);
+
     protected:
         /**
          * X_i=A*X_{i-1}+B*u_i+w_i
@@ -73,6 +88,9 @@ namespace BSE {
          * v_i \in R
          */
         StateTransMatrixType A_ = StateTransMatrixType::Identity();
+
+
+    protected:
         InputGainMatrixType B_ = InputGainMatrixType::Identity();
         OutputGainMatrixType H_ = OutputGainMatrixType::Identity();
 

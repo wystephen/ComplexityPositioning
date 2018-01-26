@@ -44,4 +44,40 @@ namespace BSE {
             return false;
         }
     }
+
+    template<int StateNumber, int InputNumber, int MeasurementNumber, typename T>
+    const KalmanFilterBase::StateTransMatrixType &
+    KalmanFilterBase<StateNumber, InputNumber, MeasurementNumber, T>::getA_() const {
+        return A_;
+    }
+
+    template<int StateNumber, int InputNumber, int MeasurementNumber, typename T>
+    void KalmanFilterBase<StateNumber, InputNumber, MeasurementNumber, T>::setA_(
+            const KalmanFilterBase::StateTransMatrixType &A_) {
+        KalmanFilterBase::A_ = A_;
+    }
+
+    template<int StateNumber, int InputNumber, int MeasurementNumber, typename T>
+    const KalmanFilterBase::InputGainMatrixType &
+    KalmanFilterBase<StateNumber, InputNumber, MeasurementNumber, T>::getB_() const {
+        return B_;
+    }
+
+    template<int StateNumber, int InputNumber, int MeasurementNumber, typename T>
+    void KalmanFilterBase<StateNumber, InputNumber, MeasurementNumber, T>::setB_(
+            const KalmanFilterBase::InputGainMatrixType &B_) {
+        KalmanFilterBase::B_ = B_;
+    }
+
+    template<int StateNumber, int InputNumber, int MeasurementNumber, typename T>
+    const KalmanFilterBase::OutputGainMatrixType &
+    KalmanFilterBase<StateNumber, InputNumber, MeasurementNumber, T>::getH_() const {
+        return H_;
+    }
+
+    template<int StateNumber, int InputNumber, int MeasurementNumber, typename T>
+    void KalmanFilterBase<StateNumber, InputNumber, MeasurementNumber, T>::setH_(
+            const KalmanFilterBase::OutputGainMatrixType &H_) {
+        KalmanFilterBase::H_ = H_;
+    }
 }
