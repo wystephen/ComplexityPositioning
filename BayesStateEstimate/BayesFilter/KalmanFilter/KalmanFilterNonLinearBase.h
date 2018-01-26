@@ -29,14 +29,21 @@ namespace BSE {
                 : KalmanFilterBase(process_noise_vec, measurement_noise_vec, initial_probability_vec) {}
 
     protected:
-//        std::function<bool(decltype(A_),
-//                           decltype(B_),
-//                           decltype(state_),
-//                           decltype(input_))> *StateTransactionEquation;
-        std::function<bool(StateTransMatrixType,
-                           InputGainMatrixType,
-                           StateType,
-                           InputType)> *stateTransactionEquation;
+        std::function<void(decltype(A_) & ,
+                           decltype(B_) & ,
+                           decltype(state_) & ,
+                           decltype(input_) & )> *StateTransactionEquation = nullptr;
+
+        std::function<void(decltype(H_) & ,
+                           decltype(state_) & ,
+                           decltype(m_) & )> *MeasurementEquation = nullptr;
+
+
+//        std::function<bool(StateTransMatrixType ,
+//                           InputGainMatrixType,
+//                           StateType,
+//                           InputType)> stateTransactionEquation;
+
 
 
     };

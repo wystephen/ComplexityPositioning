@@ -89,6 +89,7 @@ namespace BSE {
         StateType state_;
         StateProbabilityType state_probability_;
         InputType input_;
+        MeasurementType m_;
 
 
     };
