@@ -8,6 +8,7 @@
 #include <unsupported/Eigen/AutoDiff>
 #include <iostream>
 #include "../BayesFilter.h"
+#include "../BayesFilter.cpp"
 
 namespace BSE {
     template<int StateNumber,
@@ -27,9 +28,6 @@ namespace BSE {
         using ProcessNoiseMatrixType=Eigen::Matrix<T, StateNumber, StateNumber>;
         using MeasurementNoiseMatrixType=Eigen::Matrix<T, MeasurementNumber, MeasurementNumber>;
         using KMatrixType=Eigen::Matrix<T, StateNumber, MeasurementNumber>;
-
-//        typedef std::function<StateType(StateType,InputType)> StateTransFunc;
-//        typedef std::function<MeasurementType(MeasurementType,)
 
         /**
          * Initial Kalman Filter
@@ -54,7 +52,7 @@ namespace BSE {
          * @param input
          * @return
          */
-        virtual bool StateTransaction(const InputType &input);
+        virtual bool StateTransaction(const decltype(input_) &input);
 
 
         /**
@@ -62,7 +60,7 @@ namespace BSE {
          * @param m  measurement state.
          * @return
          */
-        virtual bool MeasurementState(const MeasurementType &m);
+        virtual bool MeasurementState(const decltype(m_) &m);
 
 
         /**
@@ -99,7 +97,7 @@ namespace BSE {
 
         KMatrixType K_ = KMatrixType::Identity();
 
-        StateType dX_ = StateType::Zero();
+        decltype(state_) dX_;
 
 
     };
