@@ -21,17 +21,25 @@ namespace BSE {
 
         KalmanFilterNonLinearBase(const Eigen::MatrixXd &process_noise_vec,
                                   const Eigen::MatrixXd &measurement_noise_vec,
-                                  const Eigen::MatrixXd &initial_probability_vec) : BayesFilter() ,
-        Q_(Eigen::MatrixXd::Identity(process_noise_vec.rows(),process_noise_vec.rows())*process_noise_vec){
+                                  const Eigen::MatrixXd &initial_probability_vec) :
+                BayesFilter() {
 
         }
 
 
-        bool StateTransaction(const Eigen::MatrixXd &input);
+        /**
+         *
+         * @param input
+         * @param cov_input
+         * @return
+         */
+        bool StateTransaction(const Eigen::MatrixXd &input,
+                              const Eigen::MatrixXd &cov_input);
 
         /**
-         * state transaction function using the state transaction equation in StateTransactonMap
+         *  state transaction...
          * @param input
+         * @param cov_input
          * @param methodType
          * @return
          */
@@ -40,58 +48,39 @@ namespace BSE {
                               int methodType = 0);
 
 
-        bool MeasurementState(const Eigen::MatrixXd &m);
+        bool MeasurementState(const Eigen::MatrixXd &m,
+                              const Eigen::MatrixXd &cov_m);
 
         /**
-         * choice measurement equation based on method Type.
+         *  measurement State function
          * @param m
+         * @param cov_m
          * @param methodType
          * @return
          */
-        bool MeasurementState(const Eigen::MatrixXd &m, int methodType = 0);
+        bool MeasurementState(const Eigen::MatrixXd &m,
+                              const Eigen::MatrixXd &cov_m,
+                              int methodType = 0);
 
 
     protected:
-        std::map<int, std::function<void(Eigen::MatrixXd &,
-                                         Eigen::MatrixXd &,
-                                         Eigen::MatrixXd &,
-                                         Eigen::MatrixXd &)> *> StateTransactionEquationMap = {};
+        std::map<int, std::function<void(Eigen::MatrixXd &,//state
+                                         Eigen::MatrixXd &,//state probability
+                                         Eigen::MatrixXd &,//input
+                                         Eigen::MatrixXd &// cov input
+        )> *> StateTransactionEquationMap = {};
 
-        std::map<int, std::function<void(Eigen::MatrixXd &,
-                                         Eigen::MatrixXd &,
-                                         Eigen::MatrixXd &,
-                                         Eigen::MatrixXd &)> *> MeasurementEquationMap = {};
+        std::map<int, std::function<void(Eigen::MatrixXd &,//state
+                                         Eigen::MatrixXd &,//state probability
+                                         Eigen::MatrixXd &,//measurement
+                                         Eigen::MatrixXd &,// cov measurement
+                                         Eigen::MatrixXd &// dx
+        )> *> MeasurementEquationMap = {};
         /**
          * Setter and getter for A,B&C.
          */
     public:
-        const Eigen::MatrixXd &getA_() const;
 
-        void setA_(const Eigen::MatrixXd &A_);
-
-        const Eigen::MatrixXd &getB_() const;
-
-        void setB_(const Eigen::MatrixXd &B_);
-
-        const Eigen::MatrixXd &getH_() const;
-
-        void setH_(const Eigen::MatrixXd &H_);
-
-        const Eigen::MatrixXd &getQ_() const;
-
-        void setQ_(const Eigen::MatrixXd &Q_);
-
-        const Eigen::MatrixXd &getR_() const;
-
-        void setR_(const Eigen::MatrixXd &R_);
-
-        const Eigen::MatrixXd &getK_() const;
-
-        void setK_(const Eigen::MatrixXd &K_);
-
-        const Eigen::MatrixXd &getDX_() const;
-
-        void setDX_(const Eigen::MatrixXd &dX_);
 
     protected:
 
@@ -101,18 +90,13 @@ namespace BSE {
          * w_i \in Q
          * v_i \in R
          */
-        Eigen::MatrixXd A_;
-
-
-        Eigen::MatrixXd B_;
-        Eigen::MatrixXd H_;
-
-        Eigen::MatrixXd Q_;
-        Eigen::MatrixXd R_;
-
-        Eigen::MatrixXd K_;
-
-        Eigen::MatrixXd dX_;
+        Eigen::MatrixXd A_ = Eigen::MatrixXd();
+        Eigen::MatrixXd B_ = Eigen::MatrixXd();
+        Eigen::MatrixXd H_ = Eigen::MatrixXd();
+        Eigen::MatrixXd Q_ = Eigen::MatrixXd();
+        Eigen::MatrixXd R_ = Eigen::MatrixXd();
+        Eigen::MatrixXd K_ = Eigen::MatrixXd();
+        Eigen::MatrixXd dX_ = Eigen::MatrixXd();
 
     };
 }
