@@ -5,13 +5,23 @@
 #include "KalmanFilterNonLinearBase.h"
 
 namespace BSE {
-    bool KalmanFilterNonLinearBase::StateTransaction(const InputType &input) {
+    KalmanFilterNonLinearBase::StateTransaction(const Eigen::MatrixXd &input) {
+        StateTransaction(input, 0);
+    }
+
+    bool KalmanFilterNonLinearBase::StateTransaction(const Eigen::MatrixXd &input, int methodType) {
         try {
-            if (StateTransactionEquation != nullptr) {
-                StateTransactionEquation->(A_, B_, state_, input);
+            if (StateTransactionEquationMap.count(methodType) > 0) {
+                StateTransactionEquationMap[methodType]->(A_, B_, state_, input);
                 state_probability_ = A_ * state_probability_ * A_.transpose() + Q_;
                 return true;
             } else {
+                std::cout << "method type [" << methodType
+                          << "] is invalid. \nFollowing methodType contained in the map";
+                for (auto val:StateTransactionEquationMap) {
+                    std::cout << val.first << " ";
+                }
+                std::cout << std::endl;
                 return false;
 //                throw std::exception().what() = "StateTransactionEquation is nullptr";
             }
@@ -30,19 +40,26 @@ namespace BSE {
     }
 
 
-    bool KalmanFilterNonLinearBase::MeasurementState(const MeasurementType &m) {
+    bool KalmanFilterNonLinearBase::MeasurementState(const Eigen::MatrixXd &m, int methodType) {
         try {
-            if (MeasurementEquation != nullptr) {
-                MeasurementEquation->(H_, state_, m, dX_);
+            if (MeasurementEquationMap.count(methodType) > 0) {
+                MeasurementEquationMap[methodType]->(H_, state_, m, dX_);
 
                 K_ = state_probability_ * H_.transpose() *
                      (H_ * state_probability_ * H_.transpose()).inverse();
 
-                state_probability_ = (StateProbabilityType::Identity() - (K_ * H_))
-                                     * state_probability_;
+                state_probability_ =
+                        (Eigen::MatrixXd::Identity(state_probability_.rows(), state_probability_.cols()) - (K_ * H_))
+                        * state_probability_;
                 return true;
 
             } else {
+                std::cout << "method type [" << methodType
+                          << "] is invalid. \nFollowing methodType contained in the map {";
+                for (auto val:MeasurementEquationMap) {
+                    std::cout << val.first << ",";
+                }
+                std::cout <<"}"<< std::endl;
                 return false;
 //                throw std::exception().what() = "MeasurementEquation is nullptr";
             }

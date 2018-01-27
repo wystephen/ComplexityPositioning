@@ -7,59 +7,53 @@
 
 #include <iostream>
 #include <functional>
+#include <map>
 #include "KalmanFilterBase.h"
 
 namespace BSE {
-    template<int StateNumber,
-            int InputNumber,
-            int MeasurementNumber,
-            typename T>
     class KalmanFilterNonLinearBase :
-            public KalmanFilterBase<
-                    StateNumber,
-                    InputNumber,
-                    MeasurementNumber,
-                    T> {
+            public KalmanFilterBase {
     public:
 
 
-        KalmanFilterNonLinearBase(const Eigen::Matrix<double, InputNumber, 1> &process_noise_vec,
-                                  const Eigen::Matrix<double, MeasurementNumber, 1> &measurement_noise_vec,
-                                  const Eigen::Matrix<double, StateNumber, 1> &initial_probability_vec)
+        KalmanFilterNonLinearBase(const Eigen::MatrixXd &process_noise_vec,
+                                  const Eigen::MatrixXd &measurement_noise_vec,
+                                  const Eigen::MatrixXd &initial_probability_vec)
                 : KalmanFilterBase(process_noise_vec, measurement_noise_vec, initial_probability_vec) {}
 
+
+        bool StateTransaction(const Eigen::MatrixXd &input);
+
         /**
-         *
+         * state transaction function using the state transaction equation in StateTransactonMap
          * @param input
+         * @param methodType
          * @return
          */
-        virtual bool StateTransaction(const InputType &input);
+        bool StateTransaction(const Eigen::MatrixXd &input, int methodType = 0);
 
+
+        bool MeasurementState(const Eigen::MatrixXd &m);
 
         /**
-         *  measurement state
-         * @param m  measurement state.
+         * choice measurement equation based on method Type.
+         * @param m
+         * @param methodType
          * @return
          */
-        virtual bool MeasurementState(const MeasurementType &m);
+        bool MeasurementState(const Eigen::MatrixXd &m, int methodType = 0);
+
 
     protected:
-        std::function<void(decltype(A_) & ,
-                           decltype(B_) & ,
-                           decltype(state_) & ,
-                           decltype(input_) & )> *StateTransactionEquation = nullptr;
+        std::map<int, std::function<void(Eigen::MatrixXd &,
+                                         Eigen::MatrixXd &,
+                                         Eigen::MatrixXd &,
+                                         Eigen::MatrixXd &)> *> StateTransactionEquationMap = {};
 
-        std::function<void(decltype(H_) & ,
-                           decltype(state_) & ,
-                           decltype(m_) & ,
-                           decltype(dX_) & )> *MeasurementEquation = nullptr;
-
-
-//        std::function<bool(StateTransMatrixType ,
-//                           InputGainMatrixType,
-//                           StateType,
-//                           InputType)> stateTransactionEquation;
-
+        std::map<int, std::function<void(Eigen::MatrixXd &,
+                                         Eigen::MatrixXd &,
+                                         Eigen::MatrixXd &,
+                                         Eigen::MatrixXd &)> *> MeasurementEquationMap = {};
 
 
     };

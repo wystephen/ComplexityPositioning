@@ -11,23 +11,9 @@
 #include "../BayesFilter.cpp"
 
 namespace BSE {
-    template<int StateNumber,
-            int InputNumber,
-            int MeasurementNumber,
-            typename T>
     class KalmanFilterBase :
-            public BayesFilter<StateNumber,
-                    InputNumber,
-                    MeasurementNumber,
-                    T> {
+            public BayesFilter {
     public:
-        using StateTransMatrixType=Eigen::Matrix<T, StateNumber, StateNumber>;
-        using InputGainMatrixType=Eigen::Matrix<T, StateNumber, InputNumber>;
-        using OutputGainMatrixType=Eigen::Matrix<T, MeasurementNumber, StateNumber>;
-
-        using ProcessNoiseMatrixType=Eigen::Matrix<T, StateNumber, StateNumber>;
-        using MeasurementNoiseMatrixType=Eigen::Matrix<T, MeasurementNumber, MeasurementNumber>;
-        using KMatrixType=Eigen::Matrix<T, StateNumber, MeasurementNumber>;
 
         /**
          * Initial Kalman Filter
@@ -35,13 +21,13 @@ namespace BSE {
          * @param measurement_noise_vec measurement noise vector
          * @param initial_probability_vec state probability vector
          */
-        KalmanFilterBase(Eigen::Matrix<double, InputNumber, 1> process_noise_vec,
-                         Eigen::Matrix<double, MeasurementNumber, 1> measurement_noise_vec,
-                         Eigen::Matrix<double, StateNumber, 1> initial_probability_vec) :
-                state_(StateType::Identity()),
-                Q_(ProcessNoiseMatrixType::Identity() * process_noise_vec),
-                R_(MeasurementNoiseMatrixType::Identity() * measurement_noise_vec),
-                state_probability_(StateProbabilityType::Identity() * initial_probability_vec) {
+        KalmanFilterBase(Eigen::Matrix<double, Eigen::Dynamic, 1> process_noise_vec,
+                         Eigen::Matrix<double, Eigen::Dynamic, 1> measurement_noise_vec,
+                         Eigen::Matrix<double, Eigen::Dynamic, 1> initial_probability_vec) :
+                state_(),
+                Q_(),
+                R_(),
+                state_probability_() {
 
 
         }
@@ -52,7 +38,7 @@ namespace BSE {
          * @param input
          * @return
          */
-        virtual bool StateTransaction(const decltype(input_) &input);
+        virtual bool StateTransaction(const Eigen::MatrixXd &input);
 
 
         /**
@@ -60,23 +46,40 @@ namespace BSE {
          * @param m  measurement state.
          * @return
          */
-        virtual bool MeasurementState(const decltype(m_) &m);
+        virtual bool MeasurementState(const Eigen::MatrixXd &m);
 
 
         /**
          * Setter and getter for A,B&C.
          */
-        const StateTransMatrixType &getA_() const;
 
-        void setA_(const StateTransMatrixType &A_);
+        const Eigen::MatrixXd &getA_() const;
 
-        const InputGainMatrixType &getB_() const;
+        void setA_(const Eigen::MatrixXd &A_);
 
-        void setB_(const InputGainMatrixType &B_);
+        const Eigen::MatrixXd &getB_() const;
 
-        const OutputGainMatrixType &getH_() const;
+        void setB_(const Eigen::MatrixXd &B_);
 
-        void setH_(const OutputGainMatrixType &H_);
+        const Eigen::MatrixXd &getH_() const;
+
+        void setH_(const Eigen::MatrixXd &H_);
+
+        const Eigen::MatrixXd &getQ_() const;
+
+        void setQ_(const Eigen::MatrixXd &Q_);
+
+        const Eigen::MatrixXd &getR_() const;
+
+        void setR_(const Eigen::MatrixXd &R_);
+
+        const Eigen::MatrixXd &getK_() const;
+
+        void setK_(const Eigen::MatrixXd &K_);
+
+        const Eigen::MatrixXd &getDX_() const;
+
+        void setDX_(const Eigen::MatrixXd &dX_);
 
     protected:
         /**
@@ -85,19 +88,18 @@ namespace BSE {
          * w_i \in Q
          * v_i \in R
          */
-        StateTransMatrixType A_ = StateTransMatrixType::Identity();
+        Eigen::MatrixXd A_;
 
 
-    protected:
-        InputGainMatrixType B_ = InputGainMatrixType::Identity();
-        OutputGainMatrixType H_ = OutputGainMatrixType::Identity();
+        Eigen::MatrixXd B_;
+        Eigen::MatrixXd H_;
 
-        ProcessNoiseMatrixType Q_;
-        MeasurementNoiseMatrixType R_;
+        Eigen::MatrixXd Q_;
+        Eigen::MatrixXd R_;
 
-        KMatrixType K_ = KMatrixType::Identity();
+        Eigen::MatrixXd K_;
 
-        decltype(state_) dX_;
+        Eigen::MatrixXd dX_;
 
 
     };

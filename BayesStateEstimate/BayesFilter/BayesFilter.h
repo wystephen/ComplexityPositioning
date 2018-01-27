@@ -8,17 +8,8 @@
 #include <Eigen/Dense>
 
 namespace BSE {
-    template<int StateNumber,
-            int InputNumber,
-            int MeasurementNumber,
-            typename T>
     class BayesFilter {
     public:
-        using StateType =  Eigen::Matrix<T, StateNumber, 1>;
-        using StateProbabilityType=Eigen::Matrix<T, StateNumber, StateNumber>;
-        using InputType=Eigen::Matrix<T, InputNumber, 1>;
-        using MeasurementType=Eigen::Matrix<T, MeasurementNumber, 1>;
-
 
         /**
          *
@@ -31,14 +22,14 @@ namespace BSE {
          * @param input
          * @return
          */
-        virtual bool StateTransaction(const InputType &input);
+        virtual bool StateTransaction(const Eigen::MatrixXd &input);
 
         /**
          * use measurement equation update the probability and value of system state.
          * @param m
          * @return
          */
-        virtual bool MeasurementState(const MeasurementType &m);
+        virtual bool MeasurementState(const Eigen::MatrixXd &m);
 
         /**
          * iterator use the measurement equation.
@@ -46,7 +37,7 @@ namespace BSE {
          * @param times times of use @MeasurementState
          * @return
          */
-        virtual bool MeasurementState(const MeasurementType &m, int times) {
+        virtual bool MeasurementState(const Eigen::MatrixXd &m, int times) {
             for (int i(0); i < times; ++i) {
                 MeasurementState(m);
             }
@@ -57,7 +48,7 @@ namespace BSE {
          * get system state
          * @return
          */
-        StateType getState_() const {
+        Eigen::MatrixXd getState_() const {
             return state_;
         }
 
@@ -65,7 +56,7 @@ namespace BSE {
          * set system state.
          * @param state_
          */
-        void setState_(StateType state_) {
+        void setState_(Eigen::MatrixXd state_) {
             BayesFilter::state_ = state_;
         }
 
@@ -73,7 +64,7 @@ namespace BSE {
          *
          * @return
          */
-        const StateProbabilityType &getState_probability_() const {
+        const Eigen::MatrixXd &getState_probability_() const {
             return state_probability_;
         }
 
@@ -81,15 +72,15 @@ namespace BSE {
          *
          * @param state_probability_
          */
-        void setState_probability_(const StateProbabilityType &state_probability_) {
+        void setState_probability_(const Eigen::MatrixXd &state_probability_) {
             BayesFilter::state_probability_ = state_probability_;
         }
 
     protected:
-        StateType state_;
-        StateProbabilityType state_probability_;
-        InputType input_;
-        MeasurementType m_;
+        Eigen::MatrixXd state_;
+        Eigen::MatrixXd state_probability_;
+        Eigen::MatrixXd input_;
+        Eigen::MatrixXd m_;
 
 
     };

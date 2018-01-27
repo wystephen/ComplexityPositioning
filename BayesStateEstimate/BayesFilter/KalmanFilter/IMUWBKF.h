@@ -15,15 +15,25 @@ namespace BSE {
      * @tparam UWBNumber
      * @tparam time_interval
      */
-    template<int UWBNumber, double time_interval>
     class IMUWBKFBase :
-            public KalmanFilterNonLinearBase<9, 6, UWBNumber, double> {
+            public KalmanFilterNonLinearBase {
     public:
-        IMUWBKFBase(const Eigen::Matrix<double, 6, 1> &process_noise_vec,
-                    const Eigen::Matrix<double, UWBNumber, 1> &measurement_noise_vec,
-                    const Eigen::Matrix<double, 9, 1> &initial_probability_vec) :
+        IMUWBKFBase(const Eigen::MatrixXd &process_noise_vec,
+                    const Eigen::MatrixXd &measurement_noise_vec,
+                    const Eigen::MatrixXd &initial_probability_vec) :
                 KalmanFilterNonLinearBase(
                         process_noise_vec, measurement_noise_vec, initial_probability_vec) {
+            /**
+             * define state transaction equation
+             */
+            *StateTransactionEquation = ([&](decltype(A_)  &A,
+                                             decltype(B_)  &B,
+                                             decltype(state_)  &X,
+                                             decltype(input_)  &input) {
+
+
+                return;
+            });
 
 
         }
@@ -37,7 +47,6 @@ namespace BSE {
             double roll = std::atan(f_v / f_w);
             double pitch = -std::asin(f_u /
                                       std::sqrt(f_u * f_u + f_v * f_v + f_w * f_w));
-
 
 
         }
