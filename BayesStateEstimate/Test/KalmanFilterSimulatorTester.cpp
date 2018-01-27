@@ -140,6 +140,17 @@ int main() {
             Eigen::Matrix<double, 9, 9>::Identity() ,
             Eigen::Matrix<double, 6, 6>::Identity() ,
             Eigen::Matrix<double, 9, 9>::Identity());
+    iuFilter.Initialization(imu_data.block(0,1,20,6));
+
+    std::vector<std::vector<double>> pose_vec={{},{},{}};
+    for(int i(1);imu_data(i,0)-imu_data(0,0)<3.0;i++){
+        iuFilter.setTime_inteval_(imu_data(i,0)-imu_data(i-1,0));
+        iuFilter.StateTransaction(imu_data.block(i,1,1,6).transpose());
+
+//        auto state = iuFilter.
+//        for(int tmp(0);tm)
+
+    }
 
 
     plt::show(true);

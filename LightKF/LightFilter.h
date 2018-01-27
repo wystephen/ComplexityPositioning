@@ -6,6 +6,7 @@
 #define COMPLEXITYPOSITIONING_LIGHTFILTER_H
 
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
 
 namespace LightFilter {
     template<int StateNumber,
@@ -164,7 +165,7 @@ namespace LightFilter {
             std::cout << "acc src:" << acc.transpose() << std::endl;
             std::cout << "acc after:" << C * acc << std::endl;
             if (std::isnan(C.sum())) {
-            std::cout << "error in initial navigation equation" << std::endl;
+                std::cout << "error in initial navigation equation" << std::endl;
             }
 
         }
@@ -227,6 +228,7 @@ namespace LightFilter {
 
         double time_inteval_ = 0.05;
         double gravity_ = 9.81;
+//        Eigen::Quaterniond
 
 
     };
