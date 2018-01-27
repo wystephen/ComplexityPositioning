@@ -22,14 +22,16 @@ namespace BSE {
          * @param input
          * @return
          */
-        virtual bool StateTransaction(const Eigen::MatrixXd &input);
+        virtual bool StateTransaction(const Eigen::MatrixXd &input,
+                                      const Eigen::MatrixXd &input_cov);
 
         /**
          * use measurement equation update the probability and value of system state.
          * @param m
          * @return
          */
-        virtual bool MeasurementState(const Eigen::MatrixXd &m);
+        virtual bool MeasurementState(const Eigen::MatrixXd &m,
+                                      const Eigen::MatrixXd &cov_m);
 
         /**
          * iterator use the measurement equation.
@@ -37,10 +39,18 @@ namespace BSE {
          * @param times times of use @MeasurementState
          * @return
          */
-        virtual bool MeasurementState(const Eigen::MatrixXd &m, int times) {
-            for (int i(0); i < times; ++i) {
-                MeasurementState(m);
+        bool MeasurementState(const Eigen::MatrixXd &m,
+                              const Eigen::MatrixXd &cov_m,
+                              int times) {
+            try {
+                for (int i(0); i < times; ++i) {
+                    MeasurementState(m, cov_m);
+                }
+                return true;
+            } catch (std::exception &e) {
+                return false;
             }
+
         }
 
 

@@ -26,10 +26,10 @@ namespace BSE {
             /**
              * define state transaction equation
              */
-            *StateTransactionEquation = ([&](decltype(A_)  &A,
-                                             decltype(B_)  &B,
-                                             decltype(state_)  &X,
-                                             decltype(input_)  &input) {
+            *(StateTransactionEquationMap[0]) = ([&](decltype(A_) &A,
+                                                     decltype(B_) &B,
+                                                     decltype(state_) &X,
+                                                     decltype(input_) &input) {
 
 
                 return;
