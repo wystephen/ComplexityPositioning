@@ -13,7 +13,9 @@
 #include <Eigen/Dense>
 
 
-#include "../BayesFilter/KalmanFilter/IMUWBKF.h"
+//#include "../BayesFilter/KalmanFilter/IMUWBKF.h"
+
+#include "../../LightKF/LightFilter.h"
 
 namespace plt = matplotlibcpp;
 
@@ -118,20 +120,26 @@ int main() {
 
     }
 
-    auto process_noise_vec = Eigen::Matrix<double, 6, 1>::Ones();
+    Eigen::Matrix<double, 6, 1> process_noise_vec = Eigen::Matrix<double, 6, 1>::Ones();
     process_noise_vec.block(0, 0, 3, 1) = Eigen::Vector3d(1.0, 1.0, 1.0) * 2.0e-3;
     process_noise_vec.block(3, 0, 3, 1) = Eigen::Vector3d(1.0, 1.0, 1.0) * 1.6968e-4;
 
-    auto measurment_noise_vec = Eigen::Matrix<double, 6, 1>::Ones();
-    measurment_noise_vec = measurment_noise_vec * 0.1;
+    Eigen::Matrix<double, 6, 1> measurment_noise_vec = Eigen::Matrix<double, 6, 1>::Ones();
+    measurment_noise_vec = (measurment_noise_vec * 0.1);
 
-    auto initial_probability = Eigen::Matrix<double, 9, 1>::Ones();
-    initial_probability = initial_probability * 0.1;
+    Eigen::Matrix<double, 9, 1> initial_probability = Eigen::Matrix<double, 9, 1>::Ones() * 0.1;
+//    initial_probability = (initial_probability * 0.1);
 
 
-    auto iuFilter = BSE::IMUWBKFBase<6, double>(process_noise_vec,
-                                                measurment_noise_vec,
-                                                initial_probability);
+//    auto iuFilter = LightFilter::ImuEkf<6, double>(
+//            Eigen::Matrix<double, 6, 6>::Identity() * process_noise_vec,
+//            Eigen::Matrix<double, 6, 6>::Identity() * measurment_noise_vec,
+//            Eigen::Matrix<double, 9, 9>::Identity() * initial_probability);
+
+    auto iuFilter = LightFilter::ImuEkf<6, double>(
+            Eigen::Matrix<double, 9, 9>::Identity() ,
+            Eigen::Matrix<double, 6, 6>::Identity() ,
+            Eigen::Matrix<double, 9, 9>::Identity());
 
 
     plt::show(true);
