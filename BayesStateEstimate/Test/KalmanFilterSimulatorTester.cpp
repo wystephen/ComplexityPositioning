@@ -112,6 +112,7 @@ int main() {
         plt::title("2d trace");
         plt::plot(pos_vec_vec[0], pos_vec_vec[1]);
         plt::grid(true);
+
     }
 
 
