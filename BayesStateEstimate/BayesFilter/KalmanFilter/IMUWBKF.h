@@ -51,6 +51,13 @@ namespace BSE {
 
         }
 
+        /**
+         * initial own pose.
+         * @param imu_data
+         * @param initial_ori
+         * @param initial_pos
+         * @return
+         */
         bool initial_state(Eigen::MatrixXd imu_data,
                            double initial_ori = 0.0,
                            Eigen::Vector3d initial_pos = Eigen::Vector3d(0, 0, 0)
