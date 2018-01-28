@@ -5,12 +5,29 @@
 
 #include <iostream>
 #include <fstream>
-
-
 #include <thread>
+
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
+
 
 #include "AWF.h"
 
+
+
+/**
+ *  process the imu data according to the typical sensor model
+ * @param imu_data
+ */
+void processImuData(Eigen::MatrixXd &imu_data){
+//    Eigen::MatrixXd tmp_data = imu_data.;
+    Eigen::MatrixXd tmp_data(imu_data);
+
+    imu_data.block(0,0,imu_data.rows(),1) = tmp_data.block(0,0,imu_data.rows(),1) *1.0;
+
+    imu_data.block()
+
+}
 
 int main(int argc, char *argv[]) {
     // parameters
@@ -33,6 +50,8 @@ int main(int argc, char *argv[]) {
 
 
     //process
+
+
 
 
 
