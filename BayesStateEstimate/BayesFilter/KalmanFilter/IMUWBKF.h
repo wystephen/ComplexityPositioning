@@ -6,7 +6,7 @@
 #define COMPLEXITYPOSITIONING_IMUWBKF_H
 
 
-#include "KalmanFilterNonLinearBase.h"
+#include "KalmanFilterBase.h"
 
 namespace BSE {
 
@@ -16,33 +16,49 @@ namespace BSE {
      * @tparam time_interval
      */
     class IMUWBKFBase :
-            public KalmanFilterNonLinearBase {
+            public KalmanFilterBase {
     public:
         IMUWBKFBase(const Eigen::MatrixXd &process_noise_vec,
                     const Eigen::MatrixXd &measurement_noise_vec,
                     const Eigen::MatrixXd &initial_probability_vec) :
-                KalmanFilterNonLinearBase(
+                KalmanFilterBase(
                         process_noise_vec, measurement_noise_vec, initial_probability_vec) {
             /**
              * define state transaction equation
              */
-            *(StateTransactionEquationMap[0]) = ([&](decltype(A_) &A,
-                                                     decltype(B_) &B,
-                                                     decltype(state_) &X,
-                                                     decltype(input_) &input) {
+            StateTransactionEquationMap.insert(0, ([&](Eigen::MatrixXd &state,
+                                                       Eigen::MatrixXd &state_prob,
+                                                       Eigen::MatrixXd &input,
+                                                       Eigen::MatrixXd &cov_input) {
 
 
                 return;
-            });
+            }));
+
+
+            MeasurementEquationMap.insert(0, ([&](
+                    Eigen::MatrixXd &state,
+                    Eigen::MatrixXd &state_prob,
+                    Eigen::MatrixXd &m,
+                    Eigen::MatrixXd &cov_m,
+                    Eigen::MatrixXd &dx
+
+            ) {
+
+                return;
+            }));
 
 
         }
 
-        bool initial_state(Eigen::MatrixXd data) {
+        bool initial_state(Eigen::MatrixXd imu_data,
+                           double initial_ori = 0.0,
+                           Eigen::Vector3d initial_pos = Eigen::Vector3d(0, 0, 0)
+        ) {
             long double f_u(0.0), f_v(0.0), f_w(0.0);
-            f_u = data.col(0).mean();
-            f_v = data.col(1).mean();
-            f_w = data.col(2).mean();
+            f_u = imu_data.col(0).mean();
+            f_v = imu_data.col(1).mean();
+            f_w = imu_data.col(2).mean();
 
             double roll = std::atan(f_v / f_w);
             double pitch = -std::asin(f_u /

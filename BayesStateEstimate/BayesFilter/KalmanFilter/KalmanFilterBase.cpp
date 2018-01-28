@@ -2,16 +2,16 @@
 // Created by steve on 18-1-26.
 //
 
-#include "KalmanFilterNonLinearBase.h"
+#include "KalmanFilterBase.h"
 
 namespace BSE {
-    bool KalmanFilterNonLinearBase::StateTransaction(const Eigen::MatrixXd &input,
+    bool KalmanFilterBase::StateTransaction(const Eigen::MatrixXd &input,
                                                      const Eigen::MatrixXd &cov_input) {
         return StateTransaction(input, cov_input, 0);
 
     }
 
-    bool KalmanFilterNonLinearBase::StateTransaction(const Eigen::MatrixXd &input,
+    bool KalmanFilterBase::StateTransaction(const Eigen::MatrixXd &input,
                                                      const Eigen::MatrixXd &cov_input,
                                                      int methodType) {
         try {
@@ -43,12 +43,12 @@ namespace BSE {
         }
     }
 
-    bool KalmanFilterNonLinearBase::MeasurementState(const Eigen::MatrixXd &m,
+    bool KalmanFilterBase::MeasurementState(const Eigen::MatrixXd &m,
                                                      const Eigen::MatrixXd &cov_m) {
         return MeasurementState(m, cov_m, 0);
     }
 
-    bool KalmanFilterNonLinearBase::MeasurementState(const Eigen::MatrixXd &m,
+    bool KalmanFilterBase::MeasurementState(const Eigen::MatrixXd &m,
                                                      const Eigen::Matrix &cov_m,
                                                      int methodType = 0) {
         try {

@@ -14,14 +14,14 @@
 #include "../BayesFilter.h"
 
 namespace BSE {
-    class KalmanFilterNonLinearBase :
+    class KalmanFilterBase :
             public BayesFilter {
     public:
 
 
-        KalmanFilterNonLinearBase(const Eigen::MatrixXd &process_noise_vec,
-                                  const Eigen::MatrixXd &measurement_noise_vec,
-                                  const Eigen::MatrixXd &initial_probability_vec) :
+        KalmanFilterBase(const Eigen::MatrixXd &process_noise_vec,
+                         const Eigen::MatrixXd &measurement_noise_vec,
+                         const Eigen::MatrixXd &initial_probability_vec) :
                 BayesFilter() {
 
         }
@@ -68,14 +68,14 @@ namespace BSE {
                                          Eigen::MatrixXd &,//state probability
                                          Eigen::MatrixXd &,//input
                                          Eigen::MatrixXd &// cov input
-        )> *> StateTransactionEquationMap = {};
+        )> > StateTransactionEquationMap = {};
 
         std::map<int, std::function<void(Eigen::MatrixXd &,//state
                                          Eigen::MatrixXd &,//state probability
                                          Eigen::MatrixXd &,//measurement
                                          Eigen::MatrixXd &,// cov measurement
                                          Eigen::MatrixXd &// dx
-        )> *> MeasurementEquationMap = {};
+        )> > MeasurementEquationMap = {};
         /**
          * Setter and getter for A,B&C.
          */
