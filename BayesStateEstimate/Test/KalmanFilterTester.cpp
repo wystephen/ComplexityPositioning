@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     auto uwb_data = uwb_file.extractDoulbeMatrix(",");
     auto beacon_set_data = uwb_file.extractDoulbeMatrix(",");
 
-    assert(beacon_set_data.rows()==(uwb_data.cols()-1));
+    assert(beacon_set_data.rows() == (uwb_data.cols() - 1));
 
     //process
     processImuData(left_imu_data);
@@ -63,18 +63,26 @@ int main(int argc, char *argv[]) {
     processImuData(head_imu_data);
 
     Eigen::MatrixXd process_noise_matrix =
-            Eigen::MatrixXd::Identity(6,6);
-    process_noise_matrix.block(0,0,3,3) *= 0.01;
-    process_noise_matrix.block(3,3,3,3) *= (0.01 *M_PI/180.0);
+            Eigen::MatrixXd::Identity(6, 6);
+    process_noise_matrix.block(0, 0, 3, 3) *= 0.01;
+    process_noise_matrix.block(3, 3, 3, 3) *= (0.01 * M_PI / 180.0);
 
-    Eigen::MatrixXd measurement_noise_matrix = Eigen::MatrixXd::Identity(uwb_data.cols()-1,uwb_data.cols()-1);
-
-
-    auto filter = BSE::IMUWBKFBase()
+    Eigen::MatrixXd measurement_noise_matrix = Eigen::MatrixXd::Identity(uwb_data.cols() - 1, uwb_data.cols() - 1);
+    measurement_noise_matrix *= 0.1;
 
 
+    Eigen::MatrixXd initial_prob_matrix = Eigen::MatrixXd::Identity(9, 9);
+    initial_prob_matrix.block(0, 0, 3, 3) *= 0.1;
+    initial_prob_matrix.block(3, 3, 3, 3) * = 0.01;
+    initial_prob_matrix.block(6, 6, 3, 3) *= 0.1 * (M_PI / 180.0);
 
 
+    auto filter = BSE::IMUWBKFBase(process_noise_matrix,
+                                   measurement_noise_matrix,
+                                   initial_prob_matrix);
+
+
+    filter.initial_state(head_imu_data.block(0,1,100,6));
 
 
 }
