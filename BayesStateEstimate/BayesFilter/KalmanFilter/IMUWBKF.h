@@ -75,7 +75,7 @@ namespace BSE {
 //            f_v = imu_data.col(1).mean();
 //            f_w = imu_data.col(2).mean();
             Eigen::Vector3d acc = imu_data.block(0, 0, imu_data.rows(), 3).colwise().mean();
-            double g = acc.norm();
+            auto g = acc.norm();
 
             double roll = std::atan(f_v / f_w);
             double pitch = -std::asin(f_u /
@@ -90,33 +90,70 @@ namespace BSE {
                                       * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
                                       * Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()));
 //                std::cout << typeid(rotate_matrix) << std::endl;
-                return std::abs(g - (rotate_matrix * acc)(2));
+                return std::abs(g + (rotate_matrix * acc)(2));
             };
             auto ge(0.0);
-            for (double tr(-M_PI); tr < M_PI; tr += 0.2 / 180.0 * M_PI) {
-                for (double tp(-M_PI); tp < M_PI; tp += 0.2 / 180.0 * M_PI) {
+//            /**
+//             * initial through grid search.
+//             */
+//            for (double tr(-M_PI); tr < M_PI; tr += 0.2 / 180.0 * M_PI) {
+//                for (double tp(-M_PI); tp < M_PI; tp += 0.2 / 180.0 * M_PI) {
+//
+//                    ge = g_error(tr, tp, initial_ori);
+//                    if (ge < error) {
+//                        error = ge;
+//                        min_roll = tr;
+//                        min_pitch = tp;
+//
+//                    }
+//                }
+//            }
 
-                    ge = g_error(tr, tp, initial_ori);
-                    if (ge < error) {
-                        error = ge;
-                        min_roll = tr;
-                        min_pitch = tp;
+            /**
+             * find initial euler angle through optimization.
+             */
+            double tr(0.0);
+            double tp(0.0);
+            double step_len = 0.05;
+            int iter_counter = 0;
+            double current_error(g_error(tr, tp, initial_ori));
+            while (current_error > 1e-2 && iter_counter < 100) {
 
-                    }
-                }
+                iter_counter++;
+//                tr +=(g_error)
+                double delta_tr = (g_error(tr+step_len,tp,initial_ori)-current_error)/step_len;
+                double delta_tp = (g_error(tr,tp+step_len,initial_ori)-current_error)/step_len;
+                tr-=delta_tr*0.05;
+                tp-=delta_tp*0.05;
+
+                current_error = g_error(tr, tp, initial_ori);
+//                std::cout << iter_counter
+//                          << ":"
+//                          << current_error
+//                          << "{"
+//                          << tr
+//                          << ":"
+//                          << tp
+//                          << "}"
+//                          << std::endl;
             }
+            min_roll = tr;
+            min_pitch = tp;
+
+
 //            std::cout << state_
             state_.block(0, 0, 3, 1) = initial_pos;
             state_.block(3, 0, 3, 1).setZero();
             state_.block(6, 0, 3, 1) = Eigen::Vector3d(min_roll, min_pitch, initial_ori);
 
-            auto rotate_matrix = (Eigen::AngleAxisd(state_(6), Eigen::Vector3d::UnitX())
-                                 * Eigen::AngleAxisd(state_(7), Eigen::Vector3d::UnitY())
-                                 * Eigen::AngleAxisd(state_(8), Eigen::Vector3d::UnitZ()));
-            std::cout << "value angle:" << state_.block(6,0,3,1).transpose() << std::endl;
-            std::cout << "eular angle:" << rotate_matrix.toRotationMatrix().eulerAngles(0,1,2).transpose() << std::endl;
+            auto rotate_q = (Eigen::AngleAxisd(state_(6), Eigen::Vector3d::UnitX())
+                                  * Eigen::AngleAxisd(state_(7), Eigen::Vector3d::UnitY())
+                                  * Eigen::AngleAxisd(state_(8), Eigen::Vector3d::UnitZ()));
+            std::cout << "value angle:" << state_.block(6, 0, 3, 1).transpose() << std::endl;
+            std::cout << "eular angle:" << rotate_q.toRotationMatrix().eulerAngles(0, 1, 2).transpose()
+                      << std::endl;
             std::cout << "before acc:" << acc.transpose() << std::endl;
-            std::cout << "after acc:" << (rotate_matrix * acc).transpose() << std::endl;
+            std::cout << "after acc:" << (rotate_q * acc).transpose() << std::endl;
 
 
         }
@@ -148,6 +185,8 @@ namespace BSE {
 
     protected:
         double time_interval_ = 0.05;
+
+        Eigen::Quaterniond rotate_q = Eigen::Quaterniond().setIdentity();
 
 
     };
