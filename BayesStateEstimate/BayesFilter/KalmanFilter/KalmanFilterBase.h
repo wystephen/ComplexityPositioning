@@ -67,8 +67,8 @@ namespace BSE {
     protected:
         std::map<int, std::function<void(Eigen::MatrixXd &,//state
                                          Eigen::MatrixXd &,//state probability
-                                         Eigen::MatrixXd &,//input (included input data and auxiliary data)
-                                         Eigen::MatrixXd &// cov input
+                                         const Eigen::MatrixXd &,//input (included input data and auxiliary data)
+                                         const Eigen::MatrixXd &// cov input
         )> > StateTransactionEquationMap = {};
 
         std::map<int, std::function<void(Eigen::MatrixXd &,//state
@@ -76,7 +76,7 @@ namespace BSE {
                                          Eigen::MatrixXd &,//measurement
                                          Eigen::MatrixXd &,// cov measurement
                                          Eigen::MatrixXd &// dx
-        )> > MeasurementEquationMap = {};
+        )>> MeasurementEquationMap = {};
         /**
          * Setter and getter for A,B&C.
          */

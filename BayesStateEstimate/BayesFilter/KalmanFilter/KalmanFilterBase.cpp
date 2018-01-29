@@ -6,18 +6,18 @@
 
 namespace BSE {
     bool KalmanFilterBase::StateTransaction(const Eigen::MatrixXd &input,
-                                                     const Eigen::MatrixXd &cov_input) {
+                                            const Eigen::MatrixXd &cov_input) {
         return StateTransaction(input, cov_input, 0);
 
     }
 
     bool KalmanFilterBase::StateTransaction(const Eigen::MatrixXd &input,
-                                                     const Eigen::MatrixXd &cov_input,
-                                                     int methodType) {
+                                            const Eigen::MatrixXd &cov_input,
+                                            int methodType) {
         try {
             if (StateTransactionEquationMap.count(methodType) > 0) {
-                StateTransactionEquationMap.at(methodType)( state_, state_probability_,
-                                                            input,cov_input);
+                auto f = StateTransactionEquationMap.at(methodType);
+                f(state_, state_probability_, input, cov_input);
                 state_probability_ = A_ * state_probability_ * A_.transpose() + Q_;
                 return true;
             } else {
@@ -45,13 +45,13 @@ namespace BSE {
     }
 
     bool KalmanFilterBase::MeasurementState(const Eigen::MatrixXd &m,
-                                                     const Eigen::MatrixXd &cov_m) {
-        return MeasurementState(m, cov_m, 0);
+                                            const Eigen::MatrixXd &cov_m) {
+        return MeasurementState(m, cov_m,0);
     }
 
     bool KalmanFilterBase::MeasurementState(const Eigen::MatrixXd &m,
-                                                     const Eigen::Matrix &cov_m,
-                                                     int methodType = 0) {
+                                            const Eigen::MatrixXd &cov_m,
+                                            int methodType =0) {
         try {
             if (MeasurementEquationMap.count(methodType) > 0) {
                 MeasurementEquationMap.at(methodType)(H_, state_, m, dX_);
