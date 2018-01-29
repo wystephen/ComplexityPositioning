@@ -7,6 +7,7 @@
 
 
 #include "KalmanFilterBase.h"
+#include "KalmanFilterBase.cpp"
 
 namespace BSE {
 
@@ -26,17 +27,17 @@ namespace BSE {
             /**
              * define state transaction equation
              */
-            StateTransactionEquationMap.insert(0, ([&](Eigen::MatrixXd &state,
-                                                       Eigen::MatrixXd &state_prob,
-                                                       Eigen::MatrixXd &input,
-                                                       Eigen::MatrixXd &cov_input) {
+            StateTransactionEquationMap.insert({0, ([&](Eigen::MatrixXd &state,
+                                                        Eigen::MatrixXd &state_prob,
+                                                        Eigen::MatrixXd &input,
+                                                        Eigen::MatrixXd &cov_input) {
 
 
                 return;
-            }));
+            })});
 
 
-            MeasurementEquationMap.insert(0, ([&](
+            MeasurementEquationMap.insert({0, ([&](
                     Eigen::MatrixXd &state,
                     Eigen::MatrixXd &state_prob,
                     Eigen::MatrixXd &m,
@@ -46,7 +47,7 @@ namespace BSE {
             ) {
 
                 return;
-            }));
+            })});
 
 
         }

@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
 
     Eigen::MatrixXd initial_prob_matrix = Eigen::MatrixXd::Identity(9, 9);
     initial_prob_matrix.block(0, 0, 3, 3) *= 0.1;
-    initial_prob_matrix.block(3, 3, 3, 3) * = 0.01;
+    initial_prob_matrix.block(3, 3, 3, 3) *= 0.01;
     initial_prob_matrix.block(6, 6, 3, 3) *= 0.1 * (M_PI / 180.0);
 
 

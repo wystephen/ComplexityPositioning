@@ -12,6 +12,7 @@
 #include <Eigen/Dense>
 
 #include "../BayesFilter.h"
+#include "../BayesFilter.cpp"
 
 namespace BSE {
     class KalmanFilterBase :
