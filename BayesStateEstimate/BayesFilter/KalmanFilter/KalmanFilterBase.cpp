@@ -16,7 +16,7 @@ namespace BSE {
                                                      int methodType) {
         try {
             if (StateTransactionEquationMap.count(methodType) > 0) {
-                (StateTransactionEquationMap[methodType])(A_, B_, state_, input);
+                StateTransactionEquationMap[methodType](A_, B_, state_, input);
                 state_probability_ = A_ * state_probability_ * A_.transpose() + Q_;
                 return true;
             } else {

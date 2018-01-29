@@ -67,7 +67,7 @@ namespace BSE {
     protected:
         std::map<int, std::function<void(Eigen::MatrixXd &,//state
                                          Eigen::MatrixXd &,//state probability
-                                         Eigen::MatrixXd &,//input
+                                         Eigen::MatrixXd &,//input (included input data and auxiliary data)
                                          Eigen::MatrixXd &// cov input
         )> > StateTransactionEquationMap = {};
 
