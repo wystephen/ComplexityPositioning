@@ -46,21 +46,23 @@ namespace BSE {
 
     bool KalmanFilterBase::MeasurementState(const Eigen::MatrixXd &m,
                                             const Eigen::MatrixXd &cov_m) {
-        return MeasurementState(m, cov_m,0);
+        return MeasurementState(m, cov_m, 0);
     }
 
     bool KalmanFilterBase::MeasurementState(const Eigen::MatrixXd &m,
                                             const Eigen::MatrixXd &cov_m,
-                                            int methodType =0) {
+                                            int methodType) {
         try {
             if (MeasurementEquationMap.count(methodType) > 0) {
-                MeasurementEquationMap.at(methodType)(H_, state_, m, dX_);
+                auto f = MeasurementEquationMap.at(methodType);
+                f(state_, state_probability_, m, cov_m, dX_);
 
                 K_ = state_probability_ * H_.transpose() *
                      (H_ * state_probability_ * H_.transpose()).inverse();
 
                 state_probability_ =
-                        (Eigen::MatrixXd::Identity(state_probability_.rows(), state_probability_.cols()) - (K_ * H_))
+                        (Eigen::MatrixXd::Identity(state_probability_.rows(), state_probability_.cols())
+                         - (K_ * H_))
                         * state_probability_;
                 return true;
 

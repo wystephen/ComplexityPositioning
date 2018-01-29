@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     auto right_imu_data = right_foot_file.extractDoulbeMatrix(",");
     auto head_imu_data = head_imu_file.extractDoulbeMatrix(",");
     auto uwb_data = uwb_file.extractDoulbeMatrix(",");
-    auto beacon_set_data = uwb_file.extractDoulbeMatrix(",");
+    auto beacon_set_data = beacon_set_file.extractDoulbeMatrix(",");
 
     assert(beacon_set_data.rows() == (uwb_data.cols() - 1));
 
@@ -77,12 +77,15 @@ int main(int argc, char *argv[]) {
     initial_prob_matrix.block(6, 6, 3, 3) *= 0.1 * (M_PI / 180.0);
 
 
-    auto filter = BSE::IMUWBKFBase(process_noise_matrix,
-                                   measurement_noise_matrix,
-                                   initial_prob_matrix);
+    auto time_begin = AWF::getDoubleSecondTime();
+    auto filter = BSE::IMUWBKFBase(
+            initial_prob_matrix);
 
 
-    filter.initial_state(head_imu_data.block(0,1,100,6));
+
+    filter.initial_state(head_imu_data.block(0, 1, 100, 6));
+    std::cout << "costed time :" << AWF::getDoubleSecondTime()-time_begin
+                                 << std::endl;
 
 
 }

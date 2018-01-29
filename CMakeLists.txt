@@ -78,6 +78,7 @@ include_directories(
         ${GTSAM_INCLUDE_DIR}
         /home/steve/Code/AlgorithmWorkFlowTools/
         ${PYTHON_INCLUDE_DIRS}
+        ./BayesStateEstimate/
 )
 
 link_directories(

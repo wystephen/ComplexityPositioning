@@ -23,7 +23,7 @@ namespace BSE {
          * @return
          */
         virtual bool StateTransaction(const Eigen::MatrixXd &input,
-                                      const Eigen::MatrixXd &input_cov);
+                                      const Eigen::MatrixXd &input_cov)= 0;
 
         /**
          * use measurement equation update the probability and value of system state.
@@ -31,7 +31,7 @@ namespace BSE {
          * @return
          */
         virtual bool MeasurementState(const Eigen::MatrixXd &m,
-                                      const Eigen::MatrixXd &cov_m);
+                                      const Eigen::MatrixXd &cov_m)=0;
 
 
 //// Might be define as iterator the measurement minimize the linearization error

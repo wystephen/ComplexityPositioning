@@ -20,11 +20,12 @@ namespace BSE {
     public:
 
 
-        KalmanFilterBase(const Eigen::MatrixXd &process_noise_vec,
-                         const Eigen::MatrixXd &measurement_noise_vec,
-                         const Eigen::MatrixXd &initial_probability_vec) :
+        KalmanFilterBase(const Eigen::MatrixXd &initial_probability_vec) :
                 BayesFilter() {
-
+            auto state_number = initial_probability_vec.rows();
+            state_.resize(state_number, 1);
+            state_probability_ = Eigen::MatrixXd::Identity(state_number, state_number)
+                                 * initial_probability_vec;
         }
 
 
@@ -73,8 +74,8 @@ namespace BSE {
 
         std::map<int, std::function<void(Eigen::MatrixXd &,//state
                                          Eigen::MatrixXd &,//state probability
-                                         Eigen::MatrixXd &,//measurement
-                                         Eigen::MatrixXd &,// cov measurement
+                                         const Eigen::MatrixXd &,//measurement
+                                         const Eigen::MatrixXd &,// cov measurement
                                          Eigen::MatrixXd &// dx
         )>> MeasurementEquationMap = {};
         /**
