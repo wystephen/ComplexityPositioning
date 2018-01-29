@@ -27,7 +27,7 @@ namespace BSE {
             /**
              * define state transaction equation
              */
-            StateTransactionEquationMap.insert({0, ([&](Eigen::MatrixXd &state,
+            StateTransactionEquationMap.insert({0, ([](Eigen::MatrixXd &state,
                                                         Eigen::MatrixXd &state_prob,
                                                         Eigen::MatrixXd &input,
                                                         Eigen::MatrixXd &cov_input) {
@@ -37,7 +37,7 @@ namespace BSE {
             })});
 
 
-            MeasurementEquationMap.insert({0, ([&](
+            MeasurementEquationMap.insert({0, ([](
                     Eigen::MatrixXd &state,
                     Eigen::MatrixXd &state_prob,
                     Eigen::MatrixXd &m,

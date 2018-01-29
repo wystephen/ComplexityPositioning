@@ -16,7 +16,8 @@ namespace BSE {
                                                      int methodType) {
         try {
             if (StateTransactionEquationMap.count(methodType) > 0) {
-                StateTransactionEquationMap[methodType](A_, B_, state_, input);
+                StateTransactionEquationMap.at(methodType)( state_, state_probability_,
+                                                            input,cov_input);
                 state_probability_ = A_ * state_probability_ * A_.transpose() + Q_;
                 return true;
             } else {
@@ -53,7 +54,7 @@ namespace BSE {
                                                      int methodType = 0) {
         try {
             if (MeasurementEquationMap.count(methodType) > 0) {
-                MeasurementEquationMap[methodType].(H_, state_, m, dX_);
+                MeasurementEquationMap.at(methodType)(H_, state_, m, dX_);
 
                 K_ = state_probability_ * H_.transpose() *
                      (H_ * state_probability_ * H_.transpose()).inverse();
