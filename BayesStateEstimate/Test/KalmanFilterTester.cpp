@@ -49,11 +49,11 @@ int main(int argc, char *argv[]) {
             uwb_file(dir_name + "uwb_result.csv"),
             beacon_set_file(dir_name + "beaconSet.csv");
 
-    auto left_imu_data = left_foot_file.extractDoulbeMatrix(",");
-    auto right_imu_data = right_foot_file.extractDoulbeMatrix(",");
-    auto head_imu_data = head_imu_file.extractDoulbeMatrix(",");
-    auto uwb_data = uwb_file.extractDoulbeMatrix(",");
-    auto beacon_set_data = beacon_set_file.extractDoulbeMatrix(",");
+    Eigen::MatrixXd left_imu_data = left_foot_file.extractDoulbeMatrix(",");
+    Eigen::MatrixXd right_imu_data = right_foot_file.extractDoulbeMatrix(",");
+    Eigen::MatrixXd head_imu_data = head_imu_file.extractDoulbeMatrix(",");
+    Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
+    Eigen::MatrixXd beacon_set_data = beacon_set_file.extractDoulbeMatrix(",");
 
     assert(beacon_set_data.rows() == (uwb_data.cols() - 1));
 
@@ -82,17 +82,25 @@ int main(int argc, char *argv[]) {
             initial_prob_matrix);
 
 
-
     filter.initial_state(head_imu_data.block(0, 1, 100, 6));
-    std::cout << "costed time :" << AWF::getDoubleSecondTime()-time_begin
-                                 << std::endl;
+    std::cout << "costed time :" << AWF::getDoubleSecondTime() - time_begin
+              << std::endl;
 
-    std::vector<std::vector<double>> pose = {{},{},{}};
-    std::vector<std::vector<double>> velocity = {{},{},{}};
-    std::vector<std::vector<double>> angle = {{},{},{}};
+    std::vector<std::vector<double>> pose = {{},
+                                             {},
+                                             {}};
+    std::vector<std::vector<double>> velocity = {{},
+                                                 {},
+                                                 {}};
+    std::vector<std::vector<double>> angle = {{},
+                                              {},
+                                              {}};
 
 //    filter.sett
-    for(int i(0);left_imu_data(i,0)-left_imu_data(0,0)<2.0;++i){
+    for (int i(0); (left_imu_data(i, 0) - left_imu_data(0, 0)) < 2.0; ++i) {
+        filter.StateTransaction(left_imu_data.block(i,1,1,6).transpose(),
+                                process_noise_matrix,
+        BSE::IMUMethodType::NormalRotation);
 
     }
 

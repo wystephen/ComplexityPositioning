@@ -18,7 +18,7 @@ namespace BSE {
             if (StateTransactionEquationMap.count(methodType) > 0) {
                 auto f = StateTransactionEquationMap.at(methodType);
                 f(state_, state_probability_, input, cov_input);
-                state_probability_ = A_ * state_probability_ * A_.transpose() + Q_;
+//                state_probability_ = A_ * state_probability_ * A_.transpose() + Q_;
                 return true;
             } else {
                 std::cout << "method type [" << methodType
@@ -60,10 +60,10 @@ namespace BSE {
                 K_ = state_probability_ * H_.transpose() *
                      (H_ * state_probability_ * H_.transpose()).inverse();
 
-                state_probability_ =
-                        (Eigen::MatrixXd::Identity(state_probability_.rows(), state_probability_.cols())
-                         - (K_ * H_))
-                        * state_probability_;
+//                state_probability_ =
+//                        (Eigen::MatrixXd::Identity(state_probability_.rows(), state_probability_.cols())
+//                         - (K_ * H_))
+//                        * state_probability_;
                 return true;
 
             } else {

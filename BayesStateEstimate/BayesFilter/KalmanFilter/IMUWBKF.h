@@ -62,7 +62,7 @@ namespace BSE {
                          }
 //                input.block(0, 0, 3, 1) = acc;
 //                input.block(3, 0, 3, 1) = gyr;
-                         auto euler_func = [&rotate_q](Eigen::Vector3d angle){
+                         auto euler_func = [&](Eigen::Vector3d angle){
 //                             return rotate_q
                              auto tmp_q =  Eigen::AngleAxisd(angle(0), Eigen::Vector3d::UnitX())
                                           *
@@ -76,7 +76,10 @@ namespace BSE {
                          Eigen::Vector3d gravity_g(0, 0, 9.81);
                          Eigen::Vector3d linear_acc = rotate_q * acc + gravity_g;
                          std::cout << "linear_acc:" << linear_acc.transpose() << std::endl;
-                         input.block(0, 0, 3, 1) = linear_acc;
+//                         input.block(0, 0, 3, 1) = linear_acc;
+                         auto converted_input = input;
+                         converted_input.block(0,0,3,1) = linear_acc;
+                         converted_input.block(3,0,3,1) = gyr;
 
 //                state.block
                          Eigen::MatrixXd A_ = Eigen::MatrixXd::Zero(9, 9);
@@ -98,10 +101,10 @@ namespace BSE {
                              B_.block(6,3+i,3,1) = (euler_func(t_angle)-euler_func(gyr))/(t_angle(i)-gyr(i));
                          }
 
-                         state = A_ * state + B_ * input;
+                         state = A_ * state + B_ * converted_input;
 //                         state_prob =
 //                         Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(cov_input)
-                         state_prob = A_ * state_prob * A_.transpose() + B_ * cov_input;
+                         state_prob = A_ * state_prob * A_.transpose() + B_ * cov_input * B_.transpose();
 
 
                          return;
