@@ -38,6 +38,21 @@ void processImuData(Eigen::MatrixXd &imu_data) {
     return;
 }
 
+
+
+
+auto euler_func = [&](Eigen::Vector3d angle){
+//                             return rotate_q
+    auto tmp_q =  Eigen::AngleAxisd(angle(0), Eigen::Vector3d::UnitX())
+                  *
+                  Eigen::AngleAxisd(angle(1), Eigen::Vector3d::UnitY())
+                  * Eigen::AngleAxisd(angle(2),
+                                      Eigen::Vector3d::UnitZ());
+    tmp_q = tmp_q * rotate_q;
+    return tmp_q.toRotationMatrix().eulerAngles(0,1,2);
+};
+
+
 int main(int argc, char *argv[]) {
     // parameters
     std::string dir_name = "/home/steve/Data/FusingLocationData/0014/";
@@ -84,7 +99,7 @@ int main(int argc, char *argv[]) {
             initial_prob_matrix);
 
 
-    filter.initial_state(head_imu_data.block(0, 1, 100, 6));
+    filter.initial_state(left_imu_data.block(0, 1, 100, 6));
     std::cout << "costed time :" << AWF::getDoubleSecondTime() - time_begin
               << std::endl;
 
@@ -99,10 +114,10 @@ int main(int argc, char *argv[]) {
                                               {}};
 
 //    filter.sett
-    for (int i(0); (left_imu_data(i, 0) - left_imu_data(0, 0)) < 2.0; ++i) {
+    for (int i(5); (left_imu_data(i, 0) - left_imu_data(0, 0)) < 100.0; ++i) {
         filter.StateTransaction(left_imu_data.block(i,1,1,6).transpose(),
                                 process_noise_matrix,
-        BSE::IMUMethodType::NormalRotation);
+        BSE::StateTransactionMethodType::NormalRotation);
 
         Eigen::VectorXd state = filter.getState_();
         std::cout << state.transpose() << std::endl;

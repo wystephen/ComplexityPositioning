@@ -15,12 +15,13 @@
 #include <Eigen/Geometry>
 
 namespace BSE {
-    enum IMUMethodType {
+    enum StateTransactionMethodType {
         NormalRotation = 0
     };
 
-    enum UWBMethodType {
-        NormalUwbMeasuremnt = 0
+    enum MeasurementMethodType {
+        NormalUwbMeasuremnt = 0,
+        NormalZeroVeclotiMeasurement = 1
     };
 
     /**
@@ -42,40 +43,43 @@ namespace BSE {
              * define state transaction equation
              */
             StateTransactionEquationMap.insert(
-                    {IMUMethodType::NormalRotation,
+                    {StateTransactionMethodType::NormalRotation,
                      ([&](Eigen::MatrixXd &state,
                           Eigen::MatrixXd &state_prob,
                           const Eigen::MatrixXd &input,
                           const Eigen::MatrixXd &cov_input) {
                          Eigen::Vector3d acc(input.block(0, 0, 3, 1));
                          Eigen::Vector3d gyr(input.block(3, 0, 3, 1)*time_interval_);
+                         std::cout << "before imu:" << (rotate_q_ * acc).transpose() << std::endl;
 
 
-                         if (gyr.norm() > 1e-8) {
-//                    rotate_q =
-                             auto tmp_q = Eigen::AngleAxisd(gyr(0), Eigen::Vector3d::UnitX())
+                         if (gyr.norm() > 1e-18) {
+                             Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(gyr(0), Eigen::Vector3d::UnitX())
                                           *
                                           Eigen::AngleAxisd(gyr(1), Eigen::Vector3d::UnitY())
                                           * Eigen::AngleAxisd(gyr(2),
                                                               Eigen::Vector3d::UnitZ());
-                             rotate_q =  tmp_q.inverse() * rotate_q;
+//                             rotate_q_ =  tmp_q * rotate_q_;
+                             rotate_q_ =  rotate_q_ * tmp_q;
+                             rotate_q_.normalize();
 
                          }
 
 
                          auto euler_func = [&](Eigen::Vector3d angle){
-//                             return rotate_q
+//                             return rotate_q_
                              auto tmp_q =  Eigen::AngleAxisd(angle(0), Eigen::Vector3d::UnitX())
                                            *
                                            Eigen::AngleAxisd(angle(1), Eigen::Vector3d::UnitY())
                                            * Eigen::AngleAxisd(angle(2),
                                                                Eigen::Vector3d::UnitZ());
-                             tmp_q = tmp_q * rotate_q;
+//                             tmp_q = tmp_q * rotate_q_;
+                             tmp_q =  rotate_q_ * tmp_q;
                              return tmp_q.toRotationMatrix().eulerAngles(0,1,2);
                          };
-                         Eigen::Vector3d gravity_g(0, 0, -9.52914);
-                         Eigen::Vector3d linear_acc = rotate_q * acc + gravity_g;
-                         std::cout << "acc in navigation frame:" << rotate_q * acc ;
+                         Eigen::Vector3d gravity_g(0, 0, 9.52914);
+                         Eigen::Vector3d linear_acc = rotate_q_ * acc + gravity_g;
+                         std::cout << "acc in navigation frame:" << (rotate_q_ * acc).transpose() ;
                          std::cout << "linear_acc:" << linear_acc.transpose() << std::endl;
 //                         input.block(0, 0, 3, 1) = linear_acc;
                          auto converted_input = input;
@@ -84,15 +88,19 @@ namespace BSE {
 
 //                state.block
                          Eigen::MatrixXd A_ = Eigen::MatrixXd::Zero(9, 9);
+                         // x y z
                          A_.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity();
                          A_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
-                         A_.block(3, 3, 3, 3) = Eigen::Matrix3d::Identity();
+                         // vx vy vz
+                         A_.block(3, 3, 3, 3) = Eigen::Matrix3d::Identity() ;
+                         // wx wy wz
                          A_.block(6, 6, 3, 3) = Eigen::Matrix3d::Identity();
 
                          Eigen::MatrixXd B_ = Eigen::MatrixXd::Zero(9, 6);
-                         B_.block(0, 0, 3, 3) =
-                                 Eigen::Matrix3d::Identity() * 0.5 * time_interval_ *
-                                 time_interval_;
+                         //x =
+//                         B_.block(0, 0, 3, 3) =
+//                                 Eigen::Matrix3d::Identity() * 0.5 * time_interval_ *
+//                                 time_interval_;
                          B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
 
                          double step_len_rate =  0.1;
@@ -103,7 +111,7 @@ namespace BSE {
                          }
 
                          state = A_ * state + B_ * converted_input;
-                         state.block(6,0,3,1) = rotate_q.toRotationMatrix().eulerAngles(0,1,2);
+                         state.block(6,0,3,1) = rotate_q_.toRotationMatrix().eulerAngles(0,1,2);
 //                         state_prob =
 //                         Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(cov_input)
                          state_prob = A_ * state_prob * A_.transpose() + B_ * cov_input * B_.transpose();
@@ -113,7 +121,7 @@ namespace BSE {
                      })});
 
 
-            MeasurementEquationMap.insert({0, ([&](
+            MeasurementEquationMap.insert({MeasurementMethodType::NormalZeroVeclotiMeasurement, ([&](
                     Eigen::MatrixXd &state,
                     Eigen::MatrixXd &state_prob,
                     const Eigen::MatrixXd &m,
@@ -153,7 +161,7 @@ namespace BSE {
             double min_roll(0.0), min_pitch(0.0);
             double error = 10000.0;
 
-            auto g_error = [&g, &acc](double roll, double pitch, double yaw) -> double {
+            auto g_error = [g, acc](double roll, double pitch, double yaw) -> double {
 
                 auto rotate_matrix = (Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX())
                                       * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
@@ -162,21 +170,7 @@ namespace BSE {
                 return std::abs(g + (rotate_matrix * acc)(2));
             };
             auto ge(0.0);
-//            /**
-//             * initial through grid search.
-//             */
-//            for (double tr(-M_PI); tr < M_PI; tr += 0.2 / 180.0 * M_PI) {
-//                for (double tp(-M_PI); tp < M_PI; tp += 0.2 / 180.0 * M_PI) {
 //
-//                    ge = g_error(tr, tp, initial_ori);
-//                    if (ge < error) {
-//                        error = ge;
-//                        min_roll = tr;
-//                        min_pitch = tp;
-//
-//                    }
-//                }
-//            }
 
             /**
              * find initial euler angle through optimization.
@@ -184,27 +178,31 @@ namespace BSE {
             double tr(0.0);
             double tp(0.0);
             double step_len = 0.05;
+            double update_rate = 0.5;
             int iter_counter = 0;
             double current_error(g_error(tr, tp, initial_ori));
-            while (current_error > 1e-2 && iter_counter < 100) {
+            while (current_error > 1e-5 && iter_counter < 3000) {
 
                 iter_counter++;
 //                tr +=(g_error)
                 double delta_tr = (g_error(tr + step_len, tp, initial_ori) - current_error) / step_len;
                 double delta_tp = (g_error(tr, tp + step_len, initial_ori) - current_error) / step_len;
-                tr -= delta_tr * 0.05;
-                tp -= delta_tp * 0.05;
+                tr -= delta_tr * update_rate;
+                tp -= delta_tp * update_rate;
+                if(update_rate>0.0000001){
+                    update_rate *= 0.9;
+                }
 
                 current_error = g_error(tr, tp, initial_ori);
-//                std::cout << iter_counter
-//                          << ":"
-//                          << current_error
-//                          << "{"
-//                          << tr
-//                          << ":"
-//                          << tp
-//                          << "}"
-//                          << std::endl;
+                std::cout << iter_counter
+                          << ":"
+                          << current_error
+                          << "{"
+                          << tr
+                          << ":"
+                          << tp
+                          << "}"
+                          << std::endl;
             }
             min_roll = tr;
             min_pitch = tp;
@@ -215,14 +213,14 @@ namespace BSE {
             state_.block(3, 0, 3, 1).setZero();
             state_.block(6, 0, 3, 1) = Eigen::Vector3d(min_roll, min_pitch, initial_ori);
 
-            auto rotate_q = (Eigen::AngleAxisd(state_(6), Eigen::Vector3d::UnitX())
-                             * Eigen::AngleAxisd(state_(7), Eigen::Vector3d::UnitY())
-                             * Eigen::AngleAxisd(state_(8), Eigen::Vector3d::UnitZ()));
+            rotate_q_ = (Eigen::AngleAxisd(min_roll, Eigen::Vector3d::UnitX())
+                             * Eigen::AngleAxisd(min_pitch, Eigen::Vector3d::UnitY())
+                             * Eigen::AngleAxisd(initial_ori, Eigen::Vector3d::UnitZ()));
             std::cout << "value angle:" << state_.block(6, 0, 3, 1).transpose() << std::endl;
-            std::cout << "eular angle:" << rotate_q.toRotationMatrix().eulerAngles(0, 1, 2).transpose()
+            std::cout << "eular angle:" << rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2).transpose()
                       << std::endl;
             std::cout << "before acc:" << acc.transpose() << std::endl;
-            std::cout << "after acc:" << (rotate_q * acc).transpose() << std::endl;
+            std::cout << "after acc:" << (rotate_q_ * acc).transpose() << std::endl;
 
 
         }
@@ -260,17 +258,17 @@ namespace BSE {
         }
 
         const Eigen::Quaterniond &getRotate_q() const {
-            return rotate_q;
+            return rotate_q_;
         }
 
         void setRotate_q(const Eigen::Quaterniond &rotate_q) {
-            IMUWBKFBase::rotate_q = rotate_q;
+            IMUWBKFBase::rotate_q_ = rotate_q;
         }
 
     protected:
         double time_interval_ = 0.05;
 
-        Eigen::Quaterniond rotate_q = Eigen::Quaterniond().setIdentity();
+        Eigen::Quaterniond rotate_q_ = Eigen::Quaterniond().setIdentity();
 
 
     };
