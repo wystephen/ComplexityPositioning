@@ -39,18 +39,52 @@ void processImuData(Eigen::MatrixXd &imu_data) {
 }
 
 
+bool GLRT_Detector(Eigen::MatrixXd u) {
+    if (u.cols() == 6 && u.rows() != 6) {
+        u = u.transpose();
+    }
+    assert(u.rows() == 6 || "u must be a 6 rows matrix(each col represent acc and gyro at one moement");
+    Eigen::Vector3d ya_m;
+    double g = 9.8;
+    double sigma_a_ = 0.03;
+    double sigma_g_ = 0.3 * M_PI / 180.0;
+    double ZeroDetectorWindowSize_ = u.rows();
+    double gamma_ = 200;
+
+    double T(0.0);
+
+    for (int i(0); i < 3; ++i) {
+        ya_m(i) = u.block(i, 0, 1, u.cols()).mean();
+    }
+
+    Eigen::Vector3d tmp;
+
+    for (int i(0); i < u.cols(); ++i) {
+
+        tmp = u.block(0, i, 3, 1) - g * ya_m / ya_m.norm();
+        if (std::isnan(tmp.sum())) {
+            std::cout << "nan at tmp in " << __FUNCTION__ << ":"
+                      << __FILE__ << ":" << __LINE__ << std::endl;
+        }
 
 
-auto euler_func = [&](Eigen::Vector3d angle){
-//                             return rotate_q
-    auto tmp_q =  Eigen::AngleAxisd(angle(0), Eigen::Vector3d::UnitX())
-                  *
-                  Eigen::AngleAxisd(angle(1), Eigen::Vector3d::UnitY())
-                  * Eigen::AngleAxisd(angle(2),
-                                      Eigen::Vector3d::UnitZ());
-    tmp_q = tmp_q * rotate_q;
-    return tmp_q.toRotationMatrix().eulerAngles(0,1,2);
-};
+        T += (u.block(3, i, 3, 1).transpose() * u.block(3, i, 3, 1) / sigma_g_ +
+              tmp.transpose() * tmp / sigma_a_).sum();
+
+
+    }
+
+
+    T = T / double(ZeroDetectorWindowSize_);
+
+    if (T < gamma_) {
+        return true;
+
+    } else {
+
+        return false;
+    }
+}
 
 
 int main(int argc, char *argv[]) {
@@ -112,26 +146,37 @@ int main(int argc, char *argv[]) {
     std::vector<std::vector<double>> angle = {{},
                                               {},
                                               {}};
+    std::vector<double> zv_flag = {}; 
 
 //    filter.sett
     for (int i(5); (left_imu_data(i, 0) - left_imu_data(0, 0)) < 100.0; ++i) {
-        filter.StateTransaction(left_imu_data.block(i,1,1,6).transpose(),
+        filter.StateTransaction(left_imu_data.block(i, 1, 1, 6).transpose(),
                                 process_noise_matrix,
-        BSE::StateTransactionMethodType::NormalRotation);
+                                BSE::StateTransactionMethodType::NormalRotation);
+        
+        if (GLRT_Detector(left_imu_data.block(i - 4, 1, 5, 6))) {
+            // zero velocity detector
+            filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
+                                    Eigen::Matrix3d::Identity() * 0.1,
+                                    BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
+            zv_flag.push_back(1.0);
+        }else{
+            zv_flag.push_back(0.0);
+        }
 
         Eigen::VectorXd state = filter.getState_();
         std::cout << state.transpose() << std::endl;
-        for(int j(0);j<3;++j){
+        for (int j(0); j < 3; ++j) {
             pose[j].push_back(state(j));
-            velocity[j].push_back(state(j+3));
-            angle[j].push_back(state(j+6));
+            velocity[j].push_back(state(j + 3));
+            angle[j].push_back(state(j + 6));
         }
 
     }
 
     plt::figure();
-    for(int i(0);i<3;++i){
-        plt::named_plot(std::to_string(i),pose[i]);
+    for (int i(0); i < 3; ++i) {
+        plt::named_plot(std::to_string(i), pose[i]);
     }
     plt::title("pose");
     plt::grid(true);
@@ -139,17 +184,18 @@ int main(int argc, char *argv[]) {
 
 
     plt::figure();
-    for(int i(0);i<3;++i){
-        plt::named_plot(std::to_string(i),velocity[i]);
+    for (int i(0); i < 3; ++i) {
+        plt::named_plot(std::to_string(i), velocity[i]);
     }
     plt::title("vel");
     plt::grid(true);
     plt::legend();
 
     plt::figure();
-    for(int i(0);i<3;++i){
-        plt::named_plot(std::to_string(i),angle[i]);
+    for (int i(0); i < 3; ++i) {
+        plt::named_plot(std::to_string(i), angle[i]);
     }
+    plt::named_plot("zv_falg",zv_flag);
     plt::title("angle");
     plt::grid(true);
     plt::legend();
