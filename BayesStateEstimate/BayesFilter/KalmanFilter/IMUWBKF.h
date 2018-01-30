@@ -49,42 +49,48 @@ namespace BSE {
                           const Eigen::MatrixXd &input,
                           const Eigen::MatrixXd &cov_input) {
                          Eigen::Vector3d acc(input.block(0, 0, 3, 1));
-                         Eigen::Vector3d gyr(input.block(3, 0, 3, 1)*time_interval_);
-                         std::cout << "before imu:" << (rotate_q_ * acc).transpose() << std::endl;
+                         Eigen::Vector3d gyr(input.block(3, 0, 3, 1) * time_interval_);
+                         if (IS_DEBUG) {
+                             std::cout << "before imu:" << (rotate_q_ * acc).transpose() << std::endl;
+                         }
 
 
                          if (gyr.norm() > 1e-18) {
                              Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(gyr(0), Eigen::Vector3d::UnitX())
-                                          *
-                                          Eigen::AngleAxisd(gyr(1), Eigen::Vector3d::UnitY())
-                                          * Eigen::AngleAxisd(gyr(2),
-                                                              Eigen::Vector3d::UnitZ());
+                                                        *
+                                                        Eigen::AngleAxisd(gyr(1), Eigen::Vector3d::UnitY())
+                                                        * Eigen::AngleAxisd(gyr(2),
+                                                                            Eigen::Vector3d::UnitZ());
 //                             rotate_q_ =  tmp_q * rotate_q_;
-                             rotate_q_ =  rotate_q_ * tmp_q;
+                             tmp_q.normalize();
+                             rotate_q_ = rotate_q_ * tmp_q;
                              rotate_q_.normalize();
 
                          }
 
 
-                         auto euler_func = [&](Eigen::Vector3d angle){
+                         auto euler_func = [&](Eigen::Vector3d angle) {
 //                             return rotate_q_
-                             auto tmp_q =  Eigen::AngleAxisd(angle(0), Eigen::Vector3d::UnitX())
-                                           *
-                                           Eigen::AngleAxisd(angle(1), Eigen::Vector3d::UnitY())
-                                           * Eigen::AngleAxisd(angle(2),
-                                                               Eigen::Vector3d::UnitZ());
+                             auto tmp_q = Eigen::AngleAxisd(angle(0), Eigen::Vector3d::UnitX())
+                                          *
+                                          Eigen::AngleAxisd(angle(1), Eigen::Vector3d::UnitY())
+                                          * Eigen::AngleAxisd(angle(2),
+                                                              Eigen::Vector3d::UnitZ());
 //                             tmp_q = tmp_q * rotate_q_;
-                             tmp_q =  rotate_q_ * tmp_q;
-                             return tmp_q.toRotationMatrix().eulerAngles(0,1,2);
+                             tmp_q = rotate_q_ * tmp_q;
+                             tmp_q.normalize();
+                             return tmp_q.toRotationMatrix().eulerAngles(0, 1, 2);
                          };
-                         Eigen::Vector3d gravity_g(0, 0, 9.52914);
+                         Eigen::Vector3d gravity_g(0, 0, local_g_);
                          Eigen::Vector3d linear_acc = rotate_q_ * acc + gravity_g;
-                         std::cout << "acc in navigation frame:" << (rotate_q_ * acc).transpose() ;
-                         std::cout << "linear_acc:" << linear_acc.transpose() << std::endl;
-//                         input.block(0, 0, 3, 1) = linear_acc;
+                         if (IS_DEBUG) {
+                             std::cout << "acc in navigation frame:" << (rotate_q_ * acc).transpose();
+                             std::cout << "linear_acc:" << linear_acc.transpose() << std::endl;
+                         }
+
                          auto converted_input = input;
-                         converted_input.block(0,0,3,1) = linear_acc;
-                         converted_input.block(3,0,3,1) = gyr;
+                         converted_input.block(0, 0, 3, 1) = linear_acc;
+                         converted_input.block(3, 0, 3, 1) = gyr;
 
 //                state.block
                          Eigen::MatrixXd A_ = Eigen::MatrixXd::Zero(9, 9);
@@ -92,34 +98,40 @@ namespace BSE {
                          A_.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity();
                          A_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
                          // vx vy vz
-                         A_.block(3, 3, 3, 3) = Eigen::Matrix3d::Identity() ;
+                         A_.block(3, 3, 3, 3) = Eigen::Matrix3d::Identity();
                          // wx wy wz
                          A_.block(6, 6, 3, 3) = Eigen::Matrix3d::Identity();
 
                          Eigen::MatrixXd B_ = Eigen::MatrixXd::Zero(9, 6);
                          //x =
-//                         B_.block(0, 0, 3, 3) =
-//                                 Eigen::Matrix3d::Identity() * 0.5 * time_interval_ *
-//                                 time_interval_;
+                         B_.block(0, 0, 3, 3) =
+                                 Eigen::Matrix3d::Identity() * 0.5 * time_interval_ *
+                                 time_interval_;
                          B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
+//                         B_.block(3,0,3,3) =
+//                         B_.block()
 
-                         double step_len_rate =  0.1;
-                         for(int i(0);i<3;++i){
+                         double step_len_rate = 0.1;
+                         for (int i(0); i < 3; ++i) {
                              auto t_angle = gyr;
-                             t_angle(i) = gyr(i) *(1+step_len_rate);
+                             t_angle(i) = gyr(i) * (1 + step_len_rate);
 //                             B_.block(6,3+i,3,1) = (euler_func(t_angle)-euler_func(gyr))/(t_angle(i)-gyr(i));
                          }
 
                          state = A_ * state + B_ * converted_input;
-                         state.block(6,0,3,1) = rotate_q_.toRotationMatrix().eulerAngles(0,1,2);
-//                         state_prob =
-//                         Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(cov_input)
-                         std::cout << "state trans P:" << state_prob<< std::endl;
-                         std::cout << " A * P * A^ T " << A_ * state_prob * A_.transpose() << std::endl;
-                         std::cout << "B * cove * B.transpose() " <<  B_ * cov_input * B_.transpose() << std::endl;
+                         state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
+                         if (IS_DEBUG) {
+                             std::cout << "state trans P:" << state_prob << std::endl;
+                             std::cout << " A * P * A^ T " << A_ * state_prob * A_.transpose() << std::endl;
+                             std::cout << "B * cove * B.transpose() " << B_ * cov_input * B_.transpose() << std::endl;
+                         }
+                         // unconverted value
+//                         B_
+//                         cov_input.block(3,0,3,1) = (rotate_q_.toRotationMatrix()) * cov_input.block(3,0,3,1);
+                         B_.block(3,0,3,3) = rotate_q_.toRotationMatrix() * time_interval_;
                          state_prob = A_ * state_prob * A_.transpose() + B_ * cov_input * B_.transpose();
-                         if(std::isnan(state_prob.sum())){
+                         if (std::isnan(state_prob.sum())) {
                              std::cout << "state prob is naa: " << state_prob << std::endl;
                          }
 
@@ -136,47 +148,53 @@ namespace BSE {
                     Eigen::MatrixXd &dx
 
             ) {
-                H_ = Eigen::MatrixXd::Zero(3,9);
-                H_.block(0,3,3,3) = Eigen::Matrix3d::Identity()*1.0;
-                std::cout << H_ << std::endl;
-                std::cout << " p * H^T :" << state_prob * H_.transpose().eval() << std::endl;
-                std::cout << " H * P * H^T + cosv:" << H_ * state_prob * H_.transpose().eval() + cov_m << std::endl;
-                std::cout << "inverse " << (H_*state_prob*H_.transpose().eval()+cov_m).inverse() << std::endl;
+                H_ = Eigen::MatrixXd::Zero(3, 9);
+                H_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * 1.0;
+                if (IS_DEBUG) {
+                    std::cout << H_ << std::endl;
+                    std::cout << " p * H^T :" << state_prob * H_.transpose().eval() << std::endl;
+                    std::cout << " H * P * H^T + cosv:" << H_ * state_prob * H_.transpose().eval() + cov_m << std::endl;
+                    std::cout << "inverse " << (H_ * state_prob * H_.transpose().eval() + cov_m).inverse() << std::endl;
 
-                K_ = (state_prob * H_.transpose().eval()) * (H_*state_prob*H_.transpose().eval()+cov_m).inverse();
-                if(std::isnan(K_.sum())|| std::isinf(K_.sum())){
+                }
+
+                K_ = (state_prob * H_.transpose().eval()) *
+                     (H_ * state_prob * H_.transpose().eval() + cov_m).inverse();
+                if (std::isnan(K_.sum()) || std::isinf(K_.sum())) {
                     std::cout << "K is nana" << std::endl;
                 }
 
                 /*
                  * update probability
                  */
-                state_prob = (Eigen::Matrix<double,9,9>::Identity() - K_ * H_) * state_prob;
-                state_prob = (state_prob + state_prob.transpose().eval())*0.5;
+                state_prob = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * state_prob;
+                state_prob = (state_prob + state_prob.transpose().eval()) * 0.5;
 //                if(state_prob.norm()>10000){
 //                    state_prob/=100.0;
 //                }
-                if(std::isnan(state_prob.sum()) || std::isinf(state_prob.sum())){
+                if (std::isnan(state_prob.sum()) || std::isinf(state_prob.sum())) {
                     std::cout << "state prob has nan" << std::endl;
                 }
 
                 /*
                  * update state
                  */
-                Eigen::MatrixXd tdx = K_ * (m-state.block(3,0,3,1));
+                Eigen::MatrixXd tdx = K_ * (m - state.block(3, 0, 3, 1));
 
                 state += tdx;
 
-                Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(3),Eigen::Vector3d::UnitX())
-                *Eigen::AngleAxisd(tdx(4),Eigen::Vector3d::UnitY())
-                *Eigen::AngleAxisd(tdx(5),Eigen::Vector3d::UnitZ());
-                if(std::isnan(state.sum())){
+                Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(3), Eigen::Vector3d::UnitX())
+                                             * Eigen::AngleAxisd(tdx(4), Eigen::Vector3d::UnitY())
+                                             * Eigen::AngleAxisd(tdx(5), Eigen::Vector3d::UnitZ());
+                if (std::isnan(state.sum())) {
                     std::cout << "some error " << std::endl;
                 }
 
+//                rotate_q_ =  rotate_q_ * delta_q;
 //                rotate_q_ = delta_q * rotate_q_;
 //                state.block(3,0,3,1) = rotate_q_.toRotationMatrix().eulerAngles(0,1,2);
 
+                rotate_q_.normalize();
 
                 return;
             })});
@@ -201,6 +219,7 @@ namespace BSE {
 //            f_w = imu_data.col(2).mean();
             Eigen::Vector3d acc = imu_data.block(0, 0, imu_data.rows(), 3).colwise().mean();
             auto g = acc.norm();
+            local_g_ = g;
 
             double roll = std::atan(f_v / f_w);
             double pitch = -std::asin(f_u /
@@ -237,7 +256,7 @@ namespace BSE {
                 double delta_tp = (g_error(tr, tp + step_len, initial_ori) - current_error) / step_len;
                 tr -= delta_tr * update_rate;
                 tp -= delta_tp * update_rate;
-                if(update_rate>0.0000001){
+                if (update_rate > 0.0000001) {
                     update_rate *= 0.9;
                 }
 
@@ -262,8 +281,8 @@ namespace BSE {
             state_.block(6, 0, 3, 1) = Eigen::Vector3d(min_roll, min_pitch, initial_ori);
 
             rotate_q_ = (Eigen::AngleAxisd(min_roll, Eigen::Vector3d::UnitX())
-                             * Eigen::AngleAxisd(min_pitch, Eigen::Vector3d::UnitY())
-                             * Eigen::AngleAxisd(initial_ori, Eigen::Vector3d::UnitZ()));
+                         * Eigen::AngleAxisd(min_pitch, Eigen::Vector3d::UnitY())
+                         * Eigen::AngleAxisd(initial_ori, Eigen::Vector3d::UnitZ()));
             std::cout << "value angle:" << state_.block(6, 0, 3, 1).transpose() << std::endl;
             std::cout << "eular angle:" << rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2).transpose()
                       << std::endl;
@@ -314,9 +333,11 @@ namespace BSE {
         }
 
     protected:
-        double time_interval_ = 0.05;
+        double time_interval_ = 0.005;
 
         Eigen::Quaterniond rotate_q_ = Eigen::Quaterniond().setIdentity();
+
+        double local_g_ = 9.81;
 
 
     };

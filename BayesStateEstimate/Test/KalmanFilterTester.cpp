@@ -41,7 +41,7 @@ void processImuData(Eigen::MatrixXd &imu_data) {
 
 bool GLRT_Detector(Eigen::MatrixXd u) {
     if (u.cols() == 6 && u.rows() != 6) {
-        Eigen::MatrixXd tu =u*1.0;
+        Eigen::MatrixXd tu = u * 1.0;
 //        u = u.transpose();
         u = tu.transpose();
     }
@@ -90,8 +90,11 @@ bool GLRT_Detector(Eigen::MatrixXd u) {
 
 
 int main(int argc, char *argv[]) {
+
+
+    std::cout.precision(30);
     // parameters
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0014/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 
 
 
@@ -117,8 +120,8 @@ int main(int argc, char *argv[]) {
 
     Eigen::MatrixXd process_noise_matrix =
             Eigen::MatrixXd::Identity(6, 6);
-    process_noise_matrix.block(0, 0, 3, 3) *= 0.01;
-    process_noise_matrix.block(3, 3, 3, 3) *= (0.01 * M_PI / 180.0);
+    process_noise_matrix.block(0, 0, 3, 3) *= 0.1;
+    process_noise_matrix.block(3, 3, 3, 3) *= (0.1 * M_PI / 180.0);
 
     Eigen::MatrixXd measurement_noise_matrix = Eigen::MatrixXd::Identity(uwb_data.cols() - 1, uwb_data.cols() - 1);
     measurement_noise_matrix *= 0.1;
@@ -134,6 +137,7 @@ int main(int argc, char *argv[]) {
     auto filter = BSE::IMUWBKFBase(
             initial_prob_matrix);
     filter.setTime_interval_(0.005);
+//    filter.IS_DEBUG = true;
 
 
     filter.initial_state(left_imu_data.block(0, 1, 100, 6));
@@ -151,24 +155,38 @@ int main(int argc, char *argv[]) {
                                               {}};
     std::vector<double> zv_flag = {};
 
+    double uwb_index = 0;
+
 //    filter.sett
-    for (int i(5); (left_imu_data(i, 0) - left_imu_data(0, 0)) < 100.0; ++i) {
+    for (int i(5); i < left_imu_data.rows() - 5; ++i) {
+        /// state transaction equation
         filter.StateTransaction(left_imu_data.block(i, 1, 1, 6).transpose(),
                                 process_noise_matrix,
                                 BSE::StateTransactionMethodType::NormalRotation);
 
+        /// uwb measurement
+//        while (uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
+//            uwb_index++;
+//        }
+//        if (uwb_data(uwb_index, 0) - left_imu_data(i, 0) < 0.5) {
+//            filter.MeasurementState(uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1),
+//                                    measurement_noise_matrix,
+//                                    BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+//        }
+
+
         if (GLRT_Detector(left_imu_data.block(i - 4, 1, 7, 6))) {
-            // zero velocity detector
+            /// zero velocity detector
             filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-                                    Eigen::Matrix3d::Identity() * 0.001,
+                                    Eigen::Matrix3d::Identity() * 0.0001,
                                     BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
             zv_flag.push_back(1.0);
-        }else{
+        } else {
             zv_flag.push_back(0.0);
         }
 
         Eigen::VectorXd state = filter.getState_();
-        std::cout << state.transpose() << std::endl;
+//        std::cout << state.transpose() << std::endl;
         for (int j(0); j < 3; ++j) {
             pose[j].push_back(state(j));
             velocity[j].push_back(state(j + 3));
@@ -198,13 +216,13 @@ int main(int argc, char *argv[]) {
     for (int i(0); i < 3; ++i) {
         plt::named_plot(std::to_string(i), angle[i]);
     }
-    plt::named_plot("zv_falg",zv_flag);
+    plt::named_plot("zv_falg", zv_flag);
     plt::title("angle");
     plt::grid(true);
     plt::legend();
 
     plt::figure();
-    plt::plot(pose[0],pose[1],"-*");
+    plt::plot(pose[0], pose[1], "-*");
     plt::grid(true);
     plt::title("trace");
 

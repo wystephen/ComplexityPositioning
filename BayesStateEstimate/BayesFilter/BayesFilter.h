@@ -89,6 +89,8 @@ namespace BSE {
             BayesFilter::state_probability_ = state_probability_;
         }
 
+        bool IS_DEBUG = false;
+
     protected:
         Eigen::MatrixXd state_;
         Eigen::MatrixXd state_probability_;
