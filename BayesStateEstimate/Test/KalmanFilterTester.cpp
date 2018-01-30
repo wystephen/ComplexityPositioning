@@ -87,5 +87,14 @@ int main(int argc, char *argv[]) {
     std::cout << "costed time :" << AWF::getDoubleSecondTime()-time_begin
                                  << std::endl;
 
+    std::vector<std::vector<double>> pose = {{},{},{}};
+    std::vector<std::vector<double>> velocity = {{},{},{}};
+    std::vector<std::vector<double>> angle = {{},{},{}};
+
+//    filter.sett
+    for(int i(0);left_imu_data(i,0)-left_imu_data(0,0)<2.0;++i){
+
+    }
+
 
 }

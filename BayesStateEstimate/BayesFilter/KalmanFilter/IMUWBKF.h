@@ -48,7 +48,7 @@ namespace BSE {
                           const Eigen::MatrixXd &input,
                           const Eigen::MatrixXd &cov_input) {
                          Eigen::Vector3d acc(input.block(0, 0, 3, 1));
-                         Eigen::Vector3d gyr(input.block(3, 0, 3, 1));
+                         Eigen::Vector3d gyr(input.block(3, 0, 3, 1)*time_interval_);
 
                          if (gyr.norm() > 1e-8) {
 //                    rotate_q =
@@ -62,6 +62,16 @@ namespace BSE {
                          }
 //                input.block(0, 0, 3, 1) = acc;
 //                input.block(3, 0, 3, 1) = gyr;
+                         auto euler_func = [&rotate_q](Eigen::Vector3d angle){
+//                             return rotate_q
+                             auto tmp_q =  Eigen::AngleAxisd(angle(0), Eigen::Vector3d::UnitX())
+                                          *
+                                          Eigen::AngleAxisd(angle(1), Eigen::Vector3d::UnitY())
+                                          * Eigen::AngleAxisd(angle(2),
+                                                              Eigen::Vector3d::UnitZ());
+                             tmp_q = tmp_q * rotate_q;
+                             return tmp_q.toRotationMatrix().eulerAngles(0,1,2);
+                         };
 
                          Eigen::Vector3d gravity_g(0, 0, 9.81);
                          Eigen::Vector3d linear_acc = rotate_q * acc + gravity_g;
@@ -81,8 +91,17 @@ namespace BSE {
                                  time_interval_;
                          B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
 
+                         double step_len_rate =  0.1;
+                         for(int i(0);i<3;++i){
+                             auto t_angle = gyr;
+                             t_angle(i) = gyr(i) *(1+step_len_rate);
+                             B_.block(6,3+i,3,1) = (euler_func(t_angle)-euler_func(gyr))/(t_angle(i)-gyr(i));
+                         }
+
                          state = A_ * state + B_ * input;
-                         state_prob =
+//                         state_prob =
+//                         Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(cov_input)
+                         state_prob = A_ * state_prob * A_.transpose() + B_ * cov_input;
 
 
                          return;
@@ -227,6 +246,21 @@ namespace BSE {
             return C;
         }
 
+        double getTime_interval_() const {
+            return time_interval_;
+        }
+
+        void setTime_interval_(double time_interval_) {
+            IMUWBKFBase::time_interval_ = time_interval_;
+        }
+
+        const Eigen::Quaterniond &getRotate_q() const {
+            return rotate_q;
+        }
+
+        void setRotate_q(const Eigen::Quaterniond &rotate_q) {
+            IMUWBKFBase::rotate_q = rotate_q;
+        }
 
     protected:
         double time_interval_ = 0.05;
