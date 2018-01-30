@@ -243,10 +243,13 @@ namespace BSE {
 
                 iter_counter++;
 //                tr +=(g_error)
+                // compute gradient
                 double delta_tr = (g_error(tr + step_len, tp, initial_ori) - current_error) / step_len;
                 double delta_tp = (g_error(tr, tp + step_len, initial_ori) - current_error) / step_len;
+                // update state.
                 tr -= delta_tr * update_rate;
                 tp -= delta_tp * update_rate;
+
                 while (tr > M_PI + 0.01) {
                     tr -= 2.0 * M_PI;
                 }
@@ -262,6 +265,9 @@ namespace BSE {
                 while (tp < -M_PI - 0.01) {
                     tp += 2.0 * M_PI;
                 }
+                /*
+                 * Reduce the learning rate.
+                 */
                 if (update_rate > 0.001) {
                     update_rate *= 0.99;
                 }
@@ -277,18 +283,16 @@ namespace BSE {
                           << "}"
                           << std::endl;
             }
-            min_roll = tr;
-            min_pitch = tp;
 
 
-//            std::cout << state_
             state_.block(0, 0, 3, 1) = initial_pos;
             state_.block(3, 0, 3, 1).setZero();
-            state_.block(6, 0, 3, 1) = Eigen::Vector3d(min_roll, min_pitch, initial_ori);
+            state_.block(6, 0, 3, 1) = Eigen::Vector3d(tr, tp, initial_ori);
 
-            rotate_q_ = (Eigen::AngleAxisd(min_roll, Eigen::Vector3d::UnitX())
-                         * Eigen::AngleAxisd(min_pitch, Eigen::Vector3d::UnitY())
+            rotate_q_ = (Eigen::AngleAxisd(tr, Eigen::Vector3d::UnitX())
+                         * Eigen::AngleAxisd(tp, Eigen::Vector3d::UnitY())
                          * Eigen::AngleAxisd(initial_ori, Eigen::Vector3d::UnitZ()));
+
             std::cout << "value angle:" << state_.block(6, 0, 3, 1).transpose() << std::endl;
             std::cout << "eular angle:" << rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2).transpose()
                       << std::endl;
