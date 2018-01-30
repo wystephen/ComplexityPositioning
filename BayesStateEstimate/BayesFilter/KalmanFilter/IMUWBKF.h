@@ -107,14 +107,21 @@ namespace BSE {
                          for(int i(0);i<3;++i){
                              auto t_angle = gyr;
                              t_angle(i) = gyr(i) *(1+step_len_rate);
-                             B_.block(6,3+i,3,1) = (euler_func(t_angle)-euler_func(gyr))/(t_angle(i)-gyr(i));
+//                             B_.block(6,3+i,3,1) = (euler_func(t_angle)-euler_func(gyr))/(t_angle(i)-gyr(i));
                          }
 
                          state = A_ * state + B_ * converted_input;
                          state.block(6,0,3,1) = rotate_q_.toRotationMatrix().eulerAngles(0,1,2);
 //                         state_prob =
 //                         Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(cov_input)
+                         std::cout << "state trans P:" << state_prob<< std::endl;
+                         std::cout << " A * P * A^ T " << A_ * state_prob * A_.transpose() << std::endl;
+                         std::cout << "B * cove * B.transpose() " <<  B_ * cov_input * B_.transpose() << std::endl;
+
                          state_prob = A_ * state_prob * A_.transpose() + B_ * cov_input * B_.transpose();
+                         if(std::isnan(state_prob.sum())){
+                             std::cout << "state prob is naa: " << state_prob << std::endl;
+                         }
 
 
                          return;
@@ -129,6 +136,47 @@ namespace BSE {
                     Eigen::MatrixXd &dx
 
             ) {
+                H_ = Eigen::MatrixXd::Zero(3,9);
+                H_.block(0,3,3,3) = Eigen::Matrix3d::Identity()*1.0;
+                std::cout << H_ << std::endl;
+                std::cout << " p * H^T :" << state_prob * H_.transpose().eval() << std::endl;
+                std::cout << " H * P * H^T + cosv:" << H_ * state_prob * H_.transpose().eval() + cov_m << std::endl;
+                std::cout << "inverse " << (H_*state_prob*H_.transpose().eval()+cov_m).inverse() << std::endl;
+
+                K_ = (state_prob * H_.transpose().eval()) * (H_*state_prob*H_.transpose().eval()+cov_m).inverse();
+                if(std::isnan(K_.sum())|| std::isinf(K_.sum())){
+                    std::cout << "K is nana" << std::endl;
+                }
+
+                /*
+                 * update probability
+                 */
+                state_prob = (Eigen::Matrix<double,9,9>::Identity() - K_ * H_) * state_prob;
+                state_prob = (state_prob + state_prob.transpose().eval())*0.5;
+//                if(state_prob.norm()>10000){
+//                    state_prob/=100.0;
+//                }
+                if(std::isnan(state_prob.sum()) || std::isinf(state_prob.sum())){
+                    std::cout << "state prob has nan" << std::endl;
+                }
+
+                /*
+                 * update state
+                 */
+                Eigen::MatrixXd tdx = K_ * (m-state.block(3,0,3,1));
+
+                state += tdx;
+
+                Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(3),Eigen::Vector3d::UnitX())
+                *Eigen::AngleAxisd(tdx(4),Eigen::Vector3d::UnitY())
+                *Eigen::AngleAxisd(tdx(5),Eigen::Vector3d::UnitZ());
+                if(std::isnan(state.sum())){
+                    std::cout << "some error " << std::endl;
+                }
+
+//                rotate_q_ = delta_q * rotate_q_;
+//                state.block(3,0,3,1) = rotate_q_.toRotationMatrix().eulerAngles(0,1,2);
+
 
                 return;
             })});

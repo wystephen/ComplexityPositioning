@@ -125,14 +125,15 @@ int main(int argc, char *argv[]) {
 
 
     Eigen::MatrixXd initial_prob_matrix = Eigen::MatrixXd::Identity(9, 9);
-    initial_prob_matrix.block(0, 0, 3, 3) *= 0.1;
-    initial_prob_matrix.block(3, 3, 3, 3) *= 0.01;
-    initial_prob_matrix.block(6, 6, 3, 3) *= 0.1 * (M_PI / 180.0);
+    initial_prob_matrix.block(0, 0, 3, 3) *= 0.001;
+    initial_prob_matrix.block(3, 3, 3, 3) *= 0.001;
+    initial_prob_matrix.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
 
 
     auto time_begin = AWF::getDoubleSecondTime();
     auto filter = BSE::IMUWBKFBase(
             initial_prob_matrix);
+    filter.setTime_interval_(0.005);
 
 
     filter.initial_state(left_imu_data.block(0, 1, 100, 6));
@@ -159,7 +160,7 @@ int main(int argc, char *argv[]) {
         if (GLRT_Detector(left_imu_data.block(i - 4, 1, 7, 6))) {
             // zero velocity detector
             filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-                                    Eigen::Matrix3d::Identity() * 0.1,
+                                    Eigen::Matrix3d::Identity() * 0.001,
                                     BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
             zv_flag.push_back(1.0);
         }else{
