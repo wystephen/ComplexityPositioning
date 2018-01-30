@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
 //    filter.IS_DEBUG = true;
 
 
-    filter.initial_state(left_imu_data.block(0, 1, 100, 6));
+    filter.initial_state(left_imu_data.block(10, 1, 100, 6));
     std::cout << "costed time :" << AWF::getDoubleSecondTime() - time_begin
               << std::endl;
 
@@ -180,6 +180,9 @@ int main(int argc, char *argv[]) {
             filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
                                     Eigen::Matrix3d::Identity() * 0.0001,
                                     BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
+            filter.MeasurementState(left_imu_data.block(i,4,1,3).transpose(),
+                                    Eigen::Matrix3d::Identity() * 0.05,
+                                    BSE::MeasurementMethodType::NormalAngleConstraint);
             zv_flag.push_back(1.0);
         } else {
             zv_flag.push_back(0.0);

@@ -21,7 +21,8 @@ namespace BSE {
 
     enum MeasurementMethodType {
         NormalUwbMeasuremnt = 0,
-        NormalZeroVeclotiMeasurement = 1
+        NormalZeroVeclotiMeasurement = 1,
+        NormalAngleConstraint = 2
     };
 
     /**
@@ -126,8 +127,6 @@ namespace BSE {
                              std::cout << "B * cove * B.transpose() " << B_ * cov_input * B_.transpose() << std::endl;
                          }
                          // unconverted value
-//                         B_
-//                         cov_input.block(3,0,3,1) = (rotate_q_.toRotationMatrix()) * cov_input.block(3,0,3,1);
                          B_.block(3, 0, 3, 3) = rotate_q_.toRotationMatrix() * time_interval_;
                          state_prob = A_ * state_prob * A_.transpose() + B_ * cov_input * B_.transpose();
                          if (std::isnan(state_prob.sum())) {
@@ -139,6 +138,14 @@ namespace BSE {
                      })});
 
 
+            /**
+             * Measurement function.
+             */
+
+
+            /**
+             * zero-velocity constraint function (without angle constraint).
+             */
             MeasurementEquationMap.insert({MeasurementMethodType::NormalZeroVeclotiMeasurement, ([&](
                     Eigen::MatrixXd &state,
                     Eigen::MatrixXd &state_prob,
@@ -195,6 +202,63 @@ namespace BSE {
             })});
 
 
+            /**
+             *
+             */
+            MeasurementEquationMap.insert({MeasurementMethodType::NormalUwbMeasuremnt, ([&](Eigen::MatrixXd &state,
+                                                                                            Eigen::MatrixXd &state_prob,
+                                                                                            const Eigen::MatrixXd &m,
+                                                                                            const Eigen::MatrixXd &cov_m,
+                                                                                            Eigen::MatrixXd &dx
+            ) {
+
+
+                return;
+            })});
+
+
+            MeasurementEquationMap.insert({MeasurementMethodType::NormalAngleConstraint, ([&](Eigen::MatrixXd &state,
+                                                                                              Eigen::MatrixXd &state_prob,
+                                                                                              const Eigen::MatrixXd &m,
+                                                                                              const Eigen::MatrixXd &cov_m,
+                                                                                              Eigen::MatrixXd &dx
+            ) {
+                Eigen::Vector3d tmp_acc = m;
+                auto the_y = [tmp_acc](Eigen::Vector3d w) -> Eigen::Vector3d {
+                    Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(w(0), Eigen::Vector3d::UnitX())
+                                 * Eigen::AngleAxisd(w(1), Eigen::Vector3d::UnitY())
+                                 * Eigen::AngleAxisd(w(2), Eigen::Vector3d::UnitZ());
+
+                    return tmp_q * tmp_acc;
+                };
+
+
+                state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+//                dx =
+                H_ = Eigen::Matrix3d::Identity();
+                double epsilon = 0.000001;
+                for (int i(0); i < 3; ++i) {
+                    Eigen::Vector3d offset(0, 0, 0);
+                    offset(i) += epsilon;
+                    H_.block(0, i, 3, 1) = (the_y(state.block(6, 0, 3, 1) + offset) -
+                            the_y(state.block(6, 0, 3, 1))) / epsilon;
+                }
+
+
+                K_ = (state_prob.block(6, 6, 3, 3) * H_.transpose().eval()) *
+                     (H_ * state_prob.block(6, 6, 3, 3) * H_.transpose() + cov_m).inverse();
+                dx = K_ * (Eigen::Vector3d(0, 0, m.norm()) - the_y(state.block(6, 0, 3, 1)));
+
+                Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dx(0), Eigen::Vector3d::UnitX())
+                                           * Eigen::AngleAxisd(dx(1), Eigen::Vector3d::UnitY())
+                                           * Eigen::AngleAxisd(dx(2), Eigen::Vector3d::UnitZ());
+                rotate_q_ =  tmp_q * rotate_q_ ;
+                rotate_q_.normalize();
+                state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+
+
+                return;
+            })});
         }
 
         /**
@@ -231,9 +295,11 @@ namespace BSE {
             /**
              * find initial euler angle through optimization.
              */
-            double tr = std::atan(f_v / f_w);
-            double tp = -std::asin(f_u /
-                                   std::sqrt(f_u * f_u + f_v * f_v + f_w * f_w));
+//            double tr = std::atan(f_v / f_w);
+//            double tp = -std::asin(f_u /
+//                                   std::sqrt(f_u * f_u + f_v * f_v + f_w * f_w));
+            double tr = 0.0;
+            double tp = 0.0;
 
             double step_len = 0.000005;
             double update_rate = 0.5;
@@ -246,6 +312,12 @@ namespace BSE {
                 // compute gradient
                 double delta_tr = (g_error(tr + step_len, tp, initial_ori) - current_error) / step_len;
                 double delta_tp = (g_error(tr, tp + step_len, initial_ori) - current_error) / step_len;
+                if (std::isnan(delta_tp) || std::isnan(delta_tr)) {
+                    delta_tp = 0.0001;
+                    delta_tr = 0.0001;
+
+                    continue;
+                }
                 // update state.
                 tr -= delta_tr * update_rate;
                 tp -= delta_tp * update_rate;
@@ -302,29 +374,6 @@ namespace BSE {
 
         }
 
-        /**
-         * Auxiliary function convert euler angle to rotation matrix.
-         * @param pitch
-         * @param roll
-         * @param yaw
-         * @return
-         */
-        inline Eigen::Matrix3d Ang2RotMatrix(double pitch, double roll, double yaw) {
-            double cp = std::cos(pitch);
-            double sp = std::sin(pitch);
-
-            double cr = std::cos(roll);
-            double sr = std::sin(roll);
-
-            double cy = std::cos(yaw);
-            double sy = std::sin(yaw);
-
-            Eigen::Matrix3d C;
-            C << cp * cy, (sr * sp * cy) - (cr * sy), (cr * sp * cy + sr * sy),
-                    cp * sy, (sr * sp * sy) + (cr * cy), (cr * sp * sy) - (sr * cy),
-                    -sp, sr * cp, cr * cp;
-            return C;
-        }
 
         double getTime_interval_() const {
             return time_interval_;
