@@ -95,6 +95,7 @@ link_directories(
 add_executable(DualFeetLocalization GraphOptimization/src/DualFeetLocalization.cpp)
 
 add_executable(KalmanFilterTester BayesStateEstimate/Test/KalmanFilterTester.cpp)
+target_link_libraries(KalmanFilterTester ${PYTHON_LIBRARIES})
 
 add_executable(KalmanFilterSimulatorTester BayesStateEstimate/Test/KalmanFilterSimulatorTester.cpp)
 target_link_libraries(KalmanFilterSimulatorTester ${PYTHON_LIBRARIES})

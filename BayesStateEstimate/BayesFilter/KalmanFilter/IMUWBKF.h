@@ -50,6 +50,7 @@ namespace BSE {
                          Eigen::Vector3d acc(input.block(0, 0, 3, 1));
                          Eigen::Vector3d gyr(input.block(3, 0, 3, 1)*time_interval_);
 
+
                          if (gyr.norm() > 1e-8) {
 //                    rotate_q =
                              auto tmp_q = Eigen::AngleAxisd(gyr(0), Eigen::Vector3d::UnitX())
@@ -57,24 +58,24 @@ namespace BSE {
                                           Eigen::AngleAxisd(gyr(1), Eigen::Vector3d::UnitY())
                                           * Eigen::AngleAxisd(gyr(2),
                                                               Eigen::Vector3d::UnitZ());
-                             rotate_q = tmp_q * rotate_q;
+                             rotate_q =  tmp_q.inverse() * rotate_q;
 
                          }
-//                input.block(0, 0, 3, 1) = acc;
-//                input.block(3, 0, 3, 1) = gyr;
+
+
                          auto euler_func = [&](Eigen::Vector3d angle){
 //                             return rotate_q
                              auto tmp_q =  Eigen::AngleAxisd(angle(0), Eigen::Vector3d::UnitX())
-                                          *
-                                          Eigen::AngleAxisd(angle(1), Eigen::Vector3d::UnitY())
-                                          * Eigen::AngleAxisd(angle(2),
-                                                              Eigen::Vector3d::UnitZ());
+                                           *
+                                           Eigen::AngleAxisd(angle(1), Eigen::Vector3d::UnitY())
+                                           * Eigen::AngleAxisd(angle(2),
+                                                               Eigen::Vector3d::UnitZ());
                              tmp_q = tmp_q * rotate_q;
                              return tmp_q.toRotationMatrix().eulerAngles(0,1,2);
                          };
-
-                         Eigen::Vector3d gravity_g(0, 0, 9.81);
+                         Eigen::Vector3d gravity_g(0, 0, -9.52914);
                          Eigen::Vector3d linear_acc = rotate_q * acc + gravity_g;
+                         std::cout << "acc in navigation frame:" << rotate_q * acc ;
                          std::cout << "linear_acc:" << linear_acc.transpose() << std::endl;
 //                         input.block(0, 0, 3, 1) = linear_acc;
                          auto converted_input = input;
@@ -102,6 +103,7 @@ namespace BSE {
                          }
 
                          state = A_ * state + B_ * converted_input;
+                         state.block(6,0,3,1) = rotate_q.toRotationMatrix().eulerAngles(0,1,2);
 //                         state_prob =
 //                         Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(cov_input)
                          state_prob = A_ * state_prob * A_.transpose() + B_ * cov_input * B_.transpose();

@@ -9,6 +9,7 @@
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+//#include <AWF.h>dd
 
 
 #include "AWF.h"
@@ -16,6 +17,7 @@
 #include "../BayesFilter/KalmanFilter/IMUWBKF.h"
 #include "../BayesFilter/KalmanFilter/IMUWBKF.cpp"
 
+namespace plt = matplotlibcpp;
 
 /**
  *  process the imu data according to the typical sensor model
@@ -102,7 +104,41 @@ int main(int argc, char *argv[]) {
                                 process_noise_matrix,
         BSE::IMUMethodType::NormalRotation);
 
+        Eigen::VectorXd state = filter.getState_();
+        std::cout << state.transpose() << std::endl;
+        for(int j(0);j<3;++j){
+            pose[j].push_back(state(j));
+            velocity[j].push_back(state(j+3));
+            angle[j].push_back(state(j+6));
+        }
+
     }
 
+    plt::figure();
+    for(int i(0);i<3;++i){
+        plt::named_plot(std::to_string(i),pose[i]);
+    }
+    plt::title("pose");
+    plt::grid(true);
+    plt::legend();
+
+
+    plt::figure();
+    for(int i(0);i<3;++i){
+        plt::named_plot(std::to_string(i),velocity[i]);
+    }
+    plt::title("vel");
+    plt::grid(true);
+    plt::legend();
+
+    plt::figure();
+    for(int i(0);i<3;++i){
+        plt::named_plot(std::to_string(i),angle[i]);
+    }
+    plt::title("angle");
+    plt::grid(true);
+    plt::legend();
+
+    plt::show();
 
 }
