@@ -57,13 +57,6 @@ namespace BSE {
                 auto f = MeasurementEquationMap.at(methodType);
                 f(state_, state_probability_, m, cov_m, dX_);
 
-//                K_ = state_probability_ * H_.transpose() *
-//                     (H_ * state_probability_ * H_.transpose()).inverse();
-
-//                state_probability_ =
-//                        (Eigen::MatrixXd::Identity(state_probability_.rows(), state_probability_.cols())
-//                         - (K_ * H_))
-//                        * state_probability_;
                 return true;
 
             } else {

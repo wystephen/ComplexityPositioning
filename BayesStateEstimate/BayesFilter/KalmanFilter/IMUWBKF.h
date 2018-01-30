@@ -76,7 +76,6 @@ namespace BSE {
                                           Eigen::AngleAxisd(angle(1), Eigen::Vector3d::UnitY())
                                           * Eigen::AngleAxisd(angle(2),
                                                               Eigen::Vector3d::UnitZ());
-//                             tmp_q = tmp_q * rotate_q_;
                              tmp_q = rotate_q_ * tmp_q;
                              tmp_q.normalize();
                              return tmp_q.toRotationMatrix().eulerAngles(0, 1, 2);
@@ -129,7 +128,7 @@ namespace BSE {
                          // unconverted value
 //                         B_
 //                         cov_input.block(3,0,3,1) = (rotate_q_.toRotationMatrix()) * cov_input.block(3,0,3,1);
-                         B_.block(3,0,3,3) = rotate_q_.toRotationMatrix() * time_interval_;
+                         B_.block(3, 0, 3, 3) = rotate_q_.toRotationMatrix() * time_interval_;
                          state_prob = A_ * state_prob * A_.transpose() + B_ * cov_input * B_.transpose();
                          if (std::isnan(state_prob.sum())) {
                              std::cout << "state prob is naa: " << state_prob << std::endl;
@@ -190,11 +189,7 @@ namespace BSE {
                     std::cout << "some error " << std::endl;
                 }
 
-//                rotate_q_ =  rotate_q_ * delta_q;
 //                rotate_q_ = delta_q * rotate_q_;
-//                state.block(3,0,3,1) = rotate_q_.toRotationMatrix().eulerAngles(0,1,2);
-
-                rotate_q_.normalize();
 
                 return;
             })});
@@ -221,12 +216,6 @@ namespace BSE {
             auto g = acc.norm();
             local_g_ = g;
 
-            double roll = std::atan(f_v / f_w);
-            double pitch = -std::asin(f_u /
-                                      std::sqrt(f_u * f_u + f_v * f_v + f_w * f_w));
-
-            double min_roll(0.0), min_pitch(0.0);
-            double error = 10000.0;
 
             auto g_error = [g, acc](double roll, double pitch, double yaw) -> double {
 
@@ -242,9 +231,11 @@ namespace BSE {
             /**
              * find initial euler angle through optimization.
              */
-            double tr(0.0);
-            double tp(0.0);
-            double step_len = 0.05;
+            double tr = std::atan(f_v / f_w);
+            double tp = -std::asin(f_u /
+                                   std::sqrt(f_u * f_u + f_v * f_v + f_w * f_w));
+
+            double step_len = 0.000005;
             double update_rate = 0.5;
             int iter_counter = 0;
             double current_error(g_error(tr, tp, initial_ori));
@@ -256,8 +247,23 @@ namespace BSE {
                 double delta_tp = (g_error(tr, tp + step_len, initial_ori) - current_error) / step_len;
                 tr -= delta_tr * update_rate;
                 tp -= delta_tp * update_rate;
-                if (update_rate > 0.0000001) {
-                    update_rate *= 0.9;
+                while (tr > M_PI + 0.01) {
+                    tr -= 2.0 * M_PI;
+                }
+                while (tr < -M_PI - 0.01) {
+
+                    tr += 2.0 * M_PI;
+                }
+
+                while (tp > M_PI + 0.01) {
+                    tp -= 2.0 * M_PI;
+                }
+
+                while (tp < -M_PI - 0.01) {
+                    tp += 2.0 * M_PI;
+                }
+                if (update_rate > 0.001) {
+                    update_rate *= 0.99;
                 }
 
                 current_error = g_error(tr, tp, initial_ori);
