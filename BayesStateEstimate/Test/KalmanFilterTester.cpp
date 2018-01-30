@@ -41,7 +41,9 @@ void processImuData(Eigen::MatrixXd &imu_data) {
 
 bool GLRT_Detector(Eigen::MatrixXd u) {
     if (u.cols() == 6 && u.rows() != 6) {
-        u = u.transpose();
+        Eigen::MatrixXd tu =u*1.0;
+//        u = u.transpose();
+        u = tu.transpose();
     }
     assert(u.rows() == 6 || "u must be a 6 rows matrix(each col represent acc and gyro at one moement");
     Eigen::Vector3d ya_m;
@@ -146,15 +148,15 @@ int main(int argc, char *argv[]) {
     std::vector<std::vector<double>> angle = {{},
                                               {},
                                               {}};
-    std::vector<double> zv_flag = {}; 
+    std::vector<double> zv_flag = {};
 
 //    filter.sett
     for (int i(5); (left_imu_data(i, 0) - left_imu_data(0, 0)) < 100.0; ++i) {
         filter.StateTransaction(left_imu_data.block(i, 1, 1, 6).transpose(),
                                 process_noise_matrix,
                                 BSE::StateTransactionMethodType::NormalRotation);
-        
-        if (GLRT_Detector(left_imu_data.block(i - 4, 1, 5, 6))) {
+
+        if (GLRT_Detector(left_imu_data.block(i - 4, 1, 7, 6))) {
             // zero velocity detector
             filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
                                     Eigen::Matrix3d::Identity() * 0.1,
@@ -199,6 +201,11 @@ int main(int argc, char *argv[]) {
     plt::title("angle");
     plt::grid(true);
     plt::legend();
+
+    plt::figure();
+    plt::plot(pose[0],pose[1],"-*");
+    plt::grid(true);
+    plt::title("trace");
 
     plt::show();
 
