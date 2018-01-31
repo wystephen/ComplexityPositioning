@@ -134,37 +134,38 @@ int main(int argc, char *argv[]) {
 
 
     auto time_begin = AWF::getDoubleSecondTime();
-    auto filter = BSE::IMUWBKFBase(
-            initial_prob_matrix);
-    filter.setTime_interval_(0.005);
+    auto f = [](const Eigen::MatrixXd &left_imu_data, std::string data_name) {
+        auto filter = BSE::IMUWBKFBase(
+                initial_prob_matrix);
+        filter.setTime_interval_(0.005);
 //    filter.IS_DEBUG = true;
 
 
-    filter.initial_state(left_imu_data.block(10, 1, 100, 6));
-    std::cout << "costed time :" << AWF::getDoubleSecondTime() - time_begin
-              << std::endl;
+        filter.initial_state(left_imu_data.block(10, 1, 100, 6));
+        std::cout << "costed time :" << AWF::getDoubleSecondTime() - time_begin
+                  << std::endl;
 
-    std::vector<std::vector<double>> pose = {{},
-                                             {},
-                                             {}};
-    std::vector<std::vector<double>> velocity = {{},
+        std::vector<std::vector<double>> pose = {{},
                                                  {},
                                                  {}};
-    std::vector<std::vector<double>> angle = {{},
-                                              {},
-                                              {}};
-    std::vector<double> zv_flag = {};
+        std::vector<std::vector<double>> velocity = {{},
+                                                     {},
+                                                     {}};
+        std::vector<std::vector<double>> angle = {{},
+                                                  {},
+                                                  {}};
+        std::vector<double> zv_flag = {};
 
-    double uwb_index = 0;
+        double uwb_index = 0;
 
 //    filter.sett
-    for (int i(5); i < left_imu_data.rows() - 5; ++i) {
-        /// state transaction equation
-        filter.StateTransaction(left_imu_data.block(i, 1, 1, 6).transpose(),
-                                process_noise_matrix,
-                                BSE::StateTransactionMethodType::NormalRotation);
+        for (int i(5); i < left_imu_data.rows() - 5; ++i) {
+            /// state transaction equation
+            filter.StateTransaction(left_imu_data.block(i, 1, 1, 6).transpose(),
+                                    process_noise_matrix,
+                                    BSE::StateTransactionMethodType::NormalRotation);
 
-        /// uwb measurement
+            /// uwb measurement
 //        while (uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
 //            uwb_index++;
 //        }
@@ -175,59 +176,61 @@ int main(int argc, char *argv[]) {
 //        }
 
 
-        if (GLRT_Detector(left_imu_data.block(i - 4, 1, 7, 6))) {
-            /// zero velocity detector
-            filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-                                    Eigen::Matrix3d::Identity() * 0.0001,
-                                    BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
-            filter.MeasurementState(left_imu_data.block(i, 4, 1, 3).transpose(),
-                                    Eigen::Matrix3d::Identity() * 0.05,
-                                    BSE::MeasurementMethodType::NormalAngleConstraint);
-            zv_flag.push_back(1.0);
-        } else {
-            zv_flag.push_back(0.0);
-        }
+            if (GLRT_Detector(left_imu_data.block(i - 4, 1, 7, 6))) {
+                /// zero velocity detector
+                filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
+                                        Eigen::Matrix3d::Identity() * 0.0001,
+                                        BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
+                filter.MeasurementState(left_imu_data.block(i, 4, 1, 3).transpose(),
+                                        Eigen::Matrix3d::Identity() * 0.015,
+                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+                zv_flag.push_back(1.0);
+            } else {
+                zv_flag.push_back(0.0);
+            }
 
-        Eigen::VectorXd state = filter.getState_();
+            Eigen::VectorXd state = filter.getState_();
 //        std::cout << state.transpose() << std::endl;
-        for (int j(0); j < 3; ++j) {
-            pose[j].push_back(state(j));
-            velocity[j].push_back(state(j + 3));
-            angle[j].push_back(state(j + 6));
+            for (int j(0); j < 3; ++j) {
+                pose[j].push_back(state(j));
+                velocity[j].push_back(state(j + 3));
+                angle[j].push_back(state(j + 6));
+            }
+
         }
 
-    }
-
-    plt::figure();
-    for (int i(0); i < 3; ++i) {
-        plt::named_plot(std::to_string(i), pose[i]);
-    }
-    plt::title("pose");
-    plt::grid(true);
-    plt::legend();
+        plt::figure();
+        for (int i(0); i < 3; ++i) {
+            plt::named_plot(std::to_string(i), pose[i]);
+        }
+        plt::title("pose");
+        plt::grid(true);
+        plt::legend();
 
 
-    plt::figure();
-    for (int i(0); i < 3; ++i) {
-        plt::named_plot(std::to_string(i), velocity[i]);
-    }
-    plt::title("vel");
-    plt::grid(true);
-    plt::legend();
+        plt::figure();
+        for (int i(0); i < 3; ++i) {
+            plt::named_plot(std::to_string(i), velocity[i]);
+        }
+        plt::title("vel");
+        plt::grid(true);
+        plt::legend();
 
-    plt::figure();
-    for (int i(0); i < 3; ++i) {
-        plt::named_plot(std::to_string(i), angle[i]);
-    }
-    plt::named_plot("zv_falg", zv_flag);
-    plt::title("angle");
-    plt::grid(true);
-    plt::legend();
+        plt::figure();
+        for (int i(0); i < 3; ++i) {
+            plt::named_plot(std::to_string(i), angle[i]);
+        }
+        plt::named_plot("zv_falg", zv_flag);
+        plt::title("angle");
+        plt::grid(true);
+        plt::legend();
 
-    plt::figure();
-    plt::plot(pose[0], pose[1], "-*");
-    plt::grid(true);
-    plt::title("trace");
+        plt::figure();
+        plt::plot(pose[0], pose[1], "-*");
+        plt::grid(true);
+        plt::title("trace");
+
+    };
 
     plt::show();
 
