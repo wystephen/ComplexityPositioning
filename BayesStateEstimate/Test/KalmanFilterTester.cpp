@@ -133,7 +133,8 @@ int main(int argc, char *argv[]) {
     initial_prob_matrix.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
 
 
-    auto f = [&process_noise_matrix,&initial_prob_matrix,&measurement_noise_matrix](const Eigen::MatrixXd &imu_data, std::string data_name) {
+    auto f = [&process_noise_matrix, &initial_prob_matrix, &measurement_noise_matrix](const Eigen::MatrixXd &imu_data,
+                                                                                      std::string data_name) {
         auto filter = BSE::IMUWBKFBase(
                 initial_prob_matrix);
         filter.setTime_interval_(0.005);
@@ -203,7 +204,7 @@ int main(int argc, char *argv[]) {
         for (int i(0); i < 3; ++i) {
             plt::named_plot(std::to_string(i), pose[i]);
         }
-        plt::title(data_name+"pose");
+        plt::title(data_name + "pose");
         plt::grid(true);
         plt::legend();
 
@@ -212,7 +213,7 @@ int main(int argc, char *argv[]) {
         for (int i(0); i < 3; ++i) {
             plt::named_plot(std::to_string(i), velocity[i]);
         }
-        plt::title(data_name+"vel");
+        plt::title(data_name + "vel");
         plt::grid(true);
         plt::legend();
 
@@ -221,20 +222,20 @@ int main(int argc, char *argv[]) {
             plt::named_plot(std::to_string(i), angle[i]);
         }
         plt::named_plot("zv_falg", zv_flag);
-        plt::title(data_name+"angle");
+        plt::title(data_name + "angle");
         plt::grid(true);
         plt::legend();
 
         plt::figure();
         plt::plot(pose[0], pose[1], "-*");
         plt::grid(true);
-        plt::title(data_name+"trace");
+        plt::title(data_name + "trace");
 
     };
 
-    f(left_imu_data,"left_foot");
-    f(right_imu_data,"right_foot");
-    f(head_imu_data,"head");
+    f(left_imu_data, "left_foot");
+    f(right_imu_data, "right_foot");
+    f(head_imu_data, "head");
 
     plt::show();
 
