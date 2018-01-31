@@ -56,6 +56,7 @@ namespace BSE {
                          }
 
 
+
                          if (gyr.norm() > 1e-18) {
                              Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(gyr(0), Eigen::Vector3d::UnitX())
                                                         *
@@ -154,6 +155,7 @@ namespace BSE {
                     Eigen::MatrixXd &dx
 
             ) {
+
                 H_ = Eigen::MatrixXd::Zero(3, 9);
                 H_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * 1.0;
                 if (IS_DEBUG) {
@@ -228,6 +230,7 @@ namespace BSE {
                                                                                               Eigen::MatrixXd &dx
             ) {
                 Eigen::Vector3d tmp_acc = m;
+                local_g_ = tmp_acc.norm();
                 auto the_y = [tmp_acc](Eigen::Vector3d w) -> Eigen::Vector3d {
                     Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(w(0), Eigen::Vector3d::UnitX())
                                                * Eigen::AngleAxisd(w(1), Eigen::Vector3d::UnitY())
