@@ -348,16 +348,20 @@ namespace BSE {
                     update_rate *= 0.99;
                 }
 
+
                 current_error = g_error(tr, tp, initial_ori);
-                std::cout << iter_counter
-                          << ":"
-                          << current_error
-                          << "{"
-                          << tr
-                          << ":"
-                          << tp
-                          << "}"
-                          << std::endl;
+                if (IS_DEBUG) {
+                    std::cout << iter_counter
+                              << ":"
+                              << current_error
+                              << "{"
+                              << tr
+                              << ":"
+                              << tp
+                              << "}"
+                              << std::endl;
+                }
+
             }
 
 
