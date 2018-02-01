@@ -133,8 +133,12 @@ int main(int argc, char *argv[]) {
     initial_prob_matrix.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
 
 
-    auto f = [&process_noise_matrix, &initial_prob_matrix, &measurement_noise_matrix](const Eigen::MatrixXd &imu_data,
-                                                                                      std::string data_name) {
+    auto f = [&process_noise_matrix,
+            &initial_prob_matrix,
+            &measurement_noise_matrix,
+            &uwb_data,
+            &beacon_set_data](const Eigen::MatrixXd &imu_data,
+                              std::string data_name) {
         auto filter = BSE::IMUWBKFBase(
                 initial_prob_matrix);
         filter.setTime_interval_(0.005);
