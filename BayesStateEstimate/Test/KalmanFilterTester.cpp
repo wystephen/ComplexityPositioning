@@ -173,16 +173,32 @@ int main(int argc, char *argv[]) {
             /// uwb measurement
             while (uwb_data(uwb_index, 0) < imu_data(i, 0)) {
                 uwb_index++;
-                if(uwb_index== uwb_data.rows()){
-                    break;
+                if (uwb_index == uwb_data.rows()) {
+//                    break;
+
+                    return;
                 }
             }
             if (uwb_data(uwb_index, 0) - imu_data(i, 0) < 0.5) {
 //                filter.MeasurementState(uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1),
 //                                        measurement_noise_matrix,
 //                                        BSE::MeasurementMethodType::NormalUwbMeasuremnt);
-                std::cout <<"test uwb :" << uwb_data(uwb_index,0) << ",imu :"
-                          << imu_data(i,0) << std::endl;
+//                std::cout <<"test uwb :" << uwb_data(uwb_index,0) << ",imu :"
+//                          << imu_data(i,0) << std::endl;
+
+                for (int k(1); k < uwb_data.cols(); ++k) {
+                    if (uwb_data(uwb_index, k) > 0) {
+                        Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
+                        measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
+                        measurement_noise_matrix.resize(1, 1);
+                        measurement_noise_matrix(0, 0) = 0.3;
+                        // correct
+                        filter.MeasurementState(measurement_data,
+                                                measurement_noise_matrix,
+                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+
+                    }
+                }
             }
 
 
