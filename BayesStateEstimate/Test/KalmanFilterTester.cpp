@@ -113,6 +113,53 @@ int main(int argc, char *argv[]) {
 
     assert(beacon_set_data.rows() == (uwb_data.cols() - 1));
 
+    // get the initial pose based on uwb data.
+
+    auto uwb_err = [&beacon_set_data, &uwb_data]
+            (Eigen::Vector3d pos) -> double {
+        int vaild_counter = 0;
+        double sum_err = 0.0;
+        for (int i(1); i < uwb_data.cols(); ++i) {
+            if (5.0 > uwb_data(0, i) && uwb_data(0, i) > 0.0) {
+                sum_err += std::abs(uwb_data(0, i) -
+                                    (pos - beacon_set_data.block(i - 1, 0, 1, 3).transpose()).norm());
+                vaild_counter ++;
+            }
+            if(vaild_counter > 0){
+
+                return sum_err /double(vaild_counter);
+            }else{
+                return 1000000.0;
+            }
+        }
+    };
+
+    Eigen::Vector3d initial_pos = Eigen::Vector3d(0,0,0);
+    double last_uwb_err = 10000000000.0;
+    int ite_times = 0;
+
+    double step_length = 0.00001;
+    double update_rate = 0.05;
+
+    while(uwb_err(initial_pos)-last_uwb_err>-1e-3
+            && ite_times < 100)
+    {
+        last_uwb_err = uwb_err(initial_pos);
+        Eigen::Vector3d tmp_gradient(0,0,0);
+       for(int i(0);i<3;++i){
+           auto t_v = initial_pos;
+           t_v(i) += step_length;
+          tmp_gradient(i) = (uwb_err(t_v) - last_uwb_err) / step_length;
+       }
+        initial_pos -= tmp_gradient * update_rate;
+
+
+        std::cout << "last err:" << last_uwb_err << std::endl;
+        ite_times ++;
+
+    }
+//    std::cout << last_uwb_err
+
     //process
     processImuData(left_imu_data);
     processImuData(right_imu_data);
