@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
                                                   {}};
         std::vector<double> zv_flag = {};
 
-        double uwb_index = 0;
+
 
 //    filter.sett
         for (int i(5); i < imu_data.rows() - 5; ++i) {
@@ -169,16 +169,16 @@ int main(int argc, char *argv[]) {
             filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
                                     process_noise_matrix,
                                     BSE::StateTransactionMethodType::NormalRotation);
-
+            double uwb_index = 0;
             /// uwb measurement
-//        while (uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
-//            uwb_index++;
-//        }
-//        if (uwb_data(uwb_index, 0) - left_imu_data(i, 0) < 0.5) {
-//            filter.MeasurementState(uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1),
-//                                    measurement_noise_matrix,
-//                                    BSE::MeasurementMethodType::NormalUwbMeasuremnt);
-//        }
+            while (uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
+                uwb_index++;
+            }
+            if (uwb_data(uwb_index, 0) - left_imu_data(i, 0) < 0.5) {
+                filter.MeasurementState(uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1),
+                                        measurement_noise_matrix,
+                                        BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+            }
 
 
             if (GLRT_Detector(imu_data.block(i - 4, 1, 7, 6))) {
