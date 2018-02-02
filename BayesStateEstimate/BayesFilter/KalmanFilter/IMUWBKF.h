@@ -212,6 +212,26 @@ namespace BSE {
                                                                                             const Eigen::MatrixXd &cov_m,
                                                                                             Eigen::MatrixXd &dx
             ) {
+                Eigen::Vector3d b = m.block(0,0,3,1);
+                Eigen::Matrix<double,1,1> z;
+                z(0)= m(3);
+                Eigen::Matrix<double,1,1> y;
+                y(0) = (state.block(0,0,3,1)-b).norm();
+
+
+                H_.resize(9,1);
+                H_.setZero();
+                H_.block(0,0,3,1) = 2* (state.block(0,0,3,1)-b);
+
+                K_ = (state_prob * H_.transpose()) * (H_ * state_prob * H_.transpose() +  cov_m).inverse();
+
+                dx =K_*(z - y);
+
+                state.block(0,0,6,1) += dx.block(0,0,6,1);
+
+                std::cout << "dx:" << dx.transpose() << std::endl;
+
+                state_prob = (Eigen::Matrix<double,9,9>::Identity()-K_ * H_ ) * state_prob;
 
 
                 return;
