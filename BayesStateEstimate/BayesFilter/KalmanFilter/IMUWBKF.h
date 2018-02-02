@@ -219,11 +219,12 @@ namespace BSE {
                 y(0) = (state.block(0,0,3,1)-b).norm();
 
 
-                H_.resize(9,1);
+                H_.resize(1,9);
                 H_.setZero();
-                H_.block(0,0,3,1) = 2* (state.block(0,0,3,1)-b);
+                H_.block(0,0,1,3) = 2* (state.block(0,0,3,1)-b).transpose();
 
-                K_ = (state_prob * H_.transpose()) * (H_ * state_prob * H_.transpose() +  cov_m).inverse();
+                K_ = (state_prob * H_.transpose().eval()) *
+                        (H_ * state_prob * H_.transpose().eval() +  cov_m).inverse();
 
                 dx =K_*(z - y);
 
