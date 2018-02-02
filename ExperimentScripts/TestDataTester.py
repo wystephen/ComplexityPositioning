@@ -40,7 +40,15 @@ class DataLoder():
         self.uwb_data = np.loadtxt(data_dir+'uwb_result.csv', delimiter=',')
         self.beacon_set = np.loadtxt(data_dir + 'beaconSet.csv', delimiter=',')
 
-    def
+    def showTime(self):
+        plt.figure()
+        plt.title('time')
+        plt.plot(self.left_imu_data[:,1],label='left imu')
+        plt.plot(self.uwb_data[:,0],label = 'headuwb')
+
+        plt.grid()
+        plt.legend()
+
 
 
 
@@ -52,6 +60,7 @@ if __name__ == '__main__':
     #                       delimiter=',')
     dl = DataLoder('/home/steve/Data/FusingLocationData/0014/')
 
+    dl.showTime()
     plt.show()
 
 
