@@ -197,11 +197,11 @@ int main(int argc, char *argv[]) {
                           << imu_data(i,0) << std::endl;
 
                 for (int k(1); k < uwb_data.cols(); ++k) {
-                    if (uwb_data(uwb_index, k) > 0 ) {
+                    if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index,k) < 5.0) {
                         Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
                         measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
                         measurement_noise_matrix.resize(1, 1);
-                        measurement_noise_matrix(0, 0) = 0.3;
+                        measurement_noise_matrix(0, 0) = 0.03;
                         // correct
                         filter.MeasurementState(measurement_data,
                                                 measurement_noise_matrix,
