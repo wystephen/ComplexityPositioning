@@ -31,7 +31,7 @@ void processImuData(Eigen::MatrixXd &imu_data) {
     int col(imu_data.cols());
     imu_data.resize(row, 1 + 3 + 3 + 3 + 1);//
     // time
-    imu_data.block(0, 0, row, 1) = tmp_data.block(0, 0, row, 1) * 1.0;
+    imu_data.block(0, 0, row, 1) = tmp_data.block(0, 1, row, 1) * 1.0;
     imu_data.block(0, 1, row, 3) = tmp_data.block(0, 2, row, 3) * 9.81;
     imu_data.block(0, 4, row, 3) = tmp_data.block(0, 5, row, 3) * (M_PI / 180.0);
     imu_data.block(0, 7, row, 3) = tmp_data.block(0, 8, row, 3) * 1.0;
@@ -173,6 +173,9 @@ int main(int argc, char *argv[]) {
             /// uwb measurement
             while (uwb_data(uwb_index, 0) < imu_data(i, 0)) {
                 uwb_index++;
+                if(uwb_index== uwb_data.rows()){
+                    break;
+                }
             }
             if (uwb_data(uwb_index, 0) - imu_data(i, 0) < 0.5) {
 //                filter.MeasurementState(uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1),
