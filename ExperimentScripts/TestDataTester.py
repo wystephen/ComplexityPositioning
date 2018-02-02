@@ -40,12 +40,18 @@ class DataLoder():
         self.uwb_data = np.loadtxt(data_dir+'uwb_result.csv', delimiter=',')
         self.beacon_set = np.loadtxt(data_dir + 'beaconSet.csv', delimiter=',')
 
+    def
+
 
 
 
 
 
 if __name__ == '__main__':
-    imu_data = np.loadtxt('/home/steve/Data/FusingLocationData/0014/LEFT_FOOT.data',
-                          delimiter=',')
+    # imu_data = np.loadtxt('/home/steve/Data/FusingLocationData/0014/LEFT_FOOT.data',
+    #                       delimiter=',')
+    dl = DataLoder('/home/steve/Data/FusingLocationData/0014/')
+
+    plt.show()
+
 
