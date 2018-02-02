@@ -217,9 +217,9 @@ int main(int argc, char *argv[]) {
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
                                         Eigen::Matrix3d::Identity() * 0.0001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
-                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
-                                        Eigen::Matrix3d::Identity() * 0.01,
-                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+//                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
+//                                        Eigen::Matrix3d::Identity() * 0.01,
+//                                        BSE::MeasurementMethodType::NormalAngleConstraint);
                 zv_flag.push_back(1.0);
             } else {
                 zv_flag.push_back(0.0);
