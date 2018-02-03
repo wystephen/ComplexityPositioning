@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
                                                            {}};
     for (int i(0); i < optimize_trace.rows(); ++i) {
         for (int j(0); j < 3; ++j) {
-            optimize_trace_vec[j].push_back(uwb_data(i, j));
+            optimize_trace_vec[j].push_back(optimize_trace(i, j));
         }
     }
 
@@ -302,7 +302,7 @@ int main(int argc, char *argv[]) {
     };
 
 //    f(left_imu_data, "left_foot");
-    f(right_imu_data, "right_foot");
+//    f(right_imu_data, "right_foot");
     f(head_imu_data, "head");
 
     plt::show();
