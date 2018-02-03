@@ -124,11 +124,13 @@ int main(int argc, char *argv[]) {
                                   beacon_set_data);
 
     Eigen::MatrixXd optimize_trace = uwb_tool.uwb_position_function();
-    Eigen::Vector3d initial_pos = optimize_trace.block(0,0,1,3).transpose();
-    std::vector<std::vector<double>> optimize_trace_vec={{},{},{}};
-    for(int i(0);i<optimize_trace.rows();++i){
-        for(int j(0);j<3;++j){
-            optimize_trace_vec[j].push_back(uwb_data(i,j));
+    Eigen::Vector3d initial_pos = optimize_trace.block(0, 0, 1, 3).transpose();
+    std::vector<std::vector<double>> optimize_trace_vec = {{},
+                                                           {},
+                                                           {}};
+    for (int i(0); i < optimize_trace.rows(); ++i) {
+        for (int j(0); j < 3; ++j) {
+            optimize_trace_vec[j].push_back(uwb_data(i, j));
         }
     }
 
@@ -161,8 +163,9 @@ int main(int argc, char *argv[]) {
             &measurement_noise_matrix,
             &uwb_data,
             &beacon_set_data,
-            &initial_pos](const Eigen::MatrixXd &imu_data,
-                          std::string data_name) {
+            &initial_pos,
+            &optimize_trace_vec](const Eigen::MatrixXd &imu_data,
+                                 std::string data_name) {
         auto filter = BSE::IMUWBKFBase(
                 initial_prob_matrix);
         filter.setTime_interval_(0.005);
@@ -288,10 +291,10 @@ int main(int argc, char *argv[]) {
         plt::legend();
 
         plt::figure();
-        plt::named_plot("ekf trace",pose[0], pose[1], "-*");
+        plt::named_plot("ekf trace", pose[0], pose[1], "-*");
         plt::named_plot("optimized trace",
                         optimize_trace_vec[0],
-                        optimize_trace_vec[1],"*");
+                        optimize_trace_vec[1], "*");
         plt::legend();
         plt::grid(true);
         plt::title(data_name + "trace");
