@@ -27,11 +27,6 @@
 namespace plt = matplotlibcpp;
 
 
-
-
-
-
-
 int main(int argc, char *argv[]) {
 
 
@@ -65,6 +60,8 @@ int main(int argc, char *argv[]) {
 
     Eigen::MatrixXd optimize_trace = uwb_tool.uwb_position_function();
     Eigen::Vector3d initial_pos = optimize_trace.block(0, 0, 1, 3).transpose();
+    Eigen::Vector3d initial_ori = 0;
+
     std::vector<std::vector<double>> optimize_trace_vec = {{},
                                                            {},
                                                            {}};
@@ -106,8 +103,10 @@ int main(int argc, char *argv[]) {
             &uwb_data,
             &beacon_set_data,
             &initial_pos,
-            &optimize_trace_vec](const Eigen::MatrixXd &imu_data,
-                                 std::string data_name) {
+            &initial_ori,
+            &optimize_trace_vec,
+            &imu_tool](const Eigen::MatrixXd &imu_data,
+                       std::string data_name) {
         auto filter = BSE::IMUWBKFBase(
                 initial_prob_matrix);
         filter.setTime_interval_(0.005);
@@ -116,7 +115,7 @@ int main(int argc, char *argv[]) {
 
         auto time_begin = AWF::getDoubleSecondTime();
         filter.initial_state(imu_data.block(10, 1, 100, 6),
-                             0.0,
+                             initial_ori,
                              initial_pos);
         std::cout << "costed time :" << AWF::getDoubleSecondTime() - time_begin
                   << std::endl;
@@ -186,7 +185,7 @@ int main(int argc, char *argv[]) {
             if (imu_tool.GLRT_Detector(imu_data.block(i - 4, 1, 7, 6))) {
                 /// zero velocity detector
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-                                        Eigen::Matrix3d::Identity() * 0.021001,
+                                        Eigen::Matrix3d::Identity() * 0.051001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 //                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
 //                                        Eigen::Matrix3d::Identity() * 0.01,

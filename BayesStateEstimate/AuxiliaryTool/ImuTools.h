@@ -90,7 +90,6 @@ namespace BSE {
  * @param imu_data after preprocess time[s] acc_(x,y,z)[m*s^-2] gyr_(x,y,z)[rad*s^-1] mag_(x,y,z) pressure
  */
         void processImuData(Eigen::MatrixXd &imu_data) {
-//    Eigen::MatrixXd tmp_data = imu_data.;
             Eigen::MatrixXd tmp_data(imu_data);
 
             int row(imu_data.rows());
