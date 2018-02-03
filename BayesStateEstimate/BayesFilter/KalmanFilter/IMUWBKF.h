@@ -146,146 +146,153 @@ namespace BSE {
             /**
              * zero-velocity constraint function (without angle constraint).
              */
-            MeasurementEquationMap.insert({MeasurementMethodType::NormalZeroVeclotiMeasurement, ([&](
-                    Eigen::MatrixXd &state,
-                    Eigen::MatrixXd &state_prob,
-                    const Eigen::MatrixXd &m,
-                    const Eigen::MatrixXd &cov_m,
-                    Eigen::MatrixXd &dx
+            MeasurementEquationMap.insert(
+                    {MeasurementMethodType::NormalZeroVeclotiMeasurement,
+                     ([&](Eigen::MatrixXd &state,
+                          Eigen::MatrixXd &state_prob,
+                          const Eigen::MatrixXd &m,
+                          const Eigen::MatrixXd &cov_m,
+                          Eigen::MatrixXd &dx
 
-            ) {
+                     ) {
 
-                H_ = Eigen::MatrixXd::Zero(3, 9);
-                H_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * 1.0;
-                if (IS_DEBUG) {
-                    std::cout << H_ << std::endl;
-                    std::cout << " p * H^T :" << state_prob * H_.transpose().eval() << std::endl;
-                    std::cout << " H * P * H^T + cosv:" << H_ * state_prob * H_.transpose().eval() + cov_m << std::endl;
-                    std::cout << "inverse " << (H_ * state_prob * H_.transpose().eval() + cov_m).inverse() << std::endl;
+                         H_ = Eigen::MatrixXd::Zero(3, 9);
+                         H_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * 1.0;
+                         if (IS_DEBUG) {
+                             std::cout << H_ << std::endl;
+                             std::cout << " p * H^T :" << state_prob * H_.transpose().eval() << std::endl;
+                             std::cout << " H * P * H^T + cosv:" << H_ * state_prob * H_.transpose().eval() + cov_m
+                                       << std::endl;
+                             std::cout << "inverse " << (H_ * state_prob * H_.transpose().eval() + cov_m).inverse()
+                                       << std::endl;
 
-                }
+                         }
 
-                K_ = (state_prob * H_.transpose().eval()) *
-                     (H_ * state_prob * H_.transpose().eval() + cov_m).inverse();
-                if (std::isnan(K_.sum()) || std::isinf(K_.sum())) {
-                    std::cout << "K is nana" << std::endl;
-                }
+                         K_ = (state_prob * H_.transpose().eval()) *
+                              (H_ * state_prob * H_.transpose().eval() + cov_m).inverse();
+                         if (std::isnan(K_.sum()) || std::isinf(K_.sum())) {
+                             std::cout << "K is nana" << std::endl;
+                         }
 
-                /*
-                 * update probability
-                 */
-                state_prob = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * state_prob;
-                state_prob = (state_prob + state_prob.transpose().eval()) * 0.5;
+                         /*
+                          * update probability
+                          */
+                         state_prob = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * state_prob;
+                         state_prob = (state_prob + state_prob.transpose().eval()) * 0.5;
 //                if(state_prob.norm()>10000){
 //                    state_prob/=100.0;
 //                }
-                if (std::isnan(state_prob.sum()) || std::isinf(state_prob.sum())) {
-                    std::cout << "state prob has nan" << std::endl;
-                }
+                         if (std::isnan(state_prob.sum()) || std::isinf(state_prob.sum())) {
+                             std::cout << "state prob has nan" << std::endl;
+                         }
 
-                /*
-                 * update state
-                 */
-                Eigen::MatrixXd tdx = K_ * (m - state.block(3, 0, 3, 1));
+                         /*
+                          * update state
+                          */
+                         Eigen::MatrixXd tdx = K_ * (m - state.block(3, 0, 3, 1));
 
-                state += tdx;
+                         state += tdx;
 
-                Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(3), Eigen::Vector3d::UnitX())
-                                             * Eigen::AngleAxisd(tdx(4), Eigen::Vector3d::UnitY())
-                                             * Eigen::AngleAxisd(tdx(5), Eigen::Vector3d::UnitZ());
-                if (std::isnan(state.sum())) {
-                    std::cout << "some error " << std::endl;
-                }
+                         Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(3), Eigen::Vector3d::UnitX())
+                                                      * Eigen::AngleAxisd(tdx(4), Eigen::Vector3d::UnitY())
+                                                      * Eigen::AngleAxisd(tdx(5), Eigen::Vector3d::UnitZ());
+                         if (std::isnan(state.sum())) {
+                             std::cout << "some error " << std::endl;
+                         }
 
 //                rotate_q_ = delta_q * rotate_q_;
 
-                return;
-            })});
+                         return;
+                     })});
 
 
             /**
              *
              */
-            MeasurementEquationMap.insert({MeasurementMethodType::NormalUwbMeasuremnt, ([&](Eigen::MatrixXd &state,
-                                                                                            Eigen::MatrixXd &state_prob,
-                                                                                            const Eigen::MatrixXd &m,
-                                                                                            const Eigen::MatrixXd &cov_m,
-                                                                                            Eigen::MatrixXd &dx
-            ) {
-                Eigen::Vector3d b = m.block(0,0,3,1);
-                Eigen::Matrix<double,1,1> z;
-                z(0)= m(3);
-                Eigen::Matrix<double,1,1> y;
-                y(0) = (state.block(0,0,3,1)-b).norm();
+            MeasurementEquationMap.insert(
+                    {MeasurementMethodType::NormalUwbMeasuremnt,
+                     ([&](Eigen::MatrixXd &state,
+                          Eigen::MatrixXd &state_prob,
+                          const Eigen::MatrixXd &m,
+                          const Eigen::MatrixXd &cov_m,
+                          Eigen::MatrixXd &dx
+                     ) {
+                         Eigen::Vector3d b = m.block(0, 0, 3, 1);
+                         Eigen::Matrix<double, 1, 1> z;
+                         z(0) = m(3);
+                         Eigen::Matrix<double, 1, 1> y;
+                         y(0) = (state.block(0, 0, 3, 1) - b).norm();
 
 
-                H_.resize(1,9);
-                H_.setZero();
-                H_.block(0,0,1,3) = 2* (state.block(0,0,3,1)-b).transpose();
+                         H_.resize(1, 9);
+                         H_.setZero();
+                         H_.block(0, 0, 1, 3) = 2 * (state.block(0, 0, 3, 1) - b).transpose();
 
-                K_ = (state_prob * H_.transpose().eval()) *
-                        (H_ * state_prob * H_.transpose().eval() +  cov_m).inverse();
+                         K_ = (state_prob * H_.transpose().eval()) *
+                              (H_ * state_prob * H_.transpose().eval() + cov_m).inverse();
 
-                dx =K_*(z - y);
+                         dx = K_ * (z - y);
 
-                state.block(0,0,6,1) += dx.block(0,0,6,1);
+                         state.block(0, 0, 6, 1) += dx.block(0, 0, 6, 1);
 
 //                std::cout << "dx:" << dx.transpose() << std::endl;
 
-                state_prob = (Eigen::Matrix<double,9,9>::Identity()-K_ * H_ ) * state_prob;
+                         state_prob = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * state_prob;
 
 
-                return;
-            })});
+                         return;
+                     })});
 
 
             /**
              *  measurement here is not the measurement value in kalman filter frame!!!
              *
              */
-            MeasurementEquationMap.insert({MeasurementMethodType::NormalAngleConstraint, ([&](Eigen::MatrixXd &state,
-                                                                                              Eigen::MatrixXd &state_prob,
-                                                                                              const Eigen::MatrixXd &m,
-                                                                                              const Eigen::MatrixXd &cov_m,
-                                                                                              Eigen::MatrixXd &dx
-            ) {
-                Eigen::Vector3d tmp_acc = m;
-                local_g_ = tmp_acc.norm();
-                auto the_y = [tmp_acc](Eigen::Vector3d w) -> Eigen::Vector3d {
-                    Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(w(0), Eigen::Vector3d::UnitX())
-                                               * Eigen::AngleAxisd(w(1), Eigen::Vector3d::UnitY())
-                                               * Eigen::AngleAxisd(w(2), Eigen::Vector3d::UnitZ());
+            MeasurementEquationMap.insert(
+                    {MeasurementMethodType::NormalAngleConstraint,
+                     ([&](Eigen::MatrixXd &state,
+                          Eigen::MatrixXd &state_prob,
+                          const Eigen::MatrixXd &m,
+                          const Eigen::MatrixXd &cov_m,
+                          Eigen::MatrixXd &dx
+                     ) {
+                         Eigen::Vector3d tmp_acc = m;
+                         local_g_ = tmp_acc.norm();
+                         auto the_y = [tmp_acc](Eigen::Vector3d w) -> Eigen::Vector3d {
+                             Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(w(0), Eigen::Vector3d::UnitX())
+                                                        * Eigen::AngleAxisd(w(1), Eigen::Vector3d::UnitY())
+                                                        * Eigen::AngleAxisd(w(2), Eigen::Vector3d::UnitZ());
 
-                    return tmp_q * tmp_acc;
-                };
+                             return tmp_q * tmp_acc;
+                         };
 
 
-                state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+                         state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 //                dx =
-                H_ = Eigen::Matrix3d::Identity();
-                double epsilon = 0.000001;
-                for (int i(0); i < 3; ++i) {
-                    Eigen::Vector3d offset(0, 0, 0);
-                    offset(i) += epsilon;
-                    H_.block(0, i, 3, 1) = (the_y(state.block(6, 0, 3, 1) + offset) -
-                                            the_y(state.block(6, 0, 3, 1))) / epsilon;
-                }
+                         H_ = Eigen::Matrix3d::Identity();
+                         double epsilon = 0.000001;
+                         for (int i(0); i < 3; ++i) {
+                             Eigen::Vector3d offset(0, 0, 0);
+                             offset(i) += epsilon;
+                             H_.block(0, i, 3, 1) = (the_y(state.block(6, 0, 3, 1) + offset) -
+                                                     the_y(state.block(6, 0, 3, 1))) / epsilon;
+                         }
 
 
-                K_ = (state_prob.block(6, 6, 3, 3) * H_.transpose().eval()) *
-                     (H_ * state_prob.block(6, 6, 3, 3) * H_.transpose() + cov_m).inverse();
-                dx = K_ * (Eigen::Vector3d(0, 0, m.norm()) - the_y(state.block(6, 0, 3, 1)));
+                         K_ = (state_prob.block(6, 6, 3, 3) * H_.transpose().eval()) *
+                              (H_ * state_prob.block(6, 6, 3, 3) * H_.transpose() + cov_m).inverse();
+                         dx = K_ * (Eigen::Vector3d(0, 0, m.norm()) - the_y(state.block(6, 0, 3, 1)));
 
-                Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dx(0), Eigen::Vector3d::UnitX())
-                                           * Eigen::AngleAxisd(dx(1), Eigen::Vector3d::UnitY())
-                                           * Eigen::AngleAxisd(dx(2), Eigen::Vector3d::UnitZ());
-                rotate_q_ = tmp_q * rotate_q_;
-                rotate_q_.normalize();
-                state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+                         Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dx(0), Eigen::Vector3d::UnitX())
+                                                    * Eigen::AngleAxisd(dx(1), Eigen::Vector3d::UnitY())
+                                                    * Eigen::AngleAxisd(dx(2), Eigen::Vector3d::UnitZ());
+                         rotate_q_ = tmp_q * rotate_q_;
+                         rotate_q_.normalize();
+                         state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
 
-                return;
-            })});
+                         return;
+                     })});
         }
 
         /**
