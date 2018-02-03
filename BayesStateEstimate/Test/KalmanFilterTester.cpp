@@ -17,6 +17,9 @@
 #include "../BayesFilter/KalmanFilter/IMUWBKF.h"
 #include "../BayesFilter/KalmanFilter/IMUWBKF.cpp"
 
+#include "../AuxiliaryTool/UwbTools.h"
+#include "../AuxiliaryTool/UwbTools.cpp"
+
 namespace plt = matplotlibcpp;
 
 /**
@@ -116,32 +119,20 @@ int main(int argc, char *argv[]) {
     // get the initial pose based on uwb data.
 
     std::cout << uwb_data.block(0, 0, 1, uwb_data.cols()) << std::endl;
-    auto uwb_err = [&beacon_set_data, &uwb_data]
 
+    auto uwb_tool = BSE::UwbTools(uwb_data,
+                                  beacon_set_data);
 
-    Eigen::Vector3d initial_pos = Eigen::Vector3d(0, 0, 0);
-    double last_uwb_err = 10000000000.0;
-    int ite_times = 0;
-
-    double step_length = 0.00001;
-    double update_rate = 0.15;
-
-    while (
-            ite_times < 1000) {
-        last_uwb_err = uwb_err(initial_pos);
-        Eigen::Vector3d tmp_gradient(0, 0, 0);
-        for (int i(0); i < 3; ++i) {
-            auto t_v = initial_pos;
-            t_v(i) += step_length;
-            tmp_gradient(i) = (uwb_err(t_v) - last_uwb_err) / step_length;
+    Eigen::MatrixXd optimize_trace = uwb_tool.uwb_position_function();
+    Eigen::Vector3d initial_pos = optimize_trace.block(0,0,1,3).transpose();
+    std::vector<std::vector<double>> optimize_trace_vec={{},{},{}};
+    for(int i(0);i<optimize_trace.rows();++i){
+        for(int j(0);j<3;++j){
+            optimize_trace_vec[j].push_back(uwb_data(i,j));
         }
-        initial_pos -= tmp_gradient * update_rate;
-
-
-        std::cout << "last err:" << last_uwb_err << std::endl;
-        ite_times++;
-
     }
+
+
 //    std::cout << last_uwb_err
 
     //process
@@ -154,7 +145,8 @@ int main(int argc, char *argv[]) {
     process_noise_matrix.block(0, 0, 3, 3) *= 0.1;
     process_noise_matrix.block(3, 3, 3, 3) *= (0.1 * M_PI / 180.0);
 
-    Eigen::MatrixXd measurement_noise_matrix = Eigen::MatrixXd::Identity(uwb_data.cols() - 1, uwb_data.cols() - 1);
+    Eigen::MatrixXd measurement_noise_matrix =
+            Eigen::MatrixXd::Identity(uwb_data.cols() - 1, uwb_data.cols() - 1);
     measurement_noise_matrix *= 0.1;
 
 
@@ -296,7 +288,11 @@ int main(int argc, char *argv[]) {
         plt::legend();
 
         plt::figure();
-        plt::plot(pose[0], pose[1], "-*");
+        plt::named_plot("ekf trace",pose[0], pose[1], "-*");
+        plt::named_plot("optimized trace",
+                        optimize_trace_vec[0],
+                        optimize_trace_vec[1],"*");
+        plt::legend();
         plt::grid(true);
         plt::title(data_name + "trace");
 
