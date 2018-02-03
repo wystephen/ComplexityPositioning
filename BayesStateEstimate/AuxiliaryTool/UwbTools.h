@@ -43,9 +43,7 @@ namespace BSE {
         Eigen::MatrixXd beacon_set_;
         int uwb_index = 0;
 
-        std::function<double(Eigen::Vector3d)> uwb_err_function = [&uwb_data_,
-                &beacon_set_,
-                &uwb_index]
+        std::function<double(Eigen::Vector3d)> uwb_err_function = [&]
                 (Eigen::Vector3d pos) -> double {
             int vaild_counter = 0;
             double sum_err = 0.0;
