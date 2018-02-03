@@ -186,8 +186,8 @@ int main(int argc, char *argv[]) {
             &measurement_noise_matrix,
             &uwb_data,
             &beacon_set_data,
-    &initial_pos](const Eigen::MatrixXd &imu_data,
-                              std::string data_name) {
+            &initial_pos](const Eigen::MatrixXd &imu_data,
+                          std::string data_name) {
         auto filter = BSE::IMUWBKFBase(
                 initial_prob_matrix);
         filter.setTime_interval_(0.005);
@@ -196,8 +196,8 @@ int main(int argc, char *argv[]) {
 
         auto time_begin = AWF::getDoubleSecondTime();
         filter.initial_state(imu_data.block(10, 1, 100, 6),
-        0.0,
-        initial_pos);
+                             0.0,
+                             initial_pos);
         std::cout << "costed time :" << AWF::getDoubleSecondTime() - time_begin
                   << std::endl;
 
