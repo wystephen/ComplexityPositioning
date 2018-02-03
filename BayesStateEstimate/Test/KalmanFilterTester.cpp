@@ -117,24 +117,7 @@ int main(int argc, char *argv[]) {
 
     std::cout << uwb_data.block(0, 0, 1, uwb_data.cols()) << std::endl;
     auto uwb_err = [&beacon_set_data, &uwb_data]
-            (Eigen::Vector3d pos) -> double {
-        int vaild_counter = 0;
-        double sum_err = 0.0;
-        for (int i(1); i < uwb_data.cols(); ++i) {
-            if (uwb_data(0, i) > 0.0) {
-                sum_err += std::abs(uwb_data(0, i) -
-                                    (pos - beacon_set_data.block(i - 1, 0, 1, 3).transpose()).norm());
-                vaild_counter++;
-            }
 
-        }
-        if (vaild_counter > 0) {
-
-            return sum_err / double(vaild_counter);
-        } else {
-            return 1000000.0;
-        }
-    };
 
     Eigen::Vector3d initial_pos = Eigen::Vector3d(0, 0, 0);
     double last_uwb_err = 10000000000.0;
