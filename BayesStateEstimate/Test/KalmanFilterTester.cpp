@@ -20,6 +20,9 @@
 #include "../AuxiliaryTool/UwbTools.h"
 #include "../AuxiliaryTool/UwbTools.cpp"
 
+#include "../AuxiliaryTool/ImuTools.h"
+#include "../AuxiliaryTool/ImuTools.cpp"
+
 
 namespace plt = matplotlibcpp;
 
@@ -73,11 +76,13 @@ int main(int argc, char *argv[]) {
 
 
 //    std::cout << last_uwb_err
+    auto imu_tool = BSE::ImuTools();
+
 
     //process
-    processImuData(left_imu_data);
-    processImuData(right_imu_data);
-    processImuData(head_imu_data);
+    imu_tool.processImuData(left_imu_data);
+    imu_tool.processImuData(right_imu_data);
+    imu_tool.processImuData(head_imu_data);
 
     Eigen::MatrixXd process_noise_matrix =
             Eigen::MatrixXd::Identity(6, 6);
@@ -178,7 +183,7 @@ int main(int argc, char *argv[]) {
             }
 
 
-            if (GLRT_Detector(imu_data.block(i - 4, 1, 7, 6))) {
+            if (imu_tool.GLRT_Detector(imu_data.block(i - 4, 1, 7, 6))) {
                 /// zero velocity detector
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
                                         Eigen::Matrix3d::Identity() * 0.021001,
