@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
     // parameters
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0015/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0014/";
 
 
 
@@ -244,7 +244,7 @@ int main(int argc, char *argv[]) {
             if (GLRT_Detector(imu_data.block(i - 4, 1, 7, 6))) {
                 /// zero velocity detector
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-                                        Eigen::Matrix3d::Identity() * 1.0001,
+                                        Eigen::Matrix3d::Identity() * 0.021001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 //                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
 //                                        Eigen::Matrix3d::Identity() * 0.01,
