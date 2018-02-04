@@ -72,6 +72,9 @@ namespace BSE {
 
         std::function<double(Eigen::Vector3d)> uwb_err_function = [&]
                 (Eigen::Vector3d pos) -> double {
+            if (!checkData()) {
+                return 0.0;
+            }
             int vaild_counter = 0;
             double sum_err = 0.0;
             for (int i(1); i < uwb_data_.cols(); ++i) {
@@ -92,6 +95,9 @@ namespace BSE {
 
         std::function<Eigen::MatrixXd()> uwb_position_function = [
                 &]() -> Eigen::MatrixXd {
+            if (!checkData()) {
+                return Eigen::Matrix3d::Identity();
+            }
             Eigen::MatrixXd trace = Eigen::MatrixXd(uwb_data_.rows(), 3);
             Eigen::Vector3d initial_pos(0, 0, 0);
             for (int i(0); i < trace.rows(); ++i) {
