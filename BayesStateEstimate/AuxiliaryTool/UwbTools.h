@@ -69,8 +69,13 @@ namespace BSE {
             }
         }
 
+        /**
+         * return the orientation of the function.
+         */
         std::function<double(Eigen::MatrixXd &)> computeInitialOri=[&]
                 (Eigen::MatrixXd &trace_data)->double{
+
+
 
 
         };
