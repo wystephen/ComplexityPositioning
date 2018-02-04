@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
 
     Eigen::MatrixXd optimize_trace = uwb_tool.uwb_position_function();
     Eigen::Vector3d initial_pos = optimize_trace.block(0, 0, 1, 3).transpose();
-    Eigen::Vector3d initial_ori = 0;
+    double initial_ori = 0;
 
     std::vector<std::vector<double>> optimize_trace_vec = {{},
                                                            {},
