@@ -43,6 +43,33 @@ namespace BSE {
         Eigen::MatrixXd beacon_set_;
         int uwb_index = 0;
 
+        /**
+         * check the data if it is available.
+         * @return wether the data is available.
+         */
+        bool checkData() {
+            if (uwb_data_.rows() > 0 && beacon_set_.rows() > 0) {
+                if (uwb_data_.cols() - 1 != beacon_set_.rows()) {
+
+                    return true;
+                } else {
+                    std::cout << uwb_data_.rows() << "x" << uwb_data_.cols() << std::endl;
+                    std::cout << beacon_set_.rows() << "x" << beacon_set_.cols() << std::endl;
+
+                    return false;
+                }
+
+            } else {
+                std::cout << __FUNCTION__
+                          << ":"
+                          << __LINE__
+                          << "uwb data or beacon set is zeros"
+                          << std::endl;
+                return false;
+            }
+        }
+
+
         std::function<double(Eigen::Vector3d)> uwb_err_function = [&]
                 (Eigen::Vector3d pos) -> double {
             int vaild_counter = 0;
@@ -92,7 +119,7 @@ namespace BSE {
 
                 }
 
-                trace.block(i,0,1,3) = initial_pos.transpose();
+                trace.block(i, 0, 1, 3) = initial_pos.transpose();
 
             }
             return trace;
