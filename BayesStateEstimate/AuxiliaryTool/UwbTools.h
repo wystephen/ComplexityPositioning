@@ -70,6 +70,11 @@ namespace BSE {
         }
 
 
+        /**
+         * err function.
+         * @param pose
+         * return error according to beacon set.
+         */
         std::function<double(Eigen::Vector3d)> uwb_err_function = [&]
                 (Eigen::Vector3d pos) -> double {
             if (!checkData()) {
@@ -93,6 +98,11 @@ namespace BSE {
             }
         };
 
+        /**
+         *
+         * @param trace based on
+         * return
+         */
         std::function<Eigen::MatrixXd()> uwb_position_function = [
                 &]() -> Eigen::MatrixXd {
             if (!checkData()) {
