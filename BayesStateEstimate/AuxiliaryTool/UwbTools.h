@@ -49,7 +49,7 @@ namespace BSE {
          */
         bool checkData() {
             if (uwb_data_.rows() > 0 && beacon_set_.rows() > 0) {
-                if (uwb_data_.cols() - 1 != beacon_set_.rows()) {
+                if (uwb_data_.cols() - 1 == beacon_set_.rows()) {
 
                     return true;
                 } else {
@@ -68,6 +68,12 @@ namespace BSE {
                 return false;
             }
         }
+
+        std::function<double(Eigen::MatrixXd &)> computeInitialOri=[&]
+                (Eigen::MatrixXd &trace_data)->double{
+
+
+        };
 
 
         /**
@@ -106,6 +112,12 @@ namespace BSE {
         std::function<Eigen::MatrixXd()> uwb_position_function = [
                 &]() -> Eigen::MatrixXd {
             if (!checkData()) {
+                std::cout << __FUNCTION__
+                          << ":"
+                          << __FILE__
+                          <<":"
+                          << __LINE__
+                          << std::endl;
                 return Eigen::Matrix3d::Identity();
             }
             Eigen::MatrixXd trace = Eigen::MatrixXd(uwb_data_.rows(), 3);

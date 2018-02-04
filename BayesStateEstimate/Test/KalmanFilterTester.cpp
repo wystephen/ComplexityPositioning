@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
     // parameters
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0015/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0014/";
 
 
 
@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
                         Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
                         measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
                         measurement_noise_matrix.resize(1, 1);
-                        measurement_noise_matrix(0, 0) = 0.003;
+                        measurement_noise_matrix(0, 0) = 0.3;
                         // correct
                         filter.MeasurementState(measurement_data,
                                                 measurement_noise_matrix,
