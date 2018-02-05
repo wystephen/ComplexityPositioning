@@ -167,11 +167,11 @@ int main(int argc, char *argv[]) {
 //                          << imu_data(i, 0) << std::endl;
 
                 for (int k(1); k < uwb_data.cols(); ++k) {
-                    if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 5.0) {
+                    if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 115.0) {
                         Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
                         measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
                         measurement_noise_matrix.resize(1, 1);
-                        measurement_noise_matrix(0, 0) = 0.3;
+                        measurement_noise_matrix(0, 0) = 0.003;
                         // correct
                         filter.MeasurementState(measurement_data,
                                                 measurement_noise_matrix,
@@ -185,11 +185,11 @@ int main(int argc, char *argv[]) {
             if (imu_tool.GLRT_Detector(imu_data.block(i - 4, 1, 7, 6))) {
                 /// zero velocity detector
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-                                        Eigen::Matrix3d::Identity() * 0.051001,
+                                        Eigen::Matrix3d::Identity() * 0.0051001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
-                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
-                                        Eigen::Matrix3d::Identity() * 0.01,
-                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+//                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
+//                                        Eigen::Matrix3d::Identity() * 0.01,
+//                                        BSE::MeasurementMethodType::NormalAngleConstraint);
                 zv_flag.push_back(1.0);
             } else {
                 zv_flag.push_back(0.0);
@@ -236,6 +236,20 @@ int main(int argc, char *argv[]) {
         plt::named_plot("optimized trace",
                         optimize_trace_vec[0],
                         optimize_trace_vec[1], "*");
+
+        double min_v(0.0), max_v(0.0);
+        min_v = std::min(std::min(*std::min_element(pose[0].begin(), pose[0].end()),
+                                  *std::min_element(pose[1].begin(), pose[1].end())),
+                         std::min(*std::min_element(optimize_trace_vec[0].begin(), optimize_trace_vec[0].end()),
+                                  *std::min_element(optimize_trace_vec[1].begin(), optimize_trace_vec[1].end())));
+
+        max_v = std::max(std::max(*std::max_element(pose[0].begin(), pose[0].end()),
+                         *std::max_element(pose[1].begin(), pose[1].end())),
+                         std::max(*std::max_element(optimize_trace_vec[0].begin(),optimize_trace_vec[0].end()),
+                         *std::max_element(optimize_trace_vec[1].begin(),optimize_trace_vec[1].end())));
+        plt::xlim(min_v,max_v);
+        plt::ylim(min_v,max_v);
+
         plt::legend();
         plt::grid(true);
         plt::title(data_name + "trace");
@@ -243,8 +257,8 @@ int main(int argc, char *argv[]) {
     };
 
 //    f(left_imu_data, "left_foot");
-//    f(right_imu_data, "right_foot");
-    f(head_imu_data, "head");
+    f(right_imu_data, "right_foot");
+//    f(head_imu_data, "head");
 
     plt::show();
 
