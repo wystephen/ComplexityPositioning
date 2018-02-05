@@ -72,10 +72,23 @@ namespace BSE {
         /**
          * return the orientation of the function.
          */
-        std::function<double(Eigen::MatrixXd &)> computeInitialOri=[&]
-                (Eigen::MatrixXd &trace_data)->double{
+        std::function<double(Eigen::MatrixXd &)> computeInitialOri = [&]
+                (Eigen::MatrixXd &trace_data) -> double {
+            if (!checkData()) {
+                std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+                return 0.0;
+            }
 
+            int i(0);
+            int j(0);
+            // TODO: soft RANSAC for choice right orientation.
+            for (; j < trace_data.rows(); ++j) {
+                if ((trace_data.block(j, 0, 1, 3) - trace_data(i, 0, 1, 3)).norm() > 1.0) {
+                    return std::atan2(trace_data(j, 1) - trace_data(i, 1),
+                                      trace_data(j, 0) - trace_data(i, 0));
 
+                }
+            }
 
 
         };
@@ -120,7 +133,7 @@ namespace BSE {
                 std::cout << __FUNCTION__
                           << ":"
                           << __FILE__
-                          <<":"
+                          << ":"
                           << __LINE__
                           << std::endl;
                 return Eigen::Matrix3d::Identity();
