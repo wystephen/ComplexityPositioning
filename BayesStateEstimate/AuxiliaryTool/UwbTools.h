@@ -83,7 +83,7 @@ namespace BSE {
             int j(0);
             // TODO: soft RANSAC for choice right orientation.
             for (; j < trace_data.rows(); ++j) {
-                if ((trace_data.block(j, 0, 1, 3) - trace_data.block(i, 0, 1, 3)).norm() > 1.0) {
+                if ((trace_data.block(j, 0, 1, 3) - trace_data.block(i, 0, 1, 3)).norm() > 3.0) {
                     return std::atan2(trace_data(j, 1) - trace_data(i, 1),
                                       trace_data(j, 0) - trace_data(i, 0));
 
