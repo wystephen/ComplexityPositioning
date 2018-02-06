@@ -131,7 +131,14 @@ int main(int argc, char *argv[]) {
                                                   {}};
         std::vector<double> zv_flag = {};
 
+        std::vector<std::vector<double>> angle_velocity = {{},
+                                                           {},
+                                                           {}};
 
+        std::vector<std::vector<double>> acc = {
+                {},
+                {},
+                {}};
 
 //    filter.sett
         for (int i(5); i < imu_data.rows() - 5; ++i) {
@@ -190,6 +197,10 @@ int main(int argc, char *argv[]) {
 //                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
 //                                        Eigen::Matrix3d::Identity() * 0.01,
 //                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+                std::cout << " linear accc:"
+                          << (filter.getRotate_q().toRotationMatrix() *
+                              imu_data.block(i, 4, 1, 3).transpose()).transpose().norm()
+                          << std::endl;
                 zv_flag.push_back(1.0);
             } else {
                 zv_flag.push_back(0.0);
@@ -201,6 +212,8 @@ int main(int argc, char *argv[]) {
                 pose[j].push_back(state(j));
                 velocity[j].push_back(state(j + 3));
                 angle[j].push_back(state(j + 6));
+                acc[j].push_back(imu_data(i,j+2));
+                angle_velocity[j].push_back(imu_data(i,j+5));
             }
 
         }
@@ -231,6 +244,26 @@ int main(int argc, char *argv[]) {
         plt::grid(true);
         plt::legend();
 
+
+        plt::figure();
+        for (int i(0); i < 3; ++i) {
+            plt::named_plot(std::to_string(i), angle_velocity[i]);
+        }
+        plt::named_plot("zv_falg", zv_flag);
+        plt::title(data_name + "angle velocity");
+        plt::grid(true);
+        plt::legend();
+
+
+        plt::figure();
+        for (int i(0); i < 3; ++i) {
+            plt::named_plot(std::to_string(i), acc[i]);
+        }
+        plt::named_plot("zv_falg", zv_flag);
+        plt::title(data_name + "acc");
+        plt::grid(true);
+        plt::legend();
+
         plt::figure();
         plt::named_plot("ekf trace", pose[0], pose[1], "-*");
         plt::named_plot("optimized trace",
@@ -241,14 +274,16 @@ int main(int argc, char *argv[]) {
         min_v = std::min(std::min(*std::min_element(pose[0].begin(), pose[0].end()),
                                   *std::min_element(pose[1].begin(), pose[1].end())),
                          std::min(*std::min_element(optimize_trace_vec[0].begin(), optimize_trace_vec[0].end()),
-                                  *std::min_element(optimize_trace_vec[1].begin(), optimize_trace_vec[1].end())));
+                                  *std::min_element(optimize_trace_vec[1].begin(),
+                                                    optimize_trace_vec[1].end())));
 
         max_v = std::max(std::max(*std::max_element(pose[0].begin(), pose[0].end()),
-                         *std::max_element(pose[1].begin(), pose[1].end())),
-                         std::max(*std::max_element(optimize_trace_vec[0].begin(),optimize_trace_vec[0].end()),
-                         *std::max_element(optimize_trace_vec[1].begin(),optimize_trace_vec[1].end())));
-        plt::xlim(min_v,max_v);
-        plt::ylim(min_v,max_v);
+                                  *std::max_element(pose[1].begin(), pose[1].end())),
+                         std::max(*std::max_element(optimize_trace_vec[0].begin(), optimize_trace_vec[0].end()),
+                                  *std::max_element(optimize_trace_vec[1].begin(),
+                                                    optimize_trace_vec[1].end())));
+        plt::xlim(min_v, max_v);
+        plt::ylim(min_v, max_v);
 
         plt::legend();
         plt::grid(true);

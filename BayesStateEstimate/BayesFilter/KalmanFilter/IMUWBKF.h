@@ -79,7 +79,7 @@ namespace BSE {
                          Eigen::Vector3d linear_acc = rotate_q_.toRotationMatrix() * acc + gravity_g;
                          if (IS_DEBUG) {
                              std::cout << "acc in navigation frame:" << (rotate_q_ * acc).transpose();
-                             std::cout << "linear_acc:" << linear_acc.transpose() << std::endl;
+                             std::cout << "\nlinear_acc:" << linear_acc.transpose() << std::endl;
                          }
 
                          auto converted_input = input;
@@ -214,6 +214,7 @@ namespace BSE {
                          y(0) = (state.block(0, 0, 3, 1) - b).norm();
 
 
+
                          H_.resize(1, 9);
                          H_.setZero();
                          H_.block(0, 0, 1, 3) = 2 * (state.block(0, 0, 3, 1) - b).transpose();
@@ -247,8 +248,10 @@ namespace BSE {
                           Eigen::MatrixXd &dx
                      ) {
                          Eigen::Vector3d tmp_acc = m;
-                         local_g_ = tmp_acc.norm();
-                         std::cout << "local g :" << local_g_ << std::endl;
+//                         local_g_ = tmp_acc.norm();
+//                         std::cout << "local g :" << local_g_ << std::endl;
+//                         std::cout <<"linear acc:"
+//                                   << (rotate_q_ * m).transpose() << std::endl;
                          auto the_y = [tmp_acc](Eigen::Vector3d w) -> Eigen::Vector3d {
                              Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(w(0), Eigen::Vector3d::UnitX())
                                                         * Eigen::AngleAxisd(w(1), Eigen::Vector3d::UnitY())
