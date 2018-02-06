@@ -52,40 +52,31 @@ namespace BSE {
                          Eigen::Vector3d acc(input.block(0, 0, 3, 1));
                          Eigen::Vector3d gyr(input.block(3, 0, 3, 1) * time_interval_);
                          if (IS_DEBUG) {
-                             std::cout << "before imu:" << (rotate_q_ * acc).transpose() << std::endl;
+                             std::cout << "before rotate update imu:"
+                                       << (rotate_q_ * acc).transpose() << std::endl;
                          }
 
 
-                         if (gyr.norm() > 1e-8) {
+                         if (gyr.norm() > 1e-18) {
                              Eigen::Quaterniond tmp_q =
                                      Eigen::AngleAxisd(gyr(0), Eigen::Vector3d::UnitX())
                                      * Eigen::AngleAxisd(gyr(1), Eigen::Vector3d::UnitY())
                                      * Eigen::AngleAxisd(gyr(2), Eigen::Vector3d::UnitZ());
 //                             rotate_q_ =  tmp_q * rotate_q_;
 //                             tmp_q.normalize();
-//                             rotate_q_ = rotate_q_ * tmp_q;
+                             rotate_q_ = rotate_q_ * tmp_q;
 //                             rotate_q_ = tmp_q * rotate_q_;
 //                             rotate_q_ = tmp_q * rotate_q_;
 //                             rotate_q_ = rotate_q_ * tmp_q.inverse();
-                             rotate_q_ = tmp_q * rotate_q_;
+//                             rotate_q_ = tmp_q * rotate_q_;
                              rotate_q_.normalize();
 
                          }
 
 
-                         auto euler_func = [&](Eigen::Vector3d angle) {
-//                             return rotate_q_
-                             auto tmp_q = Eigen::AngleAxisd(angle(0), Eigen::Vector3d::UnitX())
-                                          *
-                                          Eigen::AngleAxisd(angle(1), Eigen::Vector3d::UnitY())
-                                          * Eigen::AngleAxisd(angle(2),
-                                                              Eigen::Vector3d::UnitZ());
-                             tmp_q = rotate_q_ * tmp_q;
-                             tmp_q.normalize();
-                             return tmp_q.toRotationMatrix().eulerAngles(0, 1, 2);
-                         };
+
                          Eigen::Vector3d gravity_g(0, 0, local_g_);
-                         Eigen::Vector3d linear_acc = rotate_q_ * acc + gravity_g;
+                         Eigen::Vector3d linear_acc = rotate_q_.toRotationMatrix() * acc + gravity_g;
                          if (IS_DEBUG) {
                              std::cout << "acc in navigation frame:" << (rotate_q_ * acc).transpose();
                              std::cout << "linear_acc:" << linear_acc.transpose() << std::endl;
@@ -95,7 +86,6 @@ namespace BSE {
                          converted_input.block(0, 0, 3, 1) = linear_acc;
                          converted_input.block(3, 0, 3, 1) = gyr;
 
-//                state.block
                          Eigen::MatrixXd A_ = Eigen::MatrixXd::Zero(9, 9);
                          // x y z
                          A_.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity();
@@ -107,19 +97,11 @@ namespace BSE {
 
                          Eigen::MatrixXd B_ = Eigen::MatrixXd::Zero(9, 6);
                          //x =
-                         B_.block(0, 0, 3, 3) =
-                                 Eigen::Matrix3d::Identity() * 0.5 * time_interval_ *
-                                 time_interval_;
+//                         B_.block(0, 0, 3, 3) =
+//                                 Eigen::Matrix3d::Identity() * 0.5 * time_interval_ *
+//                                 time_interval_;
                          B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
-//                         B_.block(3,0,3,3) =
-//                         B_.block()
 
-                         double step_len_rate = 0.1;
-                         for (int i(0); i < 3; ++i) {
-                             auto t_angle = gyr;
-                             t_angle(i) = gyr(i) * (1 + step_len_rate);
-//                             B_.block(6,3+i,3,1) = (euler_func(t_angle)-euler_func(gyr))/(t_angle(i)-gyr(i));
-                         }
 
                          state = A_ * state + B_ * converted_input;
                          state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
