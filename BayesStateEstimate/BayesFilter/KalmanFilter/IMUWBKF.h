@@ -112,7 +112,7 @@ namespace BSE {
                              std::cout << "B * cove * B.transpose() " << B_ * cov_input * B_.transpose() << std::endl;
                          }
                          // unconverted value
-                         B_.block(3, 0, 3, 3) = rotate_q_.toRotationMatrix() * time_interval_;
+//                         B_.block(3, 0, 3, 3) = rotate_q_.toRotationMatrix() ;//* time_interval_;
                          state_prob = A_ * state_prob * A_.transpose() + B_ * cov_input * B_.transpose();
                          if (std::isnan(state_prob.sum())) {
                              std::cout << "state prob is naa: " << state_prob << std::endl;
@@ -248,6 +248,7 @@ namespace BSE {
                      ) {
                          Eigen::Vector3d tmp_acc = m;
                          local_g_ = tmp_acc.norm();
+                         std::cout << "local g :" << local_g_ << std::endl;
                          auto the_y = [tmp_acc](Eigen::Vector3d w) -> Eigen::Vector3d {
                              Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(w(0), Eigen::Vector3d::UnitX())
                                                         * Eigen::AngleAxisd(w(1), Eigen::Vector3d::UnitY())
