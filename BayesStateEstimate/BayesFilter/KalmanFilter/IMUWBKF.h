@@ -317,7 +317,7 @@ namespace BSE {
 //            f_w = imu_data.col(2).mean();
             Eigen::Vector3d acc = imu_data.block(0, 0, imu_data.rows(), 3).colwise().mean();
             auto g = acc.norm();
-            local_g_ = g;
+//            local_g_ = g;
 
 
             auto g_error = [g, acc](double roll, double pitch, double yaw) -> double {
