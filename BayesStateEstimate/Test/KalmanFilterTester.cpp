@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {
 //                                        BSE::MeasurementMethodType::NormalAngleConstraint);
                 std::cout << " linear accc:"
                           << (filter.getRotate_q().toRotationMatrix() *
-                              imu_data.block(i, 4, 1, 3).transpose()).transpose().norm()
+                              imu_data.block(i, 1, 1, 3).transpose()).transpose().norm()
                           << std::endl;
                 zv_flag.push_back(1.0);
             } else {
@@ -212,8 +212,8 @@ int main(int argc, char *argv[]) {
                 pose[j].push_back(state(j));
                 velocity[j].push_back(state(j + 3));
                 angle[j].push_back(state(j + 6));
-                acc[j].push_back(imu_data(i,j+2));
-                angle_velocity[j].push_back(imu_data(i,j+5));
+                acc[j].push_back(imu_data(i,j+1));
+                angle_velocity[j].push_back(imu_data(i,j+4));
             }
 
         }
