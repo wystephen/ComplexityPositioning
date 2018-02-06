@@ -183,14 +183,16 @@ namespace BSE {
 
                          state += tdx;
 
-                         Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(3), Eigen::Vector3d::UnitX())
-                                                      * Eigen::AngleAxisd(tdx(4), Eigen::Vector3d::UnitY())
-                                                      * Eigen::AngleAxisd(tdx(5), Eigen::Vector3d::UnitZ());
+                         Eigen::Quaterniond delta_q = Eigen::AngleAxisd(-tdx(3), Eigen::Vector3d::UnitX())
+                                                      * Eigen::AngleAxisd(-tdx(4), Eigen::Vector3d::UnitY())
+                                                      * Eigen::AngleAxisd(-tdx(5), Eigen::Vector3d::UnitZ());
                          if (std::isnan(state.sum())) {
                              std::cout << "some error " << std::endl;
                          }
 
-//                         rotate_q_ = delta_q * rotate_q_;
+//                         rotate_q_ = delta_q.inverse() * rotate_q_;
+//                         rotate_q_ = rotate_q_ * delta_q;
+                         rotate_q_ = delta_q * rotate_q_;
 
                          return;
                      })});
