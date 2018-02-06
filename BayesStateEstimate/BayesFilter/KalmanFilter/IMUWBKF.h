@@ -57,14 +57,17 @@ namespace BSE {
 
 
                          if (gyr.norm() > 1e-8) {
-                             Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(gyr(0), Eigen::Vector3d::UnitX())
-                                                        *
-                                                        Eigen::AngleAxisd(gyr(1), Eigen::Vector3d::UnitY())
-                                                        * Eigen::AngleAxisd(gyr(2),
-                                                                            Eigen::Vector3d::UnitZ());
+                             Eigen::Quaterniond tmp_q =
+                                     Eigen::AngleAxisd(gyr(0), Eigen::Vector3d::UnitX())
+                                     * Eigen::AngleAxisd(gyr(1), Eigen::Vector3d::UnitY())
+                                     * Eigen::AngleAxisd(gyr(2), Eigen::Vector3d::UnitZ());
 //                             rotate_q_ =  tmp_q * rotate_q_;
-                             tmp_q.normalize();
-                             rotate_q_ = rotate_q_ * tmp_q;
+//                             tmp_q.normalize();
+//                             rotate_q_ = rotate_q_ * tmp_q;
+//                             rotate_q_ = tmp_q * rotate_q_;
+//                             rotate_q_ = tmp_q * rotate_q_;
+//                             rotate_q_ = rotate_q_ * tmp_q.inverse();
+                             rotate_q_ = tmp_q * rotate_q_;
                              rotate_q_.normalize();
 
                          }
@@ -205,7 +208,7 @@ namespace BSE {
                              std::cout << "some error " << std::endl;
                          }
 
-//                rotate_q_ = delta_q * rotate_q_;
+//                         rotate_q_ = delta_q * rotate_q_;
 
                          return;
                      })});
@@ -312,9 +315,6 @@ namespace BSE {
                            Eigen::Vector3d initial_pos = Eigen::Vector3d(0, 0, 0)
         ) {
             long double f_u(0.0), f_v(0.0), f_w(0.0);
-//            f_u = imu_data.col(0).mean();
-//            f_v = imu_data.col(1).mean();
-//            f_w = imu_data.col(2).mean();
             Eigen::Vector3d acc = imu_data.block(0, 0, imu_data.rows(), 3).colwise().mean();
             auto g = acc.norm();
 //            local_g_ = g;
@@ -325,7 +325,6 @@ namespace BSE {
                 auto rotate_matrix = (Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX())
                                       * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
                                       * Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()));
-//                std::cout << typeid(rotate_matrix) << std::endl;
                 return std::abs(g + (rotate_matrix * acc)(2));
             };
             auto ge(0.0);
@@ -334,9 +333,6 @@ namespace BSE {
             /**
              * find initial euler angle through optimization.
              */
-//            double tr = std::atan(f_v / f_w);
-//            double tp = -std::asin(f_u /
-//                                   std::sqrt(f_u * f_u + f_v * f_v + f_w * f_w));
             double tr = 0.0;
             double tp = 0.0;
 
