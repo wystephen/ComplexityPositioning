@@ -173,9 +173,9 @@ int main(int argc, char *argv[]) {
                         measurement_noise_matrix.resize(1, 1);
                         measurement_noise_matrix(0, 0) = 0.003;
                         // correct
-                        filter.MeasurementState(measurement_data,
-                                                measurement_noise_matrix,
-                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+//                        filter.MeasurementState(measurement_data,
+//                                                measurement_noise_matrix,
+//                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
                     }
                 }
@@ -257,8 +257,8 @@ int main(int argc, char *argv[]) {
     };
 
 //    f(left_imu_data, "left_foot");
-//    f(right_imu_data, "right_foot");
-    f(head_imu_data, "head");
+    f(right_imu_data, "right_foot");
+//    f(head_imu_data, "head");
 
     plt::show();
 
