@@ -183,16 +183,25 @@ namespace BSE {
 
                          state += tdx;
 
-                         Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(3), Eigen::Vector3d::UnitX())
-                                                      * Eigen::AngleAxisd(tdx(4), Eigen::Vector3d::UnitY())
-                                                      * Eigen::AngleAxisd(tdx(5), Eigen::Vector3d::UnitZ());
+
+                         Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(6), Eigen::Vector3d::UnitX())
+                                                      * Eigen::AngleAxisd(tdx(7), Eigen::Vector3d::UnitY())
+                                                      * Eigen::AngleAxisd(tdx(8), Eigen::Vector3d::UnitZ());
                          if (std::isnan(state.sum())) {
                              std::cout << "some error " << std::endl;
                          }
 
+                         Eigen::Matrix3d rotation_m ( rotate_q_.toRotationMatrix());
+                         Eigen::Matrix3d omega=Eigen::Matrix3d::Zero();
+                         omega << 0.0,tdx(8),-tdx(7),
+                                 -tdx(8),0.0,tdx(6),
+                                 tdx(7),-tdx(6),0.0;
+                         rotation_m = (2.0 * Eigen::Matrix3d::Identity()+omega) *
+                                 (2.0*Eigen::Matrix3d::Identity()-omega).inverse()
+                                 *rotation_m;
+
 //                         rotate_q_ = delta_q.inverse() * rotate_q_;
-//                         rotate_q_ = rotate_q_ * delta_q;
-                         rotate_q_ = delta_q * rotate_q_ * delta_q.inverse();
+                         rotate_q_ = Eigen::Quaterniond(rotation_m.matrix());
                          return;
                      })});
 
