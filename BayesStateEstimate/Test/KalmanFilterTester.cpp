@@ -180,9 +180,9 @@ int main(int argc, char *argv[]) {
                         measurement_noise_matrix.resize(1, 1);
                         measurement_noise_matrix(0, 0) = 0.003;
                         // correct
-                        filter.MeasurementState(measurement_data,
-                                                measurement_noise_matrix,
-                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+//                        filter.MeasurementState(measurement_data,
+//                                                measurement_noise_matrix,
+//                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
                     }
                 }
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
             if (imu_tool.GLRT_Detector(imu_data.block(i - 4, 1, 7, 6))) {
                 /// zero velocity detector
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-                                        Eigen::Matrix3d::Identity() * 0.00051001,
+                                        Eigen::Matrix3d::Identity() * 0.000251001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 //                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
 //                                        Eigen::Matrix3d::Identity() * 0.0001,
