@@ -197,10 +197,13 @@ int main(int argc, char *argv[]) {
 //                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
 //                                        Eigen::Matrix3d::Identity() * 0.01,
 //                                        BSE::MeasurementMethodType::NormalAngleConstraint);
-                std::cout << " linear accc:"
-                          << (filter.getRotate_q().toRotationMatrix() *
-                              imu_data.block(i, 1, 1, 3).transpose()).transpose().norm()
-                          << std::endl;
+                if (zv_flag[zv_flag.size() - 1] < 0.5) {
+                    std::cout << " linear accc:"
+                              << (filter.getRotate_q().toRotationMatrix() *
+                                  imu_data.block(i, 1, 1, 3).transpose()).transpose()
+                              << std::endl;
+                }
+
                 zv_flag.push_back(1.0);
             } else {
                 zv_flag.push_back(0.0);
@@ -212,8 +215,8 @@ int main(int argc, char *argv[]) {
                 pose[j].push_back(state(j));
                 velocity[j].push_back(state(j + 3));
                 angle[j].push_back(state(j + 6));
-                acc[j].push_back(imu_data(i,j+1));
-                angle_velocity[j].push_back(imu_data(i,j+4));
+                acc[j].push_back(imu_data(i, j + 1));
+                angle_velocity[j].push_back(imu_data(i, j + 4));
             }
 
         }
