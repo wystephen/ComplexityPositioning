@@ -192,7 +192,7 @@ namespace BSE {
 
 //                         rotate_q_ = delta_q.inverse() * rotate_q_;
 //                         rotate_q_ = rotate_q_ * delta_q;
-//                         rotate_q_ = delta_q * rotate_q_;
+                         rotate_q_ = delta_q * rotate_q_ * delta_q.inverse();
                          return;
                      })});
 
