@@ -56,7 +56,7 @@ namespace BSE {
                          }
 
 
-                         if (gyr.norm() > 1e-18) {
+                         if (gyr.norm() > 1e-8) {
                              Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(gyr(0), Eigen::Vector3d::UnitX())
                                                         *
                                                         Eigen::AngleAxisd(gyr(1), Eigen::Vector3d::UnitY())
@@ -179,9 +179,14 @@ namespace BSE {
                           */
                          state_prob = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * state_prob;
                          state_prob = (state_prob + state_prob.transpose().eval()) * 0.5;
-//                if(state_prob.norm()>10000){
-//                    state_prob/=100.0;
-//                }
+                         if (state_prob.norm() > 10000) {
+                             std::cout << __FILE__
+                                       << ":"
+                                       << __LINE__
+                                       << " Error state prob is too big"
+                                       << std::endl;
+                             state_prob /= 100.0;
+                         }
                          if (std::isnan(state_prob.sum()) || std::isinf(state_prob.sum())) {
                              std::cout << "state prob has nan" << std::endl;
                          }
@@ -200,7 +205,7 @@ namespace BSE {
                              std::cout << "some error " << std::endl;
                          }
 
-//                rotate_q_ = delta_q * rotate_q_;
+                rotate_q_ = delta_q * rotate_q_;
 
                          return;
                      })});
