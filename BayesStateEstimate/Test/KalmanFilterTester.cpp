@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
             if (imu_tool.GLRT_Detector(imu_data.block(i - 4, 1, 7, 6))) {
                 /// zero velocity detector
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-                                        Eigen::Matrix3d::Identity() * 0.0000051001,
+                                        Eigen::Matrix3d::Identity() * 0.00051001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 //                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
 //                                        Eigen::Matrix3d::Identity() * 0.0001,
@@ -297,7 +297,7 @@ int main(int argc, char *argv[]) {
 
     f(left_imu_data, "left_foot");
 //    f(right_imu_data, "right_foot");
-    f(head_imu_data, "head");
+//    f(head_imu_data, "head");
 
     plt::show();
 
