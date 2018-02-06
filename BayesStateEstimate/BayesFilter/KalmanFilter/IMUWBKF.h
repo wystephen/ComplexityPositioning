@@ -205,7 +205,7 @@ namespace BSE {
                              std::cout << "some error " << std::endl;
                          }
 
-                rotate_q_ = delta_q * rotate_q_;
+//                rotate_q_ = delta_q * rotate_q_;
 
                          return;
                      })});
