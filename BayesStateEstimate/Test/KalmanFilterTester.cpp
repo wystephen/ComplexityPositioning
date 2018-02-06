@@ -269,7 +269,7 @@ int main(int argc, char *argv[]) {
         plt::legend();
 
         plt::figure();
-        plt::named_plot("ekf trace", pose[0], pose[1], "-.");
+        plt::named_plot("ekf trace", pose[0], pose[1], "-+");
         plt::named_plot("optimized trace",
                         optimize_trace_vec[0],
                         optimize_trace_vec[1], "*");
@@ -286,8 +286,8 @@ int main(int argc, char *argv[]) {
                          std::max(*std::max_element(optimize_trace_vec[0].begin(), optimize_trace_vec[0].end()),
                                   *std::max_element(optimize_trace_vec[1].begin(),
                                                     optimize_trace_vec[1].end())));
-        plt::xlim(min_v, max_v);
-        plt::ylim(min_v, max_v);
+//        plt::xlim(min_v, max_v);
+//        plt::ylim(min_v, max_v);
 
         plt::legend();
         plt::grid(true);
@@ -296,7 +296,7 @@ int main(int argc, char *argv[]) {
     };
 
     f(left_imu_data, "left_foot");
-//    f(right_imu_data, "right_foot");
+    f(right_imu_data, "right_foot");
 //    f(head_imu_data, "head");
 
     plt::show();
