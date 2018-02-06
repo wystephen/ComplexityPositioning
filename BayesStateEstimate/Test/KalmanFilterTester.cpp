@@ -197,7 +197,8 @@ int main(int argc, char *argv[]) {
 //                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
 //                                        Eigen::Matrix3d::Identity() * 0.01,
 //                                        BSE::MeasurementMethodType::NormalAngleConstraint);
-                if (zv_flag[zv_flag.size() - 1] < 0.5) {
+                if (zv_flag.size()>3 &&
+                zv_flag.at(zv_flag.size() - 2) < 0.5) {
                     std::cout << " linear accc:"
                               << (filter.getRotate_q().toRotationMatrix() *
                                   imu_data.block(i, 1, 1, 3).transpose()).transpose()
