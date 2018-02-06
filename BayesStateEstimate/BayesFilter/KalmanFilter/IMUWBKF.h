@@ -183,17 +183,16 @@ namespace BSE {
 
                          state += tdx;
 
-                         Eigen::Quaterniond delta_q = Eigen::AngleAxisd(-tdx(3), Eigen::Vector3d::UnitX())
-                                                      * Eigen::AngleAxisd(-tdx(4), Eigen::Vector3d::UnitY())
-                                                      * Eigen::AngleAxisd(-tdx(5), Eigen::Vector3d::UnitZ());
+                         Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(3), Eigen::Vector3d::UnitX())
+                                                      * Eigen::AngleAxisd(tdx(4), Eigen::Vector3d::UnitY())
+                                                      * Eigen::AngleAxisd(tdx(5), Eigen::Vector3d::UnitZ());
                          if (std::isnan(state.sum())) {
                              std::cout << "some error " << std::endl;
                          }
 
 //                         rotate_q_ = delta_q.inverse() * rotate_q_;
 //                         rotate_q_ = rotate_q_ * delta_q;
-                         rotate_q_ = delta_q * rotate_q_;
-
+//                         rotate_q_ = delta_q * rotate_q_;
                          return;
                      })});
 
@@ -253,7 +252,7 @@ namespace BSE {
 //                         local_g_ = tmp_acc.norm();
 //                         std::cout << "local g :" << local_g_ << std::endl;
 //                         std::cout <<"linear acc:"
-//                                   << (rotate_q_ * m).transpose() << std::endl;
+//                                   << (rotate_q_.toRotationMatrix() * m).transpose() << std::endl;
                          auto the_y = [tmp_acc](Eigen::Vector3d w) -> Eigen::Vector3d {
                              Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(w(0), Eigen::Vector3d::UnitX())
                                                         * Eigen::AngleAxisd(w(1), Eigen::Vector3d::UnitY())
@@ -279,12 +278,14 @@ namespace BSE {
                               (H_ * state_prob.block(6, 6, 3, 3) * H_.transpose() + cov_m).inverse();
                          dx = K_ * (Eigen::Vector3d(0, 0, m.norm()) - the_y(state.block(6, 0, 3, 1)));
 
-                         Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dx(0), Eigen::Vector3d::UnitX())
+                         Eigen::Quaterniond tmp_q =
+                                 Eigen::AngleAxisd(dx(0), Eigen::Vector3d::UnitX())
                                                     * Eigen::AngleAxisd(dx(1), Eigen::Vector3d::UnitY())
                                                     * Eigen::AngleAxisd(dx(2), Eigen::Vector3d::UnitZ());
                          rotate_q_ = tmp_q * rotate_q_;
                          rotate_q_.normalize();
-                         state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+                         state.block(6, 0, 3, 1) =
+                                 rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
 
                          return;
