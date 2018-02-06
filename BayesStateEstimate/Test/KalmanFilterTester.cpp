@@ -174,15 +174,15 @@ int main(int argc, char *argv[]) {
 //                          << imu_data(i, 0) << std::endl;
 
                 for (int k(1); k < uwb_data.cols(); ++k) {
-                    if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 115.0) {
+                    if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 15.0) {
                         Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
                         measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
                         measurement_noise_matrix.resize(1, 1);
                         measurement_noise_matrix(0, 0) = 0.003;
                         // correct
-//                        filter.MeasurementState(measurement_data,
-//                                                measurement_noise_matrix,
-//                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+                        filter.MeasurementState(measurement_data,
+                                                measurement_noise_matrix,
+                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
                     }
                 }
@@ -269,7 +269,7 @@ int main(int argc, char *argv[]) {
         plt::legend();
 
         plt::figure();
-        plt::named_plot("ekf trace", pose[0], pose[1], "-*");
+        plt::named_plot("ekf trace", pose[0], pose[1], "-.");
         plt::named_plot("optimized trace",
                         optimize_trace_vec[0],
                         optimize_trace_vec[1], "*");
@@ -295,9 +295,9 @@ int main(int argc, char *argv[]) {
 
     };
 
-//    f(left_imu_data, "left_foot");
-    f(right_imu_data, "right_foot");
-//    f(head_imu_data, "head");
+    f(left_imu_data, "left_foot");
+//    f(right_imu_data, "right_foot");
+    f(head_imu_data, "head");
 
     plt::show();
 
