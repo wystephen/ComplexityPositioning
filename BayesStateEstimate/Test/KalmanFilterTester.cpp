@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
     // parameters
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0010/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0014/";
 
 
 
@@ -269,7 +269,7 @@ int main(int argc, char *argv[]) {
         plt::legend();
 
         plt::figure();
-        plt::named_plot("ekf trace", pose[0], pose[1], "-+");
+        plt::named_plot("ekf trace", pose[0], pose[1], "-");
         plt::named_plot("optimized trace",
                         optimize_trace_vec[0],
                         optimize_trace_vec[1], "*");

@@ -74,7 +74,6 @@ namespace BSE {
                          }
 
 
-
                          Eigen::Vector3d gravity_g(0, 0, local_g_);
                          Eigen::Vector3d linear_acc = rotate_q_.toRotationMatrix() * acc + gravity_g;
                          if (IS_DEBUG) {
@@ -101,20 +100,24 @@ namespace BSE {
 //                                 Eigen::Matrix3d::Identity() * 0.5 * time_interval_ *
 //                                 time_interval_;
                          B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
-                         B_.block(6,3,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
+                         B_.block(6, 3, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
 
 
                          state = A_ * state + B_ * converted_input;
                          state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
                          if (IS_DEBUG) {
-                             std::cout << "state trans P:" << state_prob << std::endl;
-                             std::cout << " A * P * A^ T " << A_ * state_prob * A_.transpose() << std::endl;
-                             std::cout << "B * cove * B.transpose() " << B_ * cov_input * B_.transpose() << std::endl;
+                             std::cout << "state trans P:"
+                                       << state_prob << std::endl;
+                             std::cout << " A * P * A^ T "
+                                       << A_ * state_prob * A_.transpose() << std::endl;
+                             std::cout << "B * cove * B.transpose() "
+                                       << B_ * cov_input * B_.transpose() << std::endl;
                          }
                          // unconverted value
-//                         B_.block(3, 0, 3, 3) = rotate_q_.toRotationMatrix() ;//* time_interval_;
-                         state_prob = A_ * state_prob * A_.transpose() + B_ * cov_input * B_.transpose();
+//                         B_.block(6, 0, 3, 3) = rotate_q_.toRotationMatrix() ;//* time_interval_;
+                         state_prob = A_ * state_prob * A_.transpose() +
+                                      B_ * cov_input * B_.transpose();
                          if (std::isnan(state_prob.sum())) {
                              std::cout << "state prob is naa: " << state_prob << std::endl;
                          }
@@ -192,15 +195,16 @@ namespace BSE {
                              std::cout << "some error " << std::endl;
                          }
 
-                         Eigen::Matrix3d rotation_m ( rotate_q_.toRotationMatrix());
-                         Eigen::Matrix3d omega=Eigen::Matrix3d::Zero();
-                         omega << 0.0,tdx(8),-tdx(7),
-                                 -tdx(8),0.0,tdx(6),
-                                 tdx(7),-tdx(6),0.0;
-//                         omega *= -1.0;
-                         rotation_m = (2.0 * Eigen::Matrix3d::Identity()+omega) *
-                                 (2.0*Eigen::Matrix3d::Identity()-omega).inverse()
-                                 *rotation_m;
+                         Eigen::Matrix3d rotation_m(rotate_q_.toRotationMatrix());
+                         Eigen::Matrix3d omega = Eigen::Matrix3d::Zero();
+                         omega << 0.0, tdx(8), -tdx(7),
+                                 -tdx(8), 0.0, tdx(6),
+                                 tdx(7), -tdx(6), 0.0;
+                         omega *= -1.0;
+//                         rotation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
+//                                      (2.0 * Eigen::Matrix3d::Identity() - omega).inverse()
+//                                      * rotation_m;
+                         rotation_m = (Eigen::Matrix3d::Identity()-omega) * rotation_m;
 
 //                         rotate_q_ = delta_q.inverse() * rotate_q_;
                          rotate_q_ = Eigen::Quaterniond(rotation_m);
@@ -224,7 +228,6 @@ namespace BSE {
                          z(0) = m(3);
                          Eigen::Matrix<double, 1, 1> y;
                          y(0) = (state.block(0, 0, 3, 1) - b).norm();
-
 
 
                          H_.resize(1, 9);
@@ -291,8 +294,8 @@ namespace BSE {
 
                          Eigen::Quaterniond tmp_q =
                                  Eigen::AngleAxisd(dx(0), Eigen::Vector3d::UnitX())
-                                                    * Eigen::AngleAxisd(dx(1), Eigen::Vector3d::UnitY())
-                                                    * Eigen::AngleAxisd(dx(2), Eigen::Vector3d::UnitZ());
+                                 * Eigen::AngleAxisd(dx(1), Eigen::Vector3d::UnitY())
+                                 * Eigen::AngleAxisd(dx(2), Eigen::Vector3d::UnitZ());
                          rotate_q_ = tmp_q * rotate_q_;
                          rotate_q_.normalize();
                          state.block(6, 0, 3, 1) =

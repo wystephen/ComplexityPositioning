@@ -46,7 +46,7 @@ namespace BSE {
             Eigen::Vector3d ya_m;
             double g = 9.8;
             double sigma_a_ = 0.01;
-            double sigma_g_ = 0.01 * M_PI / 180.0;
+            double sigma_g_ = 0.1 * M_PI / 180.0;
             double ZeroDetectorWindowSize_ = u.rows();
             double gamma_ = 200;
 
