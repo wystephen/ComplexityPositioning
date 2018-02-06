@@ -185,11 +185,11 @@ int main(int argc, char *argv[]) {
             if (imu_tool.GLRT_Detector(imu_data.block(i - 4, 1, 7, 6))) {
                 /// zero velocity detector
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-                                        Eigen::Matrix3d::Identity() * 0.0051001,
+                                        Eigen::Matrix3d::Identity() * 0.00051001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
-//                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
-//                                        Eigen::Matrix3d::Identity() * 0.01,
-//                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
+                                        Eigen::Matrix3d::Identity() * 0.01,
+                                        BSE::MeasurementMethodType::NormalAngleConstraint);
                 zv_flag.push_back(1.0);
             } else {
                 zv_flag.push_back(0.0);
