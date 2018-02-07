@@ -181,9 +181,9 @@ int main(int argc, char *argv[]) {
                         measurement_noise_matrix.resize(1, 1);
                         measurement_noise_matrix(0, 0) = 0.003;
                         // correct
-//                        filter.MeasurementState(measurement_data,
-//                                                measurement_noise_matrix,
-//                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+                        filter.MeasurementState(measurement_data,
+                                                measurement_noise_matrix,
+                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
                     }
                 }
