@@ -446,7 +446,7 @@ namespace BSE {
 
         Eigen::Quaterniond rotate_q_ = Eigen::Quaterniond().setIdentity();
 
-        double local_g_ = 9.81;
+        double local_g_ = -9.81;
 
 
     };
