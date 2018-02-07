@@ -9,7 +9,12 @@
 
 #include <thread>
 
+
 #include "AWF.h"
+
+
+#include "../../BayesStateEstimate/AuxiliaryTool/ImuTools.h"
+#include "../../BayesStateEstimate/AuxiliaryTool/UwbTools.h"
 
 
 int main(int argc, char *argv[]) {

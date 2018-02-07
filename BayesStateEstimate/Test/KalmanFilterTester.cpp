@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
     // parameters
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0010/";
 
 
 
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
                        std::string data_name) {
         auto filter = BSE::IMUWBKFBase(
                 initial_prob_matrix);
-        filter.setTime_interval_(0.005);
+        filter.setTime_interval_(0.00567);
 //    filter.IS_DEBUG = true;
 
 
