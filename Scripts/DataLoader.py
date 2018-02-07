@@ -43,6 +43,9 @@ class DataLoader:
         print('average time interval of left:',
               float(imu_left[-1,1]-imu_left[0,1])/float(imu_left.shape[0]))
 
+        print('average time interval of head:',
+              float(imu_head[-1,1]-imu_head[0,1])/float(imu_head.shape[0]))
+
 
 
 if __name__ == '__main__':
