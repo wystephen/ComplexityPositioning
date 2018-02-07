@@ -323,12 +323,12 @@ namespace BSE {
 //            local_g_ = g;
 
 
-            auto g_error = [g, acc](double roll, double pitch, double yaw) -> double {
+            auto g_error = [&,g, acc](double roll, double pitch, double yaw) -> double {
 
                 auto rotate_matrix = (Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX())
                                       * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
                                       * Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()));
-                return std::abs(g + (rotate_matrix * acc)(2));
+                return std::abs(local_g_ + (rotate_matrix * acc)(2));
             };
             auto ge(0.0);
 //
@@ -431,6 +431,14 @@ namespace BSE {
 
         void setRotate_q(const Eigen::Quaterniond &rotate_q) {
             IMUWBKFBase::rotate_q_ = rotate_q;
+        }
+
+        double getLocal_g_() const {
+            return local_g_;
+        }
+
+        void setLocal_g_(double local_g_) {
+            IMUWBKFBase::local_g_ = local_g_;
         }
 
     protected:
