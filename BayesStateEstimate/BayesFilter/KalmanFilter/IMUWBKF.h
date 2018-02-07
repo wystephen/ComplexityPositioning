@@ -204,7 +204,7 @@ namespace BSE {
 //                         rotation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
 //                                      (2.0 * Eigen::Matrix3d::Identity() - omega).inverse()
 //                                      * rotation_m;
-                         rotation_m = (Eigen::Matrix3d::Identity()-omega) * rotation_m;
+                         rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
 
 //                         rotate_q_ = delta_q.inverse() * rotate_q_;
                          rotate_q_ = Eigen::Quaterniond(rotation_m);
