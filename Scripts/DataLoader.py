@@ -42,12 +42,15 @@ class DataLoader:
 
         print('average time interval of left:',
               float(imu_left[-1,1]-imu_left[0,1])/float(imu_left.shape[0]))
+        print('average time interval of right:',
+              float(imu_right[-1,1]-imu_right[0,1])/float(imu_right.shape[0]))
 
         print('average time interval of head:',
               float(imu_head[-1,1]-imu_head[0,1])/float(imu_head.shape[0]))
 
         plt.figure()
         plt.plot(imu_left[1:,1]-imu_left[:-1,1], label = 'time left')
+        plt.plot(imu_right[1:,1]-imu_right[:-1,1], label = 'time right')
         # time_diff = imu_left[1:,1] - imu_left[:-1,1]
         # plt.plot(time_diff-time_diff.mean(),label='time diff')
         plt.plot(imu_head[1:,1]-imu_head[:-1,1], label = ' time head' )

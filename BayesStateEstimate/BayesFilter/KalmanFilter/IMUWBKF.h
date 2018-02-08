@@ -252,6 +252,7 @@ namespace BSE {
 
             /**
              *  measurement here is not the measurement value in kalman filter frame!!!
+             *  m here should be acc of this moment.
              *
              */
             MeasurementEquationMap.insert(

@@ -109,7 +109,15 @@ int main(int argc, char *argv[]) {
                        std::string data_name) {
         auto filter = BSE::IMUWBKFBase(
                 initial_prob_matrix);
-        filter.setTime_interval_(0.00567);
+        double tmp_time_interval = (imu_data(imu_data.rows() - 1, 0) - imu_data(0, 0))
+                                   / double(imu_data.rows());
+        std::cout <<"time interval :" << tmp_time_interval << std::endl;
+        if (std::abs(tmp_time_interval - 0.005) < 0.001) {
+            filter.setTime_interval_(0.005);
+        } else {
+
+            filter.setTime_interval_(tmp_time_interval);
+        }
         filter.setLocal_g_(-9.81);
 //    filter.IS_DEBUG = true;
 
@@ -193,13 +201,14 @@ int main(int argc, char *argv[]) {
             if (imu_tool.GLRT_Detector(imu_data.block(i - 4, 1, 7, 6))) {
                 /// zero velocity detector
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-                                        Eigen::Matrix3d::Identity() * 0.000251001,
+                                        Eigen::Matrix3d::Identity() * 0.0000251001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
-//                filter.MeasurementState(imu_data.block(i, 4, 1, 3).transpose(),
-//                                        Eigen::Matrix3d::Identity() * 0.0001,
-//                                        BSE::MeasurementMethodType::NormalAngleConstraint);
-                if (zv_flag.size()>3 &&
-                zv_flag.at(zv_flag.size() - 2) < 0.5) {
+                /// angle constraint through acc.
+                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
+                                        Eigen::Matrix3d::Identity() * 0.0001,
+                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+                if (zv_flag.size() > 3 &&
+                    zv_flag.at(zv_flag.size() - 2) < 0.5) {
                     std::cout << " linear accc:"
                               << (filter.getRotate_q().toRotationMatrix() *
                                   imu_data.block(i, 1, 1, 3).transpose()).transpose()
