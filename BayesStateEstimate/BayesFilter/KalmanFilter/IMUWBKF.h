@@ -291,7 +291,7 @@ namespace BSE {
 
                          K_ = (state_prob.block(6, 6, 3, 3) * H_.transpose().eval()) *
                               (H_ * state_prob.block(6, 6, 3, 3) * H_.transpose() + cov_m).inverse();
-                         dx = K_ * (Eigen::Vector3d(0, 0, local_g_) - the_y(state.block(6, 0, 3, 1)));
+                         dx = K_ * ( the_y(state.block(6, 0, 3, 1)) + Eigen::Vector3d(0,0,local_g_));
 
 //                         Eigen::Quaterniond tmp_q =
 //                                 Eigen::AngleAxisd(dx(0), Eigen::Vector3d::UnitX())
@@ -307,7 +307,7 @@ namespace BSE {
                          omega << 0.0, dx(2), -dx(1),
                                  -dx(2), 0.0, dx(0),
                                  dx(1), -dx(0), 0.0;
-                         omega *= -1.0;
+//                         omega *= -1.0;
 //                         rotation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
 //                                      (2.0 * Eigen::Matrix3d::Identity() - omega).inverse()
 //                                      * rotation_m;
