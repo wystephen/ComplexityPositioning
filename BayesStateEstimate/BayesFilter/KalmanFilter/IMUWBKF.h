@@ -280,7 +280,7 @@ namespace BSE {
                          state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 //                dx =
                          H_ = Eigen::Matrix3d::Identity();
-                         double epsilon = 0.000001;
+                         double epsilon = 0.00000001;
                          for (int i(0); i < 3; ++i) {
                              Eigen::Vector3d offset(0, 0, 0);
                              offset(i) += epsilon;
@@ -291,7 +291,7 @@ namespace BSE {
 
                          K_ = (state_prob.block(6, 6, 3, 3) * H_.transpose().eval()) *
                               (H_ * state_prob.block(6, 6, 3, 3) * H_.transpose() + cov_m).inverse();
-                         dx = K_ * (Eigen::Vector3d(0, 0, m.norm()) - the_y(state.block(6, 0, 3, 1)));
+                         dx = K_ * (Eigen::Vector3d(0, 0, local_g_) - the_y(state.block(6, 0, 3, 1)));
 
                          Eigen::Quaterniond tmp_q =
                                  Eigen::AngleAxisd(dx(0), Eigen::Vector3d::UnitX())
