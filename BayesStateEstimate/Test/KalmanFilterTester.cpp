@@ -204,9 +204,9 @@ int main(int argc, char *argv[]) {
                                         Eigen::Matrix3d::Identity() * 0.000251001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
                 /// angle constraint through acc.
-                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-                                        Eigen::Matrix3d::Identity() * 0.01,
-                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+//                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
+//                                        Eigen::Matrix3d::Identity() * 0.01,
+//                                        BSE::MeasurementMethodType::NormalAngleConstraint);
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
                     std::cout << " linear accc:"
