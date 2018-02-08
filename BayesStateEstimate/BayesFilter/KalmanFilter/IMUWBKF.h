@@ -293,16 +293,28 @@ namespace BSE {
                               (H_ * state_prob.block(6, 6, 3, 3) * H_.transpose() + cov_m).inverse();
                          dx = K_ * (Eigen::Vector3d(0, 0, local_g_) - the_y(state.block(6, 0, 3, 1)));
 
-                         Eigen::Quaterniond tmp_q =
-                                 Eigen::AngleAxisd(dx(0), Eigen::Vector3d::UnitX())
-                                 * Eigen::AngleAxisd(dx(1), Eigen::Vector3d::UnitY())
-                                 * Eigen::AngleAxisd(dx(2), Eigen::Vector3d::UnitZ());
-                         rotate_q_ = tmp_q * rotate_q_;
-                         rotate_q_.normalize();
-                         state.block(6, 0, 3, 1) =
-                                 rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+//                         Eigen::Quaterniond tmp_q =
+//                                 Eigen::AngleAxisd(dx(0), Eigen::Vector3d::UnitX())
+//                                 * Eigen::AngleAxisd(dx(1), Eigen::Vector3d::UnitY())
+//                                 * Eigen::AngleAxisd(dx(2), Eigen::Vector3d::UnitZ());
+//                         rotate_q_ = tmp_q * rotate_q_;
+//                         rotate_q_.normalize();
+//                         state.block(6, 0, 3, 1) =
+//                                 rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
+                         Eigen::Matrix3d rotation_m(rotate_q_.toRotationMatrix());
+                         Eigen::Matrix3d omega = Eigen::Matrix3d::Zero();
+                         omega << 0.0, dx(2), -dx(1),
+                                 -dx(2), 0.0, dx(0),
+                                 dx(1), -dx(0), 0.0;
+                         omega *= -1.0;
+//                         rotation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
+//                                      (2.0 * Eigen::Matrix3d::Identity() - omega).inverse()
+//                                      * rotation_m;
+                         rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
 
+//                         rotate_q_ = delta_q.inverse() * rotate_q_;
+                         rotate_q_ = Eigen::Quaterniond(rotation_m);
                          return;
                      })});
         }

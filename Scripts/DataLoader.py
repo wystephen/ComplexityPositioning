@@ -29,7 +29,7 @@ from matplotlib.pylab import plt
 
 class DataLoader:
     def __init__(self,
-                 dir_name='/home/steve/Data/FusingLocationData/0013/'):
+                 dir_name='/home/steve/Data/FusingLocationData/0010/'):
         if not dir_name[-1] is '/':
             dir_name = dir_name + '/'
 
