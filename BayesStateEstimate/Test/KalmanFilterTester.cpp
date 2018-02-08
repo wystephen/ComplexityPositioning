@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 
     // get the initial pose based on uwb data.
 
-    std::cout << uwb_data.block(0, 0, 1, uwb_data.cols()) << std::endl;
+//    std::cout << uwb_data.block(0, 0, 1, uwb_data.cols()) << std::endl;
 
     auto uwb_tool = BSE::UwbTools(uwb_data,
                                   beacon_set_data);
@@ -201,12 +201,12 @@ int main(int argc, char *argv[]) {
             if (imu_tool.GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
                 /// zero velocity detector
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-                                        Eigen::Matrix3d::Identity() * 0.0000251001,
+                                        Eigen::Matrix3d::Identity() * 0.000251001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
                 /// angle constraint through acc.
-                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-                                        Eigen::Matrix3d::Identity() * 0.01,
-                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+//                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
+//                                        Eigen::Matrix3d::Identity() * 0.01,
+//                                        BSE::MeasurementMethodType::NormalAngleConstraint);
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
                     std::cout << " linear accc:"
