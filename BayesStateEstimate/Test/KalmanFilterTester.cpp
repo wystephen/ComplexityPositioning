@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
                 initial_prob_matrix);
         double tmp_time_interval = (imu_data(imu_data.rows() - 1, 0) - imu_data(0, 0))
                                    / double(imu_data.rows());
-        std::cout <<"time interval :" << tmp_time_interval << std::endl;
+        std::cout << "time interval :" << tmp_time_interval << std::endl;
         if (std::abs(tmp_time_interval - 0.005) < 0.0001) {
             filter.setTime_interval_(0.005);
         } else {
