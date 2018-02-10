@@ -205,7 +205,7 @@ int main(int argc, char *argv[]) {
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
                 /// angle constraint through acc.
                 filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-                                        Eigen::Matrix3d::Identity() * 0.01,
+                                        Eigen::Matrix3d::Identity() * 0.0001,
                                         BSE::MeasurementMethodType::NormalAngleConstraint);
 
                 if (zv_flag.size() > 3 &&
