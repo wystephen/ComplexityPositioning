@@ -280,7 +280,7 @@ namespace BSE {
                          state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 //                dx =
                          H_ = Eigen::Matrix3d::Identity();
-                         double epsilon = 0.00000001;
+                         double epsilon = 0.00000000001;
                          for (int i(0); i < 3; ++i) {
                              Eigen::Vector3d offset(0, 0, 0);
                              offset(i) += epsilon;
