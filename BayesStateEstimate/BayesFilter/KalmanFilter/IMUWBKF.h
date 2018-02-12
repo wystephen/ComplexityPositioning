@@ -287,7 +287,7 @@ namespace BSE {
 //                             H_.block(0, i, 3, 1) = (the_y(state.block(6, 0, 3, 1) + offset) -
 //                                                     the_y(state.block(6, 0, 3, 1))) / epsilon;
                              H_.block(i,0, 1, 3) = (the_y(state.block(6, 0, 3, 1) + offset) -
-                                                     the_y(state.block(6, 0, 3, 1))) / epsilon;
+                                                     the_y(state.block(6, 0, 3, 1))).transpose() / epsilon;
                          }
 
 
