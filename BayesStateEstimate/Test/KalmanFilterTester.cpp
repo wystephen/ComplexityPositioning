@@ -203,10 +203,7 @@ int main(int argc, char *argv[]) {
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
                                         Eigen::Matrix3d::Identity() * 0.000251001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
-                /// angle constraint through acc.
-                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-                                        Eigen::Matrix3d::Identity() * 0.000001,
-                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
@@ -214,6 +211,10 @@ int main(int argc, char *argv[]) {
                               << (filter.getRotate_q().toRotationMatrix() *
                                   imu_data.block(i, 1, 1, 3).transpose()).transpose()
                               << std::endl;
+                    /// angle constraint through acc.
+                    filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
+                                            Eigen::Matrix3d::Identity() * 0.000001,
+                                            BSE::MeasurementMethodType::NormalAngleConstraint);
                 }
 
                 zv_flag.push_back(1.0);
