@@ -110,9 +110,9 @@ target_link_libraries(KalmanFilterTester ${PYTHON_LIBRARIES})
 add_executable(KalmanFilterSimulatorTester BayesStateEstimate/Test/KalmanFilterSimulatorTester.cpp)
 target_link_libraries(KalmanFilterSimulatorTester ${PYTHON_LIBRARIES})
 
-add_executable(MonteCarloTester BayesStateEstimate/Test/MonteCarloTester.cpp)
-target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
+#add_executable(MonteCarloTester BayesS#[[]]tateEstimate/Test/MonteCarloTester.cpp)
+#target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
 
-cuda_add_executable(MonteCarloThrustTester
-        BayesStateEstimate/Test/MonteCarloTesterCuda.cpp)
-target_link_libraries(MonteCarloThrustTester )
+#cuda_add_executable(MonteCarloThrustTester
+#        BayesStateEstimate/Test/MonteCarloTesterCuda.cpp)
+#target_link_libraries(MonteCarloThrustTester )
