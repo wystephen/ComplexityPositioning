@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.5)
 project(ComplexityPositioning)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -12,6 +12,9 @@ LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
 # boost
 find_package(Boost )
+
+# boost compute
+find_package(BoostCompute REQUIRED)
 
 # Thrust
 find_package(Thrust REQUIRED)
@@ -89,6 +92,7 @@ include_directories(
         ${PYTHON_INCLUDE_DIRS}
         ./BayesStateEstimate/
         ${Boost_INCLUDE_DIRS}
+        ${BoostCompute_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -110,8 +114,8 @@ target_link_libraries(KalmanFilterTester ${PYTHON_LIBRARIES})
 add_executable(KalmanFilterSimulatorTester BayesStateEstimate/Test/KalmanFilterSimulatorTester.cpp)
 target_link_libraries(KalmanFilterSimulatorTester ${PYTHON_LIBRARIES})
 
-#add_executable(MonteCarloTester BayesS#[[]]tateEstimate/Test/MonteCarloTester.cpp)
-#target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
+add_executable(MonteCarloTester BayesStateEstimate/Test/MonteCarloTester.cpp)
+target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
 
 #cuda_add_executable(MonteCarloThrustTester
 #        BayesStateEstimate/Test/MonteCarloTesterCuda.cpp)
