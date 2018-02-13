@@ -294,7 +294,7 @@ namespace BSE {
                          K_ = (state_prob.block(6, 6, 3, 3) * H_.transpose().eval()) *
                               (H_ * state_prob.block(6, 6, 3, 3) * H_.transpose() + cov_m).inverse();
 //                         dx = K_ * ( the_y(state.block(6, 0, 3, 1)) + Eigen::Vector3d(0,0,local_g_));
-                         dx = K_ * ( (rotate_q_ * tmp_acc) + Eigen::Vector3d(0,0,local_g_));
+                         dx = K_ * ((rotate_q_ * tmp_acc) + Eigen::Vector3d(0, 0, local_g_));
 
 //                         Eigen::Quaterniond tmp_q =
 //                                 Eigen::AngleAxisd(dx(0), Eigen::Vector3d::UnitX())
@@ -339,7 +339,7 @@ namespace BSE {
 //            local_g_ = g;
 
 
-            auto g_error = [&,g, acc](double roll, double pitch, double yaw) -> double {
+            auto g_error = [&, g, acc](double roll, double pitch, double yaw) -> double {
 
                 auto rotate_matrix = (Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX())
                                       * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
