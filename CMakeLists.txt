@@ -4,7 +4,7 @@ project(ComplexityPositioning)
 set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_BUILD_TOOL Release)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g  -lpthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g  -lpthread ")
 
 
 # add cmake module
@@ -15,6 +15,10 @@ find_package(Boost )
 
 # boost compute
 find_package(BoostCompute REQUIRED)
+# OPENCL
+set(OpenCL_LIBRARY /usr/local/cuda-8.0/lib64/libOpenCL.so)
+set(OpenCL_INCLUDE_DIR /usr/local/cuda/include)
+find_package(OpenCL REQUIRED)
 
 # Thrust
 find_package(Thrust REQUIRED)
@@ -93,6 +97,7 @@ include_directories(
         ./BayesStateEstimate/
         ${Boost_INCLUDE_DIRS}
         ${BoostCompute_INCLUDE_DIRS}
+        ${OpenCL_LIBRARY}
 )
 
 link_directories(
@@ -103,6 +108,7 @@ link_directories(
         ${LAPACK_LIBRARIES}
         ${PYTHON_LIBRARIES}
         ./include
+        ${OpenCL_LIBRARY}
 )
 
 
@@ -115,7 +121,7 @@ add_executable(KalmanFilterSimulatorTester BayesStateEstimate/Test/KalmanFilterS
 target_link_libraries(KalmanFilterSimulatorTester ${PYTHON_LIBRARIES})
 
 add_executable(MonteCarloTester BayesStateEstimate/Test/MonteCarloTester.cpp)
-target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${OpenCL_LIBRARY})
 
 #cuda_add_executable(MonteCarloThrustTester
 #        BayesStateEstimate/Test/MonteCarloTesterCuda.cpp)
