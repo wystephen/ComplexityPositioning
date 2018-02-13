@@ -16,6 +16,9 @@
 #include "../../BayesStateEstimate/AuxiliaryTool/ImuTools.h"
 #include "../../BayesStateEstimate/AuxiliaryTool/UwbTools.h"
 
+#include "../../BayesStateEstimate/BayesFilter/KalmanFilter/IMUWBKF.h"
+#include "../../BayesStateEstimate/BayesFilter/KalmanFilter/IMUWBKF.cpp"
+
 
 int main(int argc, char *argv[]) {
     std::cout.precision(30);
