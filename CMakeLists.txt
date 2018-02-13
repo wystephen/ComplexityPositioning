@@ -10,6 +10,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g  -lpthread")
 # add cmake module
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
+# boost
+find_package(Boost )
+
 #OPENMP
 find_package(OpenMP)
 if (OPENMP_FOUND)
@@ -79,6 +82,7 @@ include_directories(
         /home/steve/Code/AlgorithmWorkFlowTools/
         ${PYTHON_INCLUDE_DIRS}
         ./BayesStateEstimate/
+        ${Boost_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -99,3 +103,6 @@ target_link_libraries(KalmanFilterTester ${PYTHON_LIBRARIES})
 
 add_executable(KalmanFilterSimulatorTester BayesStateEstimate/Test/KalmanFilterSimulatorTester.cpp)
 target_link_libraries(KalmanFilterSimulatorTester ${PYTHON_LIBRARIES})
+
+add_executable(MonteCarloTester BayesStateEstimate/Test/MonteCarloTester.cpp)
+target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
