@@ -13,6 +13,9 @@ LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 # boost
 find_package(Boost )
 
+# Thrust
+find_package(Thrust REQUIRED)
+
 #OPENMP
 find_package(OpenMP)
 if (OPENMP_FOUND)
@@ -106,3 +109,6 @@ target_link_libraries(KalmanFilterSimulatorTester ${PYTHON_LIBRARIES})
 
 add_executable(MonteCarloTester BayesStateEstimate/Test/MonteCarloTester.cpp)
 target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(MonteCarloThrustTester BayesStateEstimate/Test/MonteCarloTesterCuda.cpp)
+target_link_libraries(MonteCarloThrustTester )
