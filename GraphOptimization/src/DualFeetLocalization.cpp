@@ -131,11 +131,29 @@ int main(int argc, char *argv[]) {
                                 BSE::IMUWBKFBase &imu_ekf,
                                 Eigen::MatrixXd initial_input
                         ) {
+                    /**
+                     *  initial_input 10 * 6 ...
+                     */
                     imu_ekf.initial_state(initial_input,
                                           0.0,
                                           Eigen::Vector3d(0, 0, 0));
 
                 };
+
+        // IMU zero-velocity correct
+        auto local_imu_zupt_func=
+                [&measurement_noise_matrix]
+                        (
+                                BSE::IMUWBKFBase & imu_ekf
+                        )
+                {
+                    imu_ekf.MeasurementState(
+                            Eigen::Vector3d(0,0,0),
+                            Eigen::Matrix3d::Identity() * 0.00025,
+                            BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement
+                    );
+                };
+
 
 
         if (left_imu_data(left_index, 0) < uwb_data(uwb_index, 0)) {
