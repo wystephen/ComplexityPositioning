@@ -87,12 +87,13 @@ int main(int argc, char *argv[]) {
     initial_prob_matrix.block(3, 3, 3, 3) *= 0.001;
     initial_prob_matrix.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
 
-    int left_index(0), right_index(0), head_index(0), uwb_index(0);
+    int left_index(5), right_index(5), head_index(5), uwb_index(0);
     int last_left_index(0), last_right_index(0), last_head_index(0), last_uwb_index(0);
     BSE::IMUWBKFBase left_imu_ekf(initial_prob_matrix);
     BSE::IMUWBKFBase right_imu_ekf(initial_prob_matrix);
     Eigen::Isometry3d left_last_T(Eigen::Isometry3d::Identity());// last transform matrix.
     Eigen::Isometry3d right_last_T(Eigen::Isometry3d::Identity());
+    int left_last_zv_flag(true), right_last_zv_flag(true);
 
     left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.row() - 1, 0) - left_imu_data(0, 0)) /
                                    double(left_imu_data.rows()));
@@ -104,9 +105,9 @@ int main(int argc, char *argv[]) {
      */
     while (1) {
         // end condition.
-        if (left_index + 2 >= left_imu_data.rows() ||
-            right_index + 2 >= right_imu_data.rows() ||
-            head_index + 2 >= head_imu_data.rows() ||
+        if (left_index + 5 >= left_imu_data.rows() ||
+            right_index + 5 >= right_imu_data.rows() ||
+            head_index + 5 >= head_imu_data.rows() ||
             uwb_index + 2 >= uwb_data.rows()) {
             break;
         }
@@ -141,25 +142,39 @@ int main(int argc, char *argv[]) {
                 };
 
         // IMU zero-velocity correct
-        auto local_imu_zupt_func=
+        auto local_imu_zupt_func =
                 [&measurement_noise_matrix]
                         (
-                                BSE::IMUWBKFBase & imu_ekf
-                        )
-                {
+                                BSE::IMUWBKFBase &imu_ekf
+                        ) {
                     imu_ekf.MeasurementState(
-                            Eigen::Vector3d(0,0,0),
+                            Eigen::Vector3d(0, 0, 0),
                             Eigen::Matrix3d::Identity() * 0.00025,
                             BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement
                     );
                 };
 
 
-
         if (left_imu_data(left_index, 0) < uwb_data(uwb_index, 0)) {
             //update left index
+            bool zv_flag =
+                    imu_tool.GLRT_Detector(
+                            left_imu_data.block(left_index - 5, 1, 10, 6)) > 0.5 ? true : false;
+            // non-zero velocity to zero velocity
+            if (zv_flag && !left_last_zv_flag) {
+
+            }
+
+            if (!zv_flag && left_last_zv_flag) {
+
+            }
 
 
+            local_imu_update_func(left_imu_ekf,
+                                  left_imu_data.block(left_index, 1, 1, 6).transpose());
+
+            left_last_zv_flag = zv_flag;
+            left_index++;
 
 
         }
