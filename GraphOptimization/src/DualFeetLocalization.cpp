@@ -87,5 +87,24 @@ int main(int argc, char *argv[]) {
     initial_prob_matrix.block(3, 3, 3, 3) *= 0.001;
     initial_prob_matrix.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
 
+    int left_index(0),right_index(0),head_index(0),uwb_index(0);
+    int last_left_index(0),last_right_index(0),last_head_index(0),last_uwb_index(0);
+
+    /**
+     * Main loop add foot ,
+     */
+    while(1){
+        if(left_index>=left_imu_data.rows() ||
+                right_index >= right_imu_data.rows()||
+                head_index >= head_imu_data.rows()||
+                uwb_index >= uwb_data.rows())
+        {
+            break;
+        }
+
+
+
+    }
+
 
 }
