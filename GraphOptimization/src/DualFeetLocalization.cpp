@@ -170,8 +170,14 @@ int main(int argc, char *argv[]) {
             }
 
 
-            local_imu_update_func(left_imu_ekf,
-                                  left_imu_data.block(left_index, 1, 1, 6).transpose());
+            if (zv_flag) {
+              local_imu_zupt_func(left_imu_ekf);
+
+            } else {
+                local_imu_update_func(left_imu_ekf,
+                                      left_imu_data.block(left_index, 1, 1, 6).transpose());
+
+            }
 
             left_last_zv_flag = zv_flag;
             left_index++;
