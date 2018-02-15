@@ -91,6 +91,8 @@ int main(int argc, char *argv[]) {
     int last_left_index(0), last_right_index(0), last_head_index(0), last_uwb_index(0);
     BSE::IMUWBKFBase left_imu_ekf(initial_prob_matrix);
     BSE::IMUWBKFBase right_imu_ekf(initial_prob_matrix);
+    Eigen::Isometry3d left_last_T(Eigen::Isometry3d::Identity());
+    Eigen::Isometry3d right_last_T(Eigen::Isometry3d::Identity());
 
     /**
      * Main loop add foot ,
@@ -106,14 +108,25 @@ int main(int argc, char *argv[]) {
         // IMU update lambda func
         auto local_imu_update_func =
                 [&process_noise_matrix,
-                & measurement_noise_matrix,
-                & initial_prob_matrix]
+                        & measurement_noise_matrix,
+                        & initial_prob_matrix]
                         (BSE::IMUWBKFBase &imu_ekf,
-                   Eigen::MatrixXd &input) {
+                         Eigen::MatrixXd &input) {
                     imu_ekf.StateTransaction(
-                            input,process_noise_matrix,
+                            input, process_noise_matrix,
                             BSE::StateTransactionMethodType::NormalRotation
                     );
+                };
+        // IMU initial lambda func
+        auto local_imu_initial_func =
+                [&process_noise_matrix,
+                        & measurement_noise_matrix,
+                        & initial_prob_matrix]
+                        (
+                                BSE::IMUWBKFBase &imu_ekf
+                        ) {
+                    imu_ekf.initial_state()
+
                 };
 
 
