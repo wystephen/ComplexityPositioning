@@ -87,21 +87,52 @@ int main(int argc, char *argv[]) {
     initial_prob_matrix.block(3, 3, 3, 3) *= 0.001;
     initial_prob_matrix.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
 
-    int left_index(0),right_index(0),head_index(0),uwb_index(0);
-    int last_left_index(0),last_right_index(0),last_head_index(0),last_uwb_index(0);
+    int left_index(0), right_index(0), head_index(0), uwb_index(0);
+    int last_left_index(0), last_right_index(0), last_head_index(0), last_uwb_index(0);
+    BSE::IMUWBKFBase left_imu_ekf(initial_prob_matrix);
+    BSE::IMUWBKFBase right_imu_ekf(initial_prob_matrix);
 
     /**
      * Main loop add foot ,
      */
-    while(1){
-        if(left_index>=left_imu_data.rows() ||
-                right_index >= right_imu_data.rows()||
-                head_index >= head_imu_data.rows()||
-                uwb_index >= uwb_data.rows())
-        {
+    while (1) {
+        // end condition.
+        if (left_index + 2 >= left_imu_data.rows() ||
+            right_index + 2 >= right_imu_data.rows() ||
+            head_index + 2 >= head_imu_data.rows() ||
+            uwb_index + 2 >= uwb_data.rows()) {
             break;
         }
+        // IMU update lambda func
+        auto local_imu_update_func =
+                [&process_noise_matrix,
+                & measurement_noise_matrix,
+                & initial_prob_matrix]
+                        (BSE::IMUWBKFBase &imu_ekf,
+                   Eigen::MatrixXd &input) {
+                    imu_ekf.StateTransaction(
+                            input,process_noise_matrix,
+                            BSE::StateTransactionMethodType::NormalRotation
+                    );
+                };
 
+
+        if (left_imu_data(left_index, 0) < uwb_data(uwb_index, 0)) {
+            //update left index
+
+
+
+
+        }
+        if (right_imu_data(right_index, 0) < uwb_data(uwb_index, 0)) {
+            //update right index
+
+        }
+        if (uwb_data(uwb_index, 0) < right_imu_data(right_index, 0) &&
+            uwb_data(uwb_index, 0) < left_imu_data(left_index, 0)) {
+            // update uwb index
+
+        }
 
 
     }
