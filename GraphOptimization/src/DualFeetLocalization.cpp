@@ -91,8 +91,13 @@ int main(int argc, char *argv[]) {
     int last_left_index(0), last_right_index(0), last_head_index(0), last_uwb_index(0);
     BSE::IMUWBKFBase left_imu_ekf(initial_prob_matrix);
     BSE::IMUWBKFBase right_imu_ekf(initial_prob_matrix);
-    Eigen::Isometry3d left_last_T(Eigen::Isometry3d::Identity());
+    Eigen::Isometry3d left_last_T(Eigen::Isometry3d::Identity());// last transform matrix.
     Eigen::Isometry3d right_last_T(Eigen::Isometry3d::Identity());
+
+    left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.row() - 1, 0) - left_imu_data(0, 0)) /
+                                   double(left_imu_data.rows()));
+    right_imu_ekf.setTime_interval_((right_imu_data(right_imu_data.rows() - 1, 0) - right_imu_data(0, 0))
+                                    / double(right_imu_data.rows()));
 
     /**
      * Main loop add foot ,
@@ -123,9 +128,12 @@ int main(int argc, char *argv[]) {
                         & measurement_noise_matrix,
                         & initial_prob_matrix]
                         (
-                                BSE::IMUWBKFBase &imu_ekf
+                                BSE::IMUWBKFBase &imu_ekf,
+                                Eigen::MatrixXd initial_input
                         ) {
-                    imu_ekf.initial_state()
+                    imu_ekf.initial_state(initial_input,
+                                          0.0,
+                                          Eigen::Vector3d(0, 0, 0));
 
                 };
 
