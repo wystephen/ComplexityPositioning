@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     BSE::IMUWBKFBase right_imu_ekf(initial_prob_matrix);
     Eigen::Isometry3d left_last_T(Eigen::Isometry3d::Identity());// last transform matrix.
     Eigen::Isometry3d right_last_T(Eigen::Isometry3d::Identity());
-    int left_last_zv_flag(true), right_last_zv_flag(true);
+    int left_last_zv_flag(false), right_last_zv_flag(false);
 
     left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.row() - 1, 0) - left_imu_data(0, 0)) /
                                    double(left_imu_data.rows()));
@@ -163,6 +163,9 @@ int main(int argc, char *argv[]) {
             // non-zero velocity to zero velocity
             if (zv_flag && !left_last_zv_flag) {
 
+                local_imu_initial_func(left_imu_ekf,
+                                       left_imu_data.block(left_index - 5, 1, 10, 6));
+
             }
 
             if (!zv_flag && left_last_zv_flag) {
@@ -171,7 +174,7 @@ int main(int argc, char *argv[]) {
 
 
             if (zv_flag) {
-              local_imu_zupt_func(left_imu_ekf);
+                local_imu_zupt_func(left_imu_ekf);
 
             } else {
                 local_imu_update_func(left_imu_ekf,
