@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     /**
      * Main loop add foot ,
      */
-    while (1) {
+    while (true) {
         // end condition.
         if (left_index + 5 >= left_imu_data.rows() ||
             right_index + 5 >= right_imu_data.rows() ||
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
                         (
                                 BSE::IMUWBKFBase &imu_ekf,
                                 Eigen::MatrixXd initial_input,
-                                Eigen::Isometry3d last_transform
+                                Eigen::Isometry3d &last_transform
                         ) {
                     /**
                      *  initial_input 10 * 6 ...
@@ -166,7 +166,8 @@ int main(int argc, char *argv[]) {
             if (zv_flag && !left_last_zv_flag) {
 
                 local_imu_initial_func(left_imu_ekf,
-                                       left_imu_data.block(left_index - 5, 1, 10, 6));
+                                       left_imu_data.block(left_index - 5, 1, 10, 6),
+                                       left_last_T);
 
             }
 
