@@ -130,7 +130,8 @@ int main(int argc, char *argv[]) {
                         & initial_prob_matrix]
                         (
                                 BSE::IMUWBKFBase &imu_ekf,
-                                Eigen::MatrixXd initial_input
+                                Eigen::MatrixXd initial_input,
+                                Eigen::Isometry3d last_transform
                         ) {
                     /**
                      *  initial_input 10 * 6 ...
