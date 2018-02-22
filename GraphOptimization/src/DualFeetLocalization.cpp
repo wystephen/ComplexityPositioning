@@ -177,10 +177,16 @@ int main(int argc, char *argv[]) {
             // zero velcity to non-zero velocity
             if (!zv_flag && left_last_zv_flag) {
                 auto the_transform = left_imu_ekf.getTransformMatrix();
+                // Add vertex and edge
+
+
+
+                left_last_T = the_transform;
 
             }
 
 
+            // ZUPT state or non-ZUPT state
             if (zv_flag) {
                 local_imu_zupt_func(left_imu_ekf);
 
