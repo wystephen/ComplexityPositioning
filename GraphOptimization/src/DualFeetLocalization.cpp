@@ -162,6 +162,7 @@ int main(int argc, char *argv[]) {
             bool zv_flag =
                     imu_tool.GLRT_Detector(
                             left_imu_data.block(left_index - 5, 1, 10, 6)) > 0.5 ? true : false;
+
             // non-zero velocity to zero velocity
             if (zv_flag && !left_last_zv_flag) {
 

@@ -85,6 +85,7 @@ namespace BSE {
                          converted_input.block(0, 0, 3, 1) = linear_acc;
                          converted_input.block(3, 0, 3, 1) = gyr;
 
+
                          Eigen::MatrixXd A_ = Eigen::MatrixXd::Zero(9, 9);
                          // x y z
                          A_.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity();
