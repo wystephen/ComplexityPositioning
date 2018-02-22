@@ -123,6 +123,13 @@ int main(int argc, char *argv[]) {
     left_last_T = left_imu_ekf.getTransformMatrix();
     right_last_T = right_imu_ekf.getTransformMatrix();
 
+
+
+    /**
+     * Initial graph
+     */
+
+
     /**
      * Main loop add foot ,
      */
@@ -178,6 +185,7 @@ int main(int argc, char *argv[]) {
             if (!zv_flag && left_last_zv_flag) {
                 auto the_transform = left_imu_ekf.getTransformMatrix();
                 // Add vertex and edge
+
 
 
 
