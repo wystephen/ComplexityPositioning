@@ -91,14 +91,37 @@ int main(int argc, char *argv[]) {
     int last_left_index(0), last_right_index(0), last_head_index(0), last_uwb_index(0);
     BSE::IMUWBKFBase left_imu_ekf(initial_prob_matrix);
     BSE::IMUWBKFBase right_imu_ekf(initial_prob_matrix);
-    Eigen::Isometry3d left_last_T(Eigen::Isometry3d::Identity());// last transform matrix.
-    Eigen::Isometry3d right_last_T(Eigen::Isometry3d::Identity());
+    Eigen::Isometry3d left_last_T = (Eigen::Isometry3d::Identity());// last transform matrix.
+    Eigen::Isometry3d right_last_T = (Eigen::Isometry3d::Identity());
     int left_last_zv_flag(false), right_last_zv_flag(false);
 
     left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.row() - 1, 0) - left_imu_data(0, 0)) /
                                    double(left_imu_data.rows()));
     right_imu_ekf.setTime_interval_((right_imu_data(right_imu_data.rows() - 1, 0) - right_imu_data(0, 0))
                                     / double(right_imu_data.rows()));
+    // IMU initial lambda func
+    auto local_imu_initial_func =
+            [&process_noise_matrix,
+                    & measurement_noise_matrix,
+                    & initial_prob_matrix]
+                    (
+                            BSE::IMUWBKFBase &imu_ekf,
+                            Eigen::MatrixXd initial_input
+                    ) {
+                /**
+                 *  initial_input 10 * 6 ...
+                 */
+                imu_ekf.initial_state(initial_input,
+                                      0.0,
+                                      Eigen::Vector3d(0, 0, 0));
+
+            };
+
+    local_imu_initial_func(left_imu_ekf, left_imu_data.block(0, 1, 20, 6));
+    local_imu_initial_func(right_imu_ekf, right_imu_data.block(0, 1, 20, 6));
+
+    left_last_T = left_imu_ekf.getTransformMatrix();
+    right_last_T = right_imu_ekf.getTransformMatrix();
 
     /**
      * Main loop add foot ,
@@ -122,24 +145,6 @@ int main(int argc, char *argv[]) {
                             input, process_noise_matrix,
                             BSE::StateTransactionMethodType::NormalRotation
                     );
-                };
-        // IMU initial lambda func
-        auto local_imu_initial_func =
-                [&process_noise_matrix,
-                        & measurement_noise_matrix,
-                        & initial_prob_matrix]
-                        (
-                                BSE::IMUWBKFBase &imu_ekf,
-                                Eigen::MatrixXd initial_input,
-                                Eigen::Isometry3d &last_transform
-                        ) {
-                    /**
-                     *  initial_input 10 * 6 ...
-                     */
-                    imu_ekf.initial_state(initial_input,
-                                          0.0,
-                                          Eigen::Vector3d(0, 0, 0));
-
                 };
 
         // IMU zero-velocity correct
@@ -171,11 +176,7 @@ int main(int argc, char *argv[]) {
 
             // zero velcity to non-zero velocity
             if (!zv_flag && left_last_zv_flag) {
-//                auto transform = left_imu_ekf.get
-
-                local_imu_initial_func(left_imu_ekf,
-                                       left_imu_data.block(left_index - 5, 1, 10, 6),
-                                       left_last_T);
+                auto the_transform = left_imu_ekf.getTransformMatrix();
 
             }
 
