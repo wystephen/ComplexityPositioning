@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
     Eigen::Isometry3d right_last_T = (Eigen::Isometry3d::Identity());
     int left_last_zv_flag(false), right_last_zv_flag(false);
 
-    left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.row() - 1, 0) - left_imu_data(0, 0)) /
+    left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0)) /
                                    double(left_imu_data.rows()));
     right_imu_ekf.setTime_interval_((right_imu_data(right_imu_data.rows() - 1, 0) - right_imu_data(0, 0))
                                     / double(right_imu_data.rows()));
@@ -122,6 +122,8 @@ int main(int argc, char *argv[]) {
 
     left_last_T = left_imu_ekf.getTransformMatrix();
     right_last_T = right_imu_ekf.getTransformMatrix();
+
+
 
 
 
@@ -209,12 +211,14 @@ int main(int argc, char *argv[]) {
 
 
         }
+
         if (right_imu_data(right_index, 0) < uwb_data(uwb_index, 0)) {
             //update right index
 
         }
-        if (uwb_data(uwb_index, 0) < right_imu_data(right_index, 0) &&
-            uwb_data(uwb_index, 0) < left_imu_data(left_index, 0)) {
+
+        if (uwb_data(uwb_index, 0) <= right_imu_data(right_index, 0) &&
+            uwb_data(uwb_index, 0) <= left_imu_data(left_index, 0)) {
             // update uwb index
 
         }
