@@ -458,6 +458,20 @@ namespace BSE {
             IMUWBKFBase::local_g_ = local_g_;
         }
 
+
+        /**
+         * Get current transform matrix.
+         * @return
+         */
+        Eigen::Isometry3d getTransformMatrix(){
+            Eigen::Isometry3d trans_matrix=Eigen::Isometry3d::Identity();
+
+
+
+            return trans_matrix;
+
+        }
+
     protected:
         double time_interval_ = 0.005;
 
