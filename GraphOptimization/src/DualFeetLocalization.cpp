@@ -116,6 +116,33 @@ int main(int argc, char *argv[]) {
                                       Eigen::Vector3d(0, 0, 0));
 
             };
+    // IMU update lambda func
+    auto local_imu_update_func =
+            [&process_noise_matrix,
+                    & measurement_noise_matrix,
+                    & initial_prob_matrix]
+                    (BSE::IMUWBKFBase &imu_ekf,
+                     Eigen::MatrixXd &input) {
+                imu_ekf.StateTransaction(
+                        input, process_noise_matrix,
+                        BSE::StateTransactionMethodType::NormalRotation
+                );
+            };
+
+    // IMU zero-velocity correct
+    auto local_imu_zupt_func =
+            [&measurement_noise_matrix]
+                    (
+                            BSE::IMUWBKFBase &imu_ekf
+                    ) {
+                imu_ekf.MeasurementState(
+                        Eigen::Vector3d(0, 0, 0),
+                        Eigen::Matrix3d::Identity() * 0.00025,
+                        BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement
+                        ///
+                );
+            };
+
 
     local_imu_initial_func(left_imu_ekf, left_imu_data.block(0, 1, 20, 6));
     local_imu_initial_func(right_imu_ekf, right_imu_data.block(0, 1, 20, 6));
@@ -143,32 +170,6 @@ int main(int argc, char *argv[]) {
             uwb_index + 2 >= uwb_data.rows()) {
             break;
         }
-        // IMU update lambda func
-        auto local_imu_update_func =
-                [&process_noise_matrix,
-                        & measurement_noise_matrix,
-                        & initial_prob_matrix]
-                        (BSE::IMUWBKFBase &imu_ekf,
-                         Eigen::MatrixXd &input) {
-                    imu_ekf.StateTransaction(
-                            input, process_noise_matrix,
-                            BSE::StateTransactionMethodType::NormalRotation
-                    );
-                };
-
-        // IMU zero-velocity correct
-        auto local_imu_zupt_func =
-                [&measurement_noise_matrix]
-                        (
-                                BSE::IMUWBKFBase &imu_ekf
-                        ) {
-                    imu_ekf.MeasurementState(
-                            Eigen::Vector3d(0, 0, 0),
-                            Eigen::Matrix3d::Identity() * 0.00025,
-                            BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement
-                            ///
-                    );
-                };
 
 
         if (left_imu_data(left_index, 0) < uwb_data(uwb_index, 0)) {
