@@ -166,13 +166,16 @@ int main(int argc, char *argv[]) {
             // non-zero velocity to zero velocity
             if (zv_flag && !left_last_zv_flag) {
 
-                local_imu_initial_func(left_imu_ekf,
-                                       left_imu_data.block(left_index - 5, 1, 10, 6),
-                                       left_last_T);
 
             }
 
+            // zero velcity to non-zero velocity
             if (!zv_flag && left_last_zv_flag) {
+//                auto transform = left_imu_ekf.get
+
+                local_imu_initial_func(left_imu_ekf,
+                                       left_imu_data.block(left_index - 5, 1, 10, 6),
+                                       left_last_T);
 
             }
 
