@@ -116,13 +116,13 @@ int main(int argc, char *argv[]) {
                                       Eigen::Vector3d(0, 0, 0));
 
             };
-    // IMU update lambda func
+    // IMU update lambda function
     auto local_imu_update_func =
             [&process_noise_matrix,
                     & measurement_noise_matrix,
                     & initial_prob_matrix]
                     (BSE::IMUWBKFBase &imu_ekf,
-                     Eigen::MatrixXd &input) {
+                     Eigen::MatrixXd input) {
                 imu_ekf.StateTransaction(
                         input, process_noise_matrix,
                         BSE::StateTransactionMethodType::NormalRotation
