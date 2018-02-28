@@ -63,7 +63,6 @@ int main(int argc, char *argv[]) {
     }
 
 
-//    std::cout << last_uwb_err
     auto imu_tool = BSE::ImuTools();
 
 
