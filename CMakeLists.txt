@@ -119,8 +119,11 @@ link_directories(
         ${OpenCL_LIBRARY}
 )
 
+#add_library(BayesStateEstimate  STATIC BayesStateEstimate/BSE.h)
+
 
 add_executable(DualFeetLocalization GraphOptimization/src/DualFeetLocalization.cpp)
+#target_link_libraries(DualFeetLocalization BayesStateEstimate)
 
 add_executable(KalmanFilterTester BayesStateEstimate/Test/KalmanFilterTester.cpp)
 target_link_libraries(KalmanFilterTester ${PYTHON_LIBRARIES})
@@ -134,3 +137,4 @@ target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${
 #cuda_add_executable(MonteCarloThrustTester
 #        BayesStateEstimate/Test/MonteCarloTesterCuda.cpp)
 #target_link_libraries(MonteCarloThrustTester )
+

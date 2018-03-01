@@ -13,11 +13,6 @@
 #include "AWF.h"
 
 
-//#include "../../BayesStateEstimate/AuxiliaryTool/ImuTools.h"
-//#include "../../BayesStateEstimate/AuxiliaryTool/UwbTools.h"
-//
-//#include "../../BayesStateEstimate/BayesFilter/KalmanFilter/IMUWBKF.h"
-//#include "../../BayesStateEstimate/BayesFilter/KalmanFilter/IMUWBKF.cpp"
 #include "BSE.h"
 
 
@@ -188,7 +183,7 @@ int main(int argc, char *argv[]) {
 
         if (left_imu_data(left_index, 0) < uwb_data(uwb_index, 0)) {
             //update left index
-            std::cout << "left foot" ;//<< std::endl;
+//            std::cout << "left foot" ;//<< std::endl;
             bool zv_flag =
                     imu_tool.GLRT_Detector(
                             left_imu_data.block(left_index - 5, 1, 10, 6)) > 0.5 ? true : false;
@@ -231,7 +226,7 @@ int main(int argc, char *argv[]) {
 
         if (right_imu_data(right_index, 0) < uwb_data(uwb_index, 0)) {
             //update right index
-            std::cout << "right foot";//<< std::endl;
+//            std::cout << "right foot";//<< std::endl;
 
 
             right_index ++;
@@ -241,7 +236,8 @@ int main(int argc, char *argv[]) {
         if (uwb_data(uwb_index, 0) <= right_imu_data(right_index, 0) &&
             uwb_data(uwb_index, 0) <= left_imu_data(left_index, 0)) {
             // update uwb index
-            std::cout << "uwb" << std::endl;
+//            std::cout << "uwb" << std::endl;
+
             uwb_index++;
 
         }
