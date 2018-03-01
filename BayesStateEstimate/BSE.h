@@ -32,5 +32,8 @@
 #include "BayesFilter/KalmanFilter/KalmanFilterBase.h"
 #include "BayesFilter/KalmanFilter/IMUWBKF.h"
 
+#include "AuxiliaryTool/ImuTools.h"
+#include "AuxiliaryTool/UwbTools.h"
+
 
 #endif //COMPLEXITYPOSITIONING_BSE_H
