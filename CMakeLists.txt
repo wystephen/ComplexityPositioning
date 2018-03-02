@@ -102,7 +102,7 @@ include_directories(
         ${GTSAM_INCLUDE_DIR}
         /home/steve/Code/AlgorithmWorkFlowTools/
         ${PYTHON_INCLUDE_DIRS}
-        ./BayesStateEstimate/
+        BayesStateEstimate/
         ${Boost_INCLUDE_DIRS}
         ${BoostCompute_INCLUDE_DIRS}
         ${OpenCL_LIBRARY}

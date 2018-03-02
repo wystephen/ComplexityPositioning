@@ -221,7 +221,6 @@ int main(int argc, char *argv[]) {
             left_index++;
 
 
-
         }
 
         if (right_imu_data(right_index, 0) < uwb_data(uwb_index, 0)) {
@@ -229,7 +228,7 @@ int main(int argc, char *argv[]) {
 //            std::cout << "right foot";//<< std::endl;
 
 
-            right_index ++;
+            right_index++;
 
         }
 
