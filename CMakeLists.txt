@@ -123,7 +123,7 @@ link_directories(
 
 
 add_executable(DualFeetLocalization GraphOptimization/src/DualFeetLocalization.cpp)
-#target_link_libraries(DualFeetLocalization BayesStateEstimate)
+target_link_libraries(DualFeetLocalization ${PYTHON_LIBRARIES})
 
 add_executable(KalmanFilterTester BayesStateEstimate/Test/KalmanFilterTester.cpp)
 target_link_libraries(KalmanFilterTester ${PYTHON_LIBRARIES})
