@@ -174,10 +174,18 @@ int main(int argc, char *argv[]) {
     /**
      * Aux tool
      */
-    std::vector<std::vector<double>> left_trace={{},{},{}};
-    std::vector<std::vector<double>> right_trace={{},{},{}};
-    std::vector<std::vector<double>> uwb_trace={{},{},{}};
-    std::vector<std::vector<double>> fusiong_trace={{},{},{}};
+    std::vector<std::vector<double>> left_trace = {{},
+                                                   {},
+                                                   {}};
+    std::vector<std::vector<double>> right_trace = {{},
+                                                    {},
+                                                    {}};
+    std::vector<std::vector<double>> uwb_trace = {{},
+                                                  {},
+                                                  {}};
+    std::vector<std::vector<double>> fusiong_trace = {{},
+                                                      {},
+                                                      {}};
 
 
     /**
@@ -210,8 +218,8 @@ int main(int argc, char *argv[]) {
             if (!zv_flag && left_last_zv_flag) {
                 auto the_transform = left_imu_ekf.getTransformMatrix();
                 // Add vertex and edge
-                for(int k(0);k<3;++k){
-                    left_trace[k].push_back(the_transform(k,3));
+                for (int k(0); k < 3; ++k) {
+                    left_trace[k].push_back(the_transform(k, 3));
                 }
 
 
@@ -254,9 +262,8 @@ int main(int argc, char *argv[]) {
         }
 
 
-
     }
 
-    plt::plot(left_trace[0],left_trace[1],"r-*");
+    plt::plot(left_trace[0], left_trace[1], "r-*");
     plt::show();
 }
