@@ -232,12 +232,14 @@ int main(int argc, char *argv[]) {
     int beacon_index_offset(0);
     for(int k(0);k<beacon_set_data.rows();k++){
         g2o::VertexSE3 *v = new g2o::VertexSE3();
+        v->setId(k);
         double *d = new double[6];
         for(int ki(0);ki<3;++ki){
             d[ki] = beacon_set_data(k,ki);
         }
         v->setEstimateData(d);
 //        v->setFixed(true);
+        globalOptimizer.addVertex(v);
 
     }
 
@@ -315,6 +317,12 @@ int main(int argc, char *argv[]) {
         Eigen::Matrix<double,1,1> info_matrix;
         info_matrix(0,0) = distance_info;
 
+        std::cout << measurement_index
+                  << "<--->"
+                  << left_vertex_index
+                  << "<--->"
+                  << right_vertex_index
+                  << std::endl;
         auto *edge = new DistanceEdge();
         edge->vertices()[0] = globalOptimizer.vertex(measurement_index);
         edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index-1);
@@ -440,10 +448,10 @@ int main(int argc, char *argv[]) {
 //            );
             for(int k(1);k<uwb_data.cols();++k){
                 if(uwb_data(uwb_index,k)>0){
-                    std::cout << uwb_index
-                              << ","
-                              << uwb_data(uwb_index,k)
-                              << std::endl;
+//                    std::cout << uwb_index
+//                              << ","
+//                              << uwb_data(uwb_index,k)
+//                              << std::endl;
 
                     add_uwb_edge(uwb_data(uwb_index,k),k-1,0);
                 }
