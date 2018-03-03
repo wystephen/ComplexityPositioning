@@ -32,6 +32,7 @@
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_factory.h"
 #include "../include/OwnEdge/DistanceEdge.h"
+#include "../include/OwnEdge/DistanceEdge.cpp"
 
 
 namespace plt = matplotlibcpp;
@@ -454,13 +455,36 @@ int main(int argc, char *argv[]) {
     globalOptimizer.setVerbose(true);
     globalOptimizer.optimize(1000);
 
+
+    // get pose
+    std::vector<std::vector<double>> graph_left={{},{},{}};
+    std::vector<std::vector<double>> graph_right={{},{},{}};
+    for(int i(left_vertex_index_init);i<left_vertex_index;++i){
+
+        double * data = new double[10];
+       globalOptimizer.vertex(i)->getEstimateData(data);
+        for(int j(0);j<3;++j){
+            graph_left[j].push_back(data[j]);
+        }
+    }
+
+    for(int i(right_vertex_index_init);i<right_vertex_index;++i){
+        double * data = new double[10];
+        globalOptimizer.vertex(i)->getEstimateData(data);
+        for(int j(0);j<3;++j){
+            graph_right[j].push_back(data[j]);
+        }
+    }
+
     plt::figure();
     plt::title("result");
-    std::cout << " left" << std::endl;
+//    std::cout << " left" << std::endl;
     plt::named_plot("left", left_trace[0], left_trace[1], "-+");
-    std::cout << "right" << std::endl;
+//    std::cout << "right" << std::endl;
     plt::named_plot("right", right_trace[0], right_trace[1], "-+");
-    std::cout << "grid " << std::endl;
+//    std::cout << "grid " << std::endl;
+    plt::named_plot("left_graph",graph_left[0],graph_left[1],"-*");
+    plt::named_plot("right_graph",graph_right[0],graph_right[1],"-*");
 
     plt::grid(true);
     plt::legend();
