@@ -120,12 +120,13 @@ link_directories(
 
 #add_library(BayesStateEstimate  STATIC BayesStateEstimate/BSE.h)
 
-add_subdirectory(BayesStateEstimate)
-add_subdirectory(GraphOptimization)
+#add_subdirectory(BayesStateEstimate)
+#add_subdirectory(GraphOptimization)
 
 
 add_executable(DualFeetLocalization GraphOptimization/src/DualFeetLocalization.cpp)
-target_link_libraries(DualFeetLocalization ${PYTHON_LIBRARIES})
+target_link_libraries(DualFeetLocalization ${PYTHON_LIBRARIES}
+        ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
 
 add_executable(KalmanFilterTester BayesStateEstimate/Test/KalmanFilterTester.cpp)
 target_link_libraries(KalmanFilterTester ${PYTHON_LIBRARIES})
