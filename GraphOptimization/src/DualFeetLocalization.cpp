@@ -410,7 +410,7 @@ int main(int argc, char *argv[]) {
                 for (int k(0); k < 3; ++k) {
                     right_trace[k].push_back(the_transform(k, 3));
                 }
-                add_foot_vertex(the_transform*right_last_T.inverse(),
+                add_foot_vertex(right_last_T.inverse()*the_transform,
                 right_vertex_index,
                 right_vertex_index>right_vertex_index_init);
                 right_vertex_index++;
@@ -440,6 +440,11 @@ int main(int argc, char *argv[]) {
 //            );
             for(int k(1);k<uwb_data.cols();++k){
                 if(uwb_data(uwb_index,k)>0){
+                    std::cout << uwb_index
+                              << ","
+                              << uwb_data(uwb_index,k)
+                              << std::endl;
+
                     add_uwb_edge(uwb_data(uwb_index,k),k-1,0);
                 }
 
