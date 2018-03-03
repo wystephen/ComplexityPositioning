@@ -312,7 +312,7 @@ int main(int argc, char *argv[]) {
              int measurement_index,
             int uwb_index){
         Eigen::Matrix<double,1,1> info_matrix;
-        info_matrix(0,0) = 5.0;
+        info_matrix(0,0) = 0.1;
 
         auto *edge = new DistanceEdge();
         edge->vertices()[0] = globalOptimizer.vertex(measurement_index);
