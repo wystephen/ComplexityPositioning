@@ -367,7 +367,7 @@ int main(int argc, char *argv[]) {
                 for (int k(0); k < 3; ++k) {
                     left_trace[k].push_back(the_transform(k, 3));
                 }
-                add_foot_vertex(the_transform*left_last_T.inverse(),
+                add_foot_vertex(left_last_T.inverse()*the_transform,
                 left_vertex_index,
                 left_vertex_index>left_vertex_index_init);
                 left_vertex_index++;
