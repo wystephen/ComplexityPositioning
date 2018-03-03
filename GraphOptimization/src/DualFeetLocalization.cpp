@@ -230,15 +230,15 @@ int main(int argc, char *argv[]) {
     globalOptimizer.setAlgorithm(solver);
 
     int beacon_index_offset(0);
-    for(int k(0);k<beacon_set_data.rows();k++){
+    for (int k(0); k < beacon_set_data.rows(); k++) {
         g2o::VertexSE3 *v = new g2o::VertexSE3();
         v->setId(k);
         double *d = new double[6];
-        for(int ki(0);ki<3;++ki){
-            d[ki] = beacon_set_data(k,ki);
+        for (int ki(0); ki < 3; ++ki) {
+            d[ki] = beacon_set_data(k, ki);
         }
         v->setEstimateData(d);
-//        v->setFixed(true);
+        v->setFixed(true);
         globalOptimizer.addVertex(v);
 
     }
@@ -275,8 +275,8 @@ int main(int argc, char *argv[]) {
 
 
     auto add_foot_vertex = [&globalOptimizer,
-    &first_info,
-    &second_info]
+            &first_info,
+            &second_info]
             (Eigen::Isometry3d transform_matrix,
              int current_index,
              bool add_edge) {
@@ -308,14 +308,14 @@ int main(int argc, char *argv[]) {
 
 
     auto add_uwb_edge = [&globalOptimizer,
-    &left_vertex_index,
-    &right_vertex_index,
-    &distance_info]
+            &left_vertex_index,
+            &right_vertex_index,
+            &distance_info]
             (double measurement,
              int measurement_index,
-            int uwb_index){
-        Eigen::Matrix<double,1,1> info_matrix;
-        info_matrix(0,0) = distance_info;
+             int uwb_index) {
+        Eigen::Matrix<double, 1, 1> info_matrix;
+        info_matrix(0, 0) = distance_info;
 
         std::cout << measurement_index
                   << "<--->"
@@ -325,7 +325,7 @@ int main(int argc, char *argv[]) {
                   << std::endl;
         auto *edge = new DistanceEdge();
         edge->vertices()[0] = globalOptimizer.vertex(measurement_index);
-        edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index-1);
+        edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index - 1);
         edge->setMeasurement(measurement);
         edge->setInformation(info_matrix);
 
@@ -333,7 +333,7 @@ int main(int argc, char *argv[]) {
 
         auto *edge_right = new DistanceEdge();
         edge_right->vertices()[0] = globalOptimizer.vertex(measurement_index);
-        edge_right->vertices()[1] = globalOptimizer.vertex(right_vertex_index-1);
+        edge_right->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
         edge_right->setMeasurement(measurement);
         edge_right->setInformation(info_matrix);
 
@@ -375,9 +375,9 @@ int main(int argc, char *argv[]) {
                 for (int k(0); k < 3; ++k) {
                     left_trace[k].push_back(the_transform(k, 3));
                 }
-                add_foot_vertex(left_last_T.inverse()*the_transform,
-                left_vertex_index,
-                left_vertex_index>left_vertex_index_init);
+                add_foot_vertex(left_last_T.inverse() * the_transform,
+                                left_vertex_index,
+                                left_vertex_index > left_vertex_index_init);
                 left_vertex_index++;
 
 
@@ -418,9 +418,9 @@ int main(int argc, char *argv[]) {
                 for (int k(0); k < 3; ++k) {
                     right_trace[k].push_back(the_transform(k, 3));
                 }
-                add_foot_vertex(right_last_T.inverse()*the_transform,
-                right_vertex_index,
-                right_vertex_index>right_vertex_index_init);
+                add_foot_vertex(right_last_T.inverse() * the_transform,
+                                right_vertex_index,
+                                right_vertex_index > right_vertex_index_init);
                 right_vertex_index++;
 
                 right_last_T = the_transform;
@@ -446,14 +446,15 @@ int main(int argc, char *argv[]) {
 //                    uw
 //
 //            );
-            for(int k(1);k<uwb_data.cols();++k){
-                if(uwb_data(uwb_index,k)>0){
+            for (int k(1); k < uwb_data.cols(); ++k) {
+                if (uwb_data(uwb_index, k) > 0 &&
+                    uwb_data(uwb_index, k) < 10.0) {
 //                    std::cout << uwb_index
 //                              << ","
 //                              << uwb_data(uwb_index,k)
 //                              << std::endl;
 
-                    add_uwb_edge(uwb_data(uwb_index,k),k-1,0);
+                    add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
                 }
 
             }
@@ -471,21 +472,25 @@ int main(int argc, char *argv[]) {
 
 
     // get pose
-    std::vector<std::vector<double>> graph_left={{},{},{}};
-    std::vector<std::vector<double>> graph_right={{},{},{}};
-    for(int i(left_vertex_index_init);i<left_vertex_index;++i){
+    std::vector<std::vector<double>> graph_left = {{},
+                                                   {},
+                                                   {}};
+    std::vector<std::vector<double>> graph_right = {{},
+                                                    {},
+                                                    {}};
+    for (int i(left_vertex_index_init); i < left_vertex_index; ++i) {
 
-        double * data = new double[10];
-       globalOptimizer.vertex(i)->getEstimateData(data);
-        for(int j(0);j<3;++j){
+        double *data = new double[10];
+        globalOptimizer.vertex(i)->getEstimateData(data);
+        for (int j(0); j < 3; ++j) {
             graph_left[j].push_back(data[j]);
         }
     }
 
-    for(int i(right_vertex_index_init);i<right_vertex_index;++i){
-        double * data = new double[10];
+    for (int i(right_vertex_index_init); i < right_vertex_index; ++i) {
+        double *data = new double[10];
         globalOptimizer.vertex(i)->getEstimateData(data);
-        for(int j(0);j<3;++j){
+        for (int j(0); j < 3; ++j) {
             graph_right[j].push_back(data[j]);
         }
     }
@@ -497,8 +502,8 @@ int main(int argc, char *argv[]) {
 //    std::cout << "right" << std::endl;
     plt::named_plot("right", right_trace[0], right_trace[1], "-+");
 //    std::cout << "grid " << std::endl;
-    plt::named_plot("left_graph",graph_left[0],graph_left[1],"-*");
-    plt::named_plot("right_graph",graph_right[0],graph_right[1],"-*");
+    plt::named_plot("left_graph", graph_left[0], graph_left[1], "-*");
+    plt::named_plot("right_graph", graph_right[0], graph_right[1], "-*");
 
     plt::grid(true);
     plt::legend();
