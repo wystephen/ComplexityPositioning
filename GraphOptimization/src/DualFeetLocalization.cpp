@@ -297,6 +297,8 @@ int main(int argc, char *argv[]) {
     }
 
 //    plt::plot(left_trace[0], left_trace[1], "r-*");
+    plt::figure();
+    plt::title("result");
     plt::named_plot("left",left_trace[0],left_trace[1],"-+");
     plt::named_plot("right",right_trace[0],right_trace[1],"-+");
 
