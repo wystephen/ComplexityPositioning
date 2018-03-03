@@ -31,6 +31,7 @@
 
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_factory.h"
+#include "../include/OwnEdge/DistanceEdge.h"
 
 
 namespace plt = matplotlibcpp;
@@ -227,6 +228,18 @@ int main(int argc, char *argv[]) {
             new g2o::OptimizationAlgorithmLevenberg(blockSolver);
     globalOptimizer.setAlgorithm(solver);
 
+    int beacon_index_offset(0);
+    for(int k(0);k<beacon_set_data.rows();k++){
+        g2o::VertexSE3 *v = new g2o::VertexSE3();
+        double *d = new double[6];
+        for(int ki(0);ki<3;++ki){
+            d[ki] = beacon_set_data(k,ki);
+        }
+        v->setEstimateData(d);
+        v->setFixed(true);
+
+    }
+
 
 
 
@@ -258,7 +271,9 @@ int main(int argc, char *argv[]) {
                                                       {}};
 
 
-    auto add_foot_vertex = [&globalOptimizer]
+    auto add_foot_vertex = [&globalOptimizer,
+    &first_info,
+    &second_info]
             (Eigen::Isometry3d transform_matrix,
              int current_index,
              bool add_edge) {
@@ -285,6 +300,34 @@ int main(int argc, char *argv[]) {
             globalOptimizer.addEdge(e);
         }
 
+
+    };
+
+
+    auto add_uwb_edge = [&globalOptimizer,
+    &left_vertex_index,
+    &right_vertex_index]
+            (double measurement,
+             int measurement_index,
+            int uwb_index){
+        Eigen::Matrix<double,1,1> info_matrix;
+        info_matrix(0,0) = 5.0;
+
+        auto *edge = new DistanceEdge();
+        edge->vertices()[0] = globalOptimizer.vertex(measurement_index);
+        edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index-1);
+        edge->setMeasurement(measurement);
+        edge->setInformation(info_matrix);
+
+        globalOptimizer.addEdge(edge);
+
+        auto *edge_right = new DistanceEdge();
+        edge_right->vertices()[0] = globalOptimizer.vertex(measurement_index);
+        edge_right->vertices()[1] = globalOptimizer.vertex(right_vertex_index-1);
+        edge_right->setMeasurement(measurement);
+        edge_right->setInformation(info_matrix);
+
+        globalOptimizer.addEdge(edge_right);
 
     };
 
@@ -322,6 +365,10 @@ int main(int argc, char *argv[]) {
                 for (int k(0); k < 3; ++k) {
                     left_trace[k].push_back(the_transform(k, 3));
                 }
+                add_foot_vertex(the_transform*left_last_T.inverse(),
+                left_vertex_index,
+                left_vertex_index>left_vertex_index_init);
+                left_vertex_index++;
 
 
                 left_last_T = the_transform;
@@ -335,13 +382,9 @@ int main(int argc, char *argv[]) {
             } else {
                 local_imu_update_func(left_imu_ekf,
                                       left_imu_data.block(left_index, 1, 1, 6).transpose());
-
             }
-
             left_last_zv_flag = zv_flag;
             left_index++;
-
-
         }
 
         if (right_imu_data(right_index, 0) < uwb_data(uwb_index, 0)) {
@@ -358,13 +401,17 @@ int main(int argc, char *argv[]) {
 
             }
 
-            // zero velocity
+            // zero velocity to non-zero velocity
             if (right_last_zv_flag && !zv_flag) {
                 auto the_transform = right_imu_ekf.getTransformMatrix();
 
                 for (int k(0); k < 3; ++k) {
                     right_trace[k].push_back(the_transform(k, 3));
                 }
+                add_foot_vertex(the_transform*right_last_T.inverse(),
+                right_vertex_index,
+                right_vertex_index>right_vertex_index_init);
+                right_vertex_index++;
 
                 right_last_T = the_transform;
             }
@@ -385,6 +432,16 @@ int main(int argc, char *argv[]) {
             uwb_data(uwb_index, 0) <= left_imu_data(left_index, 0)) {
             /// update uwb index
 //            std::cout << "uwb" << std::endl;
+//            add_uwb_edge(
+//                    uw
+//
+//            );
+            for(int k(1);k<uwb_data.cols();++k){
+                if(uwb_data(uwb_index,k)>0){
+                    add_uwb_edge(uwb_data(uwb_index,k),k-1,0);
+                }
+
+            }
 
             uwb_index++;
 
@@ -392,6 +449,10 @@ int main(int argc, char *argv[]) {
 
 
     }
+
+    globalOptimizer.initializeOptimization();
+    globalOptimizer.setVerbose(true);
+    globalOptimizer.optimize(1000);
 
     plt::figure();
     plt::title("result");
