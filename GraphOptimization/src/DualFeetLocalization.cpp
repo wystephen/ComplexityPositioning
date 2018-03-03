@@ -36,9 +36,52 @@
 namespace plt = matplotlibcpp;
 
 int main(int argc, char *argv[]) {
+
     std::cout.precision(30);
     // parameters
     std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+
+
+    // 3 300 0.2 5.0 10000 0.2 5.0 5
+    int only_method = 3;
+    int only_particle_num = 1150;
+    double only_transpose_sigma = 0.3;
+    double only_eval_sigma = 5.0;
+
+    int fus_particle_num = 30000;
+    double fus_transpose_sigma = 1.3;
+    double fus_eval_sigma = 1.0;
+
+
+
+    /// g2o parameter
+
+    double first_info = 1000.0;
+    double second_info = 1000.0;
+
+
+    double distance_info = 1.0;
+    double distance_sigma = 2.0;
+
+
+    double z_offset = 1.90 - 1.12;
+
+    double turn_threshold = 1.0;
+    double corner_ratio = 10.0;
+
+    int max_optimize_times = 4000;
+
+    double time_offset = 0.0;
+
+
+    double uwb_err_threshold = 0.5;
+
+    int delay_times = 25;
+
+    int out_delay_times = 4;
+
+    int data_num = 5;
+
 
 
 
@@ -196,6 +239,8 @@ int main(int argc, char *argv[]) {
     int uwb_vertex_index = uwb_vertex_index_init;
 
 
+
+
     /**
      * Aux tool
      */
@@ -211,6 +256,37 @@ int main(int argc, char *argv[]) {
     std::vector<std::vector<double>> fusiong_trace = {{},
                                                       {},
                                                       {}};
+
+
+    auto add_foot_vertex = [&globalOptimizer]
+            (Eigen::Isometry3d transform_matrix,
+             int current_index,
+             bool add_edge) {
+        g2o::VertexSE3 *foot_se3 = new g2o::VertexSE3();
+        foot_se3->setId(current_index);
+        globalOptimizer.addVertex(foot_se3);
+
+        if (add_edge) {
+            auto *e = new g2o::EdgeSE3();
+
+            e->vertices()[0] = globalOptimizer.vertex(current_index - 1);
+            e->vertices()[1] = globalOptimizer.vertex(current_index);
+            Eigen::Matrix<double, 6, 6> information(Eigen::Matrix<double, 6, 6>::Identity());
+
+            information(0, 0) = information(1, 1) = information(2, 2) = first_info;
+            information(3, 3) = information(4, 4) = information(5, 5) = second_info;
+
+//            if (is_corner) {
+//                information(0, 0) = information(1, 1) = information(2, 2) = first_info / corner_ratio;
+//                information(3, 3) = information(4, 4) = information(5, 5) = second_info / corner_ratio;
+//            }
+            e->setInformation(information);
+            e->setMeasurement(transform_matrix);
+            globalOptimizer.addEdge(e);
+        }
+
+
+    };
 
 
     /**
@@ -302,8 +378,6 @@ int main(int argc, char *argv[]) {
             }
 
             right_last_zv_flag = zv_flag;
-//            right_index++;
-
             right_index++;
         }
 
