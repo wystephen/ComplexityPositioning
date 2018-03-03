@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
 
 
         if (left_imu_data(left_index, 0) < uwb_data(uwb_index, 0)) {
-            //update left index
+            ///update left index
 //            std::cout << "left foot" ;//<< std::endl;
             bool zv_flag =
                     imu_tool.GLRT_Detector(
@@ -244,17 +244,49 @@ int main(int argc, char *argv[]) {
         }
 
         if (right_imu_data(right_index, 0) < uwb_data(uwb_index, 0)) {
-            //update right index
+            ///update right index
 //            std::cout << "right foot";//<< std::endl;
 
+            bool zv_flag =
+                    imu_tool.GLRT_Detector(
+                            right_imu_data.block(right_index - 5, 1, 10, 6)
+                    ) > 0.5 ? true : false;
 
+            //non-zero velocity to zero velocity
+            if( !right_last_zv_flag && zv_flag)
+            {
+
+            }
+
+            // zero velocity
+            if(right_last_zv_flag && !zv_flag)
+            {
+                auto the_transform = right_imu_ekf.getTransformMatrix();
+
+                for( int k(0);k<3;++k){
+                    right_trace[k].push_back(the_transform(k,3));
+                }
+
+                right_last_T = the_transform;
+            }
+
+            //ZUPT state or non-ZUPT state
+            if(zv_flag){
+                local_imu_zupt_func(right_imu_ekf);
+            }else{
+                local_imu_update_func(right_imu_ekf,
+                right_imu_data.block(right_index,1,1,6).transpose());
+            }
+
+            right_last_zv_flag = zv_flag;
             right_index++;
 
+            right_index++;
         }
 
         if (uwb_data(uwb_index, 0) <= right_imu_data(right_index, 0) &&
             uwb_data(uwb_index, 0) <= left_imu_data(left_index, 0)) {
-            // update uwb index
+            /// update uwb index
 //            std::cout << "uwb" << std::endl;
 
             uwb_index++;
@@ -264,6 +296,11 @@ int main(int argc, char *argv[]) {
 
     }
 
-    plt::plot(left_trace[0], left_trace[1], "r-*");
+//    plt::plot(left_trace[0], left_trace[1], "r-*");
+    plt::named_plot("left",left_trace[0],left_trace[1],".-+");
+    plt::named_plot("right",right_trace[0],right_trace[1],".-+");
+
+    plt::grid(true);
+    plt::legend();
     plt::show();
 }
