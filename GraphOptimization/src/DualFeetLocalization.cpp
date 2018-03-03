@@ -237,7 +237,7 @@ int main(int argc, char *argv[]) {
             d[ki] = beacon_set_data(k,ki);
         }
         v->setEstimateData(d);
-        v->setFixed(true);
+//        v->setFixed(true);
 
     }
 
@@ -307,12 +307,13 @@ int main(int argc, char *argv[]) {
 
     auto add_uwb_edge = [&globalOptimizer,
     &left_vertex_index,
-    &right_vertex_index]
+    &right_vertex_index,
+    &distance_info]
             (double measurement,
              int measurement_index,
             int uwb_index){
         Eigen::Matrix<double,1,1> info_matrix;
-        info_matrix(0,0) = 0.1;
+        info_matrix(0,0) = distance_info;
 
         auto *edge = new DistanceEdge();
         edge->vertices()[0] = globalOptimizer.vertex(measurement_index);
