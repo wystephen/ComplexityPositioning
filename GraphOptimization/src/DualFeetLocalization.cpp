@@ -319,7 +319,6 @@ int main(int argc, char *argv[]) {
 
     }
 
-//    plt::plot(left_trace[0], left_trace[1], "r-*");
     plt::figure();
     plt::title("result");
     std::cout << " left" << std::endl;
