@@ -109,10 +109,10 @@ int main(int argc, char *argv[]) {
     Eigen::Isometry3d right_last_T = (Eigen::Isometry3d::Identity());
     int left_last_zv_flag(false), right_last_zv_flag(false);
 
-    left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0)) /
-                                   double(left_imu_data.rows()));
-    right_imu_ekf.setTime_interval_((right_imu_data(right_imu_data.rows() - 1, 0) - right_imu_data(0, 0))
-                                    / double(right_imu_data.rows()));
+//    left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0)) /
+//                                   double(left_imu_data.rows()));
+//    right_imu_ekf.setTime_interval_((right_imu_data(right_imu_data.rows() - 1, 0) - right_imu_data(0, 0))
+//                                    / double(right_imu_data.rows()));
     // IMU initial lambda func
     auto local_imu_initial_func =
             [&process_noise_matrix,
@@ -169,6 +169,31 @@ int main(int argc, char *argv[]) {
     /**
      * Initial graph
      */
+    g2o::SparseOptimizer globalOptimizer;
+
+
+    typedef g2o::BlockSolverX SlamBlockSolver;
+    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+
+    // Initial solver
+    SlamLinearSolver *linearSolver = new SlamLinearSolver();
+//    linearSolver->setBlockOrdering(false);
+    linearSolver->setWriteDebug(true);
+    SlamBlockSolver *blockSolver = new SlamBlockSolver(linearSolver);
+    g2o::OptimizationAlgorithmLevenberg *solver =
+            new g2o::OptimizationAlgorithmLevenberg(blockSolver);
+    globalOptimizer.setAlgorithm(solver);
+
+
+
+
+    // set left vertex index and right vertex index
+    int left_vertex_index_init = 1000000;
+    int right_vertex_index_init = 2000000;
+    int uwb_vertex_index_init = 3000000;
+    int left_vertex_index = left_vertex_index_init;
+    int right_vertex_index = right_vertex_index_init;
+    int uwb_vertex_index = uwb_vertex_index_init;
 
 
     /**
@@ -253,29 +278,27 @@ int main(int argc, char *argv[]) {
                     ) > 0.5 ? true : false;
 
             //non-zero velocity to zero velocity
-            if( !right_last_zv_flag && zv_flag)
-            {
+            if (!right_last_zv_flag && zv_flag) {
 
             }
 
             // zero velocity
-            if(right_last_zv_flag && !zv_flag)
-            {
+            if (right_last_zv_flag && !zv_flag) {
                 auto the_transform = right_imu_ekf.getTransformMatrix();
 
-                for( int k(0);k<3;++k){
-                    right_trace[k].push_back(the_transform(k,3));
+                for (int k(0); k < 3; ++k) {
+                    right_trace[k].push_back(the_transform(k, 3));
                 }
 
                 right_last_T = the_transform;
             }
 
             //ZUPT state or non-ZUPT state
-            if(zv_flag){
+            if (zv_flag) {
                 local_imu_zupt_func(right_imu_ekf);
-            }else{
+            } else {
                 local_imu_update_func(right_imu_ekf,
-                right_imu_data.block(right_index,1,1,6).transpose());
+                                      right_imu_data.block(right_index, 1, 1, 6).transpose());
             }
 
             right_last_zv_flag = zv_flag;
@@ -299,8 +322,11 @@ int main(int argc, char *argv[]) {
 //    plt::plot(left_trace[0], left_trace[1], "r-*");
     plt::figure();
     plt::title("result");
-    plt::named_plot("left",left_trace[0],left_trace[1],"-+");
-    plt::named_plot("right",right_trace[0],right_trace[1],"-+");
+    std::cout << " left" << std::endl;
+    plt::named_plot("left", left_trace[0], left_trace[1], "-+");
+    std::cout << "right" << std::endl;
+    plt::named_plot("right", right_trace[0], right_trace[1], "-+");
+    std::cout << "grid " << std::endl;
 
     plt::grid(true);
     plt::legend();
