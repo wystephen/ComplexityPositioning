@@ -311,10 +311,10 @@ int main(int argc, char *argv[]) {
 
             zo_edge->vertices()[0] = globalOptimizer.vertex(current_index-1);
             zo_edge->vertices()[1] = globalOptimizer.vertex(current_index);
-            auto zo_info = Eigen::Matrix<double,0,0>::Identity();
-            zo_info*= 0.1;
+            auto zo_infos = Eigen::Matrix<double,0,0>::Identity();
+            zo_infos(0,0) = 0.1;
 
-            zo_edge->setInformation(zo_info);
+            zo_edge->setInformation(zo_infos);
             globalOptimizer.addEdge(zo_edge);
 
             auto *e = new g2o::EdgeSE3();
