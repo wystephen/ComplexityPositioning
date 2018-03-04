@@ -360,7 +360,7 @@ namespace BSE {
             double update_rate = 0.5;
             int iter_counter = 0;
             double current_error(g_error(tr, tp, initial_ori));
-            while (current_error > 1e-5 && iter_counter < 3000) {
+            while (current_error > 1e-7 && iter_counter < 30000) {
 
                 iter_counter++;
 //                tr +=(g_error)
