@@ -480,12 +480,12 @@ int main(int argc, char *argv[]) {
             }
 
             // add max distance constrain between right foot and left foot.
-            auto * e = new MaxDistanceEdge();
+            auto *e = new MaxDistanceEdge();
             e->vertices()[0] = globalOptimizer.vertex(left_vertex_index);
             e->vertices()[1] = globalOptimizer.vertex(right_vertex_index);
 
-            Eigen::Matrix<double,1,1> info= Eigen::Matrix<double,1,1>::Identity();
-            info*= 1.0;
+            Eigen::Matrix<double, 1, 1> info = Eigen::Matrix<double, 1, 1>::Identity();
+            info *= 1.0;
             e->setInformation(info);
 
             globalOptimizer.addEdge(e);
