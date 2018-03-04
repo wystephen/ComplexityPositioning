@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     double second_info = 1000.0;
 
 
-    double distance_info = 1.0;
+    double distance_info = 0.1;
     double distance_sigma = 2.0;
 
 
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
     BSE::IMUWBKFBase right_imu_ekf(initial_prob_matrix);
     Eigen::Isometry3d left_last_T = (Eigen::Isometry3d::Identity());// last transform matrix.
     Eigen::Isometry3d right_last_T = (Eigen::Isometry3d::Identity());
-    int left_last_zv_flag(false), right_last_zv_flag(false);
+    int left_last_zv_flag(true), right_last_zv_flag(true);
 
     left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0)) /
                                    double(left_imu_data.rows()));
@@ -162,6 +162,8 @@ int main(int argc, char *argv[]) {
 
     left_imu_ekf.setLocal_g_(-9.81);
     right_imu_ekf.setLocal_g_(-9.81);
+
+
     // IMU initial lambda func
     auto local_imu_initial_func =
             [&process_noise_matrix,
