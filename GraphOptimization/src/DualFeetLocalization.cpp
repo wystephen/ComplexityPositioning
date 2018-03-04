@@ -155,10 +155,13 @@ int main(int argc, char *argv[]) {
     Eigen::Isometry3d right_last_T = (Eigen::Isometry3d::Identity());
     int left_last_zv_flag(false), right_last_zv_flag(false);
 
-    left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0)) /
-                                   double(left_imu_data.rows()));
-    right_imu_ekf.setTime_interval_((right_imu_data(right_imu_data.rows() - 1, 0) - right_imu_data(0, 0))
-                                    / double(right_imu_data.rows()));
+//    left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0)) /
+//                                   double(left_imu_data.rows()));
+//    right_imu_ekf.setTime_interval_((right_imu_data(right_imu_data.rows() - 1, 0) - right_imu_data(0, 0))
+//                                    / double(right_imu_data.rows()));
+
+    left_imu_ekf.setLocal_g_(-9.81);
+    right_imu_ekf.setLocal_g_(-9.81);
     // IMU initial lambda func
     auto local_imu_initial_func =
             [&process_noise_matrix,
@@ -420,8 +423,10 @@ int main(int argc, char *argv[]) {
             if (right_last_zv_flag && !zv_flag) {
                 auto the_transform = right_imu_ekf.getTransformMatrix();
 
+                auto state = right_imu_ekf.getState_();
                 for (int k(0); k < 3; ++k) {
-                    right_trace[k].push_back(the_transform(k, 3));
+//                    right_trace[k].push_back(the_transform(k, 3));
+                    right_trace[k].push_back(state(k));
                 }
                 add_foot_vertex(right_last_T.inverse() * the_transform,
                                 right_vertex_index,
