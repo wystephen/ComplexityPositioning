@@ -459,7 +459,7 @@ int main(int argc, char *argv[]) {
             right_index++;
         }
 
-        if (uwb_data(uwb_index, 0) <= right_imu_data(right_index, 0) ||
+        if (uwb_data(uwb_index, 0) <= right_imu_data(right_index, 0) &&
             uwb_data(uwb_index, 0) <= left_imu_data(left_index, 0)) {
             /// update uwb index
 //            std::cout << "uwb" << std::endl;
@@ -481,8 +481,8 @@ int main(int argc, char *argv[]) {
 
             // add max distance constrain between right foot and left foot.
             auto *e = new MaxDistanceEdge();
-            e->vertices()[0] = globalOptimizer.vertex(left_vertex_index);
-            e->vertices()[1] = globalOptimizer.vertex(right_vertex_index);
+            e->vertices()[0] = globalOptimizer.vertex(left_vertex_index-1);
+            e->vertices()[1] = globalOptimizer.vertex(right_vertex_index-1);
 
             Eigen::Matrix<double, 1, 1> info = Eigen::Matrix<double, 1, 1>::Identity();
             info *= 10.0;
