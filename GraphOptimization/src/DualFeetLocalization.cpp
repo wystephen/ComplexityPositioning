@@ -325,12 +325,12 @@ int main(int argc, char *argv[]) {
         info_matrix(0, 0) = distance_info;
         beacon_flag[measurement_index] = true;
 
-        std::cout << measurement_index
-                  << "<--->"
-                  << left_vertex_index
-                  << "<--->"
-                  << right_vertex_index
-                  << std::endl;
+//        std::cout << measurement_index
+//                  << "<--->"
+//                  << left_vertex_index
+//                  << "<--->"
+//                  << right_vertex_index
+//                  << std::endl;
         auto *edge = new DistanceEdge();
         edge->vertices()[0] = globalOptimizer.vertex(measurement_index);
         edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index - 1);
@@ -368,7 +368,7 @@ int main(int argc, char *argv[]) {
 //            std::cout << "left foot" ;//<< std::endl;
             bool zv_flag =
                     imu_tool.GLRT_Detector(
-                            left_imu_data.block(left_index - 5, 1, 10, 6)) > 0.5 ? true : false;
+                            left_imu_data.block(left_index - 5, 1, 10, 6)) > 0.5;
 
             // non-zero velocity to zero velocity
             if (zv_flag && !left_last_zv_flag) {
@@ -412,7 +412,7 @@ int main(int argc, char *argv[]) {
             bool zv_flag =
                     imu_tool.GLRT_Detector(
                             right_imu_data.block(right_index - 5, 1, 10, 6)
-                    ) > 0.5 ? true : false;
+                    );
 
             //non-zero velocity to zero velocity
             if (!right_last_zv_flag && zv_flag) {
@@ -477,7 +477,8 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
-    globalOptimizer.optimize(10000);
+//    globalOptimizer.optimize(10000);
+    globalOptimizer.optimize(10);
 
 
     // get pose

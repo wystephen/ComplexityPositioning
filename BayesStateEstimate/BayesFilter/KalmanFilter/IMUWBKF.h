@@ -465,7 +465,7 @@ namespace BSE {
          */
         Eigen::Isometry3d getTransformMatrix() {
             Eigen::Isometry3d trans_matrix = Eigen::Isometry3d::Identity();
-            trans_matrix.matrix().block(0, 0, 3, 3) = rotate_q_.toRotationMatrix();
+            trans_matrix.matrix().block(0, 0, 3, 3) = rotate_q_.toRotationMatrix().eval()*1.0;
             trans_matrix.matrix().block(0, 3, 3, 1) = state_.block(0, 0, 3, 1);
 
             return trans_matrix;
