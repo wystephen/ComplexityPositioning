@@ -474,7 +474,7 @@ int main(int argc, char *argv[]) {
 //                              << uwb_data(uwb_index,k)
 //                              << std::endl;
 
-                    add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
+                   // add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
                 }
 
             }
@@ -485,7 +485,7 @@ int main(int argc, char *argv[]) {
             e->vertices()[1] = globalOptimizer.vertex(right_vertex_index-1);
 
             Eigen::Matrix<double, 1, 1> info = Eigen::Matrix<double, 1, 1>::Identity();
-            info *= 10.0;
+            info *= 0.01;
             e->setInformation(info);
 
             globalOptimizer.addEdge(e);

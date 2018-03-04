@@ -50,9 +50,9 @@ public:
         double dis = std::sqrt(dis_2);
 
         if(dis> max_distance_){
-            _error(0,0)= 0.0;
+            _error(0,0)= dis;
         }else{
-            _error(0,0) = dis;
+            _error(0,0) = 0.0;
         }
     }
 
