@@ -340,12 +340,12 @@ namespace BSE {
 //            local_g_ = g;
 
 
-            auto g_error = [&, g, acc](double roll, double pitch, double yaw) -> double {
+            auto g_error = [&, &g, acc](double roll, double pitch, double yaw) -> double {
 
                 auto rotate_matrix = (Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX())
                                       * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
                                       * Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()));
-                return std::abs(local_g_ + (rotate_matrix * acc)(2));
+                return std::abs(std::abs(g) *local_g_ / std::abs(local_g_)+ (rotate_matrix * acc)(2));
             };
             auto ge(0.0);
 //
@@ -395,7 +395,7 @@ namespace BSE {
                 /*
                  * Reduce the learning rate.
                  */
-                if (update_rate > 0.001) {
+                if (update_rate > 0.00001) {
                     update_rate *= 0.99;
                 }
 
