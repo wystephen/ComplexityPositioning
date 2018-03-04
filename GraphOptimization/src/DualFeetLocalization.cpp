@@ -485,7 +485,7 @@ int main(int argc, char *argv[]) {
             e->vertices()[1] = globalOptimizer.vertex(right_vertex_index);
 
             Eigen::Matrix<double, 1, 1> info = Eigen::Matrix<double, 1, 1>::Identity();
-            info *= 1.0;
+            info *= 10.0;
             e->setInformation(info);
 
             globalOptimizer.addEdge(e);
