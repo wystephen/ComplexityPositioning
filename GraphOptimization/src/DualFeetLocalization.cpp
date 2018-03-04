@@ -157,8 +157,9 @@ int main(int argc, char *argv[]) {
 
 //    left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0)) /
 //                                   double(left_imu_data.rows()));
-//    right_imu_ekf.setTime_interval_((right_imu_data(right_imu_data.rows() - 1, 0) - right_imu_data(0, 0))
-//                                    / double(right_imu_data.rows()));
+    left_imu_ekf.setTime_interval_(0.005);
+    right_imu_ekf.setTime_interval_((right_imu_data(right_imu_data.rows() - 1, 0) - right_imu_data(0, 0))
+                                    / double(right_imu_data.rows()));
 
     left_imu_ekf.setLocal_g_(-9.81);
     right_imu_ekf.setLocal_g_(-9.81);
@@ -207,8 +208,8 @@ int main(int argc, char *argv[]) {
             };
 
 
-    local_imu_initial_func(left_imu_ekf, left_imu_data.block(0, 1, 20, 6));
-    local_imu_initial_func(right_imu_ekf, right_imu_data.block(0, 1, 20, 6));
+    local_imu_initial_func(left_imu_ekf, left_imu_data.block(0, 1, 50, 6));
+    local_imu_initial_func(right_imu_ekf, right_imu_data.block(0, 1, 50, 6));
 
     left_last_T = left_imu_ekf.getTransformMatrix();
     right_last_T = right_imu_ekf.getTransformMatrix();
