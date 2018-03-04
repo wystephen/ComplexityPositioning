@@ -34,6 +34,8 @@
 #include "../include/OwnEdge/DistanceEdge.h"
 #include "../include/OwnEdge/DistanceEdge.cpp"
 
+#include "../include/OwnEdge/MaxDistanceEdge.h"
+
 
 namespace plt = matplotlibcpp;
 
@@ -42,7 +44,7 @@ int main(int argc, char *argv[]) {
     std::cout.precision(30);
     // parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0017/";
 
 
     // 3 300 0.2 5.0 10000 0.2 5.0 5
@@ -476,6 +478,17 @@ int main(int argc, char *argv[]) {
                 }
 
             }
+
+            // add max distance constrain between right foot and left foot.
+            auto * e = new MaxDistanceEdge();
+            e->vertices()[0] = globalOptimizer.vertex(left_vertex_index);
+            e->vertices()[1] = globalOptimizer.vertex(right_vertex_index);
+
+            Eigen::Matrix<double,1,1> info= Eigen::Matrix<double,1,1>::Identity();
+            info*= 1.0;
+            e->setInformation(info);
+
+            globalOptimizer.addEdge(e);
 
             uwb_index++;
 
