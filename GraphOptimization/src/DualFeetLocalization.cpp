@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     std::cout.precision(30);
     // parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0010/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 
 
     // 3 300 0.2 5.0 10000 0.2 5.0 5
@@ -313,7 +313,8 @@ int main(int argc, char *argv[]) {
     auto add_uwb_edge = [&globalOptimizer,
             &left_vertex_index,
             &right_vertex_index,
-            &distance_info]
+            &distance_info,
+            &beacon_flag]
             (double measurement,
              int measurement_index,
              int uwb_index) {
@@ -451,7 +452,7 @@ int main(int argc, char *argv[]) {
 //            );
             for (int k(1); k < uwb_data.cols(); ++k) {
                 if (uwb_data(uwb_index, k) > 0 &&
-                    uwb_data(uwb_index, k) < 115.0) {
+                    uwb_data(uwb_index, k) < 15.0) {
 //                    std::cout << uwb_index
 //                              << ","
 //                              << uwb_data(uwb_index,k)
