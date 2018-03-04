@@ -35,6 +35,8 @@
 #include "../include/OwnEdge/DistanceEdge.cpp"
 
 #include "../include/OwnEdge/MaxDistanceEdge.h"
+#include "../include/OwnEdge/ZoEdge.h"
+#include "../include/OwnEdge/ZoEdge.cpp"
 
 
 namespace plt = matplotlibcpp;
@@ -44,7 +46,7 @@ int main(int argc, char *argv[]) {
     std::cout.precision(30);
     // parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0010/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 
 
     // 3 300 0.2 5.0 10000 0.2 5.0 5
@@ -301,7 +303,20 @@ int main(int argc, char *argv[]) {
         foot_se3->setId(current_index);
         globalOptimizer.addVertex(foot_se3);
 
+
+
         if (add_edge) {
+
+            auto *zo_edge = new Z0Edge();
+
+            zo_edge->vertices()[0] = globalOptimizer.vertex(current_index-1);
+            zo_edge->vertices()[1] = globalOptimizer.vertex(current_index);
+            auto zo_info = Eigen::Matrix<double,0,0>::Identity();
+            zo_info*= 0.1;
+
+            zo_edge->setInformation(zo_info);
+            globalOptimizer.addEdge(zo_edge);
+
             auto *e = new g2o::EdgeSE3();
 
             e->vertices()[0] = globalOptimizer.vertex(current_index - 1);
