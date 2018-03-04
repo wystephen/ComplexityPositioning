@@ -179,6 +179,9 @@ int main(int argc, char *argv[]) {
                 imu_ekf.initial_state(initial_input,
                                       0.0,
                                       Eigen::Vector3d(0, 0, 0));
+                std::cout << "time interval:"
+                          << imu_ekf.getTime_interval_()
+                          << std::endl;
 
             };
     // IMU update lambda function
@@ -192,6 +195,10 @@ int main(int argc, char *argv[]) {
                         input, process_noise_matrix,
                         BSE::StateTransactionMethodType::NormalRotation
                 );
+                std::cout << "time interval:"
+                          << imu_ekf.getTime_interval_()
+                          << std::endl;
+
             };
 
     // IMU zero-velocity correct
