@@ -401,14 +401,14 @@ int main(int argc, char *argv[]) {
                 left_last_T = the_transform;
             }
 
-
+            local_imu_update_func(left_imu_ekf,
+                                  left_imu_data.block(left_index, 1, 1, 6).transpose());
             // ZUPT state or non-ZUPT state
             if (zv_flag) {
                 local_imu_zupt_func(left_imu_ekf);
 
             } else {
-                local_imu_update_func(left_imu_ekf,
-                                      left_imu_data.block(left_index, 1, 1, 6).transpose());
+
             }
             left_last_zv_flag = zv_flag;
             left_index++;
@@ -444,13 +444,13 @@ int main(int argc, char *argv[]) {
 
                 right_last_T = the_transform;
             }
-
+            local_imu_update_func(right_imu_ekf,
+                                  right_imu_data.block(right_index, 1, 1, 6).transpose());
             //ZUPT state or non-ZUPT state
             if (zv_flag) {
                 local_imu_zupt_func(right_imu_ekf);
             } else {
-                local_imu_update_func(right_imu_ekf,
-                                      right_imu_data.block(right_index, 1, 1, 6).transpose());
+
             }
 
             right_last_zv_flag = zv_flag;
