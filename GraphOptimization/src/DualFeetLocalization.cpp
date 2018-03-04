@@ -155,9 +155,8 @@ int main(int argc, char *argv[]) {
     Eigen::Isometry3d right_last_T = (Eigen::Isometry3d::Identity());
     int left_last_zv_flag(false), right_last_zv_flag(false);
 
-//    left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0)) /
-//                                   double(left_imu_data.rows()));
-    left_imu_ekf.setTime_interval_(0.005);
+    left_imu_ekf.setTime_interval_((left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0)) /
+                                   double(left_imu_data.rows()));
     right_imu_ekf.setTime_interval_((right_imu_data(right_imu_data.rows() - 1, 0) - right_imu_data(0, 0))
                                     / double(right_imu_data.rows()));
 
@@ -201,7 +200,7 @@ int main(int argc, char *argv[]) {
                     ) {
                 imu_ekf.MeasurementState(
                         Eigen::Vector3d(0, 0, 0),
-                        Eigen::Matrix3d::Identity() * 0.00025,
+                        Eigen::Matrix3d::Identity() * 0.00000025,
                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement
                         ///
                 );
