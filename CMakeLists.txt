@@ -128,6 +128,11 @@ add_executable(DualFeetLocalization GraphOptimization/src/DualFeetLocalization.c
 target_link_libraries(DualFeetLocalization ${PYTHON_LIBRARIES}
         ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
 
+add_executable(DualFeetIndividually GraphOptimization/src/DualFeetIndividually.cpp)
+target_link_libraries(DualFeetIndividually ${PYTHON_LIBRARIES}
+        ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
+
+
 add_executable(KalmanFilterTester BayesStateEstimate/Test/KalmanFilterTester.cpp)
 target_link_libraries(KalmanFilterTester ${PYTHON_LIBRARIES})
 
