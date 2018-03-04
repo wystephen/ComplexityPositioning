@@ -41,7 +41,8 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
     // parameters
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+//    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0010/";
 
 
     // 3 300 0.2 5.0 10000 0.2 5.0 5
@@ -448,7 +449,7 @@ int main(int argc, char *argv[]) {
 //            );
             for (int k(1); k < uwb_data.cols(); ++k) {
                 if (uwb_data(uwb_index, k) > 0 &&
-                    uwb_data(uwb_index, k) < 10.0) {
+                    uwb_data(uwb_index, k) < 115.0) {
 //                    std::cout << uwb_index
 //                              << ","
 //                              << uwb_data(uwb_index,k)
@@ -478,6 +479,10 @@ int main(int argc, char *argv[]) {
     std::vector<std::vector<double>> graph_right = {{},
                                                     {},
                                                     {}};
+
+    std::vector<std::vector<double>> beacon_pose = {
+            {},{},{}
+    };
     for (int i(left_vertex_index_init); i < left_vertex_index; ++i) {
 
         double *data = new double[10];
@@ -494,6 +499,12 @@ int main(int argc, char *argv[]) {
             graph_right[j].push_back(data[j]);
         }
     }
+    for(int i(0);i<beacon_set_data.rows();++i)
+    {
+        beacon_pose[0].push_back(beacon_set_data(i,0));
+        beacon_pose[1].push_back(beacon_set_data(i,1));
+        beacon_pose[2].push_back(beacon_set_data(i,2));
+    }
 
     plt::figure();
     plt::title("result");
@@ -504,6 +515,7 @@ int main(int argc, char *argv[]) {
 //    std::cout << "grid " << std::endl;
     plt::named_plot("left_graph", graph_left[0], graph_left[1], "-*");
     plt::named_plot("right_graph", graph_right[0], graph_right[1], "-*");
+    plt::named_plot("beaconset",beacon_pose[0],beacon_pose[1],"*");
 
     plt::grid(true);
     plt::legend();
