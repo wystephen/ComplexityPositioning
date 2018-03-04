@@ -231,9 +231,11 @@ int main(int argc, char *argv[]) {
     globalOptimizer.setAlgorithm(solver);
 
     int beacon_index_offset(0);
+    std::vector<int> beacon_flag;
     for (int k(0); k < beacon_set_data.rows(); k++) {
         g2o::VertexSE3 *v = new g2o::VertexSE3();
         v->setId(k);
+        beacon_flag.push_back(false);
         double *d = new double[6];
         for (int ki(0); ki < 3; ++ki) {
             d[ki] = beacon_set_data(k, ki);
@@ -317,6 +319,7 @@ int main(int argc, char *argv[]) {
              int uwb_index) {
         Eigen::Matrix<double, 1, 1> info_matrix;
         info_matrix(0, 0) = distance_info;
+        beacon_flag[measurement_index] = true;
 
         std::cout << measurement_index
                   << "<--->"
@@ -445,7 +448,6 @@ int main(int argc, char *argv[]) {
 //            std::cout << "uwb" << std::endl;
 //            add_uwb_edge(
 //                    uw
-            /
 //            );
             for (int k(1); k < uwb_data.cols(); ++k) {
                 if (uwb_data(uwb_index, k) > 0 &&
@@ -469,7 +471,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
-    globalOptimizer.optimize(1000);
+    globalOptimizer.optimize(10000);
 
 
     // get pose
@@ -502,9 +504,14 @@ int main(int argc, char *argv[]) {
         }
     }
     for (int i(0); i < beacon_set_data.rows(); ++i) {
-        beacon_pose[0].push_back(beacon_set_data(i, 0));
-        beacon_pose[1].push_back(beacon_set_data(i, 1));
-        beacon_pose[2].push_back(beacon_set_data(i, 2));
+        if (beacon_flag[i]) {
+            beacon_pose[0].push_back(beacon_set_data(i, 0));
+            beacon_pose[1].push_back(beacon_set_data(i, 1));
+            beacon_pose[2].push_back(beacon_set_data(i, 2));
+        } else {
+            std::cout << "i:" << i;
+        }
+
     }
 
     plt::figure();
