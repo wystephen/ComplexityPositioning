@@ -489,7 +489,7 @@ int main(int argc, char *argv[]) {
 //                              << uwb_data(uwb_index,k)
 //                              << std::endl;
 
-                   // add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
+                   add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
                 }
 
             }
