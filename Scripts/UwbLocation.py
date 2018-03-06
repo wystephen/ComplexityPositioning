@@ -27,6 +27,8 @@ import scipy as sp
 
 import matplotlib.pyplot as plt
 
+from Scripts.Trilateration import Trilateration
+
 if __name__ == '__main__':
     dir_name = '/home/steve/Data/FusingLocationData/0017/'
 
@@ -57,7 +59,30 @@ if __name__ == '__main__':
         plt.plot(second_order_div[:, i],
                  '+',
                  label='second' + str(i))
+
     plt.legend()
     plt.grid()
 
+    processed_uwb_data = uwb_data[1:-1, 1:].copy()
+
+    processed_uwb_data[np.where(np.abs(second_order_div) > 0.8)] = -10.0
+
+    plt.figure()
+    plt.title('processed')
+    for i in range(processed_uwb_data.shape[1]):
+        plt.plot(processed_uwb_data[:, i],
+                 '*',
+                 label='processed' + str(i))
+    plt.legend()
+    plt.grid()
     plt.show()
+
+    tri_positioning = Trilateration(beacon_set=beacon_data)
+    pose = tri_positioning.location_all((0, 0, 0), processed_uwb_data)
+
+    plt.figure()
+    plt.title('position')
+    plt.plot(pose[:, 0], pose[:, 1], '-*')
+    plt.show()
+
+    # plt.show()
