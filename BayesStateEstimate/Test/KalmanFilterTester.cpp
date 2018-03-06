@@ -118,13 +118,13 @@ int main(int argc, char *argv[]) {
 
             filter.setTime_interval_(tmp_time_interval);
         }
-        filter.setLocal_g_(-9.81);
+//        filter.setLocal_g_(-9.81);
 //    filter.IS_DEBUG = true;
 
 
         auto time_begin = AWF::getDoubleSecondTime();
         filter.initial_state(imu_data.block(10, 1, 100, 6),
-                             initial_ori,
+                             initial_ori+M_PI/2.0,
                              initial_pos);
         std::cout << "costed time :" << AWF::getDoubleSecondTime() - time_begin
                   << std::endl;
@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
 //                          << imu_data(i, 0) << std::endl;
 
                 for (int k(1); k < uwb_data.cols(); ++k) {
-                    if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 15.0) {
+                    if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 20.0) {
                         Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
                         measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
                         measurement_noise_matrix.resize(1, 1);
@@ -310,7 +310,7 @@ int main(int argc, char *argv[]) {
 
     f(left_imu_data, "left_foot");
     f(right_imu_data, "right_foot");
-//    f(head_imu_data, "head");
+    f(head_imu_data, "head");
 
     plt::show();
 
