@@ -492,7 +492,7 @@ int main(int argc, char *argv[]) {
                 double second_derivative = uwb_data(uwb_index - 1, k) +
                                            uwb_data(uwb_index + 1, k) -
                                            2.0 * uwb_data(uwb_index, k);
-                if (std::abs(second_derivative) < 0.8) {
+                if (std::abs(second_derivative) < 0.8 && uwb_data(uwb_index,k)>0.0) {
                     add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
                 }
 
@@ -518,7 +518,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
-    globalOptimizer.optimize(10000);
+    globalOptimizer.optimize(1000);
 //    globalOptimizer.optimize(10);
 
 
