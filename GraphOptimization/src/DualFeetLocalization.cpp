@@ -307,15 +307,13 @@ int main(int argc, char *argv[]) {
 
         if (add_edge) {
 
-            //auto *zo_edge = new Z0Edge();
-
-            //zo_edge->vertices()[0] = globalOptimizer.vertex(current_index-1);
-            //zo_edge->vertices()[1] = globalOptimizer.vertex(current_index);
-            //Eigen::Matrix<double,1,1> zo_infos = Eigen::Matrix<double,1,1>::Identity();
-            //zo_infos(0,0) = 0.1;
-
-            //zo_edge->setInformation(zo_infos);
-            //globalOptimizer.addEdge(zo_edge);
+            auto *zo_edge = new Z0Edge();
+            zo_edge->vertices()[0] = globalOptimizer.vertex(current_index-1);
+            zo_edge->vertices()[1] = globalOptimizer.vertex(current_index);
+            Eigen::Matrix<double,1,1> zo_infos = Eigen::Matrix<double,1,1>::Identity();
+            zo_infos(0,0) = 0.01;
+            zo_edge->setInformation(zo_infos);
+            globalOptimizer.addEdge(zo_edge);
 
             auto *e = new g2o::EdgeSE3();
 
