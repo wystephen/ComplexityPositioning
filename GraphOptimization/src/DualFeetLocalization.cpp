@@ -8,7 +8,7 @@
 
 
 #include <thread>
-#include <AWF.h>
+//#include <AWF.h>
 
 
 #include "AWF.h"
@@ -572,6 +572,12 @@ int main(int argc, char *argv[]) {
     plt::named_plot("left_graph", graph_left[0], graph_left[1], "-*");
     plt::named_plot("right_graph", graph_right[0], graph_right[1], "-*");
     plt::named_plot("beaconset", beacon_pose[0], beacon_pose[1], "*");
+
+
+    AWF::writeVectorsToCsv<double>("./TmpResult/left_pose.csv",left_trace);
+    AWF::writeVectorsToCsv<double>("./TmpResult/right_pose.csv",right_trace);
+    AWF::writeVectorsToCsv<double>("./TmpResult/graph_left_pose.csv",graph_left);
+    AWF::writeVectorsToCsv<double>("./TmpResult/graph_right_pose.csv",graph_right);
 
     plt::grid(true);
     plt::legend();

@@ -58,6 +58,14 @@ public:
 
 private:
     double max_distance_ = 1.5;
+public:
+    double getMax_distance_() const {
+        return max_distance_;
+    }
+
+    void setMax_distance_(double max_distance_) {
+        MaxDistanceEdge::max_distance_ = max_distance_;
+    }
 };
 
 #endif //COMPLEXITYPOSITIONING_MAXDISTANCEEDGE_H
