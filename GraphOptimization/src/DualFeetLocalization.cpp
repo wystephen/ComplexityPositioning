@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
             d[ki] = beacon_set_data(k, ki);
         }
         v->setEstimateData(d);
-        v->setFixed(true);
+//        v->setFixed(true);
         globalOptimizer.addVertex(v);
 
     }
@@ -500,6 +500,7 @@ int main(int argc, char *argv[]) {
 
             // add max distance constrain between right foot and left foot.
             auto *e = new MaxDistanceEdge();
+            e->setMax_distance_(2.0);
             e->vertices()[0] = globalOptimizer.vertex(left_vertex_index - 1);
             e->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
 
@@ -507,7 +508,7 @@ int main(int argc, char *argv[]) {
             info *= 0.0001;
             e->setInformation(info);
 
-//            globalOptimizer.addEdge(e);
+            globalOptimizer.addEdge(e);
 
             uwb_index++;
 
