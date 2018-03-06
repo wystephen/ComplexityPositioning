@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
     std::cout.precision(30);
     // parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0017/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 
 
     // 3 300 0.2 5.0 10000 0.2 5.0 5
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     double second_info = 1000.0;
 
 
-    double distance_info = 0.1;
+    double distance_info = 0.00001;
     double distance_sigma = 2.0;
 
 
@@ -164,8 +164,8 @@ int main(int argc, char *argv[]) {
     right_imu_ekf.setTime_interval_((right_imu_data(right_imu_data.rows() - 1, 0) - right_imu_data(0, 0))
                                     / double(right_imu_data.rows()));
 
-    left_imu_ekf.setLocal_g_(-9.81);
-    right_imu_ekf.setLocal_g_(-9.81);
+//    left_imu_ekf.setLocal_g_(-9.81);
+//    right_imu_ekf.setLocal_g_(-9.81);
 
 
     // IMU initial lambda func
@@ -479,22 +479,22 @@ int main(int argc, char *argv[]) {
 //                    uw
 //            );
             for (int k(1); k < uwb_data.cols(); ++k) {
-//                if (uwb_data(uwb_index, k) > 0 &&
-//                    uwb_data(uwb_index, k) < 15.0) {
-//                    std::cout << uwb_index
-//                              << ","
-//                              << uwb_data(uwb_index,k)
-//                              << std::endl;
-
-//                   add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
-//                }
-
-                double second_derivative = uwb_data(uwb_index - 1, k) +
-                                           uwb_data(uwb_index + 1, k) -
-                                           2.0 * uwb_data(uwb_index, k);
-                if (std::abs(second_derivative) < 0.8 && uwb_data(uwb_index,k)>0.0) {
-                    add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
+                if (uwb_data(uwb_index, k) > 0 &&
+                    uwb_data(uwb_index, k) < 15.0) {
+                    std::cout << uwb_index
+                              << ","
+                              << uwb_data(uwb_index,k)
+                              << std::endl;
+//
+                   add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
                 }
+//
+//                double second_derivative = uwb_data(uwb_index - 1, k) +
+//                                           uwb_data(uwb_index + 1, k) -
+//                                           2.0 * uwb_data(uwb_index, k);
+//                if (std::abs(second_derivative) < 0.8 && uwb_data(uwb_index,k)>0.0) {
+//                    add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
+//                }
 
             }
 
@@ -504,10 +504,10 @@ int main(int argc, char *argv[]) {
             e->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
 
             Eigen::Matrix<double, 1, 1> info = Eigen::Matrix<double, 1, 1>::Identity();
-            info *= 0.001;
+            info *= 0.0001;
             e->setInformation(info);
 
-            globalOptimizer.addEdge(e);
+//            globalOptimizer.addEdge(e);
 
             uwb_index++;
 
@@ -518,7 +518,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
-    globalOptimizer.optimize(1000);
+    globalOptimizer.optimize(3000);
 //    globalOptimizer.optimize(10);
 
 
