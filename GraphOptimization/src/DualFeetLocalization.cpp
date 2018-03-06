@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     double second_info = 1000.0;
 
 
-    double distance_info = 0.00001;
+    double distance_info = 0.01;
     double distance_sigma = 2.0;
 
 
@@ -164,8 +164,8 @@ int main(int argc, char *argv[]) {
     right_imu_ekf.setTime_interval_((right_imu_data(right_imu_data.rows() - 1, 0) - right_imu_data(0, 0))
                                     / double(right_imu_data.rows()));
 
-//    left_imu_ekf.setLocal_g_(-9.81);
-//    right_imu_ekf.setLocal_g_(-9.81);
+    left_imu_ekf.setLocal_g_(-9.81);
+    right_imu_ekf.setLocal_g_(-9.81);
 
 
     // IMU initial lambda func
