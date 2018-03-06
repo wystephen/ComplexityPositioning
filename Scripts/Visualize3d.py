@@ -28,22 +28,23 @@ import os
 
 import numpy as np
 
-def plot_file(ax_handle,file_name):
-    data = np.loadtxt(file_name,delimiter=',')
-    ax_handle.plot(data[:,0],data[:,1],data[:,2],label=file_name)
+
+def plot_file(ax_handle, file_name):
+    data = np.loadtxt(file_name, delimiter=',')
+    ax_handle.plot(data[:, 0], data[:, 1], data[:, 2], label=file_name)
+
 
 if __name__ == '__main__':
     dir_name = ''
 
-
     fig = plt.figure()
-    ax = fig.add_subplot(1,1,1,projection='3d')
+    ax = fig.add_subplot(1, 1, 1, projection='3d')
 
     for file_name in os.listdir('./'):
         print(file_name)
 
         if '.csv' in file_name:
-            plot_file(ax,file_name)
+            plot_file(ax, file_name)
 
     ax.legend()
     ax.grid()

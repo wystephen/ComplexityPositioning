@@ -213,7 +213,7 @@ int main(int argc, char *argv[]) {
                     ) {
                 imu_ekf.MeasurementState(
                         Eigen::Vector3d(0, 0, 0),
-                        Eigen::Matrix3d::Identity() * 0.00025,
+                        Eigen::Matrix3d::Identity() * 0.000025,
                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement
                         ///
                 );
@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
             d[ki] = beacon_set_data(k, ki);
         }
         v->setEstimateData(d);
-//        v->setFixed(true);
+        v->setFixed(true);
         globalOptimizer.addVertex(v);
 
     }
@@ -306,13 +306,13 @@ int main(int argc, char *argv[]) {
 
         if (add_edge) {
 
-//            auto *zo_edge = new Z0Edge();
-//            zo_edge->vertices()[0] = globalOptimizer.vertex(current_index - 1);
-//            zo_edge->vertices()[1] = globalOptimizer.vertex(current_index);
-//            Eigen::Matrix<double, 1, 1> zo_infos = Eigen::Matrix<double, 1, 1>::Identity();
-//            zo_infos(0, 0) = 0.01;
-//            zo_edge->setInformation(zo_infos);
-//            globalOptimizer.addEdge(zo_edge);
+            auto *zo_edge = new Z0Edge();
+            zo_edge->vertices()[0] = globalOptimizer.vertex(current_index - 1);
+            zo_edge->vertices()[1] = globalOptimizer.vertex(current_index);
+            Eigen::Matrix<double, 1, 1> zo_infos = Eigen::Matrix<double, 1, 1>::Identity();
+            zo_infos(0, 0) = 0.01;
+            zo_edge->setInformation(zo_infos);
+            globalOptimizer.addEdge(zo_edge);
 
             auto *e = new g2o::EdgeSE3();
 
@@ -486,13 +486,13 @@ int main(int argc, char *argv[]) {
 //                              << uwb_data(uwb_index,k)
 //                              << std::endl;
 
-//                   add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
+                   add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
 //                }
 //
                 double second_derivative = uwb_data(uwb_index - 1, k) +
                                            uwb_data(uwb_index + 1, k) -
                                            2.0 * uwb_data(uwb_index, k);
-                if (std::abs(second_derivative) < 0.8 && uwb_data(uwb_index,k)>0.0) {
+                if (std::abs(second_derivative) < 0.8 && uwb_data(uwb_index, k) > 0.0) {
                     add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
                 }
 
@@ -519,7 +519,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
-    globalOptimizer.optimize(3000);
+    globalOptimizer.optimize(10000);
 //    globalOptimizer.optimize(10);
 
 
@@ -575,10 +575,10 @@ int main(int argc, char *argv[]) {
     plt::named_plot("beaconset", beacon_pose[0], beacon_pose[1], "*");
 
 
-    AWF::writeVectorsToCsv<double>("./TmpResult/left_pose.csv",left_trace);
-    AWF::writeVectorsToCsv<double>("./TmpResult/right_pose.csv",right_trace);
-    AWF::writeVectorsToCsv<double>("./TmpResult/graph_left_pose.csv",graph_left);
-    AWF::writeVectorsToCsv<double>("./TmpResult/graph_right_pose.csv",graph_right);
+    AWF::writeVectorsToCsv<double>("./TmpResult/left_pose.csv", left_trace);
+    AWF::writeVectorsToCsv<double>("./TmpResult/right_pose.csv", right_trace);
+    AWF::writeVectorsToCsv<double>("./TmpResult/graph_left_pose.csv", graph_left);
+    AWF::writeVectorsToCsv<double>("./TmpResult/graph_right_pose.csv", graph_right);
 
     plt::grid(true);
     plt::legend();
