@@ -26,40 +26,35 @@ import numpy as np
 import scipy as sp
 from scipy.optimize import minimize
 
+
 class Trilateration:
-    def __init__(self,beacon_set):
+    def __init__(self, beacon_set):
         self.method = 'Optimization'
         self.beacon_set = beacon_set
 
-    def location_all(self,init_x,uwb_data):
-        pose = np.zeros([uwb_data.shape[0],3])
+    def location_all(self, init_x, uwb_data):
+        pose = np.zeros([uwb_data.shape[0], 3])
         for i in range(pose.shape[0]):
-            if len(np.where(uwb_data[i,:]>0.0)[0])>2:
-                self.location((0,0,0),
-                              uwb_data[i,:])
+            if len(np.where(uwb_data[i, :] > 0.0)[0]) > 2:
+                pose[i,:] = self.location((0, 0, 0),
+                              uwb_data[i, :])
+        return pose
 
-    def location(self,init_x, uwb_measurements):
-        print(init_x)
+
+    def location(self, init_x, uwb_measurements):
+        # print(init_x)
         self.uwb_m = uwb_measurements
 
         res = minimize(self.error_function,
-                 init_x,None,method='BFGS')
-        print(res.x)
+                       init_x, method='BFGS')
+        # print(res.x)
+        # print(res.fun)
         return res.x
 
-    def error_function(self,pose):
+    def error_function(self, pose):
         error = 0.0
-        dis_all = np.linalg.norm(self.beacon_set - pose,axis=1)
+        dis_all = np.linalg.norm(self.beacon_set - pose, axis=1)
         for i in range(self.beacon_set.shape[0]):
-            if self.uwb_m[i]>0.0:
-                error += (dis_all[i]-self.uwb_m[i]) **2.0
+            if self.uwb_m[i] > 0.0:
+                error += (dis_all[i] - self.uwb_m[i]) ** 2.0
         return error
-
-
-
-
-
-
-
-
-

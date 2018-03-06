@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
     initial_prob_matrix.block(3, 3, 3, 3) *= 0.001;
     initial_prob_matrix.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
 
-    int left_index(5), right_index(5), head_index(5), uwb_index(0);
+    int left_index(5), right_index(5), head_index(5), uwb_index(1);
     int last_left_index(0), last_right_index(0), last_head_index(0), last_uwb_index(0);
     BSE::IMUWBKFBase left_imu_ekf(initial_prob_matrix);
     BSE::IMUWBKFBase right_imu_ekf(initial_prob_matrix);
@@ -304,14 +304,13 @@ int main(int argc, char *argv[]) {
         globalOptimizer.addVertex(foot_se3);
 
 
-
         if (add_edge) {
 
             auto *zo_edge = new Z0Edge();
-            zo_edge->vertices()[0] = globalOptimizer.vertex(current_index-1);
+            zo_edge->vertices()[0] = globalOptimizer.vertex(current_index - 1);
             zo_edge->vertices()[1] = globalOptimizer.vertex(current_index);
-            Eigen::Matrix<double,1,1> zo_infos = Eigen::Matrix<double,1,1>::Identity();
-            zo_infos(0,0) = 0.01;
+            Eigen::Matrix<double, 1, 1> zo_infos = Eigen::Matrix<double, 1, 1>::Identity();
+            zo_infos(0, 0) = 0.01;
             zo_edge->setInformation(zo_infos);
             globalOptimizer.addEdge(zo_edge);
 
@@ -480,22 +479,29 @@ int main(int argc, char *argv[]) {
 //                    uw
 //            );
             for (int k(1); k < uwb_data.cols(); ++k) {
-                if (uwb_data(uwb_index, k) > 0 &&
-                    uwb_data(uwb_index, k) < 15.0) {
+//                if (uwb_data(uwb_index, k) > 0 &&
+//                    uwb_data(uwb_index, k) < 15.0) {
 //                    std::cout << uwb_index
 //                              << ","
 //                              << uwb_data(uwb_index,k)
 //                              << std::endl;
 
-                   add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
+//                   add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
+//                }
+
+                double second_derivative = uwb_data(uwb_index - 1, k) +
+                                           uwb_data(uwb_index + 1, k) -
+                                           2.0 * uwb_data(uwb_index, k);
+                if (std::abs(second_derivative) < 0.8) {
+                    add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
                 }
 
             }
 
             // add max distance constrain between right foot and left foot.
             auto *e = new MaxDistanceEdge();
-            e->vertices()[0] = globalOptimizer.vertex(left_vertex_index-1);
-            e->vertices()[1] = globalOptimizer.vertex(right_vertex_index-1);
+            e->vertices()[0] = globalOptimizer.vertex(left_vertex_index - 1);
+            e->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
 
             Eigen::Matrix<double, 1, 1> info = Eigen::Matrix<double, 1, 1>::Identity();
             info *= 0.001;

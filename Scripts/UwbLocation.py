@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 from Scripts.Trilateration import Trilateration
 
 if __name__ == '__main__':
-    dir_name = '/home/steve/Data/FusingLocationData/0017/'
+    dir_name = '/home/steve/Data/FusingLocationData/0010/'
 
     uwb_data = np.loadtxt(dir_name + 'uwb_result.csv', delimiter=',')
     beacon_data = np.loadtxt(dir_name + 'beaconSet.csv', delimiter=',')
@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     processed_uwb_data = uwb_data[1:-1, 1:].copy()
 
-    processed_uwb_data[np.where(np.abs(second_order_div) > 0.8)] = -10.0
+    processed_uwb_data[np.where(np.abs(second_order_div) > 0.6)] = -10.0
 
     plt.figure()
     plt.title('processed')
@@ -75,14 +75,18 @@ if __name__ == '__main__':
                  label='processed' + str(i))
     plt.legend()
     plt.grid()
-    plt.show()
+    # plt.show()
 
     tri_positioning = Trilateration(beacon_set=beacon_data)
     pose = tri_positioning.location_all((0, 0, 0), processed_uwb_data)
+    src_pose = tri_positioning.location_all((0, 0, 0), uwb_data[:, 1:])
 
     plt.figure()
     plt.title('position')
-    plt.plot(pose[:, 0], pose[:, 1], '-*')
+    plt.plot(pose[:, 0], pose[:, 1], '*', label='processed pose')
+    plt.plot(src_pose[:, 0], src_pose[:, 1], '*', label='source pose')
+    plt.legend()
+    plt.grid()
     plt.show()
 
     # plt.show()
