@@ -213,7 +213,7 @@ int main(int argc, char *argv[]) {
                     ) {
                 imu_ekf.MeasurementState(
                         Eigen::Vector3d(0, 0, 0),
-                        Eigen::Matrix3d::Identity() * 0.000025,
+                        Eigen::Matrix3d::Identity() * 0.0000025,
                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement
                         ///
                 );
