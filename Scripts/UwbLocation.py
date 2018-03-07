@@ -100,16 +100,14 @@ if __name__ == '__main__':
     ax.legend()
     ax.grid()
 
-
     plt.figure()
     plt.title('res error and z-axis value')
-    plt.plot(res_error,label='res error')
-    plt.plot(pose[:,2],label='z')
-    plt.plot(src_res_error,label='src res error')
-    plt.plot(src_pose[:,2],label = 'src z')
+    plt.plot(res_error, label='res error')
+    plt.plot(pose[:, 2], label='z')
+    plt.plot(src_res_error, label='src res error')
+    plt.plot(src_pose[:, 2], label='src z')
     plt.grid()
     plt.legend()
-
 
     plt.show()
 
