@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 from Scripts.Trilateration import Trilateration
 
 if __name__ == '__main__':
-    dir_name = '/home/steve/Data/FusingLocationData/0013/'
+    dir_name = '/home/steve/Data/FusingLocationData/0010/'
 
     uwb_data = np.loadtxt(dir_name + 'uwb_result.csv', delimiter=',')
     beacon_data = np.loadtxt(dir_name + 'beaconSet.csv', delimiter=',')
