@@ -163,8 +163,13 @@ namespace BSE {
                     ite_times++;
 
                 }
+                if (uwb_err_function(initial_pos) > 1.0) {
+                    trace.block(i, 0, 1, 3) = Eigen::Vector3d(0, 0, 0).transpose();
+                } else {
 
-                trace.block(i, 0, 1, 3) = initial_pos.transpose();
+                    trace.block(i, 0, 1, 3) = initial_pos.transpose();
+                }
+
 
             }
             return trace;

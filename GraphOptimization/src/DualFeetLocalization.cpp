@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
     std::cout.precision(30);
     // parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0017/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 
 
     // 3 300 0.2 5.0 10000 0.2 5.0 5
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     double second_info = 1000.0;
 
 
-    double distance_info = 0.01;
+    double distance_info = 0.1;
     double distance_sigma = 2.0;
 
 
@@ -480,23 +480,25 @@ int main(int argc, char *argv[]) {
 //            );
             for (int k(1); k < uwb_data.cols(); ++k) {
                 if (uwb_data(uwb_index, k) > 0 &&
-                    uwb_data(uwb_index, k) < 115.0 
-                    && optimize_trace(uwb_index,2)>2.0 
-                    && optimize_trace(uwb_index,2)<2.2) {
+                    uwb_data(uwb_index, k) < 115.0
+                    && optimize_trace(uwb_index, 2) > 2.0
+                    && optimize_trace(uwb_index, 2) < 2.2) {
 //                    std::cout << uwb_index
 //                              << ","
 //                              << uwb_data(uwb_index,k)
 //                              << std::endl;
 
-                   add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
+//                   add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
                 }
 
-//                double second_derivative = uwb_data(uwb_index - 1, k) +
-//                                           uwb_data(uwb_index + 1, k) -
-//                                           2.0 * uwb_data(uwb_index, k);
-//                if (std::abs(second_derivative) < 0.8 && uwb_data(uwb_index, k) > 0.0) {
-//                    add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
-//                }
+                double second_derivative = uwb_data(uwb_index - 1, k) +
+                                           uwb_data(uwb_index + 1, k) -
+                                           2.0 * uwb_data(uwb_index, k);
+                if (std::abs(second_derivative) < 0.8 && uwb_data(uwb_index, k) > 0.0
+                    && optimize_trace(uwb_index, 2) > 2.0
+                    && optimize_trace(uwb_index, 2) < 2.2) {
+                    add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
+                }
 
             }
 
