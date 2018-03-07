@@ -84,7 +84,7 @@ if __name__ == '__main__':
     plt.figure()
     plt.title('position')
     plt.plot(pose[:, 0], pose[:, 1], '*', label='processed pose')
-    plt.plot(src_pose[:, 0], src_pose[:, 1], '*', label='source pose')
+    plt.plot(src_pose[:, 0], src_pose[:, 1], '+', label='source pose')
     plt.legend()
     plt.grid()
     plt.show()
