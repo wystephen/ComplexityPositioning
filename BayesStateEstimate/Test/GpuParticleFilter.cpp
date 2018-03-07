@@ -85,7 +85,11 @@ int main(){
     imu_tool.processImuData(head_imu_data);
 
 
-    for()
+//    for()
+    
+    auto gpu_pf = BSE::GpuParticleFilter<float,6>(1000,Eigen::Matrix<float,1,6>::Zero());
+    
+    
 
 
 

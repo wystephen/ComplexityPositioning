@@ -41,11 +41,24 @@ namespace BSE {
     template<typename T, int StateSize>
     class GpuParticleFilter {
     public:
+        GpuParticleFilter(int particle_num_,
+                          Eigen::Matrix<T,1,StateSize> ini_state_){
+            compute::device gpu = compute::system::default_device();
+
+            compute::context context(gpu);
+            compute::command_queue queue(
+                    context, gpu,compute::command_queue::enable_profiling
+            );
+
+//            compute::
+
+
+        }
 
     private:
         int particle_num_ = (1000);
 
-        compute::vector particle_states_;
+        compute::vector<Eigen::Matrix<T,1,StateSize>> particle_states_;
         compute::vector<T> probability_;
 
     };
