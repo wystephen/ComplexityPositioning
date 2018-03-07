@@ -486,7 +486,7 @@ int main(int argc, char *argv[]) {
 //                              << uwb_data(uwb_index,k)
 //                              << std::endl;
 
-                   add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
+//                   add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
 //                }
 //
                 double second_derivative = uwb_data(uwb_index - 1, k) +
@@ -499,16 +499,16 @@ int main(int argc, char *argv[]) {
             }
 
             // add max distance constrain between right foot and left foot.
-            auto *e = new MaxDistanceEdge();
-            e->setMax_distance_(2.0);
-            e->vertices()[0] = globalOptimizer.vertex(left_vertex_index - 1);
-            e->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
-
-            Eigen::Matrix<double, 1, 1> info = Eigen::Matrix<double, 1, 1>::Identity();
-            info *= 0.1;
-            e->setInformation(info);
-
-            globalOptimizer.addEdge(e);
+//            auto *e = new MaxDistanceEdge();
+//            e->setMax_distance_(2.0);
+//            e->vertices()[0] = globalOptimizer.vertex(left_vertex_index - 1);
+//            e->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
+//
+//            Eigen::Matrix<double, 1, 1> info = Eigen::Matrix<double, 1, 1>::Identity();
+//            info *= 0.1;
+//            e->setInformation(info);
+//
+//            globalOptimizer.addEdge(e);
 
             uwb_index++;
 
@@ -519,7 +519,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
-    globalOptimizer.optimize(10000);
+    globalOptimizer.optimize(1000);
 //    globalOptimizer.optimize(10);
 
 
