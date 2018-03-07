@@ -186,16 +186,21 @@ int main(int argc, char *argv[]) {
                 for (int k(1); k < uwb_data.cols(); ++k) {
                     if (uwb_data(uwb_index, k) > 0
                         && uwb_data(uwb_index, k) < 100.0
-                        && optimize_trace(uwb_index, 3) < 1.0) {
+                        && optimize_trace(uwb_index, 3) < 2.0) {
 
                         Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
                         measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
                         measurement_noise_matrix.resize(1, 1);
-                        measurement_noise_matrix(0, 0) = 0.01;
+                        if (uwb_index < 15) {
+
+                            measurement_noise_matrix(0, 0) = 0.01;
+                        } else {
+                            measurement_noise_matrix(0, 0) = 0.1;
+                        }
                         // correct
-                        filter.MeasurementState(measurement_data,
-                                                measurement_noise_matrix,
-                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+//                        filter.MeasurementState(measurement_data,
+//                                                measurement_noise_matrix,
+//                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
                     }
                 }

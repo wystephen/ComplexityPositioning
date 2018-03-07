@@ -146,3 +146,5 @@ target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${
 #        BayesStateEstimate/Test/MonteCarloTesterCuda.cpp)
 #target_link_libraries(MonteCarloThrustTester )
 
+add_executable(GpuPF BayesStateEstimate/Test/GpuParticleFilter.cpp)
+target_link_libraries(GpuPF  ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${OpenCL_LIBRARY})
