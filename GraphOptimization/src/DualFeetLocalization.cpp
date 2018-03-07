@@ -156,8 +156,8 @@ int main(int argc, char *argv[]) {
 
     int left_index(5), right_index(5), head_index(5), uwb_index(1);
     int last_left_index(0), last_right_index(0), last_head_index(0), last_uwb_index(0);
-    BSE::IMUWBKFBase left_imu_ekf(initial_prob_matrix);
-    BSE::IMUWBKFBase right_imu_ekf(initial_prob_matrix);
+    BSE::IMUWBKFSimple left_imu_ekf(initial_prob_matrix);
+    BSE::IMUWBKFSimple right_imu_ekf(initial_prob_matrix);
     Eigen::Isometry3d left_last_T = (Eigen::Isometry3d::Identity());// last transform matrix.
     Eigen::Isometry3d right_last_T = (Eigen::Isometry3d::Identity());
     int left_last_zv_flag(true), right_last_zv_flag(true);
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
                     & measurement_noise_matrix,
                     & initial_prob_matrix]
                     (
-                            BSE::IMUWBKFBase &imu_ekf,
+                            BSE::IMUWBKFSimple &imu_ekf,
                             Eigen::MatrixXd initial_input
                     ) {
                 /**
@@ -196,7 +196,7 @@ int main(int argc, char *argv[]) {
             [&process_noise_matrix,
                     & measurement_noise_matrix,
                     & initial_prob_matrix]
-                    (BSE::IMUWBKFBase &imu_ekf,
+                    (BSE::IMUWBKFSimple &imu_ekf,
                      Eigen::MatrixXd input) {
                 imu_ekf.StateTransaction(
                         input, process_noise_matrix,
@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
     auto local_imu_zupt_func =
             [&measurement_noise_matrix]
                     (
-                            BSE::IMUWBKFBase &imu_ekf
+                            BSE::IMUWBKFSimple &imu_ekf
                     ) {
                 imu_ekf.MeasurementState(
                         Eigen::Vector3d(0, 0, 0),

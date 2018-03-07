@@ -30,10 +30,10 @@ namespace BSE {
      * @tparam UWBNumber
      * @tparam time_interval
      */
-    class IMUWBKFBase :
+    class IMUWBKFSimple :
             public KalmanFilterBase {
     public:
-        IMUWBKFBase(
+        IMUWBKFSimple(
                 const Eigen::MatrixXd &initial_probability_vec) :
                 KalmanFilterBase(
                         initial_probability_vec) {
@@ -439,7 +439,7 @@ namespace BSE {
         }
 
         void setTime_interval_(double time_interval_) {
-            IMUWBKFBase::time_interval_ = time_interval_;
+            IMUWBKFSimple::time_interval_ = time_interval_;
         }
 
         const Eigen::Quaterniond &getRotate_q() const {
@@ -447,7 +447,7 @@ namespace BSE {
         }
 
         void setRotate_q(const Eigen::Quaterniond &rotate_q) {
-            IMUWBKFBase::rotate_q_ = rotate_q;
+            IMUWBKFSimple::rotate_q_ = rotate_q;
         }
 
         double getLocal_g_() const {
@@ -455,7 +455,7 @@ namespace BSE {
         }
 
         void setLocal_g_(double local_g_) {
-            IMUWBKFBase::local_g_ = local_g_;
+            IMUWBKFSimple::local_g_ = local_g_;
         }
 
 

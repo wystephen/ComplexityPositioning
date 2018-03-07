@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
             &imu_tool,
             &optimize_trace](const Eigen::MatrixXd &imu_data,
                              std::string data_name) {
-        auto filter = BSE::IMUWBKFBase(
+        auto filter = BSE::IMUWBKFSimple(
                 initial_prob_matrix);
         double tmp_time_interval = (imu_data(imu_data.rows() - 1, 0) - imu_data(0, 0))
                                    / double(imu_data.rows());

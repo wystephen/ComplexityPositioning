@@ -35,26 +35,7 @@ namespace BSE {
 
 
 //// Might be define as iterator the measurement minimize the linearization error
-//        /**
-//         * iterator use the measurement equation.
-//         * @param m
-//         * @param times times of use @MeasurementState
-//         * @return
-//         */
-//        bool MeasurementState(const Eigen::MatrixXd &m,
-//                              const Eigen::MatrixXd &cov_m,
-//
-//                              int times) {
-//            try {
-//                for (int i(0); i < times; ++i) {
-//                    MeasurementState(m, cov_m);
-//                }
-//                return true;
-//            } catch (std::exception &e) {
-//                return false;
-//            }
-//
-//        }
+
 
 
         /**
