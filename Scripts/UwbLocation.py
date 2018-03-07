@@ -30,8 +30,10 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from Scripts.Trilateration import Trilateration
 
+from scipy.spatial.distance import *
+
 if __name__ == '__main__':
-    dir_name = '/home/steve/Data/FusingLocationData/0013/'
+    dir_name = '/home/steve/Data/FusingLocationData/0017/'
 
     uwb_data = np.loadtxt(dir_name + 'uwb_result.csv', delimiter=',')
     beacon_data = np.loadtxt(dir_name + 'beaconSet.csv', delimiter=',')
@@ -100,6 +102,9 @@ if __name__ == '__main__':
     ax.legend()
     ax.grid()
 
+
+
+
     plt.figure()
     plt.title('res error and z-axis value')
     plt.plot(res_error, label='res error')
@@ -108,6 +113,21 @@ if __name__ == '__main__':
     plt.plot(src_pose[:, 2], label='src z')
     plt.grid()
     plt.legend()
+
+
+    dis_mat = squareform(pdist(uwb_data[:,1:]))
+    plt.figure()
+    plt.imshow(dis_mat)
+    plt.colorbar()
+    plt.grid()
+
+
+    checked_mat = np.zeros_like(dis_mat)
+    checked_mat[np.where(dis_mat<1.0)] = 1.0
+    plt.figure()
+    plt.imshow(checked_mat)
+    plt.colorbar()
+
 
     plt.show()
 
