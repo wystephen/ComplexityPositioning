@@ -38,6 +38,9 @@
 #include "../include/OwnEdge/ZoEdge.h"
 #include "../include/OwnEdge/ZoEdge.cpp"
 
+#include "../include/OwnEdge/Plane3dVertex.h"
+#include "../include/OwnEdge/Plane3dVertex.cpp"
+
 
 namespace plt = matplotlibcpp;
 
@@ -46,7 +49,7 @@ int main(int argc, char *argv[]) {
     std::cout.precision(30);
     // parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0017/";
 
 
     // 3 300 0.2 5.0 10000 0.2 5.0 5
