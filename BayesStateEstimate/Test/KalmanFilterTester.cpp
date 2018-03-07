@@ -105,8 +105,9 @@ int main(int argc, char *argv[]) {
             &initial_pos,
             &initial_ori,
             &optimize_trace_vec,
-            &imu_tool](const Eigen::MatrixXd &imu_data,
-                       std::string data_name) {
+            &imu_tool,
+            &optimize_trace](const Eigen::MatrixXd &imu_data,
+                             std::string data_name) {
         auto filter = BSE::IMUWBKFBase(
                 initial_prob_matrix);
         double tmp_time_interval = (imu_data(imu_data.rows() - 1, 0) - imu_data(0, 0))
@@ -183,11 +184,14 @@ int main(int argc, char *argv[]) {
 //                          << imu_data(i, 0) << std::endl;
 
                 for (int k(1); k < uwb_data.cols(); ++k) {
-                    if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 12.0) {
+                    if (uwb_data(uwb_index, k) > 0
+                        && uwb_data(uwb_index, k) < 100.0
+                        && optimize_trace(uwb_index, 3) < 1.0) {
+
                         Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
                         measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
                         measurement_noise_matrix.resize(1, 1);
-                        measurement_noise_matrix(0, 0) = 1;
+                        measurement_noise_matrix(0, 0) = 0.01;
                         // correct
                         filter.MeasurementState(measurement_data,
                                                 measurement_noise_matrix,
@@ -309,7 +313,8 @@ int main(int argc, char *argv[]) {
     };
 
     f(left_imu_data, "left_foot");
-//    f(right_imu_data, "right_foot");
+
+    f(right_imu_data, "right_foot");
 //    f(head_imu_data, "head");
 
     plt::show();

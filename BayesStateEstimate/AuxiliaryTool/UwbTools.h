@@ -138,7 +138,7 @@ namespace BSE {
                           << std::endl;
                 return Eigen::Matrix3d::Identity();
             }
-            Eigen::MatrixXd trace = Eigen::MatrixXd(uwb_data_.rows(), 3);
+            Eigen::MatrixXd trace = Eigen::MatrixXd(uwb_data_.rows(), 4);
             Eigen::Vector3d initial_pos(0, 0, 0);
             for (int i(0); i < trace.rows(); ++i) {
                 uwb_index = i;
@@ -148,7 +148,7 @@ namespace BSE {
                 double step_length = 0.00001;
                 double update_rate = 0.15;
 
-                while (ite_times < 1000) {
+                while (ite_times < 1000 ) {
                     last_uwb_err = uwb_err_function(initial_pos);
                     Eigen::Vector3d tmp_gradient(0, 0, 0);
                     for (int i(0); i < 3; ++i) {
@@ -163,12 +163,10 @@ namespace BSE {
                     ite_times++;
 
                 }
-                if (uwb_err_function(initial_pos) > 1.0) {
-                    trace.block(i, 0, 1, 3) = Eigen::Vector3d(0, 0, 0).transpose();
-                } else {
 
-                    trace.block(i, 0, 1, 3) = initial_pos.transpose();
-                }
+
+                trace.block(i, 0, 1, 3) = initial_pos.transpose();
+                trace(i, 3) = uwb_err_function(initial_pos);
 
 
             }
