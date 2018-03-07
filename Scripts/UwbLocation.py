@@ -26,11 +26,12 @@ import numpy as np
 import scipy as sp
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 from Scripts.Trilateration import Trilateration
 
 if __name__ == '__main__':
-    dir_name = '/home/steve/Data/FusingLocationData/0010/'
+    dir_name = '/home/steve/Data/FusingLocationData/0013/'
 
     uwb_data = np.loadtxt(dir_name + 'uwb_result.csv', delimiter=',')
     beacon_data = np.loadtxt(dir_name + 'beaconSet.csv', delimiter=',')
@@ -78,15 +79,38 @@ if __name__ == '__main__':
     # plt.show()
 
     tri_positioning = Trilateration(beacon_set=beacon_data)
+
     pose = tri_positioning.location_all((0, 0, 0), processed_uwb_data)
+    res_error = tri_positioning.res_error
     src_pose = tri_positioning.location_all((0, 0, 0), uwb_data[:, 1:])
+    src_res_error = tri_positioning.res_error
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    # ax.title('position')
+    # ax.title
+    ax.plot(pose[:, 0], pose[:, 1], pose[:, 2], '*', label='processed pose')
+    ax.plot(src_pose[:, 0], src_pose[:, 1], src_pose[:, 2], '+', label='source pose')
+    # plt.plot(beacon_data[:, 0], beacon_data[:, 1], '*', label='beacons')
+    for i in range(beacon_data.shape[0]):
+        if np.max(processed_uwb_data[:, i]) > 0:
+            # ax.plot(beacon_data[i, 0], beacon_data[i, 1], label='beacon:' + str(i))
+            ax.text(beacon_data[i, 0], beacon_data[i, 1], beacon_data[i, 2], s=str(i))
+
+    ax.legend()
+    ax.grid()
+
 
     plt.figure()
-    plt.title('position')
-    plt.plot(pose[:, 0], pose[:, 1], '*', label='processed pose')
-    plt.plot(src_pose[:, 0], src_pose[:, 1], '+', label='source pose')
-    plt.legend()
+    plt.title('res error and z-axis value')
+    plt.plot(res_error,label='res error')
+    plt.plot(pose[:,2],label='z')
+    plt.plot(src_res_error,label='src res error')
+    plt.plot(src_pose[:,2],label = 'src z')
     plt.grid()
+    plt.legend()
+
+
     plt.show()
 
     # plt.show()

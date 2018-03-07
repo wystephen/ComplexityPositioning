@@ -34,10 +34,12 @@ class Trilateration:
 
     def location_all(self, init_x, uwb_data):
         pose = np.zeros([uwb_data.shape[0], 3])
+        self.res_error = np.zeros([uwb_data.shape[0],1])
         for i in range(pose.shape[0]):
             if len(np.where(uwb_data[i, :] > 0.0)[0]) > 2:
                 pose[i,:] = self.location((0, 0, 0),
                               uwb_data[i, :])
+                self.res_error[i,0] = self.fun
         return pose
 
 
@@ -48,6 +50,7 @@ class Trilateration:
         res = minimize(self.error_function,
                        init_x, method='BFGS')
         # print(res.x)
+        self.fun = res.fun
         # print(res.fun)
         return res.x
 

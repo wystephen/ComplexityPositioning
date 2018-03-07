@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
     std::cout.precision(30);
     // parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0010/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0017/";
 
 
     // 3 300 0.2 5.0 10000 0.2 5.0 5
@@ -479,36 +479,38 @@ int main(int argc, char *argv[]) {
 //                    uw
 //            );
             for (int k(1); k < uwb_data.cols(); ++k) {
-//                if (uwb_data(uwb_index, k) > 0 &&
-//                    uwb_data(uwb_index, k) < 15.0) {
+                if (uwb_data(uwb_index, k) > 0 &&
+                    uwb_data(uwb_index, k) < 115.0 
+                    && optimize_trace(uwb_index,2)>2.0 
+                    && optimize_trace(uwb_index,2)<2.2) {
 //                    std::cout << uwb_index
 //                              << ","
 //                              << uwb_data(uwb_index,k)
 //                              << std::endl;
-//
-//                   add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
-//                }
 
-                double second_derivative = uwb_data(uwb_index - 1, k) +
-                                           uwb_data(uwb_index + 1, k) -
-                                           2.0 * uwb_data(uwb_index, k);
-                if (std::abs(second_derivative) < 0.8 && uwb_data(uwb_index, k) > 0.0) {
-                    add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
+                   add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
                 }
+
+//                double second_derivative = uwb_data(uwb_index - 1, k) +
+//                                           uwb_data(uwb_index + 1, k) -
+//                                           2.0 * uwb_data(uwb_index, k);
+//                if (std::abs(second_derivative) < 0.8 && uwb_data(uwb_index, k) > 0.0) {
+//                    add_uwb_edge(uwb_data(uwb_index, k), k - 1, 0);
+//                }
 
             }
 
             // add max distance constrain between right foot and left foot.
-//            auto *e = new MaxDistanceEdge();
-//            e->setMax_distance_(2.0);
-//            e->vertices()[0] = globalOptimizer.vertex(left_vertex_index - 1);
-//            e->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
+            auto *e = new MaxDistanceEdge();
+            e->setMax_distance_(2.0);
+            e->vertices()[0] = globalOptimizer.vertex(left_vertex_index - 1);
+            e->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
 //
-//            Eigen::Matrix<double, 1, 1> info = Eigen::Matrix<double, 1, 1>::Identity();
-//            info *= 0.01;
-//            e->setInformation(info);
+            Eigen::Matrix<double, 1, 1> info = Eigen::Matrix<double, 1, 1>::Identity();
+            info *= 0.01;
+            e->setInformation(info);
 //
-//            globalOptimizer.addEdge(e);
+            globalOptimizer.addEdge(e);
 
             uwb_index++;
 
@@ -579,6 +581,7 @@ int main(int argc, char *argv[]) {
     AWF::writeVectorsToCsv<double>("./TmpResult/right_pose.csv", right_trace);
     AWF::writeVectorsToCsv<double>("./TmpResult/graph_left_pose.csv", graph_left);
     AWF::writeVectorsToCsv<double>("./TmpResult/graph_right_pose.csv", graph_right);
+    AWF::writeVectorsToCsv<double>("./TmpResult/uwb_pose.csv", optimize_trace_vec);
 
     plt::grid(true);
     plt::legend();

@@ -29,9 +29,9 @@ import os
 import numpy as np
 
 
-def plot_file(ax_handle, file_name):
+def plot_file(ax_handle, file_name,flag='+-'):
     data = np.loadtxt(file_name, delimiter=',')
-    ax_handle.plot(data[:, 0], data[:, 1], data[:, 2], label=file_name)
+    ax_handle.plot(data[:, 0], data[:, 1], data[:, 2], flag,label=file_name)
 
 
 if __name__ == '__main__':
@@ -44,7 +44,10 @@ if __name__ == '__main__':
         print(file_name)
 
         if '.csv' in file_name:
-            plot_file(ax, file_name)
+            if 'graph' in file_name:
+                plot_file(ax, file_name)
+            if 'uwb' in file_name:
+                plot_file(ax,file_name,'*')
 
     ax.legend()
     ax.grid()
