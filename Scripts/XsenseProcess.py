@@ -66,7 +66,7 @@ class imuread:
         # plt.show()
 
     def save(self, file_name):
-        np.savetxt(file_name, self.data)
+        np.savetxt(file_name, self.data,delimiter=',')
 
 
 if __name__ == '__main__':
