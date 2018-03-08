@@ -136,6 +136,10 @@ target_link_libraries(DualFeetIndividually ${PYTHON_LIBRARIES}
 add_executable(KalmanFilterTester BayesStateEstimate/Test/KalmanFilterTester.cpp)
 target_link_libraries(KalmanFilterTester ${PYTHON_LIBRARIES})
 
+add_executable(XsenseIntegrateTest BayesStateEstimate/Test/XsenseIntegrateTest.cpp)
+target_link_libraries(XsenseIntegrateTest ${PYTHON_LIBRARIES})
+
+
 add_executable(KalmanFilterSimulatorTester BayesStateEstimate/Test/KalmanFilterSimulatorTester.cpp)
 target_link_libraries(KalmanFilterSimulatorTester ${PYTHON_LIBRARIES})
 
@@ -147,4 +151,4 @@ target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${
 #target_link_libraries(MonteCarloThrustTester )
 
 add_executable(GpuPF BayesStateEstimate/Test/GpuParticleFilter.cpp)
-target_link_libraries(GpuPF  ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${OpenCL_LIBRARY})
+target_link_libraries(GpuPF ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${OpenCL_LIBRARY})
