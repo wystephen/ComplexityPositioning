@@ -151,11 +151,160 @@ namespace BSE {
 
         }
 
-        Eigen::Matrix<double, 15, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
-                                                   Eigen::Matrix<double, 6, 6> noise_matrix) {
+        Eigen::Matrix<double, 9, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
+                                                  Eigen::Matrix<double, 6, 6> noise_matrix) {
+
+            Eigen::Vector3d acc(input.block(0, 0, 3, 1));
+            Eigen::Vector3d gyr(input.block(0, 0, 3, 1));
+
+            if (IS_DEBUG) {
+                std::cout << "acc in navigation frame:"
+                          << (rotation_q_ * acc).transpose()
+                          << std::endl;
+            }
+
+            if (gyr.norm() > 1e-8) {
+                Eigen::Quaterniond tmp_q =
+                        Eigen::AngleAxisd(gyr(0), Eigen::Vector3d::UnitX())
+                        * Eigen::AngleAxisd(gyr(1), Eigen::Vector3d::UnitY())
+                        * Eigen::AngleAxisd(gyr(2), Eigen::Vector3d::UnitZ());
+//                             rotate_q_ =  tmp_q * rotate_q_;
+//                             tmp_q.normalize();
+                rotation_q_ = rotation_q_ * tmp_q;
+
+//                             rotate_q_ = tmp_q * rotate_q_;
+//                             rotate_q_ = tmp_q * rotate_q_;
+//                             rotate_q_ = rotate_q_ * tmp_q.inverse();
+//                             rotate_q_ = tmp_q * rotate_q_;
+                rotation_q_.normalize();
+
+            }
+
+
+            Eigen::Vector3d gravity_g(0, 0, local_g_);
+            Eigen::Vector3d linear_acc = rotation_q_.toRotationMatrix() * acc + gravity_g;
+            if (IS_DEBUG) {
+                std::cout << "acc in navigation frame:" << (rotation_q_ * acc).transpose();
+                std::cout << "\nlinear_acc:" << linear_acc.transpose() << std::endl;
+            }
+
+            auto converted_input = input;
+            converted_input.block(0, 0, 3, 1) = linear_acc;
+            converted_input.block(3, 0, 3, 1) = gyr;
+
+
+            Eigen::MatrixXd A_ = Eigen::MatrixXd::Zero(9, 9);
+            // x y z
+            A_.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity();
+            A_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
+            // vx vy vz
+            A_.block(3, 3, 3, 3) = Eigen::Matrix3d::Identity();
+            // wx wy wz
+            A_.block(6, 6, 3, 3) = Eigen::Matrix3d::Identity();
+
+            Eigen::MatrixXd B_ = Eigen::MatrixXd::Zero(9, 6);
+            //x =
+//                         B_.block(0, 0, 3, 3) =
+//                                 Eigen::Matrix3d::Identity() * 0.5 * time_interval_ *
+//                                 time_interval_;
+            B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
+            B_.block(6, 3, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
+
+
+            state_x_ = A_ * state_x_ + B_ * converted_input;
+            state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+
+            if (IS_DEBUG) {
+                std::cout << "state trans P:"
+                          << prob_state_ << std::endl;
+                std::cout << " A * P * A^ T "
+                          << A_ * prob_state_ * A_.transpose() << std::endl;
+                std::cout << "B * cove * B.transpose() "
+                          << B_ * converted_input * B_.transpose() << std::endl;
+            }
+            // unconverted value
+//                         B_.block(6, 0, 3, 3) = rotate_q_.toRotationMatrix() ;//* time_interval_;
+            prob_state_ = A_ * prob_state_ * A_.transpose() +
+                          B_ * converted_input * B_.transpose();
+            if (std::isnan(prob_state_.sum())) {
+                std::cout << "state prob is naa: " << prob_state_ << std::endl;
+            }
+
+
+            return state_x_;
 
 
         };
+
+
+        void MeasurementStateZV(Eigen::Matrix3d cov_matrix) {
+            H_ = Eigen::MatrixXd::Zero(3, 9);
+            H_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * 1.0;
+            if (IS_DEBUG) {
+                std::cout << H_ << std::endl;
+                std::cout << " p * H^T :" << prob_state_ * H_.transpose().eval() << std::endl;
+                std::cout << " H * P * H^T + cosv:" << H_ * prob_state_ * H_.transpose().eval() + cov_matrix
+                          << std::endl;
+                std::cout << "inverse " << (H_ * prob_state_ * H_.transpose().eval() + cov_matrix).inverse()
+                          << std::endl;
+
+            }
+
+            K_ = (prob_state_ * H_.transpose().eval()) *
+                 (H_ * prob_state_ * H_.transpose().eval() + cov_matrix).inverse();
+            if (std::isnan(K_.sum()) || std::isinf(K_.sum())) {
+                std::cout << "K is nana" << std::endl;
+            }
+
+            /*
+             * update probability
+             */
+            prob_state_ = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * prob_state_;
+            prob_state_ = (prob_state_ + prob_state_.transpose().eval()) * 0.5;
+            if (prob_state_.norm() > 10000) {
+                std::cout << __FILE__
+                          << ":"
+                          << __LINE__
+                          << " Error state prob is too big"
+                          << std::endl;
+                prob_state_ /= 100.0;
+            }
+            if (std::isnan(prob_state_.sum()) || std::isinf(prob_state_.sum())) {
+                std::cout << "state prob has nan" << std::endl;
+            }
+
+            /*
+             * update state
+             */
+            Eigen::Vector3d m(0, 0, 0);
+            Eigen::MatrixXd tdx = K_ * (m - state_x_.block(3, 0, 3, 1));
+
+            state_x_ += tdx;
+
+
+            Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(6), Eigen::Vector3d::UnitX())
+                                         * Eigen::AngleAxisd(tdx(7), Eigen::Vector3d::UnitY())
+                                         * Eigen::AngleAxisd(tdx(8), Eigen::Vector3d::UnitZ());
+            if (std::isnan(state_x_.sum())) {
+                std::cout << "some error " << std::endl;
+            }
+
+            Eigen::Matrix3d rotation_m(rotation_q_.toRotationMatrix());
+            Eigen::Matrix3d omega = Eigen::Matrix3d::Zero();
+            omega << 0.0, tdx(8), -tdx(7),
+                    -tdx(8), 0.0, tdx(6),
+                    tdx(7), -tdx(6), 0.0;
+            omega *= -1.0;
+//                         rotation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
+//                                      (2.0 * Eigen::Matrix3d::Identity() - omega).inverse()
+//                                      * rotation_m;
+            rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
+
+//                         rotate_q_ = delta_q.inverse() * rotate_q_;
+            rotation_q_ = Eigen::Quaterniond(rotation_m);
+            return;
+
+        }
 
 
         /**
@@ -170,7 +319,25 @@ namespace BSE {
         Eigen::Matrix<double, 15, 15> prob_state_ = Eigen::Matrix<double, 15, 15>::Identity(); // probability of state
 
 
+
+        /**
+        * X_i=A*X_{i-1}+B*u_i+w_i
+         * z_i=H*X_i+v_i
+         * w_i \in Q
+         * v_i \in R
+         */
+        Eigen::MatrixXd A_ = Eigen::MatrixXd();
+        Eigen::MatrixXd B_ = Eigen::MatrixXd();
+        Eigen::MatrixXd H_ = Eigen::MatrixXd();
+        Eigen::MatrixXd Q_ = Eigen::MatrixXd();
+        Eigen::MatrixXd R_ = Eigen::MatrixXd();
+        Eigen::MatrixXd K_ = Eigen::MatrixXd();
+        Eigen::MatrixXd dX_ = Eigen::MatrixXd();
+
+
         double time_interval_ = 0.005;// time interval
+
+
 
         double local_g_ = -9.81; // local gravity acc.
 

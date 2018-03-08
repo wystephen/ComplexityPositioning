@@ -178,6 +178,10 @@ int main(int argc, char *argv[]) {
                                     process_noise_matrix,
                                     BSE::StateTransactionMethodType::NormalRotation);
 
+
+            auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+                                         process_noise_matrix);
+
             double uwb_index = 0;
             /// uwb measurement
             bool tmp_break_flag = false;
@@ -231,9 +235,11 @@ int main(int argc, char *argv[]) {
 
             if (imu_tool.GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
                 /// zero velocity detector
-//                filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-//                                        Eigen::Matrix3d::Identity() * 0.000251001,
-//                                        BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
+                filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
+                                        Eigen::Matrix3d::Identity() * 0.000251001,
+                                        BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
+
+                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity()* 0.00025);
 
                 /// angle constraint through acc.
 //                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
