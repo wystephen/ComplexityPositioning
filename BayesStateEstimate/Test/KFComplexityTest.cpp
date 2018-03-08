@@ -17,6 +17,9 @@
 #include "BayesFilter/KalmanFilter/IMUWBKFSimple.h"
 #include "BayesFilter/KalmanFilter/IMUWBKFSimple.cpp"
 
+
+#include "BayesFilter/KalmanFilter/KFComplex.h"
+
 #include "../AuxiliaryTool/UwbTools.h"
 #include "../AuxiliaryTool/UwbTools.cpp"
 
@@ -91,10 +94,12 @@ int main(int argc, char *argv[]) {
     measurement_noise_matrix *= 0.1;
 
 
-    Eigen::MatrixXd initial_prob_matrix = Eigen::MatrixXd::Identity(9, 9);
+    Eigen::MatrixXd initial_prob_matrix = Eigen::MatrixXd::Identity(15, 15);
     initial_prob_matrix.block(0, 0, 3, 3) *= 0.001;
     initial_prob_matrix.block(3, 3, 3, 3) *= 0.001;
     initial_prob_matrix.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
+    initial_prob_matrix.block(9, 9, 3, 3) *= 0.001;
+    initial_prob_matrix.block(12, 12, 3, 3) *= 0.001 * (M_PI / 180.0);
 
 
     auto f = [&process_noise_matrix,
