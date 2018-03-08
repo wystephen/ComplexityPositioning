@@ -143,25 +143,31 @@ namespace BSE {
                            * Eigen::AngleAxisd(tp, Eigen::Vector3d::UnitY())
                            * Eigen::AngleAxisd(initial_ori, Eigen::Vector3d::UnitZ()));
 
-            std::cout << "value angle:" << state_x_.block(6, 0, 3, 1).transpose() << std::endl;
-            std::cout << "eular angle:" << rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2).transpose()
+            std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose() << std::endl;
+            std::cout << "complex eular angle:" << rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2).transpose()
                       << std::endl;
-            std::cout << "before acc:" << acc.transpose() << std::endl;
-            std::cout << "after acc:" << (rotation_q_ * acc).transpose() << std::endl;
+            std::cout << "complex before acc:" << acc.transpose() << std::endl;
+            std::cout << "complex after acc:" << (rotation_q_ * acc).transpose() << std::endl;
 
         }
+
+        Eigen::Matrix<double, 15, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
+                                                   Eigen::Matrix<double, 6, 6> noise_matrix) {
+
+
+        };
 
 
         /**
          * dax day daz : offset of acc measurements.
          * dgx dgy dgz : offset of gyr measurements.
          */
-        Eigen::Matrix<double, 15, 1> state_x_ = Eigen::Matrix<double,15,1>::Zero();//x y z vx vy vz wx wy wz dax day daz dgx dgy dgz
+        Eigen::Matrix<double, 15, 1> state_x_ = Eigen::Matrix<double, 15, 1>::Zero();//x y z vx vy vz wx wy wz dax day daz dgx dgy dgz
 
         Eigen::Quaterniond rotation_q_ = Eigen::Quaterniond::Identity();
 
 
-        Eigen::Matrix<double, 15, 15> prob_state_ = Eigen::Matrix<double,15,15>::Identity(); // probability of state
+        Eigen::Matrix<double, 15, 15> prob_state_ = Eigen::Matrix<double, 15, 15>::Identity(); // probability of state
 
 
         double time_interval_ = 0.005;// time interval
