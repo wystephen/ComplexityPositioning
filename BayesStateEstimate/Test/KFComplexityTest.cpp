@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
         auto filter = BSE::IMUWBKFSimple(
                 initial_prob_matrix);
 
-        auto filter_complex = BSE::KFComplex(initial_prob_matrix_complex);
+        auto filter_complex = BSE::KFComplex(initial_prob_matrix);
 
         double tmp_time_interval = (imu_data(imu_data.rows() - 1, 0) - imu_data(0, 0))
                                    / double(imu_data.rows());
@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
                                         Eigen::Matrix3d::Identity() * 0.000251001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 
-                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity()* 0.00025);
+//                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity()* 0.00025);
 
                 /// angle constraint through acc.
 //                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
@@ -348,8 +348,8 @@ int main(int argc, char *argv[]) {
 //
 //    f(left_imu_data, "left_foot");
 
-//    f(right_imu_data, "right_foot");
-    f(head_imu_data, "head");
+    f(right_imu_data, "right_foot");
+//    f(head_imu_data, "head");
 
     plt::show();
 

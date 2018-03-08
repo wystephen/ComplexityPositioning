@@ -43,7 +43,7 @@ namespace BSE {
     class KFComplex {
     public:
 
-        KFComplex(Eigen::Matrix<double, 15, 15> init_prob) {
+        KFComplex(Eigen::Matrix<double, 9, 9> init_prob) {
             prob_state_ = init_prob;
             state_x_.setZero();
         }
@@ -168,14 +168,9 @@ namespace BSE {
                         Eigen::AngleAxisd(gyr(0), Eigen::Vector3d::UnitX())
                         * Eigen::AngleAxisd(gyr(1), Eigen::Vector3d::UnitY())
                         * Eigen::AngleAxisd(gyr(2), Eigen::Vector3d::UnitZ());
-//                             rotate_q_ =  tmp_q * rotate_q_;
-//                             tmp_q.normalize();
+
                 rotation_q_ = rotation_q_ * tmp_q;
 
-//                             rotate_q_ = tmp_q * rotate_q_;
-//                             rotate_q_ = tmp_q * rotate_q_;
-//                             rotate_q_ = rotate_q_ * tmp_q.inverse();
-//                             rotate_q_ = tmp_q * rotate_q_;
                 rotation_q_.normalize();
 
             }
@@ -203,10 +198,9 @@ namespace BSE {
             A_.block(6, 6, 3, 3) = Eigen::Matrix3d::Identity();
 
             Eigen::MatrixXd B_ = Eigen::MatrixXd::Zero(9, 6);
-            //x =
-//                         B_.block(0, 0, 3, 3) =
-//                                 Eigen::Matrix3d::Identity() * 0.5 * time_interval_ *
-//                                 time_interval_;
+
+
+
             B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
             B_.block(6, 3, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
 
@@ -225,15 +219,13 @@ namespace BSE {
             // unconverted value
 //                         B_.block(6, 0, 3, 3) = rotate_q_.toRotationMatrix() ;//* time_interval_;
             prob_state_ = A_ * prob_state_ * A_.transpose() +
-                          B_ * converted_input * B_.transpose();
+                          B_ * noise_matrix * B_.transpose();
             if (std::isnan(prob_state_.sum())) {
                 std::cout << "state prob is naa: " << prob_state_ << std::endl;
             }
 
 
             return state_x_;
-
-
         };
 
 
@@ -311,12 +303,12 @@ namespace BSE {
          * dax day daz : offset of acc measurements.
          * dgx dgy dgz : offset of gyr measurements.
          */
-        Eigen::Matrix<double, 15, 1> state_x_ = Eigen::Matrix<double, 15, 1>::Zero();//x y z vx vy vz wx wy wz dax day daz dgx dgy dgz
+        Eigen::Matrix<double, 9, 1> state_x_ = Eigen::Matrix<double, 9, 1>::Zero();//x y z vx vy vz wx wy wz dax day daz dgx dgy dgz
 
         Eigen::Quaterniond rotation_q_ = Eigen::Quaterniond::Identity();
 
 
-        Eigen::Matrix<double, 15, 15> prob_state_ = Eigen::Matrix<double, 15, 15>::Identity(); // probability of state
+        Eigen::Matrix<double, 9, 9> prob_state_ = Eigen::Matrix<double, 9, 9>::Identity(); // probability of state
 
 
 
