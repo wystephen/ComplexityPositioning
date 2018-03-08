@@ -94,16 +94,22 @@ int main(int argc, char *argv[]) {
     measurement_noise_matrix *= 0.1;
 
 
-    Eigen::MatrixXd initial_prob_matrix = Eigen::MatrixXd::Identity(15, 15);
+    Eigen::MatrixXd initial_prob_matrix = Eigen::MatrixXd::Identity(9, 9);
     initial_prob_matrix.block(0, 0, 3, 3) *= 0.001;
     initial_prob_matrix.block(3, 3, 3, 3) *= 0.001;
     initial_prob_matrix.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
-    initial_prob_matrix.block(9, 9, 3, 3) *= 0.001;
-    initial_prob_matrix.block(12, 12, 3, 3) *= 0.001 * (M_PI / 180.0);
-
+//    initial_prob_matrix.block(9, 9, 3, 3) *= 0.001;
+//    initial_prob_matrix.block(12, 12, 3, 3) *= 0.001 * (M_PI / 180.0);
+    Eigen::MatrixXd initial_prob_matrix_complex = Eigen::MatrixXd::Identity(15, 15);
+    initial_prob_matrix_complex.block(0, 0, 3, 3) *= 0.001;
+    initial_prob_matrix_complex.block(3, 3, 3, 3) *= 0.001;
+    initial_prob_matrix_complex.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
+    initial_prob_matrix_complex.block(9, 9, 3, 3) *= 0.001;
+    initial_prob_matrix_complex.block(12, 12, 3, 3) *= 0.001 * (M_PI / 180.0);
 
     auto f = [&process_noise_matrix,
             &initial_prob_matrix,
+            &initial_prob_matrix_complex,
             &measurement_noise_matrix,
             &uwb_data,
             &beacon_set_data,
@@ -115,14 +121,19 @@ int main(int argc, char *argv[]) {
                              std::string data_name) {
         auto filter = BSE::IMUWBKFSimple(
                 initial_prob_matrix);
+
+        auto filter_complex = BSE::KFComplex(initial_prob_matrix_complex);
+
         double tmp_time_interval = (imu_data(imu_data.rows() - 1, 0) - imu_data(0, 0))
                                    / double(imu_data.rows());
         std::cout << "time interval :" << tmp_time_interval << std::endl;
         if (std::abs(tmp_time_interval - 0.005) < 0.0001) {
             filter.setTime_interval_(0.005);
+            filter_complex.time_interval_ = 0.005;
         } else {
 
             filter.setTime_interval_(tmp_time_interval);
+            filter_complex.time_interval_ = tmp_time_interval;
         }
         filter.setLocal_g_(-9.81);
 //    filter.IS_DEBUG = true;
@@ -158,9 +169,10 @@ int main(int argc, char *argv[]) {
 //    filter.sett
         for (int i(5); i < imu_data.rows() - 5; ++i) {
             /// state transaction equation
-            filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
-                                    process_noise_matrix,
-                                    BSE::StateTransactionMethodType::NormalRotation);
+//            filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
+//                                    process_noise_matrix,
+//                                    BSE::StateTransactionMethodType::NormalRotation);
+
             double uwb_index = 0;
             /// uwb measurement
             bool tmp_break_flag = false;
@@ -214,9 +226,9 @@ int main(int argc, char *argv[]) {
 
             if (imu_tool.GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
                 /// zero velocity detector
-                filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-                                        Eigen::Matrix3d::Identity() * 0.000251001,
-                                        BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
+//                filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
+//                                        Eigen::Matrix3d::Identity() * 0.000251001,
+//                                        BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 
                 /// angle constraint through acc.
 //                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),

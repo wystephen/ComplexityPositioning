@@ -57,7 +57,7 @@ namespace BSE {
                          }
 
 
-                         if (gyr.norm() > 1e-18) {
+                         if (gyr.norm() > 1e-8) {
                              Eigen::Quaterniond tmp_q =
                                      Eigen::AngleAxisd(gyr(0), Eigen::Vector3d::UnitX())
                                      * Eigen::AngleAxisd(gyr(1), Eigen::Vector3d::UnitY())
