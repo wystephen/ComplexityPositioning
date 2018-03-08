@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
 
 //        auto state_T = filter.getTransformMatrix();
         auto state_x = filter.getState_()*1.0;
-        std::cout << state_x.transpose() << std::endl;
+//        std::cout << state_x.transpose().eval() << std::endl;
 
 
         for (int j(0); j < 3; ++j) {
