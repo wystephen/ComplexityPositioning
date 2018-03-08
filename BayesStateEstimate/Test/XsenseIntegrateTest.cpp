@@ -86,6 +86,13 @@ int main(int argc, char *argv[]) {
                                               {}};
 
 
+    typedef std::vector<std::vector<double>> vec_data;
+    vec_data acc = {{},{},{}};
+    vec_data gyr = {{},{},{}};
+    vec_data velocity = {{},{},{}};
+    vec_data attitude = {{},{},{}};
+
+
 
 
     for (int i(0); i < imu_data.rows(); ++i) {
@@ -93,18 +100,45 @@ int main(int argc, char *argv[]) {
                                 process_noise_matrix,
                                 BSE::StateTransactionMethodType::NormalRotation);
 
-        auto state_x = filter.getTransformMatrix();
+        auto state_T = filter.getTransformMatrix();
+        auto state_x = filter.getState_();
+
 
         for (int j(0); j < 3; ++j) {
-            trace[j].push_back(state_x(j, 3));
+            trace[j].push_back(state_x(j));
+            acc[i].push_back(imu_data(i,j+1));
+            gyr[i].push_back(imu_data(i,j+4));
+            velocity[i].push_back(state_x(j+3));
+            attitude[i].push_back(state_x(j+6));
         }
     }
 
+    AWF::writeVectorsToCsv<double>("./XsenseResult/trace.csv",trace);
 
 
+    plt::figure();
     plt::plot(trace[0], trace[1], "-+");
     plt::title(file_name);
     plt::grid(true);
+
+    auto show_func = [&](vec_data d, std::string name){
+        plt::figure();
+        plt::title(name);
+        for(int i(0);i<d.size();++i){
+            plt::named_plot(std::to_string(i),d[i],"-+");
+        }
+        plt::grid(true);
+        plt::legend();
+    };
+
+
+    show_func(velocity,"velocity");
+    show_func(attitude,"orientation");
+    show_func(acc,"acc");
+    show_func(gyr,"gyr");
+
+
+
     plt::show();
 
 

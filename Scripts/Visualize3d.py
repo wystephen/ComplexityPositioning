@@ -35,19 +35,23 @@ def plot_file(ax_handle, file_name, flag='+-'):
 
 
 if __name__ == '__main__':
-    dir_name = ''
+    # dir_name = './' # graph Optimization result
+    dir_name = '/home/steve/Code/ComplexityPositioning/XsenseResult/' # xsense imu test result
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1, projection='3d')
 
-    for file_name in os.listdir('./'):
+    for file_name in os.listdir(dir_name):
         print(file_name)
+        file_name = dir_name+file_name
 
         if '.csv' in file_name:
-            if 'graph' in file_name:
-                plot_file(ax, file_name)
-            if 'uwb' in file_name:
-                plot_file(ax, file_name, '*')
+            # if 'graph' in file_name:
+            #     plot_file(ax, file_name)
+            # if 'uwb' in file_name:
+            #     plot_file(ax, file_name, '*')
+            plot_file(ax,file_name)
+
 
     ax.legend()
     ax.grid()
