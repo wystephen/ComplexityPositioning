@@ -14,8 +14,8 @@
 
 #include "AWF.h"
 
-#include "../BayesFilter/KalmanFilter/IMUWBKF.h"
-#include "../BayesFilter/KalmanFilter/IMUWBKF.cpp"
+#include "BayesFilter/KalmanFilter/IMUWBKFSimple.h"
+#include "BayesFilter/KalmanFilter/IMUWBKFSimple.cpp"
 
 #include "../AuxiliaryTool/UwbTools.h"
 #include "../AuxiliaryTool/UwbTools.cpp"
@@ -316,11 +316,11 @@ int main(int argc, char *argv[]) {
         plt::title(data_name + "trace");
 
     };
+//
+//    f(left_imu_data, "left_foot");
 
-    f(left_imu_data, "left_foot");
-
-    f(right_imu_data, "right_foot");
-//    f(head_imu_data, "head");
+//    f(right_imu_data, "right_foot");
+    f(head_imu_data, "head");
 
     plt::show();
 

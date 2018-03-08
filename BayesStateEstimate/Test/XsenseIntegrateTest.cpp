@@ -37,8 +37,8 @@
 
 #include "AWF.h"
 
-#include "../BayesFilter/KalmanFilter/IMUWBKF.h"
-#include "../BayesFilter/KalmanFilter/IMUWBKF.cpp"
+#include "BayesFilter/KalmanFilter/IMUWBKFSimple.h"
+#include "BayesFilter/KalmanFilter/IMUWBKFSimple.cpp"
 
 #include "../AuxiliaryTool/UwbTools.h"
 #include "../AuxiliaryTool/UwbTools.cpp"
@@ -57,6 +57,7 @@ int main(int argc, char *argv[]) {
 //    std::string file_name = "/home/steve/Data/XsensData/line-high.csv";
     std::string file_name = "/home/steve/Data/XsensData/line-low.csv";
 //    std::string file_name = "/home/steve/Data/XsensData/two round high.csv";
+//    std::string file_name = "/home/steve/Data/XsensData/mav_data.csv";
 
     AWF::FileReader imu_file(file_name);
 
@@ -75,7 +76,8 @@ int main(int argc, char *argv[]) {
 
 
     auto filter = BSE::IMUWBKFSimple(initial_prob_matrix);
-    filter.setTime_interval_(0.01);
+//    filter.setTime_interval_(0.01);
+    filter.setTime_interval_(0.005);
     filter.initial_state(imu_data.block(0, 1, 50, 6), 0.0);
     filter.setLocal_g_(9.81);
 //    filter.IS_DEBUG = true;
@@ -105,15 +107,15 @@ int main(int argc, char *argv[]) {
         auto state_T = filter.getTransformMatrix();
         Eigen::MatrixXd state_x = filter.getState_();
 //        std::cout << state_x.transpose().eval() << std::endl;
-        std::cout << state_x.transpose() << std::endl;
+//        std::cout << state_x.transpose() << std::endl;
 
 
         for (int j(0); j < 3; ++j) {
             trace[j].push_back(state_T(j,3));
-//            acc[i].push_back(imu_data(i,j+1));
-//            gyr[i].push_back(imu_data(i,j+4));
-//            velocity[i].push_back(state_x(j+3,0));
-//            attitude[i].push_back(state_x(j+6,0));
+            acc[j].push_back(imu_data(i,j+1));
+            gyr[j].push_back(imu_data(i,j+4));
+            velocity[j].push_back(state_x(j+3,0));
+            attitude[j].push_back(state_x(j+6,0));
         }
     }
 

@@ -30,7 +30,7 @@
 #include <BayesFilter/BayesFilter.h>
 
 #include "BayesFilter/KalmanFilter/KalmanFilterBase.h"
-#include "BayesFilter/KalmanFilter/IMUWBKF.h"
+#include "BayesFilter/KalmanFilter/IMUWBKFSimple.h"
 
 #include "AuxiliaryTool/ImuTools.h"
 #include "AuxiliaryTool/UwbTools.h"
