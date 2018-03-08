@@ -105,6 +105,7 @@ int main(int argc, char *argv[]) {
         auto state_T = filter.getTransformMatrix();
         Eigen::MatrixXd state_x = filter.getState_();
 //        std::cout << state_x.transpose().eval() << std::endl;
+        std::cout << state_x.transpose() << std::endl;
 
 
         for (int j(0); j < 3; ++j) {
