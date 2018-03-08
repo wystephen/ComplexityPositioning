@@ -73,6 +73,8 @@ int main(int argc, char *argv[]) {
 
 
     auto filter = BSE::IMUWBKFSimple(initial_prob_matrix);
+    filter.setTime_interval_(0.01);
+
 
 
 }

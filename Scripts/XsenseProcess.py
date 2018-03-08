@@ -51,7 +51,7 @@ class imuread:
             tt = datetime.datetime(int(all_num[2]), int(all_num[3]), int(all_num[4]), int(all_num[5]), int(all_num[6]),
                                    int(all_num[7]))
 
-            print(tt.timestamp() + float(all_num[1]) * 1e-9)
+            # print(tt.timestamp() + float(all_num[1]) * 1e-9)
             self.data[i - 7, 0] = tt.timestamp() + float(all_num[0]) * 1e-9
 
             # print(all_num)
@@ -76,3 +76,5 @@ if __name__ == '__main__':
             ir = imuread(dir_name+file_name)
             ir.load()
             ir.save(dir_name+file_name.split('.')[0]+'.csv')
+            time_interval_list = ir.data[1:,0]-ir.data[:-1,0]
+            print(time_interval_list.mean(),time_interval_list.std())
