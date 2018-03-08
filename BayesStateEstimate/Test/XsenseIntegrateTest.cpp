@@ -54,9 +54,9 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
 
-//    std::string file_name = "/home/steve/Data/XsensData/line-high.csv";
+    std::string file_name = "/home/steve/Data/XsensData/line-high.csv";
 //    std::string file_name = "/home/steve/Data/XsensData/line-low.csv";
-    std::string file_name = "/home/steve/Data/XsensData/two round high.csv";
+//    std::string file_name = "/home/steve/Data/XsensData/two round high.csv";
 
     AWF::FileReader imu_file(file_name);
 
@@ -99,6 +99,8 @@ int main(int argc, char *argv[]) {
             trace[j].push_back(state_x(j, 3));
         }
     }
+
+
 
     plt::plot(trace[0], trace[1], "-+");
     plt::title(file_name);

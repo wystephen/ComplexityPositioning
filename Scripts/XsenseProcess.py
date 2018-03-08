@@ -40,7 +40,7 @@ class imuread:
     def load(self):
         file_lines = open(self.file_name).readlines()
 
-        self.data = np.zeros([len(file_lines) - 7, 10])
+        self.data = np.zeros([len(file_lines) - 7, 13])
 
         for i in range(7, len(file_lines)):
             # print(file_lines[i])
@@ -56,8 +56,8 @@ class imuread:
             self.data[i - 7, 0] = tt.timestamp() + float(all_num[0]) * 1e-9
 
             # print(all_num)
-            for j in range(9):
-                self.data[i - 7, 1 + j] = float(all_num[j + len(all_num) - 9])
+            for j in range(12):
+                self.data[i - 7, 1 + j] = float(all_num[j + len(all_num) - 12])
 
         # plt.figure()
         # plt.imshow(self.data/self.data.std(axis=1))
@@ -68,19 +68,38 @@ class imuread:
     def save(self, file_name):
         np.savetxt(file_name, self.data,delimiter=',')
 
+    def show(self):
+        plt.figure()
+        plt.subplot(211)
+        plt.title('acc')
+        for i in range(3):
+            plt.plot(self.data[:,i+1],label=str(i))
+        plt.legend()
+        plt.grid()
+
+        plt.subplot(212)
+        plt.title('gyr')
+        for i in range(3):
+            plt.plot(self.data[:,i+4],label=str(i))
+        plt.legend()
+        plt.grid()
+        plt.show()
+
+
 
 if __name__ == '__main__':
     dir_name = '/home/steve/Data/XsensData/'
-    plt.figure()
+    # plt.figure()
 
     for file_name in os.listdir(dir_name):
         if 'CVS' in file_name:
             ir = imuread(dir_name+file_name)
             ir.load()
+            ir.show()
             ir.save(dir_name+file_name.split('.')[0]+'.csv')
             time_interval_list = ir.data[1:,0]-ir.data[:-1,0]
             print(time_interval_list.mean(),time_interval_list.std())
-            plt.plot(time_interval_list,'-*',label=file_name)
-    plt.grid()
-    plt.legend()
-    plt.show()
+            # plt.plot(time_interval_list,'-*',label=file_name)
+    # plt.grid()
+    # plt.legend()
+    # plt.show()
