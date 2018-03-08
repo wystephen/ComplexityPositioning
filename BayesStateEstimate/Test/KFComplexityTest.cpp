@@ -116,6 +116,8 @@ int main(int argc, char *argv[]) {
         auto filter = BSE::IMUWBKFSimple(
                 initial_prob_matrix);
         double tmp_time_interval = (imu_data(imu_data.rows() - 1, 0) - imu_data(0, 0))
+
+                                   iuy
                                    / double(imu_data.rows());
         std::cout << "time interval :" << tmp_time_interval << std::endl;
         if (std::abs(tmp_time_interval - 0.005) < 0.0001) {
