@@ -169,9 +169,9 @@ int main(int argc, char *argv[]) {
 //    filter.sett
         for (int i(5); i < imu_data.rows() - 5; ++i) {
             /// state transaction equation
-//            filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
-//                                    process_noise_matrix,
-//                                    BSE::StateTransactionMethodType::NormalRotation);
+            filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
+                                    process_noise_matrix,
+                                    BSE::StateTransactionMethodType::NormalRotation);
 
             double uwb_index = 0;
             /// uwb measurement
@@ -194,9 +194,9 @@ int main(int argc, char *argv[]) {
 //                break;
 //            }
             if (uwb_data(uwb_index, 0) - imu_data(i, 0) < 0.01) {
-//                filter.MeasurementState(uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1),
-//                                        measurement_noise_matrix,
-//                                        BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+                filter.MeasurementState(uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1),
+                                        measurement_noise_matrix,
+                                        BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 //                std::cout << "test uwb :" << uwb_data(uwb_index, 0) << ",imu :"
 //                          << imu_data(i, 0) << std::endl;
 
@@ -249,7 +249,8 @@ int main(int argc, char *argv[]) {
                 zv_flag.push_back(0.0);
             }
 
-            Eigen::VectorXd state = filter.getState_();
+//            Eigen::VectorXd state = filter.getState_();
+            Eigen::VectorXd state = filter_complex.state_x_;
 //        std::cout << state.transpose() << std::endl;
             for (int j(0); j < 3; ++j) {
                 pose[j].push_back(state(j));
