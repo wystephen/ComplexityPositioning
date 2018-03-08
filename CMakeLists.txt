@@ -5,7 +5,7 @@ project(ComplexityPositioning)
 set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_BUILD_TOOL Release)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g  -lpthread ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1 -g  -lpthread ")
 
 # Configure CCache if available
 find_program(CCACHE_FOUND ccache)

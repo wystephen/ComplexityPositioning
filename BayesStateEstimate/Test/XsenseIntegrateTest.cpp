@@ -102,15 +102,15 @@ int main(int argc, char *argv[]) {
                                 process_noise_matrix,
                                 BSE::StateTransactionMethodType::NormalRotation);
 
-//        auto state_T = filter.getTransformMatrix();
+        auto state_T = filter.getTransformMatrix();
         Eigen::MatrixXd state_x = filter.getState_();
 //        std::cout << state_x.transpose().eval() << std::endl;
 
 
         for (int j(0); j < 3; ++j) {
-//            trace[j].push_back(state_x(j,0));
-            acc[i].push_back(imu_data(i,j+1));
-            gyr[i].push_back(imu_data(i,j+4));
+            trace[j].push_back(state_T(j,3));
+//            acc[i].push_back(imu_data(i,j+1));
+//            gyr[i].push_back(imu_data(i,j+4));
 //            velocity[i].push_back(state_x(j+3,0));
 //            attitude[i].push_back(state_x(j+6,0));
         }
