@@ -54,8 +54,8 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
 
-    std::string file_name = "/home/steve/Data/XsensData/line-high.csv";
-//    std::string file_name = "/home/steve/Data/XsensData/line-low.csv";
+//    std::string file_name = "/home/steve/Data/XsensData/line-high.csv";
+    std::string file_name = "/home/steve/Data/XsensData/line-low.csv";
 //    std::string file_name = "/home/steve/Data/XsensData/two round high.csv";
 
     AWF::FileReader imu_file(file_name);
@@ -77,6 +77,7 @@ int main(int argc, char *argv[]) {
     auto filter = BSE::IMUWBKFSimple(initial_prob_matrix);
     filter.setTime_interval_(0.01);
     filter.initial_state(imu_data.block(0, 1, 50, 6), 0.0);
+    filter.IS_DEBUG = true;
 
 
     auto imu_tool = BSE::ImuTools();
