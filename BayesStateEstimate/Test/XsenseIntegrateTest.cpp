@@ -100,8 +100,8 @@ int main(int argc, char *argv[]) {
                                 process_noise_matrix,
                                 BSE::StateTransactionMethodType::NormalRotation);
 
-        auto state_T = filter.getTransformMatrix();
-        auto state_x = filter.getState_();
+//        auto state_T = filter.getTransformMatrix();
+        auto state_x = filter.getState_()*1.0;
 
 
         for (int j(0); j < 3; ++j) {
