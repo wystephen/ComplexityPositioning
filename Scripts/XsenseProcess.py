@@ -51,7 +51,8 @@ class imuread:
             tt = datetime.datetime(int(all_num[2]), int(all_num[3]), int(all_num[4]), int(all_num[5]), int(all_num[6]),
                                    int(all_num[7]))
 
-            # print(tt.timestamp() + float(all_num[1]) * 1e-9)
+            print(tt.timestamp() + float(all_num[1]) * 1e-9)
+
             self.data[i - 7, 0] = tt.timestamp() + float(all_num[0]) * 1e-9
 
             # print(all_num)
@@ -70,6 +71,7 @@ class imuread:
 
 if __name__ == '__main__':
     dir_name = '/home/steve/Data/XsensData/'
+    plt.figure()
 
     for file_name in os.listdir(dir_name):
         if 'CVS' in file_name:
@@ -78,3 +80,7 @@ if __name__ == '__main__':
             ir.save(dir_name+file_name.split('.')[0]+'.csv')
             time_interval_list = ir.data[1:,0]-ir.data[:-1,0]
             print(time_interval_list.mean(),time_interval_list.std())
+            plt.plot(time_interval_list,'-*',label=file_name)
+    plt.grid()
+    plt.legend()
+    plt.show()
