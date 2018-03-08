@@ -77,7 +77,8 @@ int main(int argc, char *argv[]) {
     auto filter = BSE::IMUWBKFSimple(initial_prob_matrix);
     filter.setTime_interval_(0.01);
     filter.initial_state(imu_data.block(0, 1, 50, 6), 0.0);
-    filter.IS_DEBUG = true;
+    filter.setLocal_g_(9.81);
+//    filter.IS_DEBUG = true;
 
 
     auto imu_tool = BSE::ImuTools();
@@ -103,6 +104,7 @@ int main(int argc, char *argv[]) {
 
 //        auto state_T = filter.getTransformMatrix();
         auto state_x = filter.getState_()*1.0;
+        std::cout << state_x.transpose() << std::endl;
 
 
         for (int j(0); j < 3; ++j) {
