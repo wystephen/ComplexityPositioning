@@ -337,7 +337,7 @@ namespace BSE {
             long double f_u(0.0), f_v(0.0), f_w(0.0);
             Eigen::Vector3d acc = imu_data.block(0, 0, imu_data.rows(), 3).colwise().mean();
             auto g = acc.norm();
-//            local_g_ = g;
+            local_g_ = -1.0 * g;
 
 
             auto g_error = [&, &g, acc](double roll, double pitch, double yaw) -> double {
@@ -345,7 +345,7 @@ namespace BSE {
                 auto rotate_matrix = (Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX())
                                       * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
                                       * Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()));
-                return std::abs(std::abs(g) *local_g_ / std::abs(local_g_)+ (rotate_matrix * acc)(2));
+                return std::abs(std::abs(g) * 1.0 * local_g_ / std::abs(local_g_) + (rotate_matrix * acc)(2));
             };
             auto ge(0.0);
 //
@@ -465,7 +465,7 @@ namespace BSE {
          */
         Eigen::Isometry3d getTransformMatrix() {
             Eigen::Isometry3d trans_matrix = Eigen::Isometry3d::Identity();
-            trans_matrix.matrix().block(0, 0, 3, 3) = rotate_q_.toRotationMatrix().eval()*1.0;
+            trans_matrix.matrix().block(0, 0, 3, 3) = rotate_q_.toRotationMatrix().eval() * 1.0;
             trans_matrix.matrix().block(0, 3, 3, 1) = state_.block(0, 0, 3, 1);
 
             return trans_matrix;

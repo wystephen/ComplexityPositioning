@@ -150,7 +150,9 @@ int main(int argc, char *argv[]) {
                                      initial_pos);
         std::cout << "costed time :" << AWF::getDoubleSecondTime() - time_begin
                   << std::endl;
-
+        std::vector<std::vector<double>> pose_simple = {{},
+                                                 {},
+                                                 {}};
         std::vector<std::vector<double>> pose = {{},
                                                  {},
                                                  {}};
@@ -260,10 +262,11 @@ int main(int argc, char *argv[]) {
                 zv_flag.push_back(0.0);
             }
 
-//            Eigen::VectorXd state = filter.getState_();
+            Eigen::VectorXd state_simple = filter.getState_();
             Eigen::VectorXd state = filter_complex.state_x_;
 //        std::cout << state.transpose() << std::endl;
             for (int j(0); j < 3; ++j) {
+                pose_simple[j].push_back(state_simple(j));
                 pose[j].push_back(state(j));
                 velocity[j].push_back(state(j + 3));
                 angle[j].push_back(state(j + 6));
@@ -321,6 +324,7 @@ int main(int argc, char *argv[]) {
 
         plt::figure();
         plt::named_plot("ekf trace", pose[0], pose[1], "-");
+        plt::named_plot("simple trace", pose_simple[0], pose_simple[1],"-");
         plt::named_plot("optimized trace",
                         optimize_trace_vec[0],
                         optimize_trace_vec[1], "*");
@@ -347,9 +351,8 @@ int main(int argc, char *argv[]) {
     };
 //
     f(left_imu_data, "left_foot");
-
-    f(right_imu_data, "right_foot");
-    f(head_imu_data, "head");
+//    f(right_imu_data, "right_foot");
+//    f(head_imu_data, "head");
 
     plt::show();
 

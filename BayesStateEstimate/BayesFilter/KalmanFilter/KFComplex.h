@@ -33,6 +33,7 @@
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <AuxiliaryTool/GravityOrientationFunction.h>
 
 #include "KalmanFilterBase.h"
 #include "KalmanFilterBase.h"
@@ -55,84 +56,25 @@ namespace BSE {
             long double f_u(0.0), f_v(0.0), f_w(0.0);
             Eigen::Vector3d acc = imu_data.block(0, 0, imu_data.rows(), 3).colwise().mean();
             auto g = acc.norm();
-//            local_g_ = g;
+            local_g_ = -1.0 * g;
 
+            auto gof = GravityOrientationFunction(acc, -1.0 * local_g_ / std::abs(local_g_) * acc.norm(), initial_ori);
 
-            auto g_error = [&, &g, acc](double roll, double pitch, double yaw) -> double {
+            auto res_vec = gof.minimize_error(Eigen::Vector2d(0.0, 0.0));
+            double tr = res_vec[0](0);
+            double tp = res_vec[0](1);
 
-                auto rotate_matrix = (Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX())
-                                      * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
-                                      * Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()));
-                return std::abs(std::abs(g) * local_g_ / std::abs(local_g_) + (rotate_matrix * acc)(2));
+            auto f = [](double a) -> double {
+                while (a > M_PI + 1e-3) {
+                    a -= 2.0 * M_PI;
+                }
+                while (a < M_PI - 1e-3) {
+                    a += 2.0 * M_PI;
+                }
+                return a;
             };
-            auto ge(0.0);
-//
-
-            /**
-             * find initial euler angle through optimization.
-             */
-            double tr = 0.0;
-            double tp = 0.0;
-
-            double step_len = 0.000005;
-            double update_rate = 0.5;
-            int iter_counter = 0;
-            double current_error(g_error(tr, tp, initial_ori));
-            while (current_error > 1e-7 && iter_counter < 30000) {
-
-                iter_counter++;
-//                tr +=(g_error)
-                // compute gradient
-                double delta_tr = (g_error(tr + step_len, tp, initial_ori) - current_error) / step_len;
-                double delta_tp = (g_error(tr, tp + step_len, initial_ori) - current_error) / step_len;
-                if (std::isnan(delta_tp) || std::isnan(delta_tr)) {
-                    delta_tp = 0.0001;
-                    delta_tr = 0.0001;
-
-                    continue;
-                }
-                // update state.
-                tr -= delta_tr * update_rate;
-                tp -= delta_tp * update_rate;
-
-                while (tr > M_PI + 0.01) {
-                    tr -= 2.0 * M_PI;
-                }
-                while (tr < -M_PI - 0.01) {
-
-                    tr += 2.0 * M_PI;
-                }
-
-                while (tp > M_PI + 0.01) {
-                    tp -= 2.0 * M_PI;
-                }
-
-                while (tp < -M_PI - 0.01) {
-                    tp += 2.0 * M_PI;
-                }
-                /*
-                 * Reduce the learning rate.
-                 */
-                if (update_rate > 0.00001) {
-                    update_rate *= 0.99;
-                }
-
-
-                current_error = g_error(tr, tp, initial_ori);
-                if (IS_DEBUG) {
-                    std::cout << iter_counter
-                              << ":"
-                              << current_error
-                              << "{"
-                              << tr
-                              << ":"
-                              << tp
-                              << "}"
-                              << std::endl;
-                }
-
-
-            }
+            tr = f(tr);
+            tp = f(tp);
 
 
             state_x_.block(0, 0, 3, 1) = initial_pose;
