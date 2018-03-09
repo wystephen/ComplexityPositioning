@@ -143,7 +143,7 @@ namespace BSE {
 
 
             B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
-            B_.block(6, 3, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
+//            B_.block(6, 3, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
 
 
             state_x_ = A_ * state_x_ + B_ * converted_input;

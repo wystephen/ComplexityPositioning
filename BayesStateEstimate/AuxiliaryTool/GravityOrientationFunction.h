@@ -45,11 +45,7 @@ public:
         return compute(in_vec[0]);
     }
 
-    std::vector<Eigen::MatrixXd> compress(Eigen::MatrixXd ori) {
-        std::vector<Eigen::MatrixXd> t = {};
-        t.push_back(ori);
-        return t;
-    }
+
 
     Eigen::MatrixXd compute(Eigen::MatrixXd orientation) {
         Eigen::MatrixXd error;
@@ -60,15 +56,18 @@ public:
 
 
     std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd in1) {
-        std::vector<Eigen::MatrixXd> in_vec;
-        in_vec.push_back(in1);
-        return d(in_vec);
+        return d(compress(in1));
     }
 
     std::vector<Eigen::MatrixXd> minimize_error(Eigen::MatrixXd in1){
         return minimize(compress(in1),100,1e-1);
     }
 
+    std::vector<Eigen::MatrixXd> compress(Eigen::MatrixXd ori) {
+        std::vector<Eigen::MatrixXd> t = {};
+        t.push_back(ori);
+        return t;
+    }
 
     Eigen::Vector3d acc_;
     double g_;

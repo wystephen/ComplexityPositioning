@@ -136,6 +136,7 @@ int main(int argc, char *argv[]) {
             filter_complex.time_interval_ = tmp_time_interval;
         }
         filter.setLocal_g_(-9.81);
+        filter_complex.local_g_ = -9.81;
 //    filter.IS_DEBUG = true;
 
 
@@ -250,10 +251,10 @@ int main(int argc, char *argv[]) {
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
-                    std::cout << " linear accc:"
-                              << (filter.getRotate_q().toRotationMatrix() *
-                                  imu_data.block(i, 1, 1, 3).transpose()).transpose()
-                              << std::endl;
+//                    std::cout << " linear accc:"
+//                              << (filter.getRotate_q().toRotationMatrix() *
+//                                  imu_data.block(i, 1, 1, 3).transpose()).transpose()
+//                              << std::endl;
 
                 }
 
