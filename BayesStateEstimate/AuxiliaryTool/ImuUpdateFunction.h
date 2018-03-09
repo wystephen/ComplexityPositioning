@@ -32,11 +32,44 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-class ImuUpdateFunction : public AWF::FunctionAbstract<9, 2> {
+template<int OutDim>
+class ImuUpdateFunction : public AWF::FunctionAbstract<OutDim, 2> {
 public:
-    ImuUpdateFunction(Eigen::Quaterniond q) : FunctionAbstract() {
+    ImuUpdateFunction(Eigen::Quaterniond q, double time_interval) : FunctionAbstract() {
 
         rotation_q = q;
+        time_interval_ = time_interval;
+    }
+
+    /**
+     *
+     * @param in_vec
+     * @return
+     */
+    Eigen::MatrixXd operator()(std::vector<Eigen::MatrixXd> in_vec) {
+        return compute(in_vec[0], in_vec[1]);
+    }
+
+    /**
+     *
+     * @param state
+     * @param input
+     * @return
+     */
+    std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd state, Eigen::MatrixXd input) {
+        return d(compress(state, input));
+    }
+
+
+    /**
+     * state transactoin function. (Core function)
+     * @param state
+     * @param input
+     * @return
+     */
+    virtual Eigen::Matrix compute(Eigen::MatrixXd state, Eigen::MatrixXd input) {
+        Eigen::MatrixXd out_state(OutDim, 1);
+        return out_state;
     }
 
     /**
@@ -55,7 +88,21 @@ public:
     }
 
 
+    /**
+     * Convert angle in three axis as quaternion.
+     * @param ang
+     * @return
+     */
+    Eigen::Quaterniond angle2q(Eigen::Vector3d ang) {
+        Eigen::Quaterniond q = Eigen::AngleAxisd(ang(0), Eigen::Vector3d::UnitX()) *
+                               Eigen::AngleAxisd(ang(1), Eigen::Vector3d::UnitY()) *
+                               Eigen::AngleAxisd(ang(2), Eigen::Vector3d::UnitZ());
+        return q;
+    }
+
+
     Eigen::Quaterniond rotation_q = Eigen::Quaterniond::Identity();
+    double time_interval_ = 0.0;
 
 
 };

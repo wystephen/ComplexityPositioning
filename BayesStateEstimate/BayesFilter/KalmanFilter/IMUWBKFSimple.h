@@ -105,7 +105,8 @@ namespace BSE {
 
 
                          state = A_ * state + B_ * converted_input;
-                         state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+                         state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix()
+                                 .eulerAngles(0, 1, 2);
 
                          if (IS_DEBUG) {
                              std::cout << "state trans P:"
