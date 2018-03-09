@@ -200,7 +200,6 @@ namespace BSE {
             Eigen::MatrixXd B_ = Eigen::MatrixXd::Zero(9, 6);
 
 
-
             B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
             B_.block(6, 3, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
 
