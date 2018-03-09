@@ -33,10 +33,10 @@
 #include <Eigen/Geometry>
 
 template<int OutDim>
-class ImuUpdateFunction : public AWF::FunctionAbstract<OutDim, 2> {
+class ImuUpdateFunction : public AWF::FunctionAbstract<9, 2> {
 public:
     ImuUpdateFunction(Eigen::Quaterniond q, double time_interval) :
-            FunctionAbstract() {
+            AWF::FunctionAbstract<9,2>::FunctionAbstract() {
 
         rotation_q = q;
         time_interval_ = time_interval;

@@ -33,7 +33,7 @@
 class SimpleImuUpdateFunction : public ImuUpdateFunction<9> {
 public:
     SimpleImuUpdateFunction(Eigen::Quaterniond q, double time_interval) :
-            ImuUpdateFunction(q, time_interval) {
+            ImuUpdateFunction<9>::ImuUpdateFunction(q, time_interval) {
 
     }
 

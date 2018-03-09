@@ -34,6 +34,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <AuxiliaryTool/GravityOrientationFunction.h>
+#include <AuxiliaryTool/ImuUpdateFunction.h>
 #include <AuxiliaryTool/SimpleImuUpdateFunction.h>
 
 #include "KalmanFilterBase.h"
