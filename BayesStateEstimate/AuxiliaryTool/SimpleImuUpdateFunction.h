@@ -27,10 +27,13 @@
 #ifndef COMPLEXITYPOSITIONING_SIMPLEIMUUPDATEFUNCTION_H
 #define COMPLEXITYPOSITIONING_SIMPLEIMUUPDATEFUNCTION_H
 
+#include <AWF.h>
 #include "ImuUpdateFunction.h"
-class SimpleImuUpdateFunction:public ImuUpdateFunction<9> {
-    SimpleImuUpdateFunction(Eigen::Quaternion q,double time_interval):
-            ImuUpdateFunction(q,time_interval){
+
+class SimpleImuUpdateFunction : public ImuUpdateFunction<9> {
+public:
+    SimpleImuUpdateFunction(Eigen::Quaterniond q, double time_interval) :
+            ImuUpdateFunction(q, time_interval) {
 
     }
 
@@ -40,10 +43,20 @@ class SimpleImuUpdateFunction:public ImuUpdateFunction<9> {
      * @param input
      * @return
      */
-    Eigen::MatrixXd compute(Eigen::MatrixXd state, Eigen::MatrixXd input){
-        Eigen::MatrixXd out_state(9,1);
+    Eigen::MatrixXd compute(Eigen::MatrixXd state, Eigen::MatrixXd input) {
+        Eigen::MatrixXd out_state(9, 1);
 
+        Eigen::Quaterniond r_q = angle2q(state.block(6, 0, 3, 1));
 
+        r_q = r_q * angle2q(input.block(3, 0, 3, 1));
+        r_q.normalize();
+
+        Eigen::Vector3d acc = r_q.toRotationMatrix() * input.block(0, 0, 3, 1) + Eigen::Vector3d(0, 0, -9.8);
+
+        out_state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) + state.block(3, 0, 3, 1) * time_interval_;
+        out_state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) + acc * time_interval_;
+        out_state.block(6, 0, 3, 1) = r_q.toRotationMatrix().eulerAngles(0, 1, 2);
+        return out_state;
 
     }
 

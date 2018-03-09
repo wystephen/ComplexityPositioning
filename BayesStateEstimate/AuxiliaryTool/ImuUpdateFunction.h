@@ -27,7 +27,7 @@
 #ifndef COMPLEXITYPOSITIONING_IMUUPDATEFUNCTION_H
 #define COMPLEXITYPOSITIONING_IMUUPDATEFUNCTION_H
 
-#include "AWF.h"
+#include <AWF.h>
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
@@ -35,7 +35,8 @@
 template<int OutDim>
 class ImuUpdateFunction : public AWF::FunctionAbstract<OutDim, 2> {
 public:
-    ImuUpdateFunction(Eigen::Quaterniond q, double time_interval) : FunctionAbstract() {
+    ImuUpdateFunction(Eigen::Quaterniond q, double time_interval) :
+            FunctionAbstract() {
 
         rotation_q = q;
         time_interval_ = time_interval;
@@ -67,7 +68,7 @@ public:
      * @param input
      * @return
      */
-    virtual Eigen::Matrix compute(Eigen::MatrixXd state, Eigen::MatrixXd input) {
+    virtual Eigen::MatrixXd compute(Eigen::MatrixXd state, Eigen::MatrixXd input) {
         Eigen::MatrixXd out_state(OutDim, 1);
         return out_state;
     }

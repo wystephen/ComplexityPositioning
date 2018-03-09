@@ -34,6 +34,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <AuxiliaryTool/GravityOrientationFunction.h>
+#include <AuxiliaryTool/SimpleImuUpdateFunction.h>
 
 #include "KalmanFilterBase.h"
 #include "KalmanFilterBase.h"
@@ -96,74 +97,20 @@ namespace BSE {
         Eigen::Matrix<double, 9, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
                                                   Eigen::Matrix<double, 6, 6> noise_matrix) {
 
-            Eigen::Vector3d acc(input.block(0, 0, 3, 1));
-            Eigen::Vector3d gyr(input.block(0, 0, 3, 1));
+            auto siuf = SimpleImuUpdateFunction(rotation_q_, time_interval_);
+            auto jac_vec = siuf.derivative(state_x_, input);
+            auto A = jac_vec[0];
+            auto B = jac_vec[1];
 
-            if (IS_DEBUG) {
-                std::cout << "acc in navigation frame:"
-                          << (rotation_q_ * acc).transpose()
-                          << std::endl;
-            }
+            prob_state_ = A * prob_state_ * A.transpose() +
+                          B * noise_matrix * B.transpose();
 
-            if (gyr.norm() > 1e-8) {
-                Eigen::Quaterniond tmp_q =
-                        Eigen::AngleAxisd(gyr(0), Eigen::Vector3d::UnitX())
-                        * Eigen::AngleAxisd(gyr(1), Eigen::Vector3d::UnitY())
-                        * Eigen::AngleAxisd(gyr(2), Eigen::Vector3d::UnitZ());
-
-                rotation_q_ = rotation_q_ * tmp_q;
-
-                rotation_q_.normalize();
-
-            }
-
-
-            Eigen::Vector3d gravity_g(0, 0, local_g_);
-            Eigen::Vector3d linear_acc = rotation_q_.toRotationMatrix() * acc + gravity_g;
-            if (IS_DEBUG) {
-                std::cout << "acc in navigation frame:" << (rotation_q_ * acc).transpose();
-                std::cout << "\nlinear_acc:" << linear_acc.transpose() << std::endl;
-            }
-
-            auto converted_input = input;
-            converted_input.block(0, 0, 3, 1) = linear_acc;
-            converted_input.block(3, 0, 3, 1) = gyr;
-
-
-            Eigen::MatrixXd A_ = Eigen::MatrixXd::Zero(9, 9);
-            // x y z
-            A_.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity();
-            A_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
-            // vx vy vz
-            A_.block(3, 3, 3, 3) = Eigen::Matrix3d::Identity();
-            // wx wy wz
-            A_.block(6, 6, 3, 3) = Eigen::Matrix3d::Identity();
-
-            Eigen::MatrixXd B_ = Eigen::MatrixXd::Zero(9, 6);
-
-
-            B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
-//            B_.block(6, 3, 3, 3) = Eigen::Matrix3d::Identity() * time_interval_;
-
-
-            state_x_ = A_ * state_x_ + B_ * converted_input;
-            state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
-
-            if (IS_DEBUG) {
-                std::cout << "state trans P:"
-                          << prob_state_ << std::endl;
-                std::cout << " A * P * A^ T "
-                          << A_ * prob_state_ * A_.transpose() << std::endl;
-                std::cout << "B * cove * B.transpose() "
-                          << B_ * converted_input * B_.transpose() << std::endl;
-            }
-            // unconverted value
-//                         B_.block(6, 0, 3, 3) = rotate_q_.toRotationMatrix() ;//* time_interval_;
-            prob_state_ = A_ * prob_state_ * A_.transpose() +
-                          B_ * noise_matrix * B_.transpose();
+            prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose());
             if (std::isnan(prob_state_.sum())) {
-                std::cout << "state prob is naa: " << prob_state_ << std::endl;
+                ERROR_MSG_FLAG("porb_state_ is nan.");
             }
+
+            state_x_ = siuf.compute(state_x_, input);
 
 
             return state_x_;
