@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
                                         Eigen::Matrix3d::Identity() * 0.000251001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 
-//                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity()* 0.00025);
+                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity()* 0.00025);
 
                 /// angle constraint through acc.
 //                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
