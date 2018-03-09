@@ -253,6 +253,7 @@ int main(int argc, char *argv[]) {
         plt::legend();
 
 
+
         plt::figure();
         for (int i(0); i < 3; ++i) {
             plt::named_plot(std::to_string(i), velocity[i]);
@@ -317,10 +318,10 @@ int main(int argc, char *argv[]) {
 
     };
 //
-//    f(left_imu_data, "left_foot");
+    f(left_imu_data, "left_foot");
 
 //    f(right_imu_data, "right_foot");
-    f(head_imu_data, "head");
+//    f(head_imu_data, "head");
 
     plt::show();
 

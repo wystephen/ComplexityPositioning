@@ -48,7 +48,7 @@ public:
 
         Eigen::Quaterniond r_q = angle2q(state.block(6, 0, 3, 1));
 
-        r_q = r_q * angle2q(input.block(3, 0, 3, 1));
+        r_q = r_q * angle2q(input.block(3, 0, 3, 1)*time_interval_);
         r_q.normalize();
 
         Eigen::Vector3d acc = r_q.toRotationMatrix() * input.block(0, 0, 3, 1) + Eigen::Vector3d(0, 0, -9.8);
