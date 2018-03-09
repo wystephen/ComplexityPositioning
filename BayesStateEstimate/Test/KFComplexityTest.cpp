@@ -245,9 +245,9 @@ int main(int argc, char *argv[]) {
                 filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity()* 0.00025);
 
                 /// angle constraint through acc.
-//                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-//                                        Eigen::Matrix3d::Identity() * 0.0001,
-//                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
+                                        Eigen::Matrix3d::Identity() * 0.1,
+                                        BSE::MeasurementMethodType::NormalAngleConstraint);
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
@@ -263,8 +263,8 @@ int main(int argc, char *argv[]) {
                 zv_flag.push_back(0.0);
             }
 
-            Eigen::VectorXd state_simple = filter.getState_();
-            Eigen::VectorXd state = filter_complex.state_x_;
+            Eigen::VectorXd state= filter.getState_();
+            Eigen::VectorXd state_simple = filter_complex.state_x_;
 //        std::cout << state.transpose() << std::endl;
             for (int j(0); j < 3; ++j) {
                 pose_simple[j].push_back(state_simple(j));
@@ -351,7 +351,7 @@ int main(int argc, char *argv[]) {
 
     };
 //
-    f(left_imu_data, "left_foot");
+//    f(left_imu_data, "left_foot");
     f(right_imu_data, "right_foot");
 //    f(head_imu_data, "head");
 

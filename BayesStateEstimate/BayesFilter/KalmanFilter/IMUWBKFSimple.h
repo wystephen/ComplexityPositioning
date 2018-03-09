@@ -270,33 +270,34 @@ namespace BSE {
 //                         std::cout << "local g :" << local_g_ << std::endl;
 //                         std::cout <<"linear acc:"
 //                                   << (rotate_q_.toRotationMatrix() * m).transpose() << std::endl;
+//                         state.block(6,0,3,1)  = rotate_q_.toRotationMatrix().eulerAngles(0,1,2);
                          auto the_y = [tmp_acc](Eigen::Vector3d w) -> Eigen::Vector3d {
                              Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(w(0), Eigen::Vector3d::UnitX())
                                                         * Eigen::AngleAxisd(w(1), Eigen::Vector3d::UnitY())
                                                         * Eigen::AngleAxisd(w(2), Eigen::Vector3d::UnitZ());
 
-                             return tmp_q * tmp_acc;
+                             return tmp_q * Eigen::Vector3d(0, 0, 9.81);
                          };
 
 
                          state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 //                dx =
                          H_ = Eigen::Matrix3d::Identity();
-                         double epsilon = 0.00000000001;
+                         double epsilon = 1e-10;
                          for (int i(0); i < 3; ++i) {
                              Eigen::Vector3d offset(0, 0, 0);
                              offset(i) += epsilon;
                              H_.block(0, i, 3, 1) = (the_y(state.block(6, 0, 3, 1) + offset) -
                                                      the_y(state.block(6, 0, 3, 1))) / epsilon;
-//                             H_.block(i,0, 1, 3) = (the_y(state.block(6, 0, 3, 1) + offset) -
-//                                                     the_y(state.block(6, 0, 3, 1))).transpose() / epsilon;
                          }
 
 
-                         K_ = (state_prob.block(6, 6, 3, 3) * H_.transpose().eval()) *
+                         K_ = (state_prob * H_.transpose().eval()) *
                               (H_ * state_prob.block(6, 6, 3, 3) * H_.transpose() + cov_m).inverse();
 //                         dx = K_ * ( the_y(state.block(6, 0, 3, 1)) + Eigen::Vector3d(0,0,local_g_));
-                         dx = K_ * ((rotate_q_ * tmp_acc) + Eigen::Vector3d(0, 0, local_g_));
+//                         dx = K_ * ((rotate_q_ * tmp_acc) - Eigen::Vector3d(0, 0, local_g_));
+//                         dx = K_ * ((rotate_q_ * tmp_acc) - Eigen::Vector3d(0, 0, tmp_acc.norm()));
+                         dx = K_ * (tmp_acc - the_y(state_.block(6, 0, 3, 1)));
 
 //                         Eigen::Quaterniond tmp_q =
 //                                 Eigen::AngleAxisd(dx(0), Eigen::Vector3d::UnitX())
@@ -306,13 +307,14 @@ namespace BSE {
 //                         rotate_q_.normalize();
 //                         state.block(6, 0, 3, 1) =
 //                                 rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+                         state.block(0, 0, 6, 1) += dx.block(0, 0, 6, 1);
 
                          Eigen::Matrix3d rotation_m(rotate_q_.toRotationMatrix());
                          Eigen::Matrix3d omega = Eigen::Matrix3d::Zero();
-                         omega << 0.0, dx(2), -dx(1),
-                                 -dx(2), 0.0, dx(0),
-                                 dx(1), -dx(0), 0.0;
-//                         omega *= -1.0;
+                         omega << 0.0, dx(2 + 6), -dx(1 + 6),
+                                 -dx(2 + 6), 0.0, dx(0 + 6),
+                                 dx(1 + 6), -dx(0 + 6), 0.0;
+                         omega *= -1.0;
 //                         rotation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
 //                                      (2.0 * Eigen::Matrix3d::Identity() - omega).inverse()
 //                                      * rotation_m;
@@ -320,6 +322,7 @@ namespace BSE {
 
 //                         rotate_q_ = delta_q.inverse() * rotate_q_;
                          rotate_q_ = Eigen::Quaterniond(rotation_m);
+                         state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
                          return;
                      })});
         }
