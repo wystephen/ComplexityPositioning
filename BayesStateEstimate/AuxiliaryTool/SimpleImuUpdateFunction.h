@@ -34,6 +34,7 @@ class SimpleImuUpdateFunction : public ImuUpdateFunction<9> {
 public:
     SimpleImuUpdateFunction(Eigen::Quaterniond q, double time_interval, double local_gravity) :
             ImuUpdateFunction<9>::ImuUpdateFunction(q, time_interval, local_gravity) {
+        epsilon_ = 1e-7;
 
     }
 
