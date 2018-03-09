@@ -35,11 +35,12 @@
 template<int OutDim>
 class ImuUpdateFunction : public AWF::FunctionAbstract<9, 2> {
 public:
-    ImuUpdateFunction(Eigen::Quaterniond q, double time_interval) :
-            AWF::FunctionAbstract<9,2>::FunctionAbstract() {
+    ImuUpdateFunction(Eigen::Quaterniond q, double time_interval, double local_gravity) :
+            AWF::FunctionAbstract<9, 2>::FunctionAbstract() {
 
         rotation_q = q;
         time_interval_ = time_interval;
+        local_gravity_ = local_gravity;
     }
 
     /**
@@ -104,6 +105,7 @@ public:
 
     Eigen::Quaterniond rotation_q = Eigen::Quaterniond::Identity();
     double time_interval_ = 0.0;
+    double local_gravity_ = -9.81;
 
 
 };
