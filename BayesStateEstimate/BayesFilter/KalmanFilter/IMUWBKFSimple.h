@@ -308,7 +308,7 @@ namespace BSE {
                                  Eigen::AngleAxisd(dx(6), Eigen::Vector3d::UnitX())
                                  * Eigen::AngleAxisd(dx(7), Eigen::Vector3d::UnitY())
                                  * Eigen::AngleAxisd(dx(8), Eigen::Vector3d::UnitZ());
-                         rotate_q_ = tmp_q.inverse() * rotate_q_;
+                         rotate_q_ = tmp_q * rotate_q_;
                          rotate_q_.normalize();
                          state.block(6, 0, 3, 1) =
                                  rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
