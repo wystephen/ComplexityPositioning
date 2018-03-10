@@ -280,7 +280,7 @@ namespace BSE {
                                                         * Eigen::AngleAxisd(w(1), Eigen::Vector3d::UnitY())
                                                         * Eigen::AngleAxisd(w(2), Eigen::Vector3d::UnitZ());
 
-                             return tmp_q.inverse() * Eigen::Vector3d(0, 0, 9.837);
+                             return tmp_q.inverse() * Eigen::Vector3d(0, 0, tmp_acc.norm());
                          };
 
 
