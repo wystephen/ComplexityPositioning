@@ -31,10 +31,10 @@
 #include <Eigen/Dense>
 #include <AWF.h>
 
-class GravityOrientationFunction : public AWF::FunctionAbstract<1, 1> {
+class GravityOrientationFunction : public AWF::FunctionAbstract {
 public:
     GravityOrientationFunction(Eigen::Vector3d acc, double g, double initial_yaw) :
-            FunctionAbstract() {
+            FunctionAbstract(1,1) {
         acc_ = acc;
         g_ = g;
         yaw_ = initial_yaw;
