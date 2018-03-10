@@ -324,8 +324,8 @@ int main(int argc, char *argv[]) {
         plt::legend();
 
         plt::figure();
-        plt::named_plot("ekf trace", pose[0], pose[1], "-");
-        plt::named_plot("simple trace", pose_simple[0], pose_simple[1],"-");
+        plt::named_plot("ekf trace", pose[0], pose[1], "-+");
+        plt::named_plot("simple trace", pose_simple[0], pose_simple[1],"-+");
         plt::named_plot("optimized trace",
                         optimize_trace_vec[0],
                         optimize_trace_vec[1], "*");
