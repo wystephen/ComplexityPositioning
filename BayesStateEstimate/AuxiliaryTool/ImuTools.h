@@ -45,10 +45,10 @@ namespace BSE {
             assert(u.rows() == 6 || "u must be a 6 rows matrix(each col represent acc and gyro at one moement");
             Eigen::Vector3d ya_m;
             double g = 9.8;
-            double sigma_a_ = 0.05;
-            double sigma_g_ = 0.05 * M_PI / 180.0;
+            double sigma_a_ = 0.03;
+            double sigma_g_ = 0.03 * M_PI / 180.0;
             double ZeroDetectorWindowSize_ = u.rows();
-            double gamma_ = 100;
+            double gamma_ = 200;
 
             double T(0.0);
 
