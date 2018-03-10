@@ -227,9 +227,9 @@ int main(int argc, char *argv[]) {
                             measurement_noise_matrix(0, 0) = 0.1;
                         }
                         // correct
-//                        filter.MeasurementState(measurement_data,
-//                                                measurement_noise_matrix,
-//                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+                        filter.MeasurementState(measurement_data,
+                                                measurement_noise_matrix,
+                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
                     }
                 }
@@ -245,9 +245,9 @@ int main(int argc, char *argv[]) {
                 filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity()* 0.00025);
 
                 /// angle constraint through acc.
-                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-                                        Eigen::Matrix3d::Identity() * 0.1,
-                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+//                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
+//                                        Eigen::Matrix3d::Identity() * 0.1,
+//                                        BSE::MeasurementMethodType::NormalAngleConstraint);
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
