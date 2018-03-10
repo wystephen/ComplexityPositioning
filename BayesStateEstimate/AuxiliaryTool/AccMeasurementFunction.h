@@ -31,7 +31,7 @@
 
 class AccMeasurementFunction:public AWF::FunctionAbstract {
 public:
-    AccMeasurementFunction(int out_dim, int in_number) : FunctionAbstract(out_dim, in_number) {
+    AccMeasurementFunction() : FunctionAbstract(9, 1) {
 
     }
 
