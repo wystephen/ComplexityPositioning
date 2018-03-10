@@ -301,16 +301,14 @@ namespace BSE {
 
                          K_ = (state_prob * H_.transpose().eval()) *
                               (H_ * state_prob * H_.transpose() + cov_m).inverse();
-//                         dx = K_ * ( the_y(state.block(6, 0, 3, 1)) + Eigen::Vector3d(0,0,local_g_));
-//                         dx = K_ * ((rotate_q_ * tmp_acc) - Eigen::Vector3d(0, 0, local_g_));
-//                         dx = K_ * ((rotate_q_ * tmp_acc) - Eigen::Vector3d(0, 0, tmp_acc.norm()));
+
                          dx = K_ * (tmp_acc - the_y(state_));
 
                          Eigen::Quaterniond tmp_q =
-                                 Eigen::AngleAxisd(dx(0), Eigen::Vector3d::UnitX())
-                                 * Eigen::AngleAxisd(dx(1), Eigen::Vector3d::UnitY())
-                                 * Eigen::AngleAxisd(dx(2), Eigen::Vector3d::UnitZ());
-                         rotate_q_ = tmp_q * rotate_q_;
+                                 Eigen::AngleAxisd(dx(6), Eigen::Vector3d::UnitX())
+                                 * Eigen::AngleAxisd(dx(7), Eigen::Vector3d::UnitY())
+                                 * Eigen::AngleAxisd(dx(8), Eigen::Vector3d::UnitZ());
+                         rotate_q_ = tmp_q.inverse() * rotate_q_;
                          rotate_q_.normalize();
                          state.block(6, 0, 3, 1) =
                                  rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
