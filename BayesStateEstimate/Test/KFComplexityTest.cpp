@@ -226,10 +226,10 @@ int main(int argc, char *argv[]) {
                         } else {
                             measurement_noise_matrix(0, 0) = 0.1;
                         }
-                        // correct
-                        filter.MeasurementState(measurement_data,
-                                                measurement_noise_matrix,
-                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+                        // correcting based on UWB measurements.
+//                        filter.MeasurementState(measurement_data,
+//                                                measurement_noise_matrix,
+//                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
                     }
                 }
@@ -245,9 +245,9 @@ int main(int argc, char *argv[]) {
                 filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00025);
 
                 /// angle constraint through acc.
-                double last_diff = std::abs(imu_data(i - 1, 6) - 9.83);
-                double current_diff = std::abs(imu_data(i, 6) - 9.83);
-                double next_diff = std::abs(imu_data(i + 1, 6) - 9.83);
+                double last_diff = std::abs(imu_data(i - 1, 3) - 9.837);
+                double current_diff = std::abs(imu_data(i, 3) - 9.837);
+                double next_diff = std::abs(imu_data(i + 1, 3) - 9.837);
                 if (current_diff < last_diff && current_diff < next_diff) {
                     filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
                                             Eigen::Matrix3d::Identity() * 1 * M_PI / 180.0,
