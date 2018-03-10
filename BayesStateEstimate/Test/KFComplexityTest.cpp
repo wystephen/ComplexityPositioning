@@ -248,12 +248,18 @@ int main(int argc, char *argv[]) {
                 double last_diff = std::abs(imu_data.block(i - 1, 1, 1, 3).norm() - 9.837);
                 double current_diff = std::abs(imu_data.block(i, 1, 1, 3).norm() - 9.837);
                 double next_diff = std::abs(imu_data.block(i + 1, 1, 1, 3).norm() - 9.837);
-                if (current_diff < last_diff && current_diff < next_diff) {
-                    filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-                                            Eigen::Matrix3d::Identity() * 11 * M_PI / 180.0,
-                                            BSE::MeasurementMethodType::NormalAngleConstraint);
-
+                int zv_index = zv_flag.size()-1;
+                bool last_zv_flag = true;
+                for(int d(0);d<15;++d){
+                    if(!zv_flag[zv_index-d]){
+                       last_zv_flag=false;
+                    }
                 }
+                if(last_zv_flag)
+                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
+                                        Eigen::Matrix3d::Identity() * 11 * M_PI / 180.0,
+                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
