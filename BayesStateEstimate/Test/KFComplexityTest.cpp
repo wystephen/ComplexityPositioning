@@ -152,8 +152,8 @@ int main(int argc, char *argv[]) {
         std::cout << "costed time :" << AWF::getDoubleSecondTime() - time_begin
                   << std::endl;
         std::vector<std::vector<double>> pose_simple = {{},
-                                                 {},
-                                                 {}};
+                                                        {},
+                                                        {}};
         std::vector<std::vector<double>> pose = {{},
                                                  {},
                                                  {}};
@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
 
 
             auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
-                                         process_noise_matrix);
+                                                              process_noise_matrix);
 
             double uwb_index = 0;
             /// uwb measurement
@@ -242,12 +242,18 @@ int main(int argc, char *argv[]) {
                                         Eigen::Matrix3d::Identity() * 0.000251001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 
-                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity()* 0.00025);
+                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00025);
 
                 /// angle constraint through acc.
-                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-                                        Eigen::Matrix3d::Identity() * 1 * M_PI / 180.0,
-                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+                double last_diff = std::abs(imu_data(i - 1, 6) - 9.83);
+                double current_diff = std::abs(imu_data(i, 6) - 9.83);
+                double next_diff = std::abs(imu_data(i + 1, 6) - 9.83);
+                if (current_diff < last_diff && current_diff < next_diff) {
+                    filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
+                                            Eigen::Matrix3d::Identity() * 1 * M_PI / 180.0,
+                                            BSE::MeasurementMethodType::NormalAngleConstraint);
+
+                }
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
@@ -263,7 +269,7 @@ int main(int argc, char *argv[]) {
                 zv_flag.push_back(0.0);
             }
 
-            Eigen::VectorXd state= filter.getState_();
+            Eigen::VectorXd state = filter.getState_();
             Eigen::VectorXd state_simple = filter_complex.state_x_;
 //        std::cout << state.transpose() << std::endl;
             for (int j(0); j < 3; ++j) {
@@ -325,7 +331,7 @@ int main(int argc, char *argv[]) {
 
         plt::figure();
         plt::named_plot("ekf trace", pose[0], pose[1], "-+");
-        plt::named_plot("simple trace", pose_simple[0], pose_simple[1],"-+");
+        plt::named_plot("simple trace", pose_simple[0], pose_simple[1], "-+");
         plt::named_plot("optimized trace",
                         optimize_trace_vec[0],
                         optimize_trace_vec[1], "*");
