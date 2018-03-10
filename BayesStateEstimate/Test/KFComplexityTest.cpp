@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {
 
                 /// angle constraint through acc.
                 filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-                                        Eigen::Matrix3d::Identity() * 0.001 * M_PI / 180.0,
+                                        Eigen::Matrix3d::Identity() * 0.1 * M_PI / 180.0,
                                         BSE::MeasurementMethodType::NormalAngleConstraint);
 
                 if (zv_flag.size() > 3 &&
