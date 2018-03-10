@@ -30,10 +30,10 @@
 #include <AWF.h>
 #include "ImuUpdateFunction.h"
 
-class SimpleImuUpdateFunction : public ImuUpdateFunction<9> {
+class SimpleImuUpdateFunction : public ImuUpdateFunction {
 public:
     SimpleImuUpdateFunction(Eigen::Quaterniond q, double time_interval, double local_gravity) :
-            ImuUpdateFunction<9>::ImuUpdateFunction(q, time_interval, local_gravity) {
+            ImuUpdateFunction(9, q, time_interval, local_gravity) {
         epsilon_ = 1e-7;
 
     }

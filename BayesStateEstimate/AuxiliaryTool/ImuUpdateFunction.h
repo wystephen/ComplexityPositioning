@@ -32,11 +32,10 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-template<int OutDim>
 class ImuUpdateFunction : public AWF::FunctionAbstract {
 public:
-    ImuUpdateFunction(Eigen::Quaterniond q, double time_interval, double local_gravity) :
-            FunctionAbstract(OutDim,2) {
+    ImuUpdateFunction(int out_dim, Eigen::Quaterniond q, double time_interval, double local_gravity) :
+            FunctionAbstract(out_dim, 2) {
 
         rotation_q = q;
         time_interval_ = time_interval;
