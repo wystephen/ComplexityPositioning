@@ -274,28 +274,29 @@ namespace BSE {
 //                         std::cout <<"linear acc:"
 //                                   << (rotate_q_.toRotationMatrix() * m).transpose() << std::endl;
 //                         state.block(6,0,3,1)  = rotate_q_.toRotationMatrix().eulerAngles(0,1,2);
-                         auto the_y = [tmp_acc](Eigen::Matrix<double,9,1> u) -> Eigen::Vector3d {
-                             Eigen::Matrix<double,3,1> w = u.block(6,0,3,1);
+                         auto the_y = [tmp_acc](Eigen::Matrix<double, 9, 1> u) -> Eigen::Vector3d {
+                             Eigen::Matrix<double, 3, 1> w = u.block(6, 0, 3, 1);
                              Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(w(0), Eigen::Vector3d::UnitX())
                                                         * Eigen::AngleAxisd(w(1), Eigen::Vector3d::UnitY())
                                                         * Eigen::AngleAxisd(w(2), Eigen::Vector3d::UnitZ());
 
-                             return tmp_q.inverse() * Eigen::Vector3d(0, 0, tmp_acc.norm());
+//                             return tmp_q.inverse() * Eigen::Vector3d(0, 0, tmp_acc.norm());
+                             return tmp_q.inverse() * Eigen::Vector3d(0, 0, 9.837);
                          };
 
 
                          state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 //                dx =
-                         H_ = Eigen::Matrix<double,3,9>::Zero();
+                         H_ = Eigen::Matrix<double, 3, 9>::Zero();
                          double epsilon = 1e-10;
                          auto src_value = the_y(state);
-                         Eigen::Matrix<double,9,1> offset;
+                         Eigen::Matrix<double, 9, 1> offset;
                          offset.setZero();
                          for (int i(0); i < 9; ++i) {
                              offset(i) += epsilon;
                              H_.block(0, i, 3, 1) = (the_y(state + offset) -
                                                      src_value) / epsilon;
-                             offset(i) -=epsilon;
+                             offset(i) -= epsilon;
                          }
 
 
