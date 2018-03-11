@@ -526,11 +526,12 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
-    globalOptimizer.optimize(3000);
+    globalOptimizer.optimize(30000);
 //    globalOptimizer.optimize(10);
 
 
     // get pose
+
     std::vector<std::vector<double>> graph_left = {{},
                                                    {},
                                                    {}};
