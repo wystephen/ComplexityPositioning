@@ -255,9 +255,9 @@ int main(int argc, char *argv[]) {
                        last_zv_flag=false;
                     }
                 }
-                if(std::abs(imu_data(i,3)-9.75)<0.15)
+                if(std::abs(imu_data(i,3)-9.7)<0.01 && current_diff < 0.02)
                 filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-                                        Eigen::Matrix3d::Identity() * 1 * M_PI / 180.0,
+                                        Eigen::Matrix3d::Identity() * 0.1 * M_PI / 180.0,
                                         BSE::MeasurementMethodType::NormalAngleConstraint);
 
 

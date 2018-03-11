@@ -305,6 +305,7 @@ namespace BSE {
 
                          dx = K_ * (tmp_acc - the_y(state_));
 
+                         std::cout << "===========================================================" << std::endl;
                          std::cout << "oldacc:" << (rotate_q_ * tmp_acc).transpose() << std::endl;
 
                          Eigen::Quaterniond tmp_q =
@@ -317,8 +318,10 @@ namespace BSE {
                          state.block(6, 0, 3, 1) =
                                  rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
-                         std::cout << "   acc:" << tmp_acc.transpose() << std::endl;
+                         std::cout << "   acc:" << tmp_acc.transpose()
+                                   << "acc norm:" << tmp_acc.norm() << std::endl;
                          std::cout << "newacc:" << (rotate_q_ * tmp_acc).transpose() << std::endl;
+                         std::cout << "===========================================================" << std::endl;
 
                          state.block(0, 0, 6, 1) += dx.block(0, 0, 6, 1);
 
