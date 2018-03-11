@@ -135,8 +135,8 @@ int main(int argc, char *argv[]) {
             filter.setTime_interval_(tmp_time_interval);
             filter_complex.time_interval_ = tmp_time_interval;
         }
-        filter.setLocal_g_(-9.81);
-        filter_complex.local_g_ = -9.81;
+        filter.setLocal_g_(-9.837);
+        filter_complex.local_g_ = -9.837;
 //    filter.IS_DEBUG = true;
 
 
@@ -255,10 +255,12 @@ int main(int argc, char *argv[]) {
                        last_zv_flag=false;
                     }
                 }
-                if(std::abs(imu_data(i,3)-9.7)<0.01 && current_diff < 0.02)
-                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-                                        Eigen::Matrix3d::Identity() * 0.1 * M_PI / 180.0,
-                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+//                if(std::abs(imu_data(i,3)-9.74)<0.01 && current_diff < 0.001)
+//                if((imu_data.block(i,1,1,3).transpose()-
+//                        Eigen::Vector3d(-1.263,0.5163,9.742)).norm()<0.02)
+//                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
+//                                        Eigen::Matrix3d::Identity() * 0.1 * M_PI / 180.0,
+//                                        BSE::MeasurementMethodType::NormalAngleConstraint);
 
 
                 if (zv_flag.size() > 3 &&
@@ -341,6 +343,10 @@ int main(int argc, char *argv[]) {
         plt::named_plot("optimized trace",
                         optimize_trace_vec[0],
                         optimize_trace_vec[1], "*");
+
+
+        AWF::writeVectorsToCsv("./XsenseResult/ekf.csv",pose);
+        AWF::writeVectorsToCsv("./XsenseResult/pose.csv",pose_simple);
 
         double min_v(0.0), max_v(0.0);
         min_v = std::min(std::min(*std::min_element(pose[0].begin(), pose[0].end()),
