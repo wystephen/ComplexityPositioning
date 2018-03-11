@@ -343,11 +343,13 @@ namespace BSE {
 //                         rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
 
 //                         rotate_q_ = delta_q.inverse() * rotate_q_;
-                         if(rotation_m.eulerAngles(0,1,2).norm()>0.5){
-                            rotate_q_.normalize();
-                             std::cout << "nomr:" << rotation_m.eulerAngles(0,1,2).transpose() << std::endl;
+                         if (rotation_m.eulerAngles(0, 1, 2).norm() > 0.5) {
+                             rotate_q_.normalize();
+                             std::cout << "nomr:" << rotation_m.eulerAngles(0, 1, 2).transpose()
+                                       << " diff:" << (tmp_acc - the_y(state_)).transpose()
+                                       << "acc:" << tmp_acc << std::endl;
 
-                         }else{
+                         } else {
 
                              rotate_q_ = Eigen::Quaterniond(rotation_m);
                              rotate_q_.normalize();
