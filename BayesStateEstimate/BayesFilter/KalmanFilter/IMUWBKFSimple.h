@@ -305,17 +305,28 @@ namespace BSE {
 
                          dx = K_ * (tmp_acc - the_y(state_));
 
+
                          Eigen::Quaterniond tmp_q =
                                  Eigen::AngleAxisd(dx(6), Eigen::Vector3d::UnitX())
                                  * Eigen::AngleAxisd(dx(7), Eigen::Vector3d::UnitY())
                                  * Eigen::AngleAxisd(dx(8), Eigen::Vector3d::UnitZ());
                          rotate_q_ = tmp_q * rotate_q_;
+                         if (dx.block(6, 0, 3, 1).norm() > 0.3) {
+                             std::cout << dx.block(6, 0, 3, 1).norm()
+                                       << ":"
+                                       << dx.block(6, 0, 3, 1).transpose()
+                                     << ":"
+
+                                       << tmp_q.toRotationMatrix().eulerAngles(0,1,2)
+                                       << std::endl;
+
+                         }
                          rotate_q_.normalize();
                          state.block(6, 0, 3, 1) =
                                  rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
-                         std::cout << "   acc:" << tmp_acc.transpose() << std::endl;
-                         std::cout << "newacc:" << (rotate_q_ * tmp_acc).transpose() << std::endl;
+//                         std::cout << "   acc:" << tmp_acc.transpose() << std::endl;
+//                         std::cout << "newacc:" << (rotate_q_ * tmp_acc).transpose() << std::endl;
 
                          state.block(0, 0, 6, 1) += dx.block(0, 0, 6, 1);
 

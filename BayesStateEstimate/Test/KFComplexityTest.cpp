@@ -250,8 +250,8 @@ int main(int argc, char *argv[]) {
                 double next_diff = std::abs(imu_data.block(i + 1, 1, 1, 3).norm() - 9.837);
                 int zv_index = zv_flag.size()-1;
                 bool last_zv_flag = true;
-                for(int d(0);d<15;++d){
-                    if(!zv_flag[zv_index-d]){
+                for(int d(0);d<5;++d){
+                    if(zv_index-d>0 && !zv_flag[zv_index-d]){
                        last_zv_flag=false;
                     }
                 }
