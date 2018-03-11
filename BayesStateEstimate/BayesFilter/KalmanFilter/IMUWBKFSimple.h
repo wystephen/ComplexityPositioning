@@ -306,21 +306,21 @@ namespace BSE {
                          dx = K_ * (tmp_acc - the_y(state_));
 
 
-                         Eigen::Quaterniond tmp_q =
-                                 Eigen::AngleAxisd(dx(6), Eigen::Vector3d::UnitX())
-                                 * Eigen::AngleAxisd(dx(7), Eigen::Vector3d::UnitY())
-                                 * Eigen::AngleAxisd(dx(8), Eigen::Vector3d::UnitZ());
-                         rotate_q_ = tmp_q * rotate_q_;
-                         if (dx.block(6, 0, 3, 1).norm() > 0.3) {
-                             std::cout << dx.block(6, 0, 3, 1).norm()
-                                       << ":"
-                                       << dx.block(6, 0, 3, 1).transpose()
-                                     << ":"
-
-                                       << tmp_q.toRotationMatrix().eulerAngles(0,1,2)
-                                       << std::endl;
-
-                         }
+//                         Eigen::Quaterniond tmp_q =
+//                                 Eigen::AngleAxisd(dx(6), Eigen::Vector3d::UnitX())
+//                                 * Eigen::AngleAxisd(dx(7), Eigen::Vector3d::UnitY())
+//                                 * Eigen::AngleAxisd(dx(8), Eigen::Vector3d::UnitZ());
+//                         rotate_q_ = tmp_q * rotate_q_;
+//                         if (dx.block(6, 0, 3, 1).norm() > 0.3) {
+//                             std::cout << dx.block(6, 0, 3, 1).norm()
+//                                       << ":"
+//                                       << dx.block(6, 0, 3, 1).transpose()
+//                                     << ":"
+//
+//                                       << tmp_q.toRotationMatrix().eulerAngles(0,1,2)
+//                                       << std::endl;
+//
+//                         }
                          rotate_q_.normalize();
                          state.block(6, 0, 3, 1) =
                                  rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
@@ -331,20 +331,28 @@ namespace BSE {
                          state.block(0, 0, 6, 1) += dx.block(0, 0, 6, 1);
 
                          //////////////////////////
-//                         Eigen::Matrix3d rotation_m(rotate_q_.toRotationMatrix());
-//                         Eigen::Matrix3d omega = Eigen::Matrix3d::Zero();
-//                         omega << 0.0, dx(2 + 6), -dx(1 + 6),
-//                                 -dx(2 + 6), 0.0, dx(0 + 6),
-//                                 dx(1 + 6), -dx(0 + 6), 0.0;
-////                         omega *= -1.0;
-//                         rotation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
-//                                      (2.0 * Eigen::Matrix3d::Identity() - omega).inverse()
-//                                      * rotation_m;
-////                         rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
-//
-////                         rotate_q_ = delta_q.inverse() * rotate_q_;
-//                         rotate_q_ = Eigen::Quaterniond(rotation_m);
-//                         state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+                         Eigen::Matrix3d rotation_m(rotate_q_.toRotationMatrix());
+                         Eigen::Matrix3d omega = Eigen::Matrix3d::Zero();
+                         omega << 0.0, dx(2 + 6), -dx(1 + 6),
+                                 -dx(2 + 6), 0.0, dx(0 + 6),
+                                 dx(1 + 6), -dx(0 + 6), 0.0;
+                         omega *= -1.0;
+                         rotation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
+                                      (2.0 * Eigen::Matrix3d::Identity() - omega).inverse()
+                                      * rotation_m;
+//                         rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
+
+//                         rotate_q_ = delta_q.inverse() * rotate_q_;
+                         if(rotation_m.eulerAngles(0,1,2).norm()>0.5){
+                            rotate_q_.normalize();
+                             std::cout << "nomr:" << rotation_m.eulerAngles(0,1,2).transpose() << std::endl;
+
+                         }else{
+
+                             rotate_q_ = Eigen::Quaterniond(rotation_m);
+                             rotate_q_.normalize();
+                         }
+                         state.block(6, 0, 3, 1) = rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
                          return;
                      })});

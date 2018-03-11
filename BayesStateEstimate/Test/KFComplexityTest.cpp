@@ -255,7 +255,7 @@ int main(int argc, char *argv[]) {
                        last_zv_flag=false;
                     }
                 }
-                if(last_zv_flag)
+//                if(last_zv_flag)
                 filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
                                         Eigen::Matrix3d::Identity() * 11 * M_PI / 180.0,
                                         BSE::MeasurementMethodType::NormalAngleConstraint);
