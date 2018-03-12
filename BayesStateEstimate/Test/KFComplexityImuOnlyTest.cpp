@@ -42,9 +42,9 @@ int main(int argc, char *argv[]) {
     // load data
     AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
             right_foot_file(dir_name + "RIGHT_FOOT.data"),
-            head_imu_file(dir_name + "HEAD.data"),
-            uwb_file(dir_name + "uwb_result.csv"),
-            beacon_set_file(dir_name + "beaconSet.csv");
+            head_imu_file(dir_name + "HEAD.data");
+//            uwb_file(dir_name + "uwb_result.csv"),
+//            beacon_set_file(dir_name + "beaconSet.csv");
 
     Eigen::MatrixXd left_imu_data = left_foot_file.extractDoulbeMatrix(",");
     Eigen::MatrixXd right_imu_data = right_foot_file.extractDoulbeMatrix(",");
