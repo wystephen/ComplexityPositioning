@@ -526,7 +526,7 @@ int main(int argc, char *argv[]) {
 
     globalOptimizer.initializeOptimization();
     globalOptimizer.setVerbose(true);
-    globalOptimizer.optimize(30000);
+    globalOptimizer.optimize(90000);
 //    globalOptimizer.optimize(10);
 
 
