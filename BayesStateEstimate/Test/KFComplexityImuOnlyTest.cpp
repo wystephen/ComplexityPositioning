@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
     // parameters
-    std::string dir_name = "/home/steve/Data/NewFusingLocationData/0013/";
+    std::string dir_name = "/home/steve/Data/NewFusingLocationData/0015/";
 
 
 
@@ -86,7 +86,6 @@ int main(int argc, char *argv[]) {
     process_noise_matrix.block(3, 3, 3, 3) *= (0.1 * M_PI / 180.0);
 
 
-
     Eigen::MatrixXd initial_prob_matrix = Eigen::MatrixXd::Identity(9, 9);
     initial_prob_matrix.block(0, 0, 3, 3) *= 0.001;
     initial_prob_matrix.block(3, 3, 3, 3) *= 0.001;
@@ -107,7 +106,7 @@ int main(int argc, char *argv[]) {
             &initial_ori,
             &optimize_trace_vec,
             &imu_tool](const Eigen::MatrixXd &imu_data,
-                             std::string data_name) {
+                       std::string data_name) {
         auto filter = BSE::IMUWBKFSimple(
                 initial_prob_matrix);
 
@@ -119,6 +118,9 @@ int main(int argc, char *argv[]) {
         if (std::abs(tmp_time_interval - 0.005) < 0.0001) {
             filter.setTime_interval_(0.005);
             filter_complex.time_interval_ = 0.005;
+        } else if (std::abs(tmp_time_interval - 0.01) < 0.001) {
+            filter.setTime_interval_(0.01);
+            filter_complex.time_interval_ = 0.01;
         } else {
 
             filter.setTime_interval_(tmp_time_interval);
@@ -179,8 +181,6 @@ int main(int argc, char *argv[]) {
             bool tmp_break_flag = false;
 
 
-
-
             if (imu_tool.GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
                 /// zero velocity detector
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
@@ -203,9 +203,9 @@ int main(int argc, char *argv[]) {
 //                if(std::abs(imu_data(i,3)-9.74)<0.01 && current_diff < 0.001)
 //                if((imu_data.block(i,1,1,3).transpose()-
 //                        Eigen::Vector3d(-1.263,0.5163,9.742)).norm()<0.02)
-//                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-//                                        Eigen::Matrix3d::Identity() * 0.1 * M_PI / 180.0,
-//                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
+                                        Eigen::Matrix3d::Identity() * 0.1 * M_PI / 180.0,
+                                        BSE::MeasurementMethodType::NormalAngleConstraint);
 
 
                 if (zv_flag.size() > 3 &&
