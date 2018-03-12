@@ -49,30 +49,26 @@ int main(int argc, char *argv[]) {
     Eigen::MatrixXd left_imu_data = left_foot_file.extractDoulbeMatrix(",");
     Eigen::MatrixXd right_imu_data = right_foot_file.extractDoulbeMatrix(",");
     Eigen::MatrixXd head_imu_data = head_imu_file.extractDoulbeMatrix(",");
-    Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
-    Eigen::MatrixXd beacon_set_data = beacon_set_file.extractDoulbeMatrix(",");
+//    Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
+//    Eigen::MatrixXd beacon_set_data = beacon_set_file.extractDoulbeMatrix(",");
 
-    assert(beacon_set_data.rows() == (uwb_data.cols() - 1));
+//    assert(beacon_set_data.rows() == (uwb_data.cols() - 1));
 
     // get the initial pose based on uwb data.
 
 //    std::cout << uwb_data.block(0, 0, 1, uwb_data.cols()) << std::endl;
 
-    auto uwb_tool = BSE::UwbTools(uwb_data,
-                                  beacon_set_data);
+//    auto uwb_tool = BSE::UwbTools(uwb_data,
+//                                  beacon_set_data);
 
-    Eigen::MatrixXd optimize_trace = uwb_tool.uwb_position_function();
-    Eigen::Vector3d initial_pos = optimize_trace.block(0, 0, 1, 3).transpose();
-    double initial_ori = uwb_tool.computeInitialOri(optimize_trace);
+//    Eigen::MatrixXd optimize_trace = uwb_tool.uwb_position_function();
+    Eigen::Vector3d initial_pos = Eigen::Vector3d(0, 0, 0);
+    double initial_ori = 0.0;
 
     std::vector<std::vector<double>> optimize_trace_vec = {{},
                                                            {},
                                                            {}};
-    for (int i(0); i < optimize_trace.rows(); ++i) {
-        for (int j(0); j < 3; ++j) {
-            optimize_trace_vec[j].push_back(optimize_trace(i, j));
-        }
-    }
+
 
 
 //    std::cout << last_uwb_err
@@ -89,9 +85,6 @@ int main(int argc, char *argv[]) {
     process_noise_matrix.block(0, 0, 3, 3) *= 0.1;
     process_noise_matrix.block(3, 3, 3, 3) *= (0.1 * M_PI / 180.0);
 
-    Eigen::MatrixXd measurement_noise_matrix =
-            Eigen::MatrixXd::Identity(uwb_data.cols() - 1, uwb_data.cols() - 1);
-    measurement_noise_matrix *= 0.1;
 
 
     Eigen::MatrixXd initial_prob_matrix = Eigen::MatrixXd::Identity(9, 9);
@@ -110,14 +103,10 @@ int main(int argc, char *argv[]) {
     auto f = [&process_noise_matrix,
             &initial_prob_matrix,
             &initial_prob_matrix_complex,
-            &measurement_noise_matrix,
-            &uwb_data,
-            &beacon_set_data,
             &initial_pos,
             &initial_ori,
             &optimize_trace_vec,
-            &imu_tool,
-            &optimize_trace](const Eigen::MatrixXd &imu_data,
+            &imu_tool](const Eigen::MatrixXd &imu_data,
                              std::string data_name) {
         auto filter = BSE::IMUWBKFSimple(
                 initial_prob_matrix);
@@ -188,52 +177,8 @@ int main(int argc, char *argv[]) {
             double uwb_index = 0;
             /// uwb measurement
             bool tmp_break_flag = false;
-            while (uwb_data(uwb_index, 0) < imu_data(i, 0)) {
-                uwb_index++;
-                if (uwb_index == uwb_data.rows()) {
-//                    break;
 
-//                    return;
-//                    tmp_break_flag = true;
-                    uwb_index--;
-                    break;
 
-                }
-            }
-//            if(tmp_break_flag)
-//            {
-//                i = imu_data.rows()+10;
-//                break;
-//            }
-            if (uwb_data(uwb_index, 0) - imu_data(i, 0) < 0.01) {
-//                filter.MeasurementState(uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1),
-//                                        measurement_noise_matrix,
-//                                        BSE::MeasurementMethodType::NormalUwbMeasuremnt);
-//                std::cout << "test uwb :" << uwb_data(uwb_index, 0) << ",imu :"
-//                          << imu_data(i, 0) << std::endl;
-
-                for (int k(1); k < uwb_data.cols(); ++k) {
-                    if (uwb_data(uwb_index, k) > 0
-                        && uwb_data(uwb_index, k) < 100.0
-                        && optimize_trace(uwb_index, 3) < 2.0) {
-
-                        Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
-                        measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
-                        measurement_noise_matrix.resize(1, 1);
-                        if (uwb_index < 15) {
-
-                            measurement_noise_matrix(0, 0) = 0.01;
-                        } else {
-                            measurement_noise_matrix(0, 0) = 0.1;
-                        }
-                        // correcting based on UWB measurements.
-//                        filter.MeasurementState(measurement_data,
-//                                                measurement_noise_matrix,
-//                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
-
-                    }
-                }
-            }
 
 
             if (imu_tool.GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
@@ -248,11 +193,11 @@ int main(int argc, char *argv[]) {
                 double last_diff = std::abs(imu_data.block(i - 1, 1, 1, 3).norm() - 9.837);
                 double current_diff = std::abs(imu_data.block(i, 1, 1, 3).norm() - 9.837);
                 double next_diff = std::abs(imu_data.block(i + 1, 1, 1, 3).norm() - 9.837);
-                int zv_index = zv_flag.size()-1;
+                int zv_index = zv_flag.size() - 1;
                 bool last_zv_flag = true;
-                for(int d(0);d<5;++d){
-                    if(zv_index-d>0 && !zv_flag[zv_index-d]){
-                       last_zv_flag=false;
+                for (int d(0); d < 5; ++d) {
+                    if (zv_index - d > 0 && !zv_flag[zv_index - d]) {
+                        last_zv_flag = false;
                     }
                 }
 //                if(std::abs(imu_data(i,3)-9.74)<0.01 && current_diff < 0.001)
@@ -345,8 +290,8 @@ int main(int argc, char *argv[]) {
                         optimize_trace_vec[1], "*");
 
 
-        AWF::writeVectorsToCsv("./XsenseResult/ekf.csv",pose);
-        AWF::writeVectorsToCsv("./XsenseResult/pose.csv",pose_simple);
+        AWF::writeVectorsToCsv("./XsenseResult/ekf.csv", pose);
+        AWF::writeVectorsToCsv("./XsenseResult/pose.csv", pose_simple);
 
         double min_v(0.0), max_v(0.0);
         min_v = std::min(std::min(*std::min_element(pose[0].begin(), pose[0].end()),
