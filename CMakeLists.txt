@@ -139,6 +139,9 @@ target_link_libraries(KalmanFilterTester ${PYTHON_LIBRARIES})
 add_executable(KFComplexityTester BayesStateEstimate/Test/KFComplexityTest.cpp)
 target_link_libraries(KFComplexityTester ${PYTHON_LIBRARIES})
 
+add_executable(KFCImuTester BayesStateEstimate/Test/KFComplexityImuOnlyTest.cpp)
+target_link_libraries(KFCImuTester ${PYTHON_LIBRARIES})
+
 add_executable(XsenseIntegrateTest BayesStateEstimate/Test/XsenseIntegrateTest.cpp)
 target_link_libraries(XsenseIntegrateTest ${PYTHON_LIBRARIES})
 
