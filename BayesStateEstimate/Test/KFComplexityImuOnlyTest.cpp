@@ -27,6 +27,8 @@
 #include "../AuxiliaryTool/ImuTools.cpp"
 
 
+
+
 namespace plt = matplotlibcpp;
 
 
@@ -203,9 +205,9 @@ int main(int argc, char *argv[]) {
 //                if(std::abs(imu_data(i,3)-9.74)<0.01 && current_diff < 0.001)
 //                if((imu_data.block(i,1,1,3).transpose()-
 //                        Eigen::Vector3d(-1.263,0.5163,9.742)).norm()<0.02)
-                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-                                        Eigen::Matrix3d::Identity() * 0.1 * M_PI / 180.0,
-                                        BSE::MeasurementMethodType::NormalAngleConstraint);
+//                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
+//                                        Eigen::Matrix3d::Identity() * 0.1 * M_PI / 180.0,
+//                                        BSE::MeasurementMethodType::NormalAngleConstraint);
 
 
                 if (zv_flag.size() > 3 &&

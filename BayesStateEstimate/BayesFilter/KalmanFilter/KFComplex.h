@@ -36,6 +36,7 @@
 #include <AuxiliaryTool/GravityOrientationFunction.h>
 #include <AuxiliaryTool/ImuUpdateFunction.h>
 #include <AuxiliaryTool/SimpleImuUpdateFunction.h>
+#include <AuxiliaryTool/MagMeasurementFunction.h>
 
 #include "KalmanFilterBase.h"
 #include "KalmanFilterBase.h"
@@ -98,7 +99,7 @@ namespace BSE {
         Eigen::Matrix<double, 9, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
                                                   Eigen::Matrix<double, 6, 6> noise_matrix) {
 
-            auto siuf = SimpleImuUpdateFunction(rotation_q_, time_interval_,local_g_);
+            auto siuf = SimpleImuUpdateFunction(rotation_q_, time_interval_, local_g_);
             auto jac_vec = siuf.derivative(state_x_, input);
             auto A = jac_vec[0];
             auto B = jac_vec[1];
