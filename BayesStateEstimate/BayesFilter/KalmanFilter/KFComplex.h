@@ -89,7 +89,8 @@ namespace BSE {
                            * Eigen::AngleAxisd(tp, Eigen::Vector3d::UnitY())
                            * Eigen::AngleAxisd(initial_ori, Eigen::Vector3d::UnitZ()));
 
-            mag_func.mag_nav_ = rotation_q_ * (mag/mag.norm());
+//            mag_func.mag_nav_ = rotation_q_ * (mag/mag.norm());
+            mag_func.setMag_nav(rotation_q_ * mag);
 
             std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose()
                       << std::endl;
@@ -212,8 +213,8 @@ namespace BSE {
             prob_state_ = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * prob_state_;
             prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
-            dX_ = K_ * (input/input.norm() - mag_func.compute(state_x_));
-            std::cout << " diff: " << (input/input.norm() - mag_func.compute(state_x_)).transpose() ;
+            dX_ = K_ * (input / input.norm() - mag_func.compute(state_x_));
+            std::cout << " diff: " << (input / input.norm() - mag_func.compute(state_x_)).transpose();
 
             state_x_ += dX_;
 

@@ -213,7 +213,7 @@ int main(int argc, char *argv[]) {
 
 
                 filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-                                                       Eigen::Matrix3d::Identity() * 1);
+                                                       Eigen::Matrix3d::Identity() * 0.5);
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
@@ -330,8 +330,8 @@ int main(int argc, char *argv[]) {
 
     };
 //
-    f(left_imu_data, "left_foot");
-//    f(right_imu_data, "right_foot");
+//    f(left_imu_data, "left_foot");
+    f(right_imu_data, "right_foot");
 //    f(head_imu_data, "head");
 
     plt::show();
