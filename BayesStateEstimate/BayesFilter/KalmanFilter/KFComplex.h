@@ -295,7 +295,8 @@ namespace BSE {
             std::cout << "input:"
                       << input.transpose()
                       << "reverted input:"
-                      << (rotation_q_ * input).transpose()
+                      << (rotation_q_ * tmp_acc).transpose()
+                      << (rotation_q_ * tmp_mag).transpose()
                       << std::endl;
 
             return;
