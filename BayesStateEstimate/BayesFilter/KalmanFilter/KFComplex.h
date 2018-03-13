@@ -121,6 +121,9 @@ namespace BSE {
             }
 
             state_x_ = siuf.compute(state_x_, input);
+            rotation_q_ = Eigen::AngleAxisd(state_x_(6,0),Eigen::Vector3d::UnitX())*
+                          Eigen::AngleAxisd(state_x_(7,0),Eigen::Vector3d::UnitY())*
+                          Eigen::AngleAxisd(state_x_(8,0),Eigen::Vector3d::UnitZ());
 
 
             return state_x_;
@@ -185,12 +188,8 @@ namespace BSE {
                     -tdx(8), 0.0, tdx(6),
                     tdx(7), -tdx(6), 0.0;
             omega *= -1.0;
-//                         rotation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
-//                                      (2.0 * Eigen::Matrix3d::Identity() - omega).inverse()
-//                                      * rotation_m;
             rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
 
-//                         rotate_q_ = delta_q.inverse() * rotate_q_;
             rotation_q_ = Eigen::Quaterniond(rotation_m);
             return;
 
