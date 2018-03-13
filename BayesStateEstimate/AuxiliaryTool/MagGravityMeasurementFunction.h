@@ -33,9 +33,9 @@
 
 #include "AWF.h"
 
-class MagGravityMeasurementFunction : public MagMeasurementFunction {
+class MagGravityMeasurementFunction : public AWF::FunctionAbstract {
 public:
-    MagGravityMeasurementFunction() : MagMeasurementFunction() {
+    MagGravityMeasurementFunction() : FunctionAbstract(6, 1) {
 
     }
 
@@ -65,6 +65,30 @@ public:
         MagGravityMeasurementFunction::gravity_nav_ = gravity_nav_;
     }
 
+
+    virtual Eigen::MatrixXd operator()(std::vector<Eigen::MatrixXd> in_vec) {
+        return compute(in_vec[0]);
+    }
+
+    std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd in1) {
+
+        return d(compress(in1));
+    }
+
+
+    std::vector<Eigen::MatrixXd> compress(Eigen::MatrixXd input_state) {
+        std::vector<Eigen::MatrixXd> t = {};
+        t.push_back(input_state);
+        return t;
+    }
+
+
+    Eigen::Vector3d mag_nav_ = Eigen::Vector3d(0,0,0);
+
+    void setMag_nav(const Eigen::Vector3d &mag_nav_) {
+        this->mag_nav_ = mag_nav_ / mag_nav_.norm();
+
+    }
 
 };
 

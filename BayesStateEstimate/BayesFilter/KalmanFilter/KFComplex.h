@@ -271,8 +271,8 @@ namespace BSE {
             prob_state_ = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * prob_state_;
             prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
-            dX_ = K_ * (g_and_mag - mag_func.compute(state_x_));
-            std::cout << " diff: " << (input / input.norm() - mag_func.compute(state_x_)).transpose();
+            dX_ = K_ * (g_and_mag - mg_fuc.compute(state_x_));
+            std::cout << " diff: " << (g_and_mag - mg_fuc.compute(state_x_)).transpose();
 
             state_x_ += dX_;
 
