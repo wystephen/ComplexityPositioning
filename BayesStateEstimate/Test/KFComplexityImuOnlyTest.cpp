@@ -217,6 +217,9 @@ int main(int argc, char *argv[]) {
                 Eigen::Matrix<double,6,1> tmp_gm;
                 tmp_gm.block(0,0,3,1) = imu_data.block(i,1,1,3).transpose();
                 tmp_gm.block(3,0,3,1) = imu_data.block(i,7,1,3).transpose();
+                Eigen::Matrix<double,6,6> cov_matrix = Eigen::Matrix<double,6,6>::Identity();
+                cov_matrix.block(0,0,3,3) *= 0.1;
+                cov_matrix.block(3,3,3,3) *= 0.5;
                 filter_complex.MeasurementAngleCorrectMG(tmp_gm,Eigen::Matrix<double,6,6>::Identity()*0.5);
 
 
