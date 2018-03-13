@@ -218,18 +218,18 @@ int main(int argc, char *argv[]) {
                 tmp_gm.block(0,0,3,1) = imu_data.block(i,1,1,3).transpose();
                 tmp_gm.block(3,0,3,1) = imu_data.block(i,7,1,3).transpose();
                 Eigen::Matrix<double,6,6> cov_matrix = Eigen::Matrix<double,6,6>::Identity();
-                cov_matrix.block(0,0,3,3) *= 0.1;
+                cov_matrix.block(0,0,3,3) *= 0.01;
                 cov_matrix.block(3,3,3,3) *= 0.5;
-                filter_complex.MeasurementAngleCorrectMG(tmp_gm,Eigen::Matrix<double,6,6>::Identity()*0.5);
 
+
+//                filter_complex.MeasurementAngleCorrectMG(tmp_gm,Eigen::Matrix<double,6,6>::Identity()*0.5);
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
-//                    std::cout << " linear accc:"
-//                              << (filter.getRotate_q().toRotationMatrix() *
-//                                  imu_data.block(i, 1, 1, 3).transpose()).transpose()
-//                              << std::endl;
-
+                    std::cout << " linear accc:"
+                              << (filter_complex.rotation_q_*
+                                  imu_data.block(i, 1, 1, 3).transpose()).transpose()
+                              << std::endl;
                 }
 
                 zv_flag.push_back(1.0);
