@@ -91,9 +91,9 @@ namespace BSE {
                            * Eigen::AngleAxisd(initial_ori, Eigen::Vector3d::UnitZ()));
 
 //            mag_func.mag_nav_ = rotation_q_ * (mag/mag.norm());
-            mag_func.setMag_nav(rotation_q_ * mag);
-            mg_fuc.setMag_nav(rotation_q_ * mag);
-            mg_fuc.setGravity_nav_(rotation_q_ * acc);
+            mag_func.setMag_nav(rotation_q_.inverse() * mag);
+            mg_fuc.setMag_nav(rotation_q_.inverse() * mag);
+            mg_fuc.setGravity_nav_(rotation_q_.inverse() * acc);
 
             std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose()
                       << std::endl;
