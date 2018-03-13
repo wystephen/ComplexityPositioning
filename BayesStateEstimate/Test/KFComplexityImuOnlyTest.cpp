@@ -154,6 +154,10 @@ int main(int argc, char *argv[]) {
         std::vector<std::vector<double>> angle = {{},
                                                   {},
                                                   {}};
+
+        std::vector<std::vector<double>> mag = {{},
+                                                {},
+                                                {}};
         std::vector<double> zv_flag = {};
 
         std::vector<std::vector<double>> angle_velocity = {{},
@@ -209,7 +213,7 @@ int main(int argc, char *argv[]) {
 
 
                 filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-                                                       Eigen::Matrix3d::Identity() * 0.1);
+                                                       Eigen::Matrix3d::Identity() * 1);
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
@@ -235,6 +239,7 @@ int main(int argc, char *argv[]) {
                 angle[j].push_back(state(j + 6));
                 acc[j].push_back(imu_data(i, j + 1));
                 angle_velocity[j].push_back(imu_data(i, j + 4));
+                mag[j].push_back(imu_data(i, j + 7));
             }
 
         }
@@ -244,6 +249,14 @@ int main(int argc, char *argv[]) {
             plt::named_plot(std::to_string(i), pose[i]);
         }
         plt::title(data_name + "pose");
+        plt::grid(true);
+        plt::legend();
+
+        plt::figure();
+        for (int i(0); i < 3; ++i) {
+            plt::named_plot(std::to_string(i), mag[i]);
+        }
+        plt::title(data_name + "mag");
         plt::grid(true);
         plt::legend();
 
@@ -318,8 +331,8 @@ int main(int argc, char *argv[]) {
     };
 //
     f(left_imu_data, "left_foot");
-    f(right_imu_data, "right_foot");
-    f(head_imu_data, "head");
+//    f(right_imu_data, "right_foot");
+//    f(head_imu_data, "head");
 
     plt::show();
 

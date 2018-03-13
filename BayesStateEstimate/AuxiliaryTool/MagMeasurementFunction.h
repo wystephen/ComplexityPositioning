@@ -35,6 +35,8 @@ class MagMeasurementFunction : public AWF::FunctionAbstract {
 public:
     MagMeasurementFunction(Eigen::Vector3d mag_in_navigation_frame) : FunctionAbstract(3, 1) {
         mag_nav_ = mag_in_navigation_frame / mag_in_navigation_frame.norm();
+        std::cout << "mag nav:"
+                  << mag_nav_ <<std::endl;
 
     }
 

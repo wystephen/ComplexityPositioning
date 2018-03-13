@@ -89,7 +89,7 @@ namespace BSE {
                            * Eigen::AngleAxisd(tp, Eigen::Vector3d::UnitY())
                            * Eigen::AngleAxisd(initial_ori, Eigen::Vector3d::UnitZ()));
 
-            mag_func.mag_nav_ = rotation_q_ * mag;
+            mag_func.mag_nav_ = rotation_q_ * (mag/mag.norm());
 
             std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose()
                       << std::endl;
@@ -200,6 +200,7 @@ namespace BSE {
         void MeasurementAngleCorrect(Eigen::Matrix<double, 3, 1> input,
                                      Eigen::Matrix<double, 3, 3> cov_m) {
             Eigen::Vector3d tmp_mag = input;
+            rotation_q_.normalize();
             state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
             auto t_vec = mag_func.derivative(state_x_);
@@ -212,6 +213,7 @@ namespace BSE {
             prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
             dX_ = K_ * (input/input.norm() - mag_func.compute(state_x_));
+            std::cout << " diff: " << (input/input.norm() - mag_func.compute(state_x_)).transpose() ;
 
             state_x_ += dX_;
 
@@ -229,7 +231,14 @@ namespace BSE {
 
 //                         rotate_q_ = delta_q.inverse() * rotate_q_;
             rotation_q_ = Eigen::Quaterniond(rotation_m);
+            rotation_q_.normalize();
             state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+            std::cout << "input:"
+                      << input.transpose()
+                      << "reverted input:"
+                      << (rotation_q_ * input).transpose()
+                      << std::endl;
+
             return;
 
 
