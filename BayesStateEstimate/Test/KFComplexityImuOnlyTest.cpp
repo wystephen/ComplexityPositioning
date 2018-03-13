@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
                              initial_pos);
 
 
-        filter_complex.initial_state(imu_data.block(10, 1, 100, 6),
+        filter_complex.initial_state(imu_data.block(10, 1, 100, 9),
                                      initial_ori,
                                      initial_pos);
         std::cout << "costed time :" << AWF::getDoubleSecondTime() - time_begin
@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
                                     BSE::StateTransactionMethodType::NormalRotation);
 
 
-            auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 9).transpose(),
+            auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
                                                               process_noise_matrix);
 
             double uwb_index = 0;
