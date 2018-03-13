@@ -27,8 +27,6 @@
 #include "../AuxiliaryTool/ImuTools.cpp"
 
 
-
-
 namespace plt = matplotlibcpp;
 
 
@@ -175,7 +173,7 @@ int main(int argc, char *argv[]) {
                                     BSE::StateTransactionMethodType::NormalRotation);
 
 
-            auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+            auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 9).transpose(),
                                                               process_noise_matrix);
 
             double uwb_index = 0;
@@ -210,6 +208,9 @@ int main(int argc, char *argv[]) {
 //                                        BSE::MeasurementMethodType::NormalAngleConstraint);
 
 
+                filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
+                                                       Eigen::Matrix3d::Identity() * 0.1);
+
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
 //                    std::cout << " linear accc:"
@@ -224,8 +225,8 @@ int main(int argc, char *argv[]) {
                 zv_flag.push_back(0.0);
             }
 
-            Eigen::VectorXd state = filter.getState_();
-            Eigen::VectorXd state_simple = filter_complex.state_x_;
+            Eigen::VectorXd state_simple = filter.getState_();
+            Eigen::VectorXd state = filter_complex.state_x_;
 //        std::cout << state.transpose() << std::endl;
             for (int j(0); j < 3; ++j) {
                 pose_simple[j].push_back(state_simple(j));

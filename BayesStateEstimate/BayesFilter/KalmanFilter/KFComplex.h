@@ -58,6 +58,7 @@ namespace BSE {
                            Eigen::Vector3d initial_pose = Eigen::Vector3d(0, 0, 0)) {
             long double f_u(0.0), f_v(0.0), f_w(0.0);
             Eigen::Vector3d acc = imu_data.block(0, 0, imu_data.rows(), 3).colwise().mean();
+            Eigen::Vector3d mag = imu_data.block(0, 6, imu_data.rows(), 3).colwise().mean();
             auto g = acc.norm();
             local_g_ = -1.0 * g;
 
@@ -88,7 +89,10 @@ namespace BSE {
                            * Eigen::AngleAxisd(tp, Eigen::Vector3d::UnitY())
                            * Eigen::AngleAxisd(initial_ori, Eigen::Vector3d::UnitZ()));
 
-            std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose() << std::endl;
+            mag_func.mag_nav_ = rotation_q_ * mag;
+
+            std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose()
+                      << std::endl;
             std::cout << "complex eular angle:" << rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2).transpose()
                       << std::endl;
             std::cout << "complex before acc:" << acc.transpose() << std::endl;
@@ -190,6 +194,49 @@ namespace BSE {
 
 
         /**
+         * correcting orientation.
+         * @param input
+         */
+        void MeasurementAngleCorrect(Eigen::Matrix<double, 3, 1> input,
+                                     Eigen::Matrix<double, 3, 3> cov_m) {
+            Eigen::Vector3d tmp_mag = input;
+            state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+
+            auto t_vec = mag_func.derivative(state_x_);
+            H_ = t_vec[0];
+            ////TODO: correct this.
+            K_ = (prob_state_ * H_.transpose().eval()) *
+                 (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
+
+            prob_state_ = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * prob_state_;
+            prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
+
+            dX_ = K_ * (input/input.norm() - mag_func.compute(state_x_));
+
+            state_x_ += dX_;
+
+
+            Eigen::Matrix3d rotation_m(rotation_q_.toRotationMatrix());
+            Eigen::Matrix3d omega = Eigen::Matrix3d::Zero();
+            omega << 0.0, dX_(8), -dX_(7),
+                    -dX_(8), 0.0, dX_(6),
+                    dX_(7), -dX_(6), 0.0;
+            omega *= -1.0;
+//                         rotation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
+//                                      (2.0 * Eigen::Matrix3d::Identity() - omega).inverse()
+//                                      * rotation_m;
+            rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
+
+//                         rotate_q_ = delta_q.inverse() * rotate_q_;
+            rotation_q_ = Eigen::Quaterniond(rotation_m);
+            state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+            return;
+
+
+        }
+
+
+        /**
          * dax day daz : offset of acc measurements.
          * dgx dgy dgz : offset of gyr measurements.
          */
@@ -219,6 +266,7 @@ namespace BSE {
 
         double time_interval_ = 0.005;// time interval
 
+        MagMeasurementFunction mag_func = MagMeasurementFunction(Eigen::Vector3d(0, 0, 1));
 
 
         double local_g_ = -9.81; // local gravity acc.
