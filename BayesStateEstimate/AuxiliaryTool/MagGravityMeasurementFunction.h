@@ -62,7 +62,7 @@ public:
     }
 
     void setGravity_nav_(const Eigen::Vector3d &gravity_nav_) {
-        MagGravityMeasurementFunction::gravity_nav_ = gravity_nav_;
+        this->gravity_nav_ = gravity_nav_/gravity_nav_.norm();
     }
 
 
