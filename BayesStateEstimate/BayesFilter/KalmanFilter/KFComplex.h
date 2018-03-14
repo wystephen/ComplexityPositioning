@@ -91,9 +91,9 @@ namespace BSE {
                            * Eigen::AngleAxisd(initial_ori, Eigen::Vector3d::UnitZ()));
 
 //            mag_func.mag_nav_ = rotation_q_ * (mag/mag.norm());
-            mag_func.setMag_nav(rotation_q_.inverse() * mag);
-            mg_fuc.setMag_nav(rotation_q_.inverse() * mag);
-            mg_fuc.setGravity_nav_(rotation_q_.inverse() * acc);
+            mag_func.setMag_nav(rotation_q_ * mag);
+            mg_fuc.setMag_nav(rotation_q_* mag);
+            mg_fuc.setGravity_nav_(rotation_q_ * acc);
 
             std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose()
                       << std::endl;
@@ -257,8 +257,9 @@ namespace BSE {
             Eigen::Vector3d tmp_mag = input.block(3, 0, 3, 1);
             Eigen::Vector3d tmp_acc = input.block(0, 0, 3, 1);
             Eigen::Matrix<double, 6, 1> g_and_mag;
-            g_and_mag.block(3, 0, 3, 1) = tmp_mag / tmp_mag.norm();
             g_and_mag.block(0, 0, 3, 1) = tmp_acc / tmp_mag.norm();
+            g_and_mag.block(3, 0, 3, 1) = tmp_mag / tmp_mag.norm();
+
 
             rotation_q_.normalize();
             state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);

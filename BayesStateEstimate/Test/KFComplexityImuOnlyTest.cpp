@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
                 cov_matrix.block(3,3,3,3) *= 0.5;
 
 
-                filter_complex.MeasurementAngleCorrectMG(tmp_gm,Eigen::Matrix<double,6,6>::Identity()*0.5);
+                filter_complex.MeasurementAngleCorrectMG(tmp_gm,cov_matrix);
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
