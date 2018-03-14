@@ -310,6 +310,7 @@ namespace BSE {
             rotation_q_ = Eigen::Quaterniond(rotation_m);
             rotation_q_.normalize();
             state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+
 //            std::cout << "input:"
 //                      << input.transpose()
             std::cout << "reve:"
