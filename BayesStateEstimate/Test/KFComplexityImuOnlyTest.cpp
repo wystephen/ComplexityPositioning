@@ -226,7 +226,7 @@ int main(int argc, char *argv[]) {
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
-                    std::cout << " linear accc:"
+                    std::cout << " lacc:"
                               << (filter_complex.rotation_q_.toRotationMatrix()*
                                   imu_data.block(i, 1, 1, 3).transpose()).transpose()
                               << std::endl;
