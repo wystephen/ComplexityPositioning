@@ -92,7 +92,7 @@ namespace BSE {
 
 //            mag_func.mag_nav_ = rotation_q_ * (mag/mag.norm());
             mag_func.setMag_nav(rotation_q_ * mag);
-            mg_fuc.setMag_nav(rotation_q_* mag);
+            mg_fuc.setMag_nav(rotation_q_ * mag);
             mg_fuc.setGravity_nav_(rotation_q_ * acc);
 
             std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose()
@@ -121,9 +121,9 @@ namespace BSE {
             }
 
             state_x_ = siuf.compute(state_x_, input);
-            rotation_q_ = Eigen::AngleAxisd(state_x_(6,0),Eigen::Vector3d::UnitX())*
-                          Eigen::AngleAxisd(state_x_(7,0),Eigen::Vector3d::UnitY())*
-                          Eigen::AngleAxisd(state_x_(8,0),Eigen::Vector3d::UnitZ());
+            rotation_q_ = Eigen::AngleAxisd(state_x_(6, 0), Eigen::Vector3d::UnitX()) *
+                          Eigen::AngleAxisd(state_x_(7, 0), Eigen::Vector3d::UnitY()) *
+                          Eigen::AngleAxisd(state_x_(8, 0), Eigen::Vector3d::UnitZ());
 
 
             return state_x_;
@@ -250,7 +250,7 @@ namespace BSE {
 
         /**
          * correcting orientation.
-         * @param input
+         * @param input acc and mag
          */
         void MeasurementAngleCorrectMG(Eigen::Matrix<double, 6, 1> input,
                                        Eigen::Matrix<double, 6, 6> cov_m) {
@@ -274,7 +274,7 @@ namespace BSE {
             prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
             dX_ = K_ * (g_and_mag - mg_fuc.compute(state_x_));
-//            std::cout << " diff: " << (g_and_mag - mg_fuc.compute(state_x_)).transpose();
+            std::cout << " diff: " << (g_and_mag - mg_fuc.compute(state_x_)).transpose();
 
             state_x_ += dX_;
 
@@ -296,10 +296,10 @@ namespace BSE {
             state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 //            std::cout << "input:"
 //                      << input.transpose()
-//                      << "reverted input:"
-//                      << (rotation_q_ * tmp_acc).transpose()
-//                      << (rotation_q_ * tmp_mag).transpose()
-//                      << std::endl;
+            std::cout << "reverted input:"
+                      << (rotation_q_ * tmp_acc).transpose()
+                      << (rotation_q_ * tmp_mag).transpose()
+                      << std::endl;
 
             return;
 
