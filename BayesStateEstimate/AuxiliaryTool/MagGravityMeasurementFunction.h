@@ -45,13 +45,14 @@ public:
      * @return
      */
     Eigen::MatrixXd compute(Eigen::MatrixXd state) {
-        Eigen::Quaterniond q = Eigen::AngleAxisd(state(6, 0), Eigen::Vector3d::UnitX()) *
-                               Eigen::AngleAxisd(state(7, 0), Eigen::Vector3d::UnitY()) *
-                               Eigen::AngleAxisd(state(8, 0), Eigen::Vector3d::UnitZ());
+        Eigen::Quaterniond q = Eigen::AngleAxisd(state(6), Eigen::Vector3d::UnitX()) *
+                               Eigen::AngleAxisd(state(7), Eigen::Vector3d::UnitY()) *
+                               Eigen::AngleAxisd(state(8), Eigen::Vector3d::UnitZ());
+//        q = q.inverse();
 
         Eigen::Matrix<double, 6, 1> out;
-        out.block(0, 0, 3, 1) = q.inverse() * gravity_nav_;
-        out.block(3, 0, 3, 1) = q.inverse() * mag_nav_;
+        out.block(0, 0, 3, 1) = q.toRotationMatrix().transpose() * gravity_nav_;
+        out.block(3, 0, 3, 1) = q.toRotationMatrix().transpose() * mag_nav_;
         return out;
     }
 
