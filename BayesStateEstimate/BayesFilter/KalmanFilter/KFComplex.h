@@ -282,15 +282,15 @@ namespace BSE {
 //            prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
             dX_ = K_ * (g_and_mag - mg_fuc.compute(state_x_));
-//            std::cout << "diff: "
-//                      << (g_and_mag - mg_fuc.compute(state_x_)).transpose()
-//                      << std::endl;
-//            std::cout << "gmag:"
-//                      << g_and_mag.transpose()
-//                      << std::endl;
-//            std::cout << "fuc :"
-//                      << mg_fuc.compute(state_x_).transpose()
-//                      << std::endl;
+            std::cout << "diff: "
+                      << (g_and_mag - mg_fuc.compute(state_x_)).transpose()
+                      << std::endl;
+            std::cout << "gmag:"
+                      << g_and_mag.transpose()
+                      << std::endl;
+            std::cout << "fuc :"
+                      << mg_fuc.compute(state_x_).transpose()
+                      << std::endl;
 
             state_x_ += dX_;
 
