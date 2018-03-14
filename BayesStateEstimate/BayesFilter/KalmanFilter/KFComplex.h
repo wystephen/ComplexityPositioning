@@ -303,7 +303,7 @@ namespace BSE {
                                        Eigen::AngleAxisd(dX_(7), Eigen::Vector3d::UnitY()) *
                                        Eigen::AngleAxisd(dX_(8), Eigen::Vector3d::UnitZ());
             tmp_q.normalize();
-            rotation_q_ = tmp_q * rotation_q_;
+            rotation_q_ = tmp_q.inverse() * rotation_q_;
 //            rotation_q_ = rotation_q_ * tmp_q;
 
             ////////
