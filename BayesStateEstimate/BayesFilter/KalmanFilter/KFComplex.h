@@ -106,6 +106,12 @@ namespace BSE {
 
         }
 
+        /**
+         * State Transaction Function. Update state based on imu measurement.
+         * @param input
+         * @param noise_matrix
+         * @return
+         */
         Eigen::Matrix<double, 9, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
                                                   Eigen::Matrix<double, 6, 6> noise_matrix) {
 
