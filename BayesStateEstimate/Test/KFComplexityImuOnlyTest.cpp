@@ -125,8 +125,8 @@ int main(int argc, char *argv[]) {
             filter.setTime_interval_(tmp_time_interval);
             filter_complex.time_interval_ = tmp_time_interval;
         }
-        filter.setLocal_g_(-9.837);
-        filter_complex.local_g_ = -9.837;
+        filter.setLocal_g_(-9.884);
+        filter_complex.local_g_ = -9.884;
 //    filter.IS_DEBUG = true;
 
 
@@ -217,7 +217,7 @@ int main(int argc, char *argv[]) {
                 tmp_gm.block(3,0,3,1) = imu_data.block(i,7,1,3).transpose();
                 Eigen::Matrix<double,6,6> cov_matrix = Eigen::Matrix<double,6,6>::Identity();
                 cov_matrix.block(0,0,3,3) *= 0.5;
-                cov_matrix.block(3,3,3,3) *= 10.5;
+                cov_matrix.block(3,3,3,3) *= 1.5;
 
 
 //                if(std::abs(imu_data(i,3)-9.74)<0.01 && current_diff < 0.001)

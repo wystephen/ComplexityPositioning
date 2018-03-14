@@ -276,12 +276,12 @@ namespace BSE {
             prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
             dX_ = K_ * (g_and_mag - mg_fuc.compute(state_x_));
-            std::cout << "diff: "
-                      << (g_and_mag - mg_fuc.compute(state_x_)).transpose()
-                      << std::endl;
-            std::cout << "gmag:"
-                      << g_and_mag.transpose()
-                      << std::endl;
+//            std::cout << "diff: "
+//                      << (g_and_mag - mg_fuc.compute(state_x_)).transpose()
+//                      << std::endl;
+//            std::cout << "gmag:"
+//                      << g_and_mag.transpose()
+//                      << std::endl;
 //                      << "fuc :"
 //                      << mg_fuc.compute(state_x_).transpose()
 //                    << ro
@@ -296,19 +296,19 @@ namespace BSE {
             Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dX_(6), Eigen::Vector3d::UnitX()) *
                                        Eigen::AngleAxisd(dX_(7), Eigen::Vector3d::UnitY()) *
                                        Eigen::AngleAxisd(dX_(8), Eigen::Vector3d::UnitZ());
-            rotation_q_ = tmp_q * rotation_q_;
-//            rotation_q_ = rotation_q_ * tmp_q;
+//            rotation_q_ = tmp_q * rotation_q_;
+            rotation_q_ = rotation_q_ * tmp_q;
 
             rotation_q_.normalize();
             state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
 //            std::cout << "input:"
 //                      << input.transpose()
-            std::cout << "reve:"
-                      << (rotation_q_ * tmp_acc).transpose()
-                      << " "
-                      << (rotation_q_ * tmp_mag).transpose()
-                      << std::endl;
+//            std::cout << "reve:"
+//                      << (rotation_q_ * tmp_acc).transpose()
+//                      << " "
+//                      << (rotation_q_ * tmp_mag).transpose()
+//                      << std::endl;
 
             return;
 
