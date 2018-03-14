@@ -279,7 +279,7 @@ namespace BSE {
                  (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
 
             prob_state_ = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * prob_state_;
-            prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
+//            prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
             dX_ = K_ * (g_and_mag - mg_fuc.compute(state_x_));
             std::cout << "diff: "
@@ -301,7 +301,7 @@ namespace BSE {
             Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dX_(6), Eigen::Vector3d::UnitX()) *
                                        Eigen::AngleAxisd(dX_(7), Eigen::Vector3d::UnitY()) *
                                        Eigen::AngleAxisd(dX_(8), Eigen::Vector3d::UnitZ());
-            rotation_q_ = tmp_q * rotation_q_;
+            rotation_q_ = tmp_q.inverse() * rotation_q_;
 //            rotation_q_ = rotation_q_ * tmp_q;
 
             rotation_q_.normalize();
