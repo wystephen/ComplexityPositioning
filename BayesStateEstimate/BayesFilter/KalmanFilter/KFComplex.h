@@ -95,12 +95,14 @@ namespace BSE {
             mg_fuc.setMag_nav(rotation_q_ * mag);
             mg_fuc.setGravity_nav_(rotation_q_ * acc);
 
+
             std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose()
                       << std::endl;
             std::cout << "complex eular angle:" << rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2).transpose()
                       << std::endl;
             std::cout << "complex before acc:" << acc.transpose() << std::endl;
             std::cout << "complex after acc:" << (rotation_q_ * acc).transpose() << std::endl;
+            std::cout << "complex after mg func:" << mg_fuc.compute(state_x_).transpose() << std::endl;
 
         }
 
@@ -274,9 +276,9 @@ namespace BSE {
             prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
             dX_ = K_ * (g_and_mag - mg_fuc.compute(state_x_));
-            std::cout << "diff: "
-                      << (g_and_mag - mg_fuc.compute(state_x_)).transpose()
-                      << std::endl;
+//            std::cout << "diff: "
+//                      << (g_and_mag - mg_fuc.compute(state_x_)).transpose()
+//                      << std::endl;
             std::cout << "gmag:"
                       << g_and_mag.transpose()
                       << std::endl
@@ -289,14 +291,20 @@ namespace BSE {
 
             Eigen::Matrix3d rotation_m(rotation_q_.toRotationMatrix());
             Eigen::Matrix3d omega = Eigen::Matrix3d::Zero();
-            omega << 0.0, dX_(8), -dX_(7),
-                    -dX_(8), 0.0, dX_(6),
-                    dX_(7), -dX_(6), 0.0;
-            omega *= -1.0;
-//                         rotation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
+//            omega << 0.0, dX_(8), -dX_(7),
+//                    -dX_(8), 0.0, dX_(6),
+//                    dX_(7), -dX_(6), 0.0;
+//            omega *= -1.0;
+//                         otation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
 //                                      (2.0 * Eigen::Matrix3d::Identity() - omega).inverse()
 //                                      * rotation_m;
-            rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
+//            rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
+            std::cout << dX_.transpose() << std::endl;
+
+            Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dX_(6),Eigen::Vector3d::UnitX())*
+                    Eigen::AngleAxisd(dX_(7),Eigen::Vector3d::UnitY())*
+                    Eigen::AngleAxisd(dX_(8),Eigen::Vector3d::UnitZ());
+            rotation_q_ = tmp_q * rotation_q_;
 
 //                         rotate_q_ = delta_q.inverse() * rotate_q_;
             rotation_q_ = Eigen::Quaterniond(rotation_m);
@@ -304,10 +312,11 @@ namespace BSE {
             state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 //            std::cout << "input:"
 //                      << input.transpose()
-//            std::cout << "reverted input:"
-//                      << (rotation_q_ * tmp_acc).transpose()
-//                      << (rotation_q_ * tmp_mag).transpose()
-//                      << std::endl;
+            std::cout << "reve:"
+                      << (rotation_q_ * tmp_acc).transpose()
+                      << " "
+                      << (rotation_q_ * tmp_mag).transpose()
+                      << std::endl;
 
             return;
 
