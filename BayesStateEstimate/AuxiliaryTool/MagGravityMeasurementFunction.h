@@ -55,16 +55,6 @@ public:
         return out;
     }
 
-    Eigen::Vector3d gravity_nav_ = Eigen::Vector3d(0, 0, 9.81);
-
-    const Eigen::Vector3d &getGravity_nav_() const {
-        return gravity_nav_;
-    }
-
-    void setGravity_nav_(const Eigen::Vector3d &gravity_nav_) {
-        this->gravity_nav_ = gravity_nav_/gravity_nav_.norm();
-    }
-
 
     virtual Eigen::MatrixXd operator()(std::vector<Eigen::MatrixXd> in_vec) {
         return compute(in_vec[0]);
@@ -83,13 +73,22 @@ public:
     }
 
 
-    Eigen::Vector3d mag_nav_ = Eigen::Vector3d(0,0,0);
+    Eigen::Vector3d mag_nav_ = Eigen::Vector3d(1.0, 0, 0);
+    Eigen::Vector3d gravity_nav_ = Eigen::Vector3d(0, 0, 1.0);
 
     void setMag_nav(const Eigen::Vector3d &mag_nav_) {
         this->mag_nav_ = mag_nav_ / mag_nav_.norm();
 
     }
 
+
+//    const Eigen::Vector3d &getGravity_nav_() const {
+//        return gravity_nav_;
+//    }
+
+    void setGravity_nav_(const Eigen::Vector3d &gravity_nav_) {
+        this->gravity_nav_ = gravity_nav_ / gravity_nav_.norm();
+    }
 };
 
 

@@ -257,7 +257,7 @@ namespace BSE {
             Eigen::Vector3d tmp_mag = input.block(3, 0, 3, 1);
             Eigen::Vector3d tmp_acc = input.block(0, 0, 3, 1);
             Eigen::Matrix<double, 6, 1> g_and_mag;
-            g_and_mag.block(0, 0, 3, 1) = tmp_acc / tmp_mag.norm();
+            g_and_mag.block(0, 0, 3, 1) = tmp_acc / tmp_acc.norm();
             g_and_mag.block(3, 0, 3, 1) = tmp_mag / tmp_mag.norm();
 
 
@@ -274,7 +274,15 @@ namespace BSE {
             prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
             dX_ = K_ * (g_and_mag - mg_fuc.compute(state_x_));
-            std::cout << " diff: " << (g_and_mag - mg_fuc.compute(state_x_)).transpose();
+            std::cout << " diff: "
+                      << (g_and_mag - mg_fuc.compute(state_x_)).transpose()
+                      << std::endl;
+            std::cout << "gmag:"
+                      << g_and_mag.transpose()
+                      << std::endl
+                      << "fuc:"
+                      << mg_fuc.compute(state_x_).transpose()
+                      << std::endl;
 
             state_x_ += dX_;
 
@@ -296,10 +304,10 @@ namespace BSE {
             state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 //            std::cout << "input:"
 //                      << input.transpose()
-            std::cout << "reverted input:"
-                      << (rotation_q_ * tmp_acc).transpose()
-                      << (rotation_q_ * tmp_mag).transpose()
-                      << std::endl;
+//            std::cout << "reverted input:"
+//                      << (rotation_q_ * tmp_acc).transpose()
+//                      << (rotation_q_ * tmp_mag).transpose()
+//                      << std::endl;
 
             return;
 
