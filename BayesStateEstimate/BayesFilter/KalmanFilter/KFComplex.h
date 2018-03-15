@@ -301,12 +301,12 @@ namespace BSE {
 
             /*---------------------------------------*/
             /////////
-            Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dX_(6) / 2.0, Eigen::Vector3d::UnitX()) *
-                                       Eigen::AngleAxisd(dX_(7) / 2.0, Eigen::Vector3d::UnitY()) *
-                                       Eigen::AngleAxisd(dX_(8) / 2.0, Eigen::Vector3d::UnitZ());
-            tmp_q.normalize();
-//            rotation_q_ = tmp_q* rotation_q_;
-            rotation_q_ = rotation_q_ * tmp_q;
+            Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dX_(6), Eigen::Vector3d::UnitX()) *
+                                       Eigen::AngleAxisd(dX_(7), Eigen::Vector3d::UnitY()) *
+                                       Eigen::AngleAxisd(dX_(8), Eigen::Vector3d::UnitZ());
+//            tmp_q.normalize();
+            rotation_q_ = tmp_q * rotation_q_;
+//            rotation_q_ = rotation_q_ * tmp_q;
 
             ////////
 //            Eigen::Matrix3d rotation_m(rotation_q_.toRotationMatrix());
