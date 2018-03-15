@@ -216,12 +216,12 @@ int main(int argc, char *argv[]) {
                 tmp_gm.block(0, 0, 3, 1) = imu_data.block(i, 1, 1, 3).transpose();
                 tmp_gm.block(3, 0, 3, 1) = imu_data.block(i, 7, 1, 3).transpose();
                 Eigen::Matrix<double, 6, 6> cov_matrix = Eigen::Matrix<double, 6, 6>::Identity();
-                cov_matrix.block(0, 0, 3, 3) *= 0.5;
+                cov_matrix.block(0, 0, 3, 3) *= 1.5;
                 cov_matrix.block(3, 3, 3, 3) *= 100.5;
 
 
 //                if(std::abs(imu_data(i,3)-9.74)<0.01 && current_diff < 0.001)
-                filter_complex.MeasurementAngleCorrectMG(tmp_gm, cov_matrix);
+//                filter_complex.MeasurementAngleCorrectMG(tmp_gm, cov_matrix);
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
