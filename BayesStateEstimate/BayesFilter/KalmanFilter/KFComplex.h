@@ -63,9 +63,9 @@ namespace BSE {
             auto g = acc.norm();
             local_g_ = -1.0 * g;
 
-            auto gof = GravityOrientationFunction(acc, 1.0 * local_g_ / std::abs(local_g_) * acc.norm(), initial_ori);
+            auto gof = GravityOrientationFunction(acc, -1.0 * local_g_ / std::abs(local_g_) * acc.norm(), initial_ori);
 
-            auto res_vec = gof.minimize_error(Eigen::Vector2d(0.0, 0.0));
+            auto res_vec = gof.minimize_error(Eigen::Vector2d(0.0, 0.0),1000,0.01);
             double tr = res_vec[0](0);
             double tp = res_vec[0](1);
 
