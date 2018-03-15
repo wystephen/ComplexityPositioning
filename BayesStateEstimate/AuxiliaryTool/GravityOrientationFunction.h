@@ -96,12 +96,12 @@ public:
 
     }
 
-    Eigen::MatrixXd operator()(std::vector<Eigen::MatrixXd> in_vec) {
-        return operator()(in_vec[0]);
-    }
+//    Eigen::MatrixXd operator()(std::vector<Eigen::MatrixXd> in_vec) {
+//        return operator()(in_vec[0]);
+//    }
 
 
-    Eigen::MatrixXd operator()(Eigen::MatrixXd orientation) {
+    Eigen::MatrixXd compute(Eigen::MatrixXd orientation) {
         Eigen::MatrixXd error;
         error.resize(1, 1);
 
