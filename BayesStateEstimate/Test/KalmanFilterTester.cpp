@@ -162,26 +162,12 @@ int main(int argc, char *argv[]) {
             while (uwb_data(uwb_index, 0) < imu_data(i, 0)) {
                 uwb_index++;
                 if (uwb_index == uwb_data.rows()) {
-//                    break;
-
-//                    return;
-//                    tmp_break_flag = true;
                     uwb_index--;
                     break;
 
                 }
             }
-//            if(tmp_break_flag)
-//            {
-//                i = imu_data.rows()+10;
-//                break;
-//            }
             if (uwb_data(uwb_index, 0) - imu_data(i, 0) < 0.01) {
-//                filter.MeasurementState(uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1),
-//                                        measurement_noise_matrix,
-//                                        BSE::MeasurementMethodType::NormalUwbMeasuremnt);
-//                std::cout << "test uwb :" << uwb_data(uwb_index, 0) << ",imu :"
-//                          << imu_data(i, 0) << std::endl;
 
                 for (int k(1); k < uwb_data.cols(); ++k) {
                     if (uwb_data(uwb_index, k) > 0
