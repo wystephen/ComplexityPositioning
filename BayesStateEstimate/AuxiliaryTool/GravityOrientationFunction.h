@@ -117,7 +117,7 @@ public:
                               * Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()));
         Eigen::MatrixXd error_matrix(1, 1);
         error_matrix(0, 0) = std::abs(g_ - (rotate_matrix * acc_)(2));
-        std::cout << error_matrix(0,0) << std::endl;
+//        std::cout << error_matrix(0,0) << std::endl;
         return error_matrix;
     }
 

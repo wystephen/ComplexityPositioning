@@ -51,7 +51,7 @@ public:
 //        q = q.inverse();
 
         Eigen::Matrix<double, 6, 1> out;
-        out.block(0, 0, 3, 1) =  q.toRotationMatrix().transpose() * gravity_nav_;
+        out.block(0, 0, 3, 1) = q.toRotationMatrix().transpose() * gravity_nav_;
         out.block(3, 0, 3, 1) = q.toRotationMatrix().transpose() * mag_nav_;
 //        std::cout << "gravity nav :" << gravity_nav_ << std::endl;
         return out;
@@ -79,7 +79,7 @@ public:
     Eigen::Vector3d gravity_nav_ = Eigen::Vector3d(0, 0, 1.0);
 
     void setMag_nav(const Eigen::Vector3d &mag_nav_) {
-        this->mag_nav_ = mag_nav_ ;// / mag_nav_.norm();
+        this->mag_nav_ = mag_nav_ / mag_nav_.norm();
 
     }
 
@@ -89,7 +89,7 @@ public:
 //    }
 
     void setGravity_nav_(const Eigen::Vector3d &gravity_nav_) {
-        this->gravity_nav_ = gravity_nav_;// / gravity_nav_.norm();
+        this->gravity_nav_ = gravity_nav_ / gravity_nav_.norm();
     }
 };
 
