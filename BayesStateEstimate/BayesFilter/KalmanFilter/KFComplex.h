@@ -312,23 +312,23 @@ namespace BSE {
 
             /*---------------------------------------*/
             /////////
-//            Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dX_(6), Eigen::Vector3d::UnitX()) *
-//                                       Eigen::AngleAxisd(dX_(7), Eigen::Vector3d::UnitY()) *
-//                                       Eigen::AngleAxisd(dX_(8), Eigen::Vector3d::UnitZ());
-//            tmp_q.normalize();
-//            rotation_q_ = tmp_q * rotation_q_;
+            Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dX_(6), Eigen::Vector3d::UnitX()) *
+                                       Eigen::AngleAxisd(dX_(7), Eigen::Vector3d::UnitY()) *
+                                       Eigen::AngleAxisd(dX_(8), Eigen::Vector3d::UnitZ());
+            tmp_q.normalize();
+            rotation_q_ = tmp_q * rotation_q_;
 //            rotation_q_ = rotation_q_ * tmp_q;
 
             ////////
-            Eigen::Matrix3d rotation_m(rotation_q_.toRotationMatrix());
-            Eigen::Matrix3d omega = Eigen::Matrix3d::Zero();
-            omega << 0.0, dX_(8), -dX_(7),
-                    -dX_(8), 0.0, dX_(6),
-                    dX_(7), -dX_(6), 0.0;
-            omega *= -1.0;
-            rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
-
-            rotation_q_ = Eigen::Quaterniond(rotation_m);
+//            Eigen::Matrix3d rotation_m(rotation_q_.toRotationMatrix());
+//            Eigen::Matrix3d omega = Eigen::Matrix3d::Zero();
+//            omega << 0.0, dX_(8), -dX_(7),
+//                    -dX_(8), 0.0, dX_(6),
+//                    dX_(7), -dX_(6), 0.0;
+//            omega *= -1.0;
+//            rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
+//
+//            rotation_q_ = Eigen::Quaterniond(rotation_m);
 
             /*-00000000000000000000000000000000000000*/
             rotation_q_.normalize();
