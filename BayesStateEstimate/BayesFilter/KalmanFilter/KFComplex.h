@@ -282,28 +282,31 @@ namespace BSE {
 //            prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
             dX_ = K_ * (g_and_mag - mg_fuc.compute(state_x_));
-            std::cout << "diff: "
-                      << (g_and_mag - mg_fuc.compute(state_x_)).transpose()
-                      << std::endl;
-            std::cout << "gmag:"
-                      << g_and_mag.transpose()
-                      << std::endl;
-            std::cout << "fuc :"
-                      << mg_fuc.compute(state_x_).transpose()
-                      << std::endl;
+//            std::cout << "diff: "
+//                      << (g_and_mag - mg_fuc.compute(state_x_)).transpose()
+//                      << std::endl;
+//            std::cout << "gmag:"
+//                      << g_and_mag.transpose()
+//                      << std::endl;
+//            std::cout << "fuc :"
+//                      << mg_fuc.compute(state_x_).transpose()
+//                      << std::endl;
 
             state_x_ += dX_;
 
 
 //            std::cout << "dx:"
-//                      << dX_.transpose() << std::endl;
+//                      << dX_.transpose()
+//                      << std::endl;
 
+            /*---------------------------------------*/
             /////////
             Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dX_(6) / 2.0, Eigen::Vector3d::UnitX()) *
                                        Eigen::AngleAxisd(dX_(7) / 2.0, Eigen::Vector3d::UnitY()) *
                                        Eigen::AngleAxisd(dX_(8) / 2.0, Eigen::Vector3d::UnitZ());
             tmp_q.normalize();
-            rotation_q_ = tmp_q.inverse() * rotation_q_;
+//            rotation_q_ = tmp_q* rotation_q_;
+            rotation_q_ = rotation_q_ * tmp_q;
 
             ////////
 //            Eigen::Matrix3d rotation_m(rotation_q_.toRotationMatrix());
@@ -319,6 +322,7 @@ namespace BSE {
 
 //            rotation_q_ = Eigen::Quaterniond(rotation_m);
 
+            /*-00000000000000000000000000000000000000*/
             rotation_q_.normalize();
             state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
