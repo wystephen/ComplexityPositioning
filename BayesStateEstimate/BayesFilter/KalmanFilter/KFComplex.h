@@ -65,7 +65,7 @@ namespace BSE {
 
             auto gof = GravityOrientationFunction(acc, -1.0 * local_g_ / std::abs(local_g_) * acc.norm(), initial_ori);
 
-            auto res_vec = gof.minimize_error(Eigen::Vector2d(0.0, 0.0),1000,0.01);
+            auto res_vec = gof.minimize_error(Eigen::Vector2d(0.0, 0.0), 1000, 0.01);
             double tr = res_vec[0](0);
             double tp = res_vec[0](1);
 
@@ -101,7 +101,6 @@ namespace BSE {
             mag_func.setMag_nav(rotation_q_ * mag);
             mg_fuc.setMag_nav(rotation_q_ * mag);
             mg_fuc.setGravity_nav_(rotation_q_ * acc);
-
 
 
             std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose()
@@ -191,9 +190,9 @@ namespace BSE {
             state_x_ += tdx;
 
 
-            Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(6)/2.0, Eigen::Vector3d::UnitX())
-                                         * Eigen::AngleAxisd(tdx(7)/2.0, Eigen::Vector3d::UnitY())
-                                         * Eigen::AngleAxisd(tdx(8)/2.0, Eigen::Vector3d::UnitZ());
+            Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(6) / 2.0, Eigen::Vector3d::UnitX())
+                                         * Eigen::AngleAxisd(tdx(7) / 2.0, Eigen::Vector3d::UnitY())
+                                         * Eigen::AngleAxisd(tdx(8) / 2.0, Eigen::Vector3d::UnitZ());
             if (std::isnan(state_x_.sum())) {
                 std::cout << "some error " << std::endl;
             }
@@ -206,11 +205,11 @@ namespace BSE {
             omega *= -1.0;
             rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
 
-            rotation_q_ = Eigen::Quaterniond(rotation_m);
+//            rotation_q_ = Eigen::Quaterniond(rotation_m);
 
-//            rotation_q_ = rotation_q_*delta_q.inverse();
-//            rotation_q_.normalize();
-            state_x_.block(6,0,3,1) = rotation_q_.toRotationMatrix().eulerAngles(0,1,2);
+            rotation_q_ = rotation_q_ * delta_q;
+            rotation_q_.normalize();
+//            state_x_.block(6,0,3,1) = rotation_q_.toRotationMatrix().eulerAngles(0,1,2);
             return;
 
         }
@@ -327,16 +326,13 @@ namespace BSE {
                     -dX_(8), 0.0, dX_(6),
                     dX_(7), -dX_(6), 0.0;
             omega *= -1.0;
-//                         rotation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
-//                                      (2.0 * Eigen::Matrix3d::Identity() - omega).inverse()
-//                                      * rotation_m;
             rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
 
             rotation_q_ = Eigen::Quaterniond(rotation_m);
 
             /*-00000000000000000000000000000000000000*/
             rotation_q_.normalize();
-            state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+//            state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
 //            std::cout << "input:"
 //                      << input.transpose()
