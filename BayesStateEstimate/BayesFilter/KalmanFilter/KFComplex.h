@@ -63,9 +63,9 @@ namespace BSE {
             auto g = acc.norm();
             local_g_ = -1.0 * g;
 
-            auto gof = GravityOrientationFunction(acc, -1.0 * local_g_ / std::abs(local_g_) * acc.norm(), initial_ori);
+            auto gof = GravityOrientationFunction(acc, 1.0 * local_g_ / std::abs(local_g_) * acc.norm(), initial_ori);
 
-            auto res_vec = gof.minimize_error(Eigen::Vector2d(0.0, 0.0));
+            auto res_vec = gof.minimize_error(Eigen::Vector2d(0.0, 0.0),0.01);
             double tr = res_vec[0](0);
             double tp = res_vec[0](1);
 
@@ -91,9 +91,17 @@ namespace BSE {
                            * Eigen::AngleAxisd(initial_ori, Eigen::Vector3d::UnitZ()));
 
 //            mag_func.mag_nav_ = rotation_q_ * (mag/mag.norm());
+            auto acc_nav = rotation_q_ * acc;
+            auto mag_nav = rotation_q_ * mag;
+            std::cout << "acc nav:"
+                      << acc_nav.transpose()
+                      << " mag nava:"
+                      << mag_nav.transpose()
+                      << std::endl;
             mag_func.setMag_nav(rotation_q_ * mag);
             mg_fuc.setMag_nav(rotation_q_ * mag);
             mg_fuc.setGravity_nav_(rotation_q_ * acc);
+
 
 
             std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose()
