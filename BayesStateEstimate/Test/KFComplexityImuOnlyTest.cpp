@@ -216,8 +216,8 @@ int main(int argc, char *argv[]) {
                 tmp_gm.block(0, 0, 3, 1) = imu_data.block(i, 1, 1, 3).transpose();
                 tmp_gm.block(3, 0, 3, 1) = imu_data.block(i, 7, 1, 3).transpose();
                 Eigen::Matrix<double, 6, 6> cov_matrix = Eigen::Matrix<double, 6, 6>::Identity();
-                cov_matrix.block(0, 0, 3, 3) *= 0.1;
-                cov_matrix.block(3, 3, 3, 3) *= 0.801;
+                cov_matrix.block(0, 0, 3, 3) *= 0.3;
+                cov_matrix.block(3, 3, 3, 3) *= 2.801;
 
 
 //                if( current_diff < 0.1)
@@ -225,7 +225,8 @@ int main(int argc, char *argv[]) {
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
-                    std::cout << " lacc:"
+                    std::cout << i
+                              << " lacc:"
                               << (filter_complex.rotation_q_.toRotationMatrix() *
                                   imu_data.block(i, 1, 1, 3).transpose()).transpose()
                               << std::endl;

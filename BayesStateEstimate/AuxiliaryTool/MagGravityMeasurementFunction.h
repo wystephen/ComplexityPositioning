@@ -77,12 +77,12 @@ public:
             return t;
         };
 
-        Eigen::Quaterniond q = Eigen::AngleAxis(in1(6),Eigen::Vector3d::UnitX())*
-                Eigen::AngleAxis(in1(7),Eigen::Vector3d::UnitY())*
-                Eigen::AngleAxis(in1(8),Eigen::Vector3d::UnitZ());
+        Eigen::Quaterniond q = Eigen::AngleAxisd(in1(6),Eigen::Vector3d::UnitX())*
+                Eigen::AngleAxisd(in1(7),Eigen::Vector3d::UnitY())*
+                Eigen::AngleAxisd(in1(8),Eigen::Vector3d::UnitZ());
         d.block(0,3,3,3) = hat(q * gravity_nav_);
         d.block(3,3,3,3) = hat(q * mag_nav_);
-        return d;
+        return compress(d);
 
 
     }
