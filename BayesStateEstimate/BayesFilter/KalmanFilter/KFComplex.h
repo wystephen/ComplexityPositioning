@@ -99,8 +99,9 @@ namespace BSE {
                       << mag_nav.transpose()
                       << std::endl;
             mag_func.setMag_nav(rotation_q_ * mag);
+            mg_fuc.setEpsilon_(1e-6);
             mg_fuc.setMag_nav(rotation_q_ * mag);
-            mg_fuc.setGravity_nav_(rotation_q_ * acc);
+            mg_fuc.setGravity_nav_(Eigen::Vector3d(0,0,1.0));
 
 
             std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose()
