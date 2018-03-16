@@ -290,7 +290,7 @@ namespace BSE {
                  (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
 
             prob_state_ = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * prob_state_;
-//            prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
+            prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
             dX_ = K_ * (g_and_mag - mg_fuc.compute(state_x_));
 //            std::cout << "diff: "
@@ -302,17 +302,19 @@ namespace BSE {
 //            std::cout << "fuc :"
 //                      << mg_fuc.compute(state_x_).transpose()
 //                      << std::endl;
+            auto t = mg_fuc.compute(state_x_);
+
 
             state_x_ += dX_;
 
-            for (int i(6); i < 9; ++i) {
-                while (dX_(i) > M_PI) {
-                    dX_(i) -= 2.0 * M_PI;
-                }
-                while (dX_(i) < -M_PI) {
-                    dX_(i) += 2.0 * M_PI;
-                }
-            }
+//            for (int i(6); i < 9; ++i) {
+//                while (dX_(i) > M_PI) {
+//                    dX_(i) -= 2.0 * M_PI;
+//                }
+//                while (dX_(i) < -M_PI) {
+//                    dX_(i) += 2.0 * M_PI;
+//                }
+//            }
 
 
 //            std::cout << "dx:"
@@ -321,9 +323,9 @@ namespace BSE {
 
             /*---------------------------------------*/
             /////////
-            Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dX_(6), Eigen::Vector3d::UnitX()) *
-                                       Eigen::AngleAxisd(dX_(7), Eigen::Vector3d::UnitY()) *
-                                       Eigen::AngleAxisd(dX_(8), Eigen::Vector3d::UnitZ());
+            Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dX_(6)/2.0, Eigen::Vector3d::UnitX()) *
+                                       Eigen::AngleAxisd(dX_(7)/2.0, Eigen::Vector3d::UnitY()) *
+                                       Eigen::AngleAxisd(dX_(8)/2.0, Eigen::Vector3d::UnitZ());
             tmp_q.normalize();
 //            rotation_q_ = tmp_q * rotation_q_;
             rotation_q_ = rotation_q_ * tmp_q;
