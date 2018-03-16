@@ -305,14 +305,14 @@ namespace BSE {
 
             state_x_ += dX_;
 
-//            for (int i(6); i < 9; ++i) {
-//                while (dX_(i) > M_PI) {
-//                    dX_(i) -= 2.0 * M_PI;
-//                }
-//                while (dX_(i) < -M_PI) {
-//                    dX_(i) += 2.0 * M_PI;
-//                }
-//            }
+            for (int i(6); i < 9; ++i) {
+                while (dX_(i) > M_PI) {
+                    dX_(i) -= 2.0 * M_PI;
+                }
+                while (dX_(i) < -M_PI) {
+                    dX_(i) += 2.0 * M_PI;
+                }
+            }
 
 
 //            std::cout << "dx:"
