@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
                 cov_matrix.block(3, 3, 3, 3) *= 0.801;
 
 
-//                if(std::abs(imu_data(i,3)-9.74)<0.01 && current_diff < 0.001)
+                if(std::abs(imu_data(i,3)-9.88)<0.01 && current_diff < 0.01)
                 filter_complex.MeasurementAngleCorrectMG(tmp_gm, cov_matrix);
 
                 if (zv_flag.size() > 3 &&
