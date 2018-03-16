@@ -51,7 +51,7 @@ public:
 //        q = q.inverse();
 
         Eigen::Matrix<double, 6, 1> out;
-        out.block(0, 0, 3, 1) = -1.0 * q.toRotationMatrix().transpose() * gravity_nav_;
+        out.block(0, 0, 3, 1) = 1.0 * q.toRotationMatrix().transpose() * gravity_nav_;
         out.block(3, 0, 3, 1) = q.toRotationMatrix().transpose() * mag_nav_;
 //        std::cout << "gravity nav :" << gravity_nav_ << std::endl;
         return out;
