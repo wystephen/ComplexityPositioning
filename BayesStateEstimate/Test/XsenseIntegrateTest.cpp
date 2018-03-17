@@ -54,15 +54,23 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
 
-    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0001/";
+    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0003/";
 
     AWF::FileReader imu_file(dir_name + "imu.data");
     AWF::FileReader uwb_file(dir_name + "uwb_data.csv");
     AWF::FileReader beacon_file(dir_name + "beaconset_no_mac.csv");
 
+
     Eigen::MatrixXd imu_data = imu_file.extractDoulbeMatrix(",");
     Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
     Eigen::MatrixXd beacon_data = beacon_file.extractDoulbeMatrix(",");
+
+//    uwb_data.block(0, 0, uwb_data.rows(), 1) =
+//            uwb_data.block(0, 0, uwb_data.rows(), 1) - double(uwb_data(0, 0) + imu_data(0, 0));
+    double time_offset = double(uwb_data(0,0)-imu_data(0,0));
+    for(int i(0);i<uwb_data.rows();++i){
+        uwb_data(i,0) = uwb_data(i,0) -time_offset;
+    }
 
     Eigen::MatrixXd process_noise_matrix =
             Eigen::MatrixXd::Identity(6, 6);
@@ -83,7 +91,21 @@ int main(int argc, char *argv[]) {
     filter.initial_state(imu_data.block(0, 1, 10, 6), 0.0);
     filter.setLocal_g_(-9.81);
 //    filter.IS_DEBUG = true;
+    auto uwb_tool = BSE::UwbTools(uwb_data,
+                                  beacon_data);
 
+    Eigen::MatrixXd optimize_trace = uwb_tool.uwb_position_function();
+    Eigen::Vector3d initial_pos = optimize_trace.block(0, 0, 1, 3).transpose();
+    double initial_ori = uwb_tool.computeInitialOri(optimize_trace);
+
+    std::vector<std::vector<double>> optimize_trace_vec = {{},
+                                                           {},
+                                                           {}};
+    for (int i(0); i < optimize_trace.rows(); ++i) {
+        for (int j(0); j < 3; ++j) {
+            optimize_trace_vec[j].push_back(optimize_trace(i, j));
+        }
+    }
 
     auto imu_tool = BSE::ImuTools();
 
@@ -130,6 +152,7 @@ int main(int argc, char *argv[]) {
                 }
                 Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
                 measurement_data.block(0, 0, 3, 1) = beacon_data.block(k - 1, 0, 1, 3).transpose();
+                std::cout << measurement_data.transpose() << std::endl;
 
 
                 filter.MeasurementState(measurement_data,
@@ -153,7 +176,10 @@ int main(int argc, char *argv[]) {
 
 
     plt::figure();
-    plt::plot(trace[0], trace[1], "-+");
+//    plt::plot(trace[0], trace[1], "-+");\
+    plt::plot(optimize_trace_vec[0],optimize_trace_vec[1],"-*");
+    plt::legend();
+    plt::grid(true);
     plt::title(dir_name);
     plt::grid(true);
 
