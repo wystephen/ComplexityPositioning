@@ -33,10 +33,20 @@ from Scripts.Trilateration import Trilateration
 from scipy.spatial.distance import *
 
 if __name__ == '__main__':
+    # dir_name = '/home/steve/Data/FusingLocationData/0017/'
     dir_name = '/home/steve/Data/FusingLocationData/0017/'
 
     uwb_data = np.loadtxt(dir_name + 'uwb_result.csv', delimiter=',')
     beacon_data = np.loadtxt(dir_name + 'beaconSet.csv', delimiter=',')
+
+
+    ###############
+    dir_name  = "/home/steve/Data/XsensUwb/MTI700/0001/"
+
+    imu_data = np.loadtxt(dir_name+'imu.data',delimiter=',')
+    uwb_data =np.loadtxt(dir_name+'uwb_data.csv',delimiter=',')
+    beacon_data = np.loadtxt(dir_name+'beaconset_no_mac.csv',delimiter=',')
+
 
     plt.figure()
     plt.title('source data')
