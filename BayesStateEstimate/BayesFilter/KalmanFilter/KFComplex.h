@@ -101,7 +101,7 @@ namespace BSE {
             mag_func.setMag_nav(rotation_q_ * mag);
             mg_fuc.setEpsilon_(1e-6);
             mg_fuc.setMag_nav(rotation_q_ * mag);
-            mg_fuc.setGravity_nav_(Eigen::Vector3d(0,0,1.0));
+            mg_fuc.setGravity_nav_(Eigen::Vector3d(0, 0, 1.0));
 
 
             std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose()
@@ -191,7 +191,7 @@ namespace BSE {
             state_x_ += tdx;
 
 
-            Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(6) , Eigen::Vector3d::UnitX())
+            Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(6), Eigen::Vector3d::UnitX())
                                          * Eigen::AngleAxisd(tdx(7), Eigen::Vector3d::UnitY())
                                          * Eigen::AngleAxisd(tdx(8), Eigen::Vector3d::UnitZ());
             if (std::isnan(state_x_.sum())) {
@@ -324,9 +324,9 @@ namespace BSE {
 
             /*---------------------------------------*/
             /////////
-            Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dX_(6)/2.0, Eigen::Vector3d::UnitX()) *
-                                       Eigen::AngleAxisd(dX_(7)/2.0, Eigen::Vector3d::UnitY()) *
-                                       Eigen::AngleAxisd(dX_(8)/2.0, Eigen::Vector3d::UnitZ());
+            Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dX_(6) / 2.0, Eigen::Vector3d::UnitX()) *
+                                       Eigen::AngleAxisd(dX_(7) / 2.0, Eigen::Vector3d::UnitY()) *
+                                       Eigen::AngleAxisd(dX_(8) / 2.0, Eigen::Vector3d::UnitZ());
             tmp_q.normalize();
 //            rotation_q_ = tmp_q * rotation_q_;
             rotation_q_ = rotation_q_ * tmp_q;

@@ -55,9 +55,10 @@ int main(int argc, char *argv[]) {
     std::cout.precision(30);
 
 //    std::string file_name = "/home/steve/Data/XsensData/line-high.csv";
-    std::string file_name = "/home/steve/Data/XsensData/line-low.csv";
+//    std::string file_name = "/home/steve/Data/XsensData/line-low.csv";
 //    std::string file_name = "/home/steve/Data/XsensData/two round high.csv";
 //    std::string file_name = "/home/steve/Data/XsensData/mav_data.csv";
+    std::string file_name = "/home/steve/Data/XsensUwb/MTI700/0003/imu.data";
 
     AWF::FileReader imu_file(file_name);
 
