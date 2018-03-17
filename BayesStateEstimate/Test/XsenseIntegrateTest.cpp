@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 
     AWF::FileReader imu_file(dir_name + "imu.data");
     AWF::FileReader uwb_file(dir_name + "uwb_data.csv");
-    AWF::FileReader beacon_file(dir_name + "beaconset_no_mac.txt");
+    AWF::FileReader beacon_file(dir_name + "beaconset_no_mac.csv");
 
     Eigen::MatrixXd imu_data = imu_file.extractDoulbeMatrix(",");
     Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
