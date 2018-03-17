@@ -105,9 +105,9 @@ int main(int argc, char *argv[]) {
 
     filter.setTime_interval_(0.01);
     filter.initial_state(imu_data.block(0, 1, 10, 6),
-                         0.0,
-                         optimize_trace.block(0, 0, 1, 3).transpose());
-    filter.setLocal_g_(9.3);
+                         initial_ori,
+                         initial_pos);
+    filter.setLocal_g_(9.8);
 //    filter.IS_DEBUG = true;
 
 
@@ -146,14 +146,16 @@ int main(int argc, char *argv[]) {
 //        std::cout << state_x.transpose().eval() << std::endl;
 //        std::cout << state_x.transpose() << std::endl;
         if (uwb_data(uwb_index, 0) < imu_data(i, 0)) {
-            uwb_index++;
+
             Eigen::Matrix<double, 1, 1> measurement_noise_matrix;
             measurement_noise_matrix.resize(1, 1);
-            measurement_noise_matrix(0, 0) = 0.1;
+            measurement_noise_matrix(0, 0) = 0.001;
+
+
             for (int k(1); k < uwb_data.cols(); ++k) {
                 if (uwb_data(uwb_index, k) < 0.0 ||
                     uwb_data(uwb_index, k) > 8.0) {
-                    continue;
+                    break;
                 } else {
 
                     Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
@@ -167,6 +169,9 @@ int main(int argc, char *argv[]) {
                 }
 
             }
+
+            uwb_index++;
+
 
         }
 
@@ -184,7 +189,7 @@ int main(int argc, char *argv[]) {
 
 
     plt::figure();
-    plt::plot(trace[0], trace[1], "-+");
+//    plt::plot(trace[0], trace[1], "-+");
     plt::plot(optimize_trace_vec[0], optimize_trace_vec[1], "-*");
     plt::legend();
     plt::grid(true);
