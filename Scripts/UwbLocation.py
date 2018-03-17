@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
 
     ###############
-    dir_name  = "/home/steve/Data/XsensUwb/MTI700/0001/"
+    dir_name  = "/home/steve/Data/XsensUwb/MTI700/0002/"
 
     imu_data = np.loadtxt(dir_name+'imu.data',delimiter=',')
     uwb_data =np.loadtxt(dir_name+'uwb_data.csv',delimiter=',')
