@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
 
-    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0001/";
+    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0002/";
 
     AWF::FileReader imu_file(dir_name+"imu.data");
 
@@ -74,8 +74,9 @@ int main(int argc, char *argv[]) {
 
     auto filter = BSE::IMUWBKFSimple(initial_prob_matrix);
 //    filter.setTime_interval_(0.01);
-    filter.setTime_interval_(0.005);
-    filter.initial_state(imu_data.block(0, 1, 50, 6), 0.0);
+
+    filter.setTime_interval_(0.01);
+    filter.initial_state(imu_data.block(0, 1, 10, 6), 0.0);
     filter.setLocal_g_(9.81);
 //    filter.IS_DEBUG = true;
 
@@ -108,7 +109,7 @@ int main(int argc, char *argv[]) {
 
 
         for (int j(0); j < 3; ++j) {
-            trace[j].push_back(state_T(j,3));
+            trace[j].push_back(state_x(j,0));
             acc[j].push_back(imu_data(i,j+1));
             gyr[j].push_back(imu_data(i,j+4));
             velocity[j].push_back(state_x(j+3,0));
