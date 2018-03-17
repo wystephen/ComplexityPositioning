@@ -54,13 +54,9 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
 
-//    std::string file_name = "/home/steve/Data/XsensData/line-high.csv";
-//    std::string file_name = "/home/steve/Data/XsensData/line-low.csv";
-//    std::string file_name = "/home/steve/Data/XsensData/two round high.csv";
-//    std::string file_name = "/home/steve/Data/XsensData/mav_data.csv";
-    std::string file_name = "/home/steve/Data/XsensUwb/MTI700/0003/imu.data";
+    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0001/";
 
-    AWF::FileReader imu_file(file_name);
+    AWF::FileReader imu_file(dir_name+"imu.data");
 
     Eigen::MatrixXd imu_data = imu_file.extractDoulbeMatrix(",");
 
@@ -125,7 +121,7 @@ int main(int argc, char *argv[]) {
 
     plt::figure();
     plt::plot(trace[0], trace[1], "-+");
-    plt::title(file_name);
+    plt::title(dir_name);
     plt::grid(true);
 
     auto show_func = [&](vec_data d, std::string name){
