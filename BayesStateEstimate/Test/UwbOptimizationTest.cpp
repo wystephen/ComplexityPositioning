@@ -27,8 +27,6 @@
 #include <iostream>
 
 
-
-
 #include <iostream>
 #include <fstream>
 #include <thread>
@@ -57,23 +55,20 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
 
+    ////////////////////////////
     std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0002/";
-
     AWF::FileReader imu_file(dir_name + "imu.data");
     AWF::FileReader uwb_file(dir_name + "uwb_data.csv");
     AWF::FileReader beacon_file(dir_name + "beaconset_no_mac.csv");
+    ///////////////////////////
+//    std::string dir_name = "/home/steve/Data/FusingLocationData/0015/";
+//    AWF::FileReader uwb_file(dir_name + "uwb_result.csv"),
+//            beacon_file(dir_name + "beaconSet.csv");
 
-
-    Eigen::MatrixXd imu_data = imu_file.extractDoulbeMatrix(",");
+//    Eigen::MatrixXd imu_data = imu_file.extractDoulbeMatrix(",");
     Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
     Eigen::MatrixXd beacon_data = beacon_file.extractDoulbeMatrix(",");
 
-//    uwb_data.block(0, 0, uwb_data.rows(), 1) =
-//            uwb_data.block(0, 0, uwb_data.rows(), 1) - double(uwb_data(0, 0) + imu_data(0, 0));
-    double time_offset = double(uwb_data(0, 0) - imu_data(0, 0));
-    for (int i(0); i < uwb_data.rows(); ++i) {
-        uwb_data(i, 0) = uwb_data(i, 0) - time_offset;
-    }
     auto uwb_tool = BSE::UwbTools(uwb_data,
                                   beacon_data);
 
@@ -89,7 +84,7 @@ int main(int argc, char *argv[]) {
     }
 
 
- AWF::writeVectorsToCsv("./XsenseResult/ekf.csv", optimize_trace_vec);
+    AWF::writeVectorsToCsv("./XsenseResult/ekf.csv", optimize_trace_vec);
 
 
     plt::figure();

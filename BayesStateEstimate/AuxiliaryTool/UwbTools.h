@@ -104,14 +104,16 @@ namespace BSE {
         std::function<double(Eigen::Vector3d)> uwb_err_function = [&]
                 (Eigen::Vector3d pos) -> double {
             if (!checkData()) {
+                ERROR_MSG_FLAG("check Data is falsed");
                 return 0.0;
             }
             int vaild_counter = 0;
             double sum_err = 0.0;
             for (int i(1); i < uwb_data_.cols(); ++i) {
                 if (uwb_data_(uwb_index, i) > 0.0) {
-                    sum_err += std::abs(uwb_data_(uwb_index, i) -
-                                        (pos - beacon_set_.block(i - 1, 0, 1, 3).transpose()).norm());
+                    sum_err += std::pow(uwb_data_(uwb_index, i) -
+                                        (pos - beacon_set_.block(i - 1, 0, 1, 3).transpose()).norm(),
+                                        2.0);
                     vaild_counter++;
                 }
 
@@ -170,7 +172,7 @@ namespace BSE {
                 }
                 trace.block(i, 0, 1, 3) = initial_pos.transpose();
                 trace(i, 3) = uwb_err_function(initial_pos);
-                std::cout << i << ":" << trace(i,3) << std::endl;
+                std::cout << i << ":" << trace(i, 3) << std::endl;
             }
 
 
