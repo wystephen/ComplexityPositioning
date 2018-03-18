@@ -29,6 +29,8 @@
 
 #include <Eigen/Dense>
 
+#include <omp.h>
+
 namespace BSE {
     class UwbTools {
     public:
@@ -139,8 +141,15 @@ namespace BSE {
                 return Eigen::Matrix3d::Identity();
             }
             Eigen::MatrixXd trace = Eigen::MatrixXd(uwb_data_.rows(), 4);
+//            Eigen::Vector3d initial_pos(0, 0, 0);
+            omp_set_num_threads(6);
+//#pragma omp parallel
             Eigen::Vector3d initial_pos(0, 0, 0);
+
+//#pragma omp parallel for
             for (int i(0); i < trace.rows(); ++i) {
+
+
                 uwb_index = i;
                 double last_uwb_err = 10000000000.0;
                 int ite_times = 0;
@@ -148,7 +157,7 @@ namespace BSE {
                 double step_length = 0.0000001;
                 double update_rate = 0.015;
 
-                while (ite_times < 10000 ) {
+                while (ite_times < 10000) {
                     last_uwb_err = uwb_err_function(initial_pos);
                     Eigen::Vector3d tmp_gradient(0, 0, 0);
                     for (int i(0); i < 3; ++i) {
@@ -164,12 +173,11 @@ namespace BSE {
 
                 }
 
-
                 trace.block(i, 0, 1, 3) = initial_pos.transpose();
                 trace(i, 3) = uwb_err_function(initial_pos);
-
-
             }
+
+
             return trace;
 
         };
