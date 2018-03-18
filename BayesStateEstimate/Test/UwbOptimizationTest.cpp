@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
 
-    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0001/";
+    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0002/";
 
     AWF::FileReader imu_file(dir_name + "imu.data");
     AWF::FileReader uwb_file(dir_name + "uwb_data.csv");
@@ -87,6 +87,9 @@ int main(int argc, char *argv[]) {
             optimize_trace_vec[j].push_back(optimize_trace(i, j));
         }
     }
+
+
+ AWF::writeVectorsToCsv("./XsenseResult/ekf.csv", optimize_trace_vec);
 
 
     plt::figure();

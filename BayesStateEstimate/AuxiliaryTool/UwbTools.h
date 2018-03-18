@@ -141,12 +141,8 @@ namespace BSE {
                 return Eigen::Matrix3d::Identity();
             }
             Eigen::MatrixXd trace = Eigen::MatrixXd(uwb_data_.rows(), 4);
-//            Eigen::Vector3d initial_pos(0, 0, 0);
-            omp_set_num_threads(6);
-//#pragma omp parallel
             Eigen::Vector3d initial_pos(0, 0, 0);
 
-//#pragma omp parallel for
             for (int i(0); i < trace.rows(); ++i) {
 
 
@@ -154,8 +150,8 @@ namespace BSE {
                 double last_uwb_err = 10000000000.0;
                 int ite_times = 0;
 
-                double step_length = 0.0000001;
-                double update_rate = 0.015;
+                double step_length = 0.00001;
+                double update_rate = 0.15;
 
                 while (ite_times < 10000) {
                     last_uwb_err = uwb_err_function(initial_pos);
@@ -172,9 +168,9 @@ namespace BSE {
                     ite_times++;
 
                 }
-
                 trace.block(i, 0, 1, 3) = initial_pos.transpose();
                 trace(i, 3) = uwb_err_function(initial_pos);
+                std::cout << i << ":" << trace(i,3) << std::endl;
             }
 
 
