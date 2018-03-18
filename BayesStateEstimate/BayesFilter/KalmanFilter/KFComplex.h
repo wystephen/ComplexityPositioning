@@ -203,15 +203,14 @@ namespace BSE {
             omega << 0.0, tdx(8), -tdx(7),
                     -tdx(8), 0.0, tdx(6),
                     tdx(7), -tdx(6), 0.0;
-//            omega *= -1.0;
+            omega *= -1.0;
             rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
 
-//            rotation_q_ = Eigen::Quaterniond(rotation_m);
+            rotation_q_ = Eigen::Quaterniond(rotation_m);
 
-            rotation_q_ = rotation_q_ * delta_q;
+//            rotation_q_ = rotation_q_ * delta_q;
             rotation_q_.normalize();
-//            state_x_.block(6,0,3,1) = rotation_q_.toRotationMatrix().eulerAngles(0,1,2);
-            return;
+            state_x_.block(6,0,3,1) = rotation_q_.toRotationMatrix().eulerAngles(0,1,2);
 
         }
 
