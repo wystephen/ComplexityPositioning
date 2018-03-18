@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
 
-    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0002/";
+    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0003/";
 
     AWF::FileReader imu_file(dir_name + "imu.data");
     AWF::FileReader uwb_file(dir_name + "uwb_data.csv");
@@ -189,12 +189,16 @@ int main(int argc, char *argv[]) {
 
 
     plt::figure();
+    plt::title("trace");
     plt::plot(trace[0], trace[1], "-+");
+    plt::grid(true);
+    plt::figure();
+    plt::title("uwb trace");
     plt::plot(optimize_trace_vec[0], optimize_trace_vec[1], "-*");
     plt::legend();
     plt::grid(true);
-    plt::title(dir_name);
-    plt::grid(true);
+//    plt::title(dir_name);
+//    plt::grid(true);
 
     auto show_func = [&](vec_data d, std::string name) {
         plt::figure();
