@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
 
     ###############
-    dir_name  = "/home/steve/Data/XsensUwb/MTI700/0002/"
+    dir_name  = "/home/steve/Data/XsensUwb/MTI700/0003/"
 
     imu_data = np.loadtxt(dir_name+'imu.data',delimiter=',')
     uwb_data =np.loadtxt(dir_name+'uwb_data.csv',delimiter=',')
@@ -111,6 +111,14 @@ if __name__ == '__main__':
 
     ax.legend()
     ax.grid()
+
+
+    plt.figure()
+    plt.title('trace')
+    plt.plot(src_pose[:,0],src_pose[:,1],'-*',label='src pose')
+    plt.plot(pose[:,0],pose[:,1],'-*',label='pose')
+    plt.legend()
+    plt.grid()
 
 
 

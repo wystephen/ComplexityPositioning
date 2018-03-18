@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
 
             for (int k(1); k < uwb_data.cols(); ++k) {
                 if (uwb_data(uwb_index, k) < 0.0 ||
-                    uwb_data(uwb_index, k) > 8.0) {
+                    uwb_data(uwb_index, k) > 28.0) {
                     break;
                 } else {
 
@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
 
 
     plt::figure();
-//    plt::plot(trace[0], trace[1], "-+");
+    plt::plot(trace[0], trace[1], "-+");
     plt::plot(optimize_trace_vec[0], optimize_trace_vec[1], "-*");
     plt::legend();
     plt::grid(true);
