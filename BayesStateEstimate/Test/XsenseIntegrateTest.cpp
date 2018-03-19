@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
 
-    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0003/";
+    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0002/";
 
     AWF::FileReader imu_file(dir_name + "imu.data");
     AWF::FileReader uwb_file(dir_name + "uwb_data.csv");
@@ -64,12 +64,16 @@ int main(int argc, char *argv[]) {
     Eigen::MatrixXd imu_data = imu_file.extractDoulbeMatrix(",");
     Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
     Eigen::MatrixXd beacon_data = beacon_file.extractDoulbeMatrix(",");
+//    beacon_data.block(0, 1, beacon_data.rows(), 1) *= -1.0;
 
 //    uwb_data.block(0, 0, uwb_data.rows(), 1) =
 //            uwb_data.block(0, 0, uwb_data.rows(), 1) - double(uwb_data(0, 0) + imu_data(0, 0));
     double time_offset = double(uwb_data(0, 0) - imu_data(0, 0));
+    std::cout << "time offset:"
+              << time_offset << std::endl;
     for (int i(0); i < uwb_data.rows(); ++i) {
-        uwb_data(i, 0) = uwb_data(i, 0) - time_offset;
+//        uwb_data(i, 0) = uwb_data(i, 0) - time_offset;
+        uwb_data(i, 0) = uwb_data(i, 0) - 8.0 * 60.0 * 60.0;//time_offset;
     }
     auto uwb_tool = BSE::UwbTools(uwb_data,
                                   beacon_data);
@@ -107,7 +111,7 @@ int main(int argc, char *argv[]) {
     filter.initial_state(imu_data.block(0, 1, 10, 6),
                          initial_ori,
                          initial_pos);
-    filter.setLocal_g_(9.8);
+    filter.setLocal_g_(-9.824);
 //    filter.IS_DEBUG = true;
 
 
@@ -149,12 +153,13 @@ int main(int argc, char *argv[]) {
 
             Eigen::Matrix<double, 1, 1> measurement_noise_matrix;
             measurement_noise_matrix.resize(1, 1);
-            measurement_noise_matrix(0, 0) = 0.001;
+            measurement_noise_matrix(0, 0) = 1;
 
 
             for (int k(1); k < uwb_data.cols(); ++k) {
                 if (uwb_data(uwb_index, k) < 0.0 ||
-                    uwb_data(uwb_index, k) > 28.0) {
+                    uwb_data(uwb_index, k) > 28.0 ||
+                    optimize_trace(uwb_index, 3) > 20.0) {
                     break;
                 } else {
 
@@ -190,11 +195,11 @@ int main(int argc, char *argv[]) {
 
     plt::figure();
     plt::title("trace");
-    plt::plot(trace[0], trace[1], "-+");
-    plt::grid(true);
-    plt::figure();
-    plt::title("uwb trace");
-    plt::plot(optimize_trace_vec[0], optimize_trace_vec[1], "-*");
+    plt::named_plot("ekf", trace[0], trace[1], "-+");
+//    plt::grid(true);
+//    plt::figure();
+//    plt::title("uwb trace");
+    plt::named_plot("uwb", optimize_trace_vec[0], optimize_trace_vec[1], "-*");
     plt::legend();
     plt::grid(true);
 //    plt::title(dir_name);
@@ -215,6 +220,7 @@ int main(int argc, char *argv[]) {
     show_func(attitude, "orientation");
     show_func(acc, "acc");
     show_func(gyr, "gyr");
+    show_func(trace, "trace");
 
 
     plt::show();

@@ -172,7 +172,7 @@ namespace BSE {
                 }
                 trace.block(i, 0, 1, 3) = initial_pos.transpose();
                 trace(i, 3) = uwb_err_function(initial_pos);
-                std::cout << i << ":" << trace(i, 3) << std::endl;
+//                std::cout << i << ":" << trace(i, 3) << std::endl;
             }
 
 
