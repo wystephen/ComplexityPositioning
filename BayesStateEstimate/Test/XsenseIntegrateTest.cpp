@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
 
             Eigen::Matrix<double, 1, 1> measurement_noise_matrix;
             measurement_noise_matrix.resize(1, 1);
-            measurement_noise_matrix(0, 0) = 1;
+            measurement_noise_matrix(0, 0) = 0.1;
 
 
             for (int k(1); k < uwb_data.cols(); ++k) {
