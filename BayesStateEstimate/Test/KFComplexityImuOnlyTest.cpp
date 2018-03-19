@@ -7,6 +7,7 @@
 #include <fstream>
 #include <thread>
 
+#define EIGEN_USE_MKL_ALL
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 //#include <AWF.h>dd
@@ -27,11 +28,15 @@
 #include "../AuxiliaryTool/ImuTools.cpp"
 
 
+#include <omp.h>
+
 namespace plt = matplotlibcpp;
 
 
 int main(int argc, char *argv[]) {
+    double start_time = AWF::getDoubleSecondTime();
 
+    omp_set_num_threads(12);
 
     std::cout.precision(10);
     // parameters
@@ -252,6 +257,8 @@ int main(int argc, char *argv[]) {
 
         }
 
+
+
         plt::figure();
         for (int i(0); i < 3; ++i) {
             plt::named_plot(std::to_string(i), pose[i]);
@@ -337,11 +344,13 @@ int main(int argc, char *argv[]) {
         plt::title(data_name + "trace");
 
     };
+
 //
 //    f(left_imu_data, "left_foot");
     f(right_imu_data, "right_foot");
 //    f(head_imu_data, "head");
 
+    std::cout << "time:" << AWF::getDoubleSecondTime()-start_time << std::endl;
     plt::show();
 
 }

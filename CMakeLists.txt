@@ -5,7 +5,10 @@ project(ComplexityPositioning)
 set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_BUILD_TOOL Release)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g  -lpthread ")
+set(MKLROOT "/opt/intel/mkl/")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g  -lpthread -fopenmp -mavx -mfma ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_intel_lp64 -lmkl_gnu_thread -lmkl_core -lgomp -lpthread -lm -ldl ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -m64 -I${MKLROOT}/include ")
 
 # Configure CCache if available
 find_program(CCACHE_FOUND ccache)
@@ -32,6 +35,8 @@ find_package(Thrust REQUIRED)
 
 # cuda
 find_package(CUDA REQUIRED)
+
+#find_package(MKL REQUIRED)
 
 #OPENMP
 find_package(OpenMP)
@@ -105,6 +110,7 @@ include_directories(
         ${Boost_INCLUDE_DIRS}
         ${BoostCompute_INCLUDE_DIRS}
         ${OpenCL_LIBRARY}
+        /opt/intel/mkl/include
 )
 
 link_directories(
@@ -116,6 +122,8 @@ link_directories(
         ${PYTHON_LIBRARIES}
         ./include
         ${OpenCL_LIBRARY}
+        /opt/intel/mkl/lib/intel64/
+#        /opt/intel/mkl/lib/intel64_lin/
 )
 
 #add_library(BayesStateEstimate  STATIC BayesStateEstimate/BSE.h)

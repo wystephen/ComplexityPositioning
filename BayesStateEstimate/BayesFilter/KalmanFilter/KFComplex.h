@@ -208,9 +208,10 @@ namespace BSE {
 
 //            rotation_q_ = Eigen::Quaterniond(rotation_m);
 
-            rotation_q_ = rotation_q_ * delta_q;
+//            rotation_q_ = rotation_q_ * delta_q;
+            rotation_q_ = delta_q.inverse() * rotation_q_;
             rotation_q_.normalize();
-            state_x_.block(6,0,3,1) = rotation_q_.toRotationMatrix().eulerAngles(0,1,2);
+//            state_x_.block(6,0,3,1) = rotation_q_.toRotationMatrix().eulerAngles(0,1,2);
 
         }
 
