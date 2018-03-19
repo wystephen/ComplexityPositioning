@@ -112,7 +112,7 @@ namespace BSE {
          * @param ang
          * @return
          */
-        inline Eigen::Quaterniond angle2q(const Eigen::Vector3d &ang) {
+        Eigen::Quaterniond angle2q(const Eigen::Vector3d &ang) {
             Eigen::Quaterniond q = Eigen::AngleAxisd(ang(0), Eigen::Vector3d::UnitX()) *
                                    Eigen::AngleAxisd(ang(1), Eigen::Vector3d::UnitY()) *
                                    Eigen::AngleAxisd(ang(2), Eigen::Vector3d::UnitZ());
