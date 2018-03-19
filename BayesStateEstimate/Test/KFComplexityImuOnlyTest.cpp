@@ -110,8 +110,7 @@ int main(int argc, char *argv[]) {
             &initial_prob_matrix_complex,
             &initial_pos,
             &initial_ori,
-            &optimize_trace_vec,
-            &imu_tool](const Eigen::MatrixXd &imu_data,
+            &optimize_trace_vec](const Eigen::MatrixXd &imu_data,
                        std::string data_name) {
         auto filter = BSE::IMUWBKFSimple(
                 initial_prob_matrix);
@@ -190,7 +189,7 @@ int main(int argc, char *argv[]) {
             bool tmp_break_flag = false;
 
 
-            if (imu_tool.GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
+            if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
                 /// zero velocity detector
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
                                         Eigen::Matrix3d::Identity() * 0.000251001,
