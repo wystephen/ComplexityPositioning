@@ -36,6 +36,11 @@ namespace BSE {
     class ImuTools {
     public:
 
+        /**
+         * zero velocity detector based on GLRT algorithm.
+         * @param u
+         * @return
+         */
         bool GLRT_Detector(Eigen::MatrixXd u) {
             if (u.cols() == 6 && u.rows() != 6) {
                 Eigen::MatrixXd tu = u * 1.0;
@@ -86,9 +91,9 @@ namespace BSE {
         }
 
         /**
- *  process the imu data according to the typical sensor model
- * @param imu_data after preprocess time[s] acc_(x,y,z)[m*s^-2] gyr_(x,y,z)[rad*s^-1] mag_(x,y,z) pressure
- */
+        *  process the imu data according to the typical sensor model
+        * @param imu_data after preprocess time[s] acc_(x,y,z)[m*s^-2] gyr_(x,y,z)[rad*s^-1] mag_(x,y,z) pressure
+         */
         void processImuData(Eigen::MatrixXd &imu_data) {
             Eigen::MatrixXd tmp_data(imu_data);
 
@@ -101,6 +106,19 @@ namespace BSE {
             imu_data.block(0, 4, row, 3) = tmp_data.block(0, 5, row, 3) * (M_PI / 180.0);
             imu_data.block(0, 7, row, 3) = tmp_data.block(0, 8, row, 3) * 1.0;
             return;
+        }
+
+
+        /**
+         *
+         * @param x
+         * @param dx
+         * @return
+         */
+        Eigen::Vector3d angleAdd(Eigen::Vector3d x, Eigen::Vector3d dx) {
+
+
+            return x;
         }
     };
 
