@@ -38,6 +38,7 @@
 #include <AuxiliaryTool/SimpleImuUpdateFunction.h>
 #include <AuxiliaryTool/MagMeasurementFunction.h>
 #include <AuxiliaryTool/MagGravityMeasurementFunction.h>
+#include <AuxiliaryTool/ImuTools.h>
 
 #include "KalmanFilterBase.h"
 #include "KalmanFilterBase.h"
@@ -304,45 +305,12 @@ namespace BSE {
             auto t = mg_fuc.compute(state_x_);
 
 
-            state_x_ += dX_;
-
-//            for (int i(6); i < 9; ++i) {
-//                while (dX_(i) > M_PI) {
-//                    dX_(i) -= 2.0 * M_PI;
-//                }
-//                while (dX_(i) < -M_PI) {
-//                    dX_(i) += 2.0 * M_PI;
-//                }
-//            }
+            state_x_.block(0, 0, 6, 1) += dX_.block(0, 0, 6, 1);
 
 
-//            std::cout << "dx:"
-//                      << dX_.transpose()
-//                      << std::endl;
+            state_x_.block(6, 0, 3, 1) = BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
+                                                                 dX_.block(6, 0, 3, 1));
 
-            /*---------------------------------------*/
-            /////////
-            Eigen::Quaterniond tmp_q = Eigen::AngleAxisd(dX_(6) / 2.0, Eigen::Vector3d::UnitX()) *
-                                       Eigen::AngleAxisd(dX_(7) / 2.0, Eigen::Vector3d::UnitY()) *
-                                       Eigen::AngleAxisd(dX_(8) / 2.0, Eigen::Vector3d::UnitZ());
-            tmp_q.normalize();
-//            rotation_q_ = tmp_q * rotation_q_;
-            rotation_q_ = rotation_q_ * tmp_q;
-
-            ////////
-//            Eigen::Matrix3d rotation_m(rotation_q_.toRotationMatrix());
-//            Eigen::Matrix3d omega = Eigen::Matrix3d::Zero();
-//            omega << 0.0, dX_(8), -dX_(7),
-//                    -dX_(8), 0.0, dX_(6),
-//                    dX_(7), -dX_(6), 0.0;
-//            omega *= -1.0;
-//            rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
-//
-//            rotation_q_ = Eigen::Quaterniond(rotation_m);
-
-            /*-00000000000000000000000000000000000000*/
-            rotation_q_.normalize();
-            state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
 //            std::cout << "input:"
 //                      << input.transpose()
