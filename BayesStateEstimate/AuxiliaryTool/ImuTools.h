@@ -34,7 +34,6 @@
 
 namespace BSE {
     namespace ImuTools {
-//    public:
 
         /**
          * zero velocity detector based on GLRT algorithm.
@@ -108,21 +107,6 @@ namespace BSE {
             return;
         }
 
-
-
-//    };
-        /**
-         *
-         * @param x
-         * @param dx
-         * @return
-         */
-        Eigen::Vector3d angleAdd(Eigen::Vector3d x, Eigen::Vector3d dx) {
-
-
-            return x;
-        }
-
         /**
          * Convert angle in three axis as quaternion.
          * @param ang
@@ -134,8 +118,28 @@ namespace BSE {
                                    Eigen::AngleAxisd(ang(2), Eigen::Vector3d::UnitZ());
             return q;
         }
-    }
 
-}
+        /**
+         *
+         * @param x
+         * @param dx
+         * @return
+         */
+        Eigen::Vector3d angleAdd(Eigen::Vector3d x, const Eigen::Vector3d &dx) {
+            Eigen::Quaterniond q, dq;
+            q = angle2q(x);
+            dq = angle2q(dx);
+            q = q * dq;
+            q.normalize();
+            x = q.toRotationMatrix().eulerAngles(0, 1, 2);
+
+
+            return x;
+        }
+
+
+    };
+
+};
 
 #endif //COMPLEXITYPOSITIONING_IMUTOOLS_H

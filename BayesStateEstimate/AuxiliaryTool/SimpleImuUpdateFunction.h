@@ -30,8 +30,8 @@
 #include <AWF.h>
 #include "ImuUpdateFunction.h"
 
-#include <ImuTools.h>
 #include <BSE.h>
+#include "ImuTools.h"
 
 namespace BSE {
     class SimpleImuUpdateFunction : public ImuUpdateFunction {
