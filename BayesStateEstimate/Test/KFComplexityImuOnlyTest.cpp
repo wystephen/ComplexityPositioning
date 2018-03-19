@@ -8,6 +8,7 @@
 #include <thread>
 
 #define EIGEN_USE_MKL_ALL
+
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 //#include <AWF.h>dd
@@ -77,13 +78,13 @@ int main(int argc, char *argv[]) {
 
 
 //    std::cout << last_uwb_err
-    auto imu_tool = BSE::ImuTools();
+//    auto imu_tool = BSE::ImuTools();
 
 
     //process
-    imu_tool.processImuData(left_imu_data);
-    imu_tool.processImuData(right_imu_data);
-    imu_tool.processImuData(head_imu_data);
+    BSE::ImuTools::processImuData(left_imu_data);
+    BSE::ImuTools::processImuData(right_imu_data);
+    BSE::ImuTools::processImuData(head_imu_data);
 
     Eigen::MatrixXd process_noise_matrix =
             Eigen::MatrixXd::Identity(6, 6);
@@ -258,7 +259,6 @@ int main(int argc, char *argv[]) {
         }
 
 
-
         plt::figure();
         for (int i(0); i < 3; ++i) {
             plt::named_plot(std::to_string(i), pose[i]);
@@ -350,7 +350,7 @@ int main(int argc, char *argv[]) {
     f(right_imu_data, "right_foot");
 //    f(head_imu_data, "head");
 
-    std::cout << "time:" << AWF::getDoubleSecondTime()-start_time << std::endl;
+    std::cout << "time:" << AWF::getDoubleSecondTime() - start_time << std::endl;
     plt::show();
 
 }
