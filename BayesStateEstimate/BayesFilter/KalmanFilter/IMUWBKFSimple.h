@@ -246,6 +246,7 @@ namespace BSE {
 
                          state.block(0, 0, 6, 1) += dx.block(0, 0, 6, 1);
 
+
 //                std::cout << "dx:" << dx.transpose() << std::endl;
 
                          state_prob = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * state_prob;

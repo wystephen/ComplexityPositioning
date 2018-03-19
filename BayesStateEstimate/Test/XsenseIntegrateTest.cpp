@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
 
     filter.setTime_interval_(0.01);
     filter.initial_state(imu_data.block(0, 1, 10, 6),
-                         initial_ori,
+                         initial_ori + 10.0 / 180.0 * M_PI,
                          initial_pos);
     filter.setLocal_g_(-9.824);
 //    filter.IS_DEBUG = true;
@@ -120,7 +120,9 @@ int main(int argc, char *argv[]) {
     std::vector<std::vector<double>> trace = {{},
                                               {},
                                               {}};
-
+    std::vector<std::vector<double>> angle = {{},
+                                              {},
+                                              {}};
 
     typedef std::vector<std::vector<double>> vec_data;
     vec_data acc = {{},
@@ -153,7 +155,7 @@ int main(int argc, char *argv[]) {
 
             Eigen::Matrix<double, 1, 1> measurement_noise_matrix;
             measurement_noise_matrix.resize(1, 1);
-            measurement_noise_matrix(0, 0) = 0.1;
+            measurement_noise_matrix(0, 0) = 0.01;
 
 
             for (int k(1); k < uwb_data.cols(); ++k) {
@@ -182,9 +184,13 @@ int main(int argc, char *argv[]) {
 
 
         for (int j(0); j < 3; ++j) {
-            trace[j].push_back(state_x(j, 0));
+
+//            angle[j].push_back(state_x(j+6,0));
             acc[j].push_back(imu_data(i, j + 1));
             gyr[j].push_back(imu_data(i, j + 4));
+            angle[j].push_back(imu_data(i, j + 10));
+
+            trace[j].push_back(state_x(j, 0));
             velocity[j].push_back(state_x(j + 3, 0));
             attitude[j].push_back(state_x(j + 6, 0));
         }
@@ -216,12 +222,13 @@ int main(int argc, char *argv[]) {
     };
 
 
-    show_func(velocity, "velocity");
-    show_func(attitude, "orientation");
     show_func(acc, "acc");
     show_func(gyr, "gyr");
-    show_func(trace, "trace");
+    show_func(angle, "angle");
 
+    show_func(trace, "trace-state");
+    show_func(velocity, "velocity-state");
+    show_func(attitude, "orientation-state");
 
     plt::show();
 
