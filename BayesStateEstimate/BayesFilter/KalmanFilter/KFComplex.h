@@ -305,11 +305,13 @@ namespace BSE {
             auto t = mg_fuc.compute(state_x_);
 
 
-            state_x_.block(0, 0, 6, 1) += dX_.block(0, 0, 6, 1);
+            state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) +
+                                         dX_.block(0, 0, 6, 1);
 
 
-            state_x_.block(6, 0, 3, 1) = BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
-                                                                 dX_.block(6, 0, 3, 1));
+            state_x_.block(6, 0, 3, 1) =
+                    BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
+                                            dX_.block(6, 0, 3, 1));
 
 
 //            std::cout << "input:"
