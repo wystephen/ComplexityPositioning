@@ -189,28 +189,11 @@ namespace BSE {
             Eigen::Vector3d m(0, 0, 0);
             Eigen::MatrixXd tdx = K_ * (m - state_x_.block(3, 0, 3, 1));
 
-            state_x_ += tdx;
+            state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
 
+            state_x_.block(6, 0, 3, 1) = BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
+                                                                 dX_.block(6, 0, 3, 1));
 
-            Eigen::Quaterniond delta_q = Eigen::AngleAxisd(tdx(6), Eigen::Vector3d::UnitX())
-                                         * Eigen::AngleAxisd(tdx(7), Eigen::Vector3d::UnitY())
-                                         * Eigen::AngleAxisd(tdx(8), Eigen::Vector3d::UnitZ());
-            if (std::isnan(state_x_.sum())) {
-                std::cout << "some error " << std::endl;
-            }
-
-            Eigen::Matrix3d rotation_m(rotation_q_.toRotationMatrix());
-            Eigen::Matrix3d omega = Eigen::Matrix3d::Zero();
-            omega << 0.0, tdx(8), -tdx(7),
-                    -tdx(8), 0.0, tdx(6),
-                    tdx(7), -tdx(6), 0.0;
-            omega *= -1.0;
-            rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
-
-
-            rotation_q_ = delta_q.inverse() * rotation_q_;
-            rotation_q_.normalize();
-            state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
         }
 
@@ -279,9 +262,6 @@ namespace BSE {
             g_and_mag.block(0, 0, 3, 1) = tmp_acc / tmp_acc.norm();
             g_and_mag.block(3, 0, 3, 1) = tmp_mag / tmp_mag.norm();
 
-
-            rotation_q_.normalize();
-            state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
             auto t_vec = mg_fuc.derivative(state_x_);
             H_ = t_vec[0];
