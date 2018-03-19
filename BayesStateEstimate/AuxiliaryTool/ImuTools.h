@@ -122,6 +122,18 @@ namespace BSE {
 
             return x;
         }
+
+        /**
+         * Convert angle in three axis as quaternion.
+         * @param ang
+         * @return
+         */
+        Eigen::Quaterniond angle2q(Eigen::Vector3d ang) {
+            Eigen::Quaterniond q = Eigen::AngleAxisd(ang(0), Eigen::Vector3d::UnitX()) *
+                                   Eigen::AngleAxisd(ang(1), Eigen::Vector3d::UnitY()) *
+                                   Eigen::AngleAxisd(ang(2), Eigen::Vector3d::UnitZ());
+            return q;
+        }
     }
 
 }
