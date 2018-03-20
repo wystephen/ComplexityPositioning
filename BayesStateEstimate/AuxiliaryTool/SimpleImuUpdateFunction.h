@@ -54,15 +54,15 @@ namespace BSE {
         Eigen::MatrixXd compute(Eigen::MatrixXd state, Eigen::MatrixXd input) {
             Eigen::MatrixXd out_state(9, 1);
 
-//            Eigen::Quaterniond rotation_q = BSE::ImuTools::angle2q(state.block(6, 0, 3, 1));
             Sophus::SO3 rotation = Sophus::SO3::exp(state.block(6,0,3,1));
-            Eigen::Vector3d gyr = input.block(3, 0, 3, 1) * time_interval_;
+            Eigen::Vector3d gyr = input.block(3, 0, 3, 1) * time_interval_ ;
+            std::cout << time_interval_ << std::endl;
+            assert(time_interval_>0.0 && time_interval_ < 0.1);
 
-//            if (input.block(3, 0, 3, 1).norm() > 1e-6) {
+            if (input.block(3, 0, 3, 1).norm() > 1e-6) {
             rotation = rotation * Sophus::SO3::exp(gyr);
-//                rotation = Sophus::SO3::exp(gyr) * rotation;
 
-//            }
+            }
 
             Eigen::Vector3d acc = rotation.matrix() * input.block(0, 0, 3, 1) + Eigen::Vector3d(0, 0, 9.8);
 //            std::cout << "acc:" << acc.transpose() << std::endl;
