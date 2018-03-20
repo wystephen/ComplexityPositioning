@@ -34,10 +34,9 @@
 
 class ImuUpdateFunction : public AWF::FunctionAbstract {
 public:
-    ImuUpdateFunction(int out_dim, Eigen::Quaterniond q, double time_interval, double local_gravity) :
+    ImuUpdateFunction(int out_dim, double time_interval, double local_gravity) :
             FunctionAbstract(out_dim, 2) {
 
-        rotation_q = q;
         time_interval_ = time_interval;
         local_gravity_ = local_gravity;
     }

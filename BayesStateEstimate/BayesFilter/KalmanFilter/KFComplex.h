@@ -147,6 +147,10 @@ namespace BSE {
         };
 
 
+        /**
+         * zero velocity measuremnt upd
+         * @param cov_matrix
+         */
         void MeasurementStateZV(Eigen::Matrix3d cov_matrix) {
             H_ = Eigen::MatrixXd::Zero(3, 9);
             H_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * 1.0;
@@ -187,12 +191,12 @@ namespace BSE {
              * update state
              */
             Eigen::Vector3d m(0, 0, 0);
-            Eigen::MatrixXd tdx = K_ * (m - state_x_.block(3, 0, 3, 1));
+            dX_ = K_ * (m - state_x_.block(3, 0, 3, 1));
 
             state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
 
-            state_x_.block(6, 0, 3, 1) = BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
-                                                                 dX_.block(6, 0, 3, 1));
+//            state_x_.block(6, 0, 3, 1) = BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
+//                                                                 dX_.block(6, 0, 3, 1));
 
 
         }
