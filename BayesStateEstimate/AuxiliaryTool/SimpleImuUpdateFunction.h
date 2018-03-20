@@ -36,8 +36,8 @@
 namespace BSE {
     class SimpleImuUpdateFunction : public ImuUpdateFunction {
     public:
-        SimpleImuUpdateFunction(Eigen::Quaterniond q, double time_interval, double local_gravity) :
-                ImuUpdateFunction(9, q, time_interval, local_gravity) {
+        SimpleImuUpdateFunction(double time_interval, double local_gravity) :
+                ImuUpdateFunction(9,  time_interval, local_gravity) {
             epsilon_ = 1e-7;
 
         }
@@ -51,7 +51,7 @@ namespace BSE {
         Eigen::MatrixXd compute(Eigen::MatrixXd state, Eigen::MatrixXd input) {
             Eigen::MatrixXd out_state(9, 1);
 
-            rotation_q = BSE::ImuTools::angle2q(state.block(6, 0, 3, 1));
+            Eigen::Quaterniond rotation_q = BSE::ImuTools::angle2q(state.block(6, 0, 3, 1));
 
             rotation_q = rotation_q * BSE::ImuTools::angle2q(input.block(3, 0, 3, 1) * time_interval_);
             rotation_q.normalize();

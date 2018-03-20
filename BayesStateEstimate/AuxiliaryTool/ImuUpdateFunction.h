@@ -91,7 +91,7 @@ public:
 
 
 
-    Eigen::Quaterniond rotation_q = Eigen::Quaterniond::Identity();
+//    Eigen::Quaterniond rotation_q = Eigen::Quaterniond::Identity();
     double time_interval_ = 0.0;
     double local_gravity_ = -9.81;
 

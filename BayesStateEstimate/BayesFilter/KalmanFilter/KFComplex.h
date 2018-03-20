@@ -124,7 +124,7 @@ namespace BSE {
         Eigen::Matrix<double, 9, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
                                                   Eigen::Matrix<double, 6, 6> noise_matrix) {
 
-            auto siuf = SimpleImuUpdateFunction(rotation_q_, time_interval_, local_g_);
+            auto siuf = SimpleImuUpdateFunction(time_interval_, local_g_);
             auto jac_vec = siuf.derivative(state_x_, input);
             auto A = jac_vec[0];
             auto B = jac_vec[1];
@@ -138,9 +138,9 @@ namespace BSE {
             }
 
             state_x_ = siuf.compute(state_x_, input);
-            rotation_q_ = Eigen::AngleAxisd(state_x_(6, 0), Eigen::Vector3d::UnitX()) *
-                          Eigen::AngleAxisd(state_x_(7, 0), Eigen::Vector3d::UnitY()) *
-                          Eigen::AngleAxisd(state_x_(8, 0), Eigen::Vector3d::UnitZ());
+//            rotation_q_ = Eigen::AngleAxisd(state_x_(6, 0), Eigen::Vector3d::UnitX()) *
+//                          Eigen::AngleAxisd(state_x_(7, 0), Eigen::Vector3d::UnitY()) *
+//                          Eigen::AngleAxisd(state_x_(8, 0), Eigen::Vector3d::UnitZ());
 
 
             return state_x_;
