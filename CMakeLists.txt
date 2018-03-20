@@ -123,7 +123,7 @@ link_directories(
         ./include
         ${OpenCL_LIBRARY}
         /opt/intel/mkl/lib/intel64/
-#        /opt/intel/mkl/lib/intel64_lin/
+        #        /opt/intel/mkl/lib/intel64_lin/
 )
 
 #add_library(BayesStateEstimate  STATIC BayesStateEstimate/BSE.h)
