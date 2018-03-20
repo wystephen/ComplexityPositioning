@@ -58,16 +58,17 @@ namespace BSE {
             Sophus::SO3 rotation = Sophus::SO3::exp(state.block(6,0,3,1));
             Eigen::Vector3d gyr = input.block(3, 0, 3, 1) * time_interval_;
 
-            if (input.block(3, 0, 3, 1).norm() > 1e-6) {
-//            rotation = rotation * Sophus::SO3::exp(gyr);
-                rotation = Sophus::SO3::exp(gyr) * rotation;
+//            if (input.block(3, 0, 3, 1).norm() > 1e-6) {
+            rotation = rotation * Sophus::SO3::exp(gyr);
+//                rotation = Sophus::SO3::exp(gyr) * rotation;
 
-            }
+//            }
 
-            Eigen::Vector3d acc = rotation.matrix() * input.block(0, 0, 3, 1) + Eigen::Vector3d(0, 0, -9.8);
+            Eigen::Vector3d acc = rotation.matrix() * input.block(0, 0, 3, 1) + Eigen::Vector3d(0, 0, 9.8);
+//            std::cout << "acc:" << acc.transpose() << std::endl;
 
-            out_state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) + state.block(3, 0, 3, 1) * time_interval_
-                                          + 0.5 * acc * time_interval_ * time_interval_;
+            out_state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) + state.block(3, 0, 3, 1) * time_interval_;
+//                                          + 0.5 * acc * time_interval_ * time_interval_;
             out_state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) + acc * time_interval_;
             out_state.block(6, 0, 3, 1) = rotation.log();
             return out_state;
