@@ -138,7 +138,7 @@ namespace BSE {
             }
 
             state_x_ = siuf.compute(state_x_, input);
-//            rbn_ = siuf.rbn;
+            rbn_ = siuf.rbn;
 //            rotation_q_ = Eigen::AngleAxisd(state_x_(6, 0), Eigen::Vector3d::UnitX()) *
 //                          Eigen::AngleAxisd(state_x_(7, 0), Eigen::Vector3d::UnitY()) *
 //                          Eigen::AngleAxisd(state_x_(8, 0), Eigen::Vector3d::UnitZ());
@@ -199,6 +199,8 @@ namespace BSE {
 //            state_x_.block(6, 0, 3, 1) = BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
 //                                                                 dX_.block(6, 0, 3, 1));
             rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
+            state_x_.block(6,0,3,1) = rbn_.log();
+
 
 
         }
