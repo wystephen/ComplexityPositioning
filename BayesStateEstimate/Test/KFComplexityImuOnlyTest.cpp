@@ -41,7 +41,8 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(10);
     // parameters
-    std::string dir_name = "/home/steve/Data/NewFusingLocationData/0015/";
+//    std::string dir_name = "/home/steve/Data/NewFusingLocationData/0018/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 
 
 
@@ -192,7 +193,7 @@ int main(int argc, char *argv[]) {
                                         Eigen::Matrix3d::Identity() * 0.000251001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 
-                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0025);
+                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00025);
 
                 /// angle constraint through acc.
                 double last_diff = std::abs(imu_data.block(i - 1, 1, 1, 3).norm() - 9.884);
