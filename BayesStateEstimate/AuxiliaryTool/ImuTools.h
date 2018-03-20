@@ -113,25 +113,25 @@ namespace BSE {
          * @return
          */
         Eigen::Quaterniond angle2q(const Eigen::Vector3d &ang) {
-            Eigen::Quaterniond q = Eigen::AngleAxisd(ang(0), Eigen::Vector3d::UnitX()) *
-                                   Eigen::AngleAxisd(ang(1), Eigen::Vector3d::UnitY()) *
-                                   Eigen::AngleAxisd(ang(2), Eigen::Vector3d::UnitZ());
+//            Eigen::Quaterniond q = Eigen::AngleAxisd(ang(0), Eigen::Vector3d::UnitX()) *
+//                                   Eigen::AngleAxisd(ang(1), Eigen::Vector3d::UnitY()) *
+//                                   Eigen::AngleAxisd(ang(2), Eigen::Vector3d::UnitZ());
 
-//            Eigen::Quaterniond q = Eigen::Quaterniond::Identity();
-//            double bank = ang(0);
-//            double attitude = ang(1);
-//            double heading = ang(2);
-//            double c1 = cos(heading);
-//            double s1 = sin(heading);
-//            double c2 = cos(attitude);
-//            double s2 = sin(attitude);
-//            double c3 = cos(bank);
-//            double s3 = sin(bank);
-//            q.w() = sqrt(1.0 + c1 * c2 + c1 * c3 - s1 * s2 * s3 + c2 * c3) / 2.0;
-//            double w4 = (4.0 * q.w());
-//            q.x() = (c2 * s3 + c1 * s3 + s1 * s2 * c3) / w4;
-//            q.y() = (s1 * c2 + s1 * c3 + c1 * s2 * s3) / w4;
-//            q.z() = (-s1 * s3 + c1 * s2 * c3 + s2) / w4;
+            Eigen::Quaterniond q = Eigen::Quaterniond::Identity();
+            double bank = ang(0);
+            double attitude = ang(1);
+            double heading = ang(2);
+            double c1 = cos(heading);
+            double s1 = sin(heading);
+            double c2 = cos(attitude);
+            double s2 = sin(attitude);
+            double c3 = cos(bank);
+            double s3 = sin(bank);
+            q.w() = sqrt(1.0 + c1 * c2 + c1 * c3 - s1 * s2 * s3 + c2 * c3) / 2.0;
+            double w4 = (4.0 * q.w());
+            q.x() = (c2 * s3 + c1 * s3 + s1 * s2 * c3) / w4;
+            q.y() = (s1 * c2 + s1 * c3 + c1 * s2 * s3) / w4;
+            q.z() = (-s1 * s3 + c1 * s2 * c3 + s2) / w4;
             return q;
         }
 
