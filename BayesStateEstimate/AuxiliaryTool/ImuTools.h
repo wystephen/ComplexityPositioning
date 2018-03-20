@@ -142,15 +142,18 @@ namespace BSE {
          * @return
          */
         Eigen::Vector3d angleAdd(Eigen::Vector3d x, const Eigen::Vector3d &dx) {
-            Eigen::Quaterniond q, dq;
-            q = angle2q(x);
-            dq = angle2q(dx);
-//            q = q * dq;
-            q.normalize();
-            x = q.toRotationMatrix().eulerAngles(0, 1, 2);
+//            Eigen::Quaterniond q, dq;
+//            q = angle2q(x);
+//            dq = angle2q(dx);
+////            q = q * dq;
+//            q.normalize();
+//            x = q.toRotationMatrix().eulerAngles(0, 1, 2);
+            Sophus::SO3 r(x(0),x(1),x(2)),tr(dx(0),dx(1),dx(2));
+//            r = tr * r;
 
+            r = r * tr;
 
-            return x;
+            return r.log();
         }
 
 

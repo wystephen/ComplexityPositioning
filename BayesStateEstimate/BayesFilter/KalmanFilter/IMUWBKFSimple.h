@@ -59,6 +59,7 @@ namespace BSE {
                                        << (rotate_q_ * acc).transpose() << std::endl;
                          }
 
+//                         rotate_q_ = st
 
                          if (gyr.norm() > 1e-8) {
                              Eigen::Quaterniond tmp_q =

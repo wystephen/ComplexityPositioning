@@ -190,13 +190,14 @@ namespace BSE {
             /*
              * update state
              */
-            Eigen::Vector3d m(0, 0, 0);
+            Eigen::Vector3d m(0, 0, 0); // pseudo velocity measurement.
             dX_ = K_ * (m - state_x_.block(3, 0, 3, 1));
 
             state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
 
-//            state_x_.block(6, 0, 3, 1) = BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
-//                                                                 dX_.block(6, 0, 3, 1));
+            state_x_.block(6, 0, 3, 1) = BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
+                                                                 dX_.block(6, 0, 3, 1));
+
 
 
         }
