@@ -39,11 +39,13 @@
 namespace BSE {
     class SimpleImuUpdateFunction : public ImuUpdateFunction {
     public:
-        SimpleImuUpdateFunction(double time_interval, double local_gravity) :
+        SimpleImuUpdateFunction(Sophus::SO3 so3,double time_interval, double local_gravity) :
                 ImuUpdateFunction(9, time_interval, local_gravity) {
             epsilon_ = 1e-8;
+            rbn = so3;
 
         }
+        Sophus::SO3 rbn=Sophus::SO3(0,0,0);
 
         /**
          * Core
@@ -54,13 +56,16 @@ namespace BSE {
         Eigen::MatrixXd compute(Eigen::MatrixXd state, Eigen::MatrixXd input) {
             Eigen::MatrixXd out_state(9, 1);
 
-            Sophus::SO3 rotation = Sophus::SO3::exp(state.block(6, 0, 3, 1));
+//            auto rotation = rbn;
+            auto rotation = Sophus::SO3::exp(state.block(6,0,3,1));
+//            Sophus::SO3 ro = Sophus::SO3::exp(state.block(6, 0, 3, 1));
             Eigen::Vector3d gyr = input.block(3, 0, 3, 1) * time_interval_;
 //            std::cout << time_interval_ << std::endl;
             assert(time_interval_ > 0.0 && time_interval_ < 0.1);
 
             if (input.block(3, 0, 3, 1).norm() > 1e-6) {
                 rotation = rotation * Sophus::SO3::exp(gyr);
+//                rbn = rbn * Sophus::SO3::exp(gyr);
 
             }
 
@@ -71,6 +76,7 @@ namespace BSE {
 //                                          + 0.5 * acc * time_interval_ * time_interval_;
             out_state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) + acc * time_interval_;
             out_state.block(6, 0, 3, 1) = rotation.log();
+            rbn = rotation;
             return out_state;
 
         }

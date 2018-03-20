@@ -124,7 +124,7 @@ namespace BSE {
         Eigen::Matrix<double, 9, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
                                                   Eigen::Matrix<double, 6, 6> noise_matrix) {
 
-            auto siuf = SimpleImuUpdateFunction(time_interval_, local_g_);
+            auto siuf = SimpleImuUpdateFunction(rbn_, time_interval_, local_g_);
             auto jac_vec = siuf.derivative(state_x_, input);
             auto A = jac_vec[0];
             auto B = jac_vec[1];
@@ -138,6 +138,7 @@ namespace BSE {
             }
 
             state_x_ = siuf.compute(state_x_, input);
+//            rbn_ = siuf.rbn;
 //            rotation_q_ = Eigen::AngleAxisd(state_x_(6, 0), Eigen::Vector3d::UnitX()) *
 //                          Eigen::AngleAxisd(state_x_(7, 0), Eigen::Vector3d::UnitY()) *
 //                          Eigen::AngleAxisd(state_x_(8, 0), Eigen::Vector3d::UnitZ());
@@ -195,9 +196,9 @@ namespace BSE {
 
             state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
 
-            state_x_.block(6, 0, 3, 1) = BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
-                                                                 dX_.block(6, 0, 3, 1));
-
+//            state_x_.block(6, 0, 3, 1) = BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
+//                                                                 dX_.block(6, 0, 3, 1));
+            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
 
 
         }
@@ -351,6 +352,7 @@ namespace BSE {
         bool IS_DEBUG = false; // debug flag.
 
 
+        Sophus::SO3 rbn_ = Sophus::SO3(0, 0, 0);// rotation matrix from sensor frame to navigation frame
 
 
     };
