@@ -33,12 +33,15 @@
 #include <BSE.h>
 #include "ImuTools.h"
 
+#include <sophus/so3.h>
+
+
 namespace BSE {
     class SimpleImuUpdateFunction : public ImuUpdateFunction {
     public:
         SimpleImuUpdateFunction(double time_interval, double local_gravity) :
-                ImuUpdateFunction(9,  time_interval, local_gravity) {
-            epsilon_ = 1e-7;
+                ImuUpdateFunction(9, time_interval, local_gravity) {
+            epsilon_ = 1e-8;
 
         }
 
@@ -51,16 +54,21 @@ namespace BSE {
         Eigen::MatrixXd compute(Eigen::MatrixXd state, Eigen::MatrixXd input) {
             Eigen::MatrixXd out_state(9, 1);
 
-            Eigen::Quaterniond rotation_q = BSE::ImuTools::angle2q(state.block(6, 0, 3, 1));
+//            Eigen::Quaterniond rotation_q = BSE::ImuTools::angle2q(state.block(6, 0, 3, 1));
+            Sophus::SO3 rotation = Sophus::SO3::exp(state.block(6,0,3,1));
+            Eigen::Vector3d gyr = input.block(3, 0, 3, 1) * time_interval_;
 
-            rotation_q = rotation_q * BSE::ImuTools::angle2q(input.block(3, 0, 3, 1) * time_interval_);
-            rotation_q.normalize();
+//            if (input.block(3, 0, 3, 1).norm() > 1e-6) {
+            rotation = rotation * Sophus::SO3::exp(gyr);
 
-            Eigen::Vector3d acc = rotation_q.toRotationMatrix() * input.block(0, 0, 3, 1) + Eigen::Vector3d(0, 0, -9.8);
+//            }
 
-            out_state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) + state.block(3, 0, 3, 1) * time_interval_;
+            Eigen::Vector3d acc = rotation.matrix() * input.block(0, 0, 3, 1) + Eigen::Vector3d(0, 0, -9.8);
+
+            out_state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) + state.block(3, 0, 3, 1) * time_interval_
+                                          + 0.5 * acc * time_interval_ * time_interval_;
             out_state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) + acc * time_interval_;
-            out_state.block(6, 0, 3, 1) = rotation_q.toRotationMatrix().eulerAngles(0, 1, 2);
+            out_state.block(6, 0, 3, 1) = rotation.log();
             return out_state;
 
         }

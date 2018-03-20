@@ -167,7 +167,7 @@ namespace BSE {
             K_ = (prob_state_ * H_.transpose().eval()) *
                  (H_ * prob_state_ * H_.transpose().eval() + cov_matrix).inverse();
             if (std::isnan(K_.sum()) || std::isinf(K_.sum())) {
-                std::cout << "K is nana" << std::endl;
+                std::cout << "K is nan" << std::endl;
             }
 
             /*

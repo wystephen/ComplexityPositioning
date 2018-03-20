@@ -123,6 +123,7 @@ link_directories(
         ./include
         ${OpenCL_LIBRARY}
         /opt/intel/mkl/lib/intel64/
+        #        ${Sophus_LIBRARIES
         #        /opt/intel/mkl/lib/intel64_lin/
 )
 
@@ -148,7 +149,7 @@ add_executable(KFComplexityTester BayesStateEstimate/Test/KFComplexityTest.cpp)
 target_link_libraries(KFComplexityTester ${PYTHON_LIBRARIES})
 
 add_executable(KFCImuTester BayesStateEstimate/Test/KFComplexityImuOnlyTest.cpp)
-target_link_libraries(KFCImuTester ${PYTHON_LIBRARIES})
+target_link_libraries(KFCImuTester ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES})
 
 add_executable(XsenseIntegrateTest BayesStateEstimate/Test/XsenseIntegrateTest.cpp)
 target_link_libraries(XsenseIntegrateTest ${PYTHON_LIBRARIES})
