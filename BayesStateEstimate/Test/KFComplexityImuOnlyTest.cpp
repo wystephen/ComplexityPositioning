@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
             &initial_pos,
             &initial_ori,
             &optimize_trace_vec](const Eigen::MatrixXd &imu_data,
-                       std::string data_name) {
+                                 std::string data_name) {
         auto filter = BSE::IMUWBKFSimple(
                 initial_prob_matrix);
 
