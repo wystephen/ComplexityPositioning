@@ -37,7 +37,8 @@
 
 
 namespace BSE {
-    class SimpleImuUpdateFunction : public ImuUpdateFunction {
+    class SimpleImuUpdateFunction :
+            public ImuUpdateFunction {
     public:
         /**
          *
