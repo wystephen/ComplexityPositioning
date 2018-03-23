@@ -39,6 +39,12 @@
 namespace BSE {
     class SimpleImuUpdateFunction : public ImuUpdateFunction {
     public:
+        /**
+         *
+         * @param so3
+         * @param time_interval
+         * @param local_gravity
+         */
         SimpleImuUpdateFunction(Sophus::SO3 so3,
                                 double time_interval,
                                 double local_gravity) :
