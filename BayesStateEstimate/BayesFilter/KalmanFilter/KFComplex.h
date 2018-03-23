@@ -124,8 +124,13 @@ namespace BSE {
         Eigen::Matrix<double, 9, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
                                                   Eigen::Matrix<double, 6, 6> noise_matrix) {
 
-            auto siuf = SimpleImuUpdateFunction(rbn_, time_interval_, local_g_);
-            auto jac_vec = siuf.derivative(state_x_, input);
+            auto siuf = SimpleImuUpdateFunction(rbn_,
+                                                time_interval_,
+                                                local_g_);
+
+            auto jac_vec = siuf.derivative(state_x_,
+                                           input);
+
             auto A = jac_vec[0];
             auto B = jac_vec[1];
 
