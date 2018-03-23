@@ -89,7 +89,9 @@
 
 class GravityOrientationFunction : public AWF::SingleFunctionAbstract {
 public:
-    GravityOrientationFunction(Eigen::Vector3d acc, double g, double initial_yaw) :
+    GravityOrientationFunction(Eigen::Vector3d acc,
+                               double g,
+                               double initial_yaw) :
             SingleFunctionAbstract(1) {
         acc_ = acc;
         g_ = g;
