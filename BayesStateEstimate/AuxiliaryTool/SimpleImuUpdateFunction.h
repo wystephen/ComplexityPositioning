@@ -70,12 +70,15 @@ namespace BSE {
 
             }
 
-            Eigen::Vector3d acc = rotation.matrix() * input.block(0, 0, 3, 1) + Eigen::Vector3d(0, 0, local_gravity_);
+            Eigen::Vector3d acc = rotation.matrix() * input.block(0, 0, 3, 1) +
+                    Eigen::Vector3d(0, 0, local_gravity_);
 //            std::cout << "acc:" << acc.transpose() << std::endl;
 
-            out_state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) + state.block(3, 0, 3, 1) * time_interval_;
+            out_state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +
+                    state.block(3, 0, 3, 1) * time_interval_;
 //                                          + 0.5 * acc * time_interval_ * time_interval_;
-            out_state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) + acc * time_interval_;
+            out_state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) +
+                    acc * time_interval_;
             out_state.block(6, 0, 3, 1) = rotation.log();
             rbn = rotation;
             return out_state;
