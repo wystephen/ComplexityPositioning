@@ -39,8 +39,12 @@
 namespace BSE {
     class SimpleImuUpdateFunction : public ImuUpdateFunction {
     public:
-        SimpleImuUpdateFunction(Sophus::SO3 so3,double time_interval, double local_gravity) :
-                ImuUpdateFunction(9, time_interval, local_gravity) {
+        SimpleImuUpdateFunction(Sophus::SO3 so3,
+                                double time_interval,
+                                double local_gravity) :
+                ImuUpdateFunction(9,
+                                  time_interval,
+                                  local_gravity) {
             epsilon_ = 1e-8;
             rbn = so3;
 
