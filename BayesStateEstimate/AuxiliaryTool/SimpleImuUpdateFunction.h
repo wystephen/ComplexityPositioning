@@ -53,7 +53,8 @@ namespace BSE {
          * @param input
          * @return
          */
-        Eigen::MatrixXd compute(Eigen::MatrixXd state, Eigen::MatrixXd input) {
+        Eigen::MatrixXd compute(Eigen::MatrixXd state,
+                                Eigen::MatrixXd input) {
             Eigen::MatrixXd out_state(9, 1);
 
 //            auto rotation = rbn;
