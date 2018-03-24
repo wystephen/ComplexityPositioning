@@ -218,6 +218,7 @@ namespace BSE {
         void MeasurementAngleCorrect(Eigen::Matrix<double, 3, 1> input,
                                      Eigen::Matrix<double, 3, 3> cov_m) {
             Eigen::Vector3d tmp_mag = input;
+
             rotation_q_.normalize();
             state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
