@@ -132,21 +132,24 @@ public:
             st << 0.0,-f_t(2),f_t(1),
                     f_t(2),0.0,-f_t(0),
                     -f_t(1),f_t(0),0.0;
-//            F.block(0,3,3,3) = Eigen::Matrix3d::Identity();
-//            F.block(3,6,3,3) = st;
-//            F = F * time_interval_;
-//            F += Eigen::Matrix<double, 9, 9>::Identity();
+            /////////////
+            F.block(0,3,3,3) = Eigen::Matrix3d::Identity();
+            F.block(3,6,3,3) = st;
+            F = F * time_interval_;
+            F += Eigen::Matrix<double, 9, 9>::Identity();
 
-            F.block(0,0,3,3) = Eigen::Matrix3d::Identity();
-            F.block(0,3,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
+//            F.block(0,0,3,3) = Eigen::Matrix3d::Identity();
+//            F.block(0,3,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
 
-            F.block(3,3,3,3) = Eigen::Matrix3d::Identity();
-            F.block(6,6,3,3) = Eigen::Matrix3d::Identity();
-//            G.block(3,0,3,3) = rotation.matrix();
-//            G.block(6,3,3,3) = -1.0 * rotation.matrix();
-//            G  = time_interval_ * G;
-            G.block(3,0,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
-            G.block(6,3,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
+//            F.block(3,3,3,3) = Eigen::Matrix3d::Identity();
+//            F.block(6,6,3,3) = Eigen::Matrix3d::Identity();
+
+            /////////////////
+            G.block(3,0,3,3) = rotation.matrix();
+            G.block(6,3,3,3) = -1.0 * rotation.matrix();
+            G  = time_interval_ * G;
+//            G.block(3,0,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
+//            G.block(6,3,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
             return compress(F,G);
 
 
