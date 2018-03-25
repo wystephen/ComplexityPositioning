@@ -204,8 +204,7 @@ namespace BSE {
 //            state_x_.block(6, 0, 3, 1) = BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
 //                                                                 dX_.block(6, 0, 3, 1));
             rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
-            state_x_.block(6,0,3,1) = rbn_.log();
-
+            state_x_.block(6, 0, 3, 1) = rbn_.log();
 
 
         }
