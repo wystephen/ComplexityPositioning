@@ -86,7 +86,8 @@ public:
                 Sophus::SO3 r(state(6), state(7), state(8));
                 Eigen::Vector3d td(0, 0, 0);
                 td(j - 6) += epsilon_;
-                r = r * Sophus::SO3::exp(td);
+//                r = r * Sophus::SO3::exp(td);
+                r = Sophus::SO3::exp(td) * r;
                 tmp_state.block(6, 0, 3, 1) = r.log();
             }
             auto tmp_value = operator()(compress(tmp_state, input));

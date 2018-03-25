@@ -246,6 +246,9 @@ namespace BSE {
                          dx = K_ * (z - y);
 
                          state.block(0, 0, 6, 1) += dx.block(0, 0, 6, 1);
+                         Sophus::SO3 r(state(6),state(7),state(8));
+                         r = r * Sophus::SO3::exp(dx.block(6,0,3,1));
+                         state.block(6,0,3,1) = r.log();
 
 
 //                std::cout << "dx:" << dx.transpose() << std::endl;

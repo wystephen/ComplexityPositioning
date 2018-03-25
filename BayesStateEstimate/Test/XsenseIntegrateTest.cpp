@@ -115,10 +115,9 @@ int main(int argc, char *argv[]) {
                          initial_pos);
 
 
-    complex_filter.initial_state(imu_data.block(0, 1, 10, 6),
+    complex_filter.initial_state(imu_data.block(0, 1, 10, 9),
                                  initial_ori + 10.0 / 180.0 * M_PI,
                                  initial_pos);
-
 
 
     filter.setLocal_g_(-9.884);
@@ -130,6 +129,10 @@ int main(int argc, char *argv[]) {
     std::vector<std::vector<double>> trace = {{},
                                               {},
                                               {}};
+    std::vector<std::vector<double>> complex_trace = {{},
+                                                      {},
+                                                      {}};
+
     std::vector<std::vector<double>> angle = {{},
                                               {},
                                               {}};
@@ -156,6 +159,8 @@ int main(int argc, char *argv[]) {
         filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
                                 process_noise_matrix,
                                 BSE::StateTransactionMethodType::NormalRotation);
+        complex_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+                                     process_noise_matrix);
 
 
         auto state_T = filter.getTransformMatrix();
@@ -166,7 +171,7 @@ int main(int argc, char *argv[]) {
 
             Eigen::Matrix<double, 1, 1> measurement_noise_matrix;
             measurement_noise_matrix.resize(1, 1);
-            measurement_noise_matrix(0, 0) = 0.01;
+            measurement_noise_matrix(0, 0) = 0.1;
 
 
             for (int k(1); k < uwb_data.cols(); ++k) {
