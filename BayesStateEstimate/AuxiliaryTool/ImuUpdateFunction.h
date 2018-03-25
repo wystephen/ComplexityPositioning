@@ -57,7 +57,7 @@ public:
      * @return
      */
     std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd state, Eigen::MatrixXd input) {
-        int methond_id = 0
+        int methond_id = 2;
         if (methond_id == 0) {
 
             return d(compress(state, input));
@@ -116,11 +116,35 @@ public:
 
             return compress(jac_state, jac_input);
 
-        }else if(methond_id == 2){
+        } else if (methond_id == 2) {
+            auto c_state = compute(state, input);
+            Eigen::MatrixXd F(9, 9);
+            Eigen::MatrixXd G(9, 6);
+
+            auto rotation = Sophus::SO3(c_state(6),
+                                        c_state(7),
+                                        c_state(8));
 
 
-        }else{
-            ERROR_MSG_FLAG("invalid method id :"+ std::to_string(methond_id));
+            auto f_t = Eigen::Vector3d(input.block(0, 0, 3, 1));
+            f_t = rotation.matrix() * f_t;
+
+            Eigen::Matrix3d st;
+            st << 0.0,-f_t(2),f_t(1),
+                    f_t(2),0.0,-f_t(0),
+                    -f_t(1),f_t(0),0.0;
+            F.block(0,3,3,3) = Eigen::Matrix3d::Identity();
+            F.block(3,6,3,3) = st;
+            F = F * time_interval_;
+            F += Eigen::Matrix<double, 9, 9>::Identity();
+
+            G.block(3,0,3,3) = rotation.matrix();
+            G.block(6,3,3,3) = -1.0 * rotation.matrix();
+            return compress(F,G);
+
+
+        } else {
+            ERROR_MSG_FLAG("invalid method id :" + std::to_string(methond_id));
         }
 
 
