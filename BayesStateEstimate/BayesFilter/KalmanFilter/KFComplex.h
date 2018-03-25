@@ -187,6 +187,7 @@ namespace BSE {
                           << ":"
                           << __LINE__
                           << " Error state prob is too big"
+                        << prob_state_.norm()
                           << std::endl;
                 prob_state_ /= 100.0;
             }

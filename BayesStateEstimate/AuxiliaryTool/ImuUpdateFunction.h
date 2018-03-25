@@ -103,13 +103,7 @@ public:
                 if (j < 6) {
                     tmp_state(j) = state(j);
                 } else {
-//                Sophus::SO3 r(tmp_state(6),tmp_state(7),tmp_state(8));
-//                Eigen::Vector3d td(0,0,0);
-//                td(j-6) += epsilon_;
-//                r = r * Sophus::SO3::exp(td).inverse();
-//                tmp_state.block(6,0,3,1) =
                     tmp_state(j) = state(j);
-
                 }
             }
 
@@ -117,9 +111,14 @@ public:
             return compress(jac_state, jac_input);
 
         } else if (methond_id == 2) {
+            /**
+             *
+             */
             auto c_state = compute(state, input);
             Eigen::MatrixXd F(9, 9);
             Eigen::MatrixXd G(9, 6);
+            F.setZero();
+            G.setZero();
 
             auto rotation = Sophus::SO3(c_state(6),
                                         c_state(7),
@@ -133,14 +132,21 @@ public:
             st << 0.0,-f_t(2),f_t(1),
                     f_t(2),0.0,-f_t(0),
                     -f_t(1),f_t(0),0.0;
-            F.block(0,3,3,3) = Eigen::Matrix3d::Identity();
-            F.block(3,6,3,3) = st;
-            F = F * time_interval_;
-            F += Eigen::Matrix<double, 9, 9>::Identity();
+//            F.block(0,3,3,3) = Eigen::Matrix3d::Identity();
+//            F.block(3,6,3,3) = st;
+//            F = F * time_interval_;
+//            F += Eigen::Matrix<double, 9, 9>::Identity();
 
-            G.block(3,0,3,3) = rotation.matrix();
-            G.block(6,3,3,3) = -1.0 * rotation.matrix();
-            G  = time_interval_ * G;
+            F.block(0,0,3,3) = Eigen::Matrix3d::Identity();
+            F.block(0,3,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
+
+            F.block(3,3,3,3) = Eigen::Matrix3d::Identity();
+            F.block(6,6,3,3) = Eigen::Matrix3d::Identity();
+//            G.block(3,0,3,3) = rotation.matrix();
+//            G.block(6,3,3,3) = -1.0 * rotation.matrix();
+//            G  = time_interval_ * G;
+            G.block(3,0,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
+            G.block(6,3,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
             return compress(F,G);
 
 
