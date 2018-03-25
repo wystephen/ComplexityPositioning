@@ -140,6 +140,7 @@ public:
 
             G.block(3,0,3,3) = rotation.matrix();
             G.block(6,3,3,3) = -1.0 * rotation.matrix();
+            G  = time_interval_ * G;
             return compress(F,G);
 
 
