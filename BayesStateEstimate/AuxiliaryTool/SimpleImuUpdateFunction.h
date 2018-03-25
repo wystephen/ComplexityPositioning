@@ -74,7 +74,7 @@ namespace BSE {
 //            std::cout << time_interval_ << std::endl;
             assert(time_interval_ > 0.0 && time_interval_ < 0.1);
 
-            if (input.block(3, 0, 3, 1).norm() > 1e-6) {
+            if (input.block(3, 0, 3, 1).norm() > 1e-10) {
                 rotation = rotation * Sophus::SO3::exp(gyr);
 //                rotation = Sophus::SO3::exp(gyr) * rotation;
 
