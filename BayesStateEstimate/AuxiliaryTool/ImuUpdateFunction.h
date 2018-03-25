@@ -57,7 +57,7 @@ public:
      * @return
      */
     std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd state, Eigen::MatrixXd input) {
-        int methond_id = 2;
+        int methond_id = 1;
         if (methond_id == 0) {
 
             return d(compress(state, input));
@@ -89,22 +89,25 @@ public:
                 if (j < 6) {
                     tmp_state(j) += epsilon_;
                 } else {
-                    tmp_epsilon = 1e-4;
-                    Sophus::SO3 r(state(6), state(7), state(8));
-                    Eigen::Vector3d td(0, 0, 0);
-                    td(j - 6) += tmp_epsilon;
-//                r = r * Sophus::SO3::exp(td);
-                    r = Sophus::SO3::exp(td) * r;
+                     tmp_state(j) += epsilon_ /180.0 * M_PI;
+
+                }
+                if (j >= 6) {
+//                    while(tmp_state(j) > M_PI){
+//                        tmp_state(j) -= 2.0 * M_PI;
+//                    }
+//                    while(tmp_state(j) < -M_PI){
+//                        tmp_state(j) += 2.0 * M_PI;
+//                    }
+                    Sophus::SO3 r = Sophus::SO3::exp(tmp_state.block(6,0,3,1));
                     tmp_state.block(6, 0, 3, 1) = r.log();
                 }
                 auto tmp_value = operator()(compress(tmp_state, input));
                 auto t_d = tmp_value - original_value;
                 jac_state.block(0, j, jac_state.rows(), 1) = t_d / double(tmp_epsilon);
-                if (j < 6) {
-                    tmp_state(j) = state(j);
-                } else {
-                    tmp_state(j) = state(j);
-                }
+
+                tmp_state(j) = state(j);
+
             }
 
 
@@ -129,12 +132,12 @@ public:
             f_t = rotation.matrix() * f_t;
 
             Eigen::Matrix3d st;
-            st << 0.0,-f_t(2),f_t(1),
-                    f_t(2),0.0,-f_t(0),
-                    -f_t(1),f_t(0),0.0;
+            st << 0.0, -f_t(2), f_t(1),
+                    f_t(2), 0.0, -f_t(0),
+                    -f_t(1), f_t(0), 0.0;
             /////////////
-            F.block(0,3,3,3) = Eigen::Matrix3d::Identity();
-            F.block(3,6,3,3) = st;
+            F.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity();
+            F.block(3, 6, 3, 3) = st;
             F = F * time_interval_;
             F += Eigen::Matrix<double, 9, 9>::Identity();
 
@@ -145,12 +148,12 @@ public:
 //            F.block(6,6,3,3) = Eigen::Matrix3d::Identity();
 
             /////////////////
-            G.block(3,0,3,3) = rotation.matrix();
-            G.block(6,3,3,3) = -1.0 * rotation.matrix();
-            G  = time_interval_ * G;
+            G.block(3, 0, 3, 3) = rotation.matrix();
+            G.block(6, 3, 3, 3) = -1.0 * rotation.matrix();
+            G = time_interval_ * G;
 //            G.block(3,0,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
 //            G.block(6,3,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
-            return compress(F,G);
+            return compress(F, G);
 
 
         } else {
