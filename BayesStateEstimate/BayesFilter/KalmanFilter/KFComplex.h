@@ -335,7 +335,7 @@ namespace BSE {
 
             Eigen::Matrix<double,1,1> t_m;
             t_m(0,0) = input(3);
-            dX_ = K_ * (t_m - mg_fuc.compute(state_x_));
+            dX_ = K_ * (t_m - uwbFunc.compute(state_x_));
 //            std::cout << "diff: "
 //                      << (g_and_mag - mg_fuc.compute(state_x_)).transpose()
 //                      << std::endl;

@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
 
-    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0002/";
+    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0001/";
 
     AWF::FileReader imu_file(dir_name + "imu.data");
     AWF::FileReader uwb_file(dir_name + "uwb_data.csv");
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
                                             BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
                     complex_filter.MeasurementUwb(measurement_data,
-                                                  measurement_noise_matrix);
+                                                  measurement_noise_matrix*0.0001);
                 }
 
             }
@@ -212,12 +212,14 @@ int main(int argc, char *argv[]) {
 
             trace[j].push_back(state_x(j, 0));
             complex_trace[j].push_back(complex_x(j, 0));
-            velocity[j].push_back(state_x(j + 3, 0));
-            attitude[j].push_back(state_x(j + 6, 0));
+            velocity[j].push_back(complex_x(j + 3, 0));
+            attitude[j].push_back(complex_x(j + 6, 0));
         }
     }
 
-    AWF::writeVectorsToCsv<double>("./XsenseResult/trace.csv", trace);
+//    AWF::writeVectorsToCsv<double>("./XsenseResult/trace.csv", trace);
+    AWF::writeVectorsToCsv<double>("./XsenseResult/complex_trace.csv",complex_trace);
+    AWF::writeVectorsToCsv<double>("./XsenseResult/optimize_trace.csv",optimize_trace_vec);
 
 
     plt::figure();
