@@ -165,6 +165,7 @@ int main(int argc, char *argv[]) {
 
         auto state_T = filter.getTransformMatrix();
         Eigen::MatrixXd state_x = filter.getState_();
+        Eigen::MatrixXd complex_x = complex_filter.state_x_;
 //        std::cout << state_x.transpose().eval() << std::endl;
 //        std::cout << state_x.transpose() << std::endl;
         if (uwb_data(uwb_index, 0) < imu_data(i, 0)) {
@@ -189,6 +190,9 @@ int main(int argc, char *argv[]) {
                     filter.MeasurementState(measurement_data,
                                             measurement_noise_matrix,
                                             BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+
+                    complex_filter.MeasurementUwb(measurement_data,
+                                                  measurement_noise_matrix);
                 }
 
             }
@@ -207,6 +211,7 @@ int main(int argc, char *argv[]) {
             angle[j].push_back(imu_data(i, j + 10));
 
             trace[j].push_back(state_x(j, 0));
+            complex_trace[j].push_back(complex_x(j, 0));
             velocity[j].push_back(state_x(j + 3, 0));
             attitude[j].push_back(state_x(j + 6, 0));
         }
@@ -218,6 +223,7 @@ int main(int argc, char *argv[]) {
     plt::figure();
     plt::title("trace");
     plt::named_plot("ekf", trace[0], trace[1], "-+");
+    plt::named_plot("complex", complex_trace[0], complex_trace[1], "-+");
 //    plt::grid(true);
 //    plt::figure();
 //    plt::title("uwb trace");

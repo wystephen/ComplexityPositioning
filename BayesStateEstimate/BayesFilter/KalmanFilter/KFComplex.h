@@ -39,6 +39,7 @@
 #include <AuxiliaryTool/MagMeasurementFunction.h>
 #include <AuxiliaryTool/MagGravityMeasurementFunction.h>
 #include <AuxiliaryTool/ImuTools.h>
+#include <AuxiliaryTool/UwbMeasurementFunction.h>
 
 #include "KalmanFilterBase.h"
 #include "KalmanFilterBase.h"
@@ -145,7 +146,7 @@ namespace BSE {
 
             state_x_ = siuf.compute(state_x_, input);
 //            rbn_ = siuf.rbn;
-            rbn_ = Sophus::SO3::exp(state_x_.block(6,0,3,1));
+            rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
 //            rotation_q_ = Eigen::AngleAxisd(state_x_(6, 0), Eigen::Vector3d::UnitX()) *
 //                          Eigen::AngleAxisd(state_x_(7, 0), Eigen::Vector3d::UnitY()) *
 //                          Eigen::AngleAxisd(state_x_(8, 0), Eigen::Vector3d::UnitZ());
@@ -188,7 +189,7 @@ namespace BSE {
                           << ":"
                           << __LINE__
                           << " Error state prob is too big"
-                        << prob_state_.norm()
+                          << prob_state_.norm()
                           << std::endl;
                 prob_state_ /= 100.0;
             }
@@ -204,7 +205,7 @@ namespace BSE {
 
             state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
 
-            rbn_ = Sophus::SO3::exp(state_x_.block(6,0,3,1));
+            rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
             rbn_ = Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
 //            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) ;
             state_x_.block(6, 0, 3, 1) = rbn_.log();
@@ -278,7 +279,6 @@ namespace BSE {
             g_and_mag.block(0, 0, 3, 1) = tmp_acc / tmp_acc.norm();
             g_and_mag.block(3, 0, 3, 1) = tmp_mag / tmp_mag.norm();
 
-
             auto t_vec = mg_fuc.derivative(state_x_);
             H_ = t_vec[0];
             ////TODO: correct this.
@@ -308,19 +308,54 @@ namespace BSE {
             state_x_.block(6, 0, 3, 1) =
                     BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
                                             dX_.block(6, 0, 3, 1));
-
-
 //            std::cout << "input:"
 //                      << input.transpose()
 //            std::cout << "reve:"
 //                      << (rotation_q_ * tmp_acc).transpose()
 //                      << std::endl;
-
             return;
-
-
         }
 
+
+        /**
+         *  measurement according to uwb.
+         * @param measurement
+         */
+        void MeasurementUwb(Eigen::Matrix<double, 4, 1> input,
+                            Eigen::Matrix<double, 1, 1> cov_m) {
+            auto uwbFunc = UwbMeasurementFunction(input.block(0, 0, 3, 1));
+
+            auto d_vec = uwbFunc.derivate(state_x_);
+            H_ = d_vec[0];
+            K_ = (prob_state_ * H_.transpose().eval()) *
+                 (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
+
+            prob_state_ = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * prob_state_;
+            prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
+
+            Eigen::Matrix<double,1,1> t_m;
+            t_m(0,0) = input(3);
+            dX_ = K_ * (t_m - mg_fuc.compute(state_x_));
+//            std::cout << "diff: "
+//                      << (g_and_mag - mg_fuc.compute(state_x_)).transpose()
+//                      << std::endl;
+//            std::cout << "gmag:"
+//                      << g_and_mag.transpose()
+//                      << std::endl;
+//            std::cout << "fuc :"
+//                      << mg_fuc.compute(state_x_).transpose()
+//                      << std::endl;
+            auto t = mg_fuc.compute(state_x_);
+
+
+            state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) +
+                                         dX_.block(0, 0, 6, 1);
+
+
+            rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
+            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
+            state_x_.block(6, 0, 3, 1) = rbn_.log();
+        }
 
         /**
          * dax day daz : offset of acc measurements.
