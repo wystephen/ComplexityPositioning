@@ -74,7 +74,12 @@ public:
 
             // jacobian of input
             for (int j(0); j < jac_input.cols(); ++j) {
-                tmp_input(j) += epsilon_;
+                if(j<3){
+
+                    tmp_input(j) += epsilon_;
+                }else{
+                    tmp_input(j) += epsilon_ /180.0 * M_PI;
+                }
                 auto tmp_value = operator()(compress(state, tmp_input));
                 auto t_d = tmp_value - original_value;
                 jac_input.block(0, j, jac_input.rows(), 1) = t_d / double(epsilon_);

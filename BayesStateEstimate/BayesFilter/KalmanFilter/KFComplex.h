@@ -127,7 +127,7 @@ namespace BSE {
             auto siuf = SimpleImuUpdateFunction(rbn_,
                                                 time_interval_,
                                                 local_g_);
-            siuf.setEpsilon_(1e-10);
+            siuf.setEpsilon_(1e-7);
 
             auto jac_vec = siuf.derivative(state_x_,
                                            input);
