@@ -32,6 +32,7 @@
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <BayesFilter/KalmanFilter/KFComplex.h>
 //#include <AWF.h>dd
 
 
@@ -105,17 +106,26 @@ int main(int argc, char *argv[]) {
 
 
     auto filter = BSE::IMUWBKFSimple(initial_prob_matrix);
-//    filter.setTime_interval_(0.01);
-
     filter.setTime_interval_(0.01);
+    auto complex_filter = BSE::KFComplex(initial_prob_matrix);
+    complex_filter.time_interval_ = 0.01;
+
     filter.initial_state(imu_data.block(0, 1, 10, 6),
                          initial_ori + 10.0 / 180.0 * M_PI,
                          initial_pos);
-    filter.setLocal_g_(-9.824);
+
+
+    complex_filter.initial_state(imu_data.block(0, 1, 10, 6),
+                                 initial_ori + 10.0 / 180.0 * M_PI,
+                                 initial_pos);
+
+
+
+    filter.setLocal_g_(-9.884);
+    complex_filter.local_g_ = -9.884;
 //    filter.IS_DEBUG = true;
 
 
-    auto imu_tool = BSE::ImuTools();
 
     std::vector<std::vector<double>> trace = {{},
                                               {},
@@ -146,6 +156,7 @@ int main(int argc, char *argv[]) {
         filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
                                 process_noise_matrix,
                                 BSE::StateTransactionMethodType::NormalRotation);
+
 
         auto state_T = filter.getTransformMatrix();
         Eigen::MatrixXd state_x = filter.getState_();

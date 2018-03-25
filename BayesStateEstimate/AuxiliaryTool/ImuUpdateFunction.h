@@ -58,43 +58,55 @@ public:
      */
     std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd state, Eigen::MatrixXd input) {
 //        return d(compress(state, input));
-        Eigen::MatrixXd jac_state,jac_input;
-        jac_state.resize(OutDim,state.rows());
-        jac_input.resize(OutDim,input.rows());
+        Eigen::MatrixXd jac_state, jac_input;
+        jac_state.resize(OutDim, state.rows());
+        jac_input.resize(OutDim, input.rows());
         jac_state.setZero();
         jac_input.setZero();
 
         auto tmp_state = state;
         auto tmp_input = input;
-        auto original_value = operator()(compress(state,input));
+        auto original_value = operator()(compress(state, input));
 
         // jacobian of input
-        for(int j(0);j<jac_input.cols();++j){
+        for (int j(0); j < jac_input.cols(); ++j) {
             tmp_input(j) += epsilon_;
-            auto tmp_value = operator()(compress(state,tmp_input));
-            auto t_d = tmp_value-original_value;
-            jac_input.block(0,j,jac_input.rows(),1) = t_d/double(epsilon_);
+            auto tmp_value = operator()(compress(state, tmp_input));
+            auto t_d = tmp_value - original_value;
+            jac_input.block(0, j, jac_input.rows(), 1) = t_d / double(epsilon_);
+            tmp_input(j) -= epsilon_;
 
         }
 
         // jacobian of state
-        for(int j(0);j<jac_state.cols();++j){
-            if(j<10){
+        for (int j(0); j < jac_state.cols(); ++j) {
+            if (j <16) {
                 tmp_state(j) += epsilon_;
-            }else{
-                Sophus::SO3 r(state(6),state(7),state(8));
-                Eigen::Vector3d td(0,0,0);
-                td(j-6) = epsilon_;
+            } else {
+                Sophus::SO3 r(state(6), state(7), state(8));
+                Eigen::Vector3d td(0, 0, 0);
+                td(j - 6) += epsilon_;
                 r = r * Sophus::SO3::exp(td);
-                tmp_state.block(6,0,3,1) = r.log();
+                tmp_state.block(6, 0, 3, 1) = r.log();
             }
-            auto tmp_value = operator()(compress(tmp_state,input));
-            auto t_d = tmp_value-original_value;
-            jac_state.block(0,j,jac_state.rows(),1) = t_d/double(epsilon_);
+            auto tmp_value = operator()(compress(tmp_state, input));
+            auto t_d = tmp_value - original_value;
+            jac_state.block(0, j, jac_state.rows(), 1) = t_d / double(epsilon_);
+            if (j < 6) {
+                tmp_state(j) = state(j);
+            } else {
+//                Sophus::SO3 r(tmp_state(6),tmp_state(7),tmp_state(8));
+//                Eigen::Vector3d td(0,0,0);
+//                td(j-6) += epsilon_;
+//                r = r * Sophus::SO3::exp(td).inverse();
+//                tmp_state.block(6,0,3,1) =
+                tmp_state(j) = state(j);
+
+            }
         }
 
 
-        return compress(jac_state,jac_input);
+        return compress(jac_state, jac_input);
 
 
     }
@@ -125,9 +137,6 @@ public:
         return para_vec;
 
     }
-
-
-
 
 
 //    Eigen::Quaterniond rotation_q = Eigen::Quaterniond::Identity();
