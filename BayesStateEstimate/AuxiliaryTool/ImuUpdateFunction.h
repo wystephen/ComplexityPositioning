@@ -57,57 +57,71 @@ public:
      * @return
      */
     std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd state, Eigen::MatrixXd input) {
-//        return d(compress(state, input));
-        Eigen::MatrixXd jac_state, jac_input;
-        jac_state.resize(OutDim, state.rows());
-        jac_input.resize(OutDim, input.rows());
-        jac_state.setZero();
-        jac_input.setZero();
+        int methond_id = 0
+        if (methond_id == 0) {
 
-        auto tmp_state = state;
-        auto tmp_input = input;
-        auto original_value = operator()(compress(state, input));
+            return d(compress(state, input));
+        } else if (methond_id == 1) {
+            Eigen::MatrixXd jac_state, jac_input;
+            jac_state.resize(OutDim, state.rows());
+            jac_input.resize(OutDim, input.rows());
+            jac_state.setZero();
+            jac_input.setZero();
 
-        // jacobian of input
-        for (int j(0); j < jac_input.cols(); ++j) {
-            tmp_input(j) += epsilon_;
-            auto tmp_value = operator()(compress(state, tmp_input));
-            auto t_d = tmp_value - original_value;
-            jac_input.block(0, j, jac_input.rows(), 1) = t_d / double(epsilon_);
-            tmp_input(j) -= epsilon_;
+            auto tmp_state = state;
+            auto tmp_input = input;
+            auto original_value = operator()(compress(state, input));
 
-        }
+            // jacobian of input
+            for (int j(0); j < jac_input.cols(); ++j) {
+                tmp_input(j) += epsilon_;
+                auto tmp_value = operator()(compress(state, tmp_input));
+                auto t_d = tmp_value - original_value;
+                jac_input.block(0, j, jac_input.rows(), 1) = t_d / double(epsilon_);
+                tmp_input(j) -= epsilon_;
 
-        // jacobian of state
-        for (int j(0); j < jac_state.cols(); ++j) {
-            if (j <16) {
-                tmp_state(j) += epsilon_;
-            } else {
-                Sophus::SO3 r(state(6), state(7), state(8));
-                Eigen::Vector3d td(0, 0, 0);
-                td(j - 6) += epsilon_;
-//                r = r * Sophus::SO3::exp(td);
-                r = Sophus::SO3::exp(td) * r;
-                tmp_state.block(6, 0, 3, 1) = r.log();
             }
-            auto tmp_value = operator()(compress(tmp_state, input));
-            auto t_d = tmp_value - original_value;
-            jac_state.block(0, j, jac_state.rows(), 1) = t_d / double(epsilon_);
-            if (j < 6) {
-                tmp_state(j) = state(j);
-            } else {
+
+            // jacobian of state
+            for (int j(0); j < jac_state.cols(); ++j) {
+
+                double tmp_epsilon = epsilon_;
+                if (j < 6) {
+                    tmp_state(j) += epsilon_;
+                } else {
+                    tmp_epsilon = 1e-4;
+                    Sophus::SO3 r(state(6), state(7), state(8));
+                    Eigen::Vector3d td(0, 0, 0);
+                    td(j - 6) += tmp_epsilon;
+//                r = r * Sophus::SO3::exp(td);
+                    r = Sophus::SO3::exp(td) * r;
+                    tmp_state.block(6, 0, 3, 1) = r.log();
+                }
+                auto tmp_value = operator()(compress(tmp_state, input));
+                auto t_d = tmp_value - original_value;
+                jac_state.block(0, j, jac_state.rows(), 1) = t_d / double(tmp_epsilon);
+                if (j < 6) {
+                    tmp_state(j) = state(j);
+                } else {
 //                Sophus::SO3 r(tmp_state(6),tmp_state(7),tmp_state(8));
 //                Eigen::Vector3d td(0,0,0);
 //                td(j-6) += epsilon_;
 //                r = r * Sophus::SO3::exp(td).inverse();
 //                tmp_state.block(6,0,3,1) =
-                tmp_state(j) = state(j);
+                    tmp_state(j) = state(j);
 
+                }
             }
+
+
+            return compress(jac_state, jac_input);
+
+        }else if(methond_id == 2){
+
+
+        }else{
+            ERROR_MSG_FLAG("invalid method id :"+ std::to_string(methond_id));
         }
-
-
-        return compress(jac_state, jac_input);
 
 
     }
