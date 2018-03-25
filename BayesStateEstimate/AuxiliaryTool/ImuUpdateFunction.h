@@ -64,6 +64,37 @@ public:
         jac_state.setZero();
         jac_input.setZero();
 
+        auto tmp_state = state;
+        auto tmp_input = input;
+        auto original_value = operator()(compress(state,input));
+
+        // jacobian of input
+        for(int j(0);j<jac_input.rows();++j){
+            tmp_input(j) += epsilon_;
+            auto tmp_value = operator()(compress(state,tmp_input));
+            auto t_d = tmp_value-original_value;
+            jac_input.block(0,j,jac_input.rows(),1) = t_d/double(epsilon_);
+
+        }
+
+        // jacobian of state
+        for(int j(0);j<jac_state;++j){
+            if(j<6){
+                tmp_state(j) += epsilon_;
+            }else{
+                Sophus::SO3 r(state(6),state(7),state(8));
+                Eigen::Vector3d td(0,0,0);
+                td(j-6) = epsilon_;
+                r = r * Sophus::SO3::exp(td);
+                tmp_state.block(6,0,3,1) = r.log();
+            }
+            auto tmp_value = operator()(compress(state,tmp_input));
+            auto t_d = tmp_value-original_value;
+            jac_state.block(0,j,jac_state.rows(0,1) = t_d/double(tmp_state(j)-state(j)));
+        }
+
+
+        return compress(jac_state,jac_input);
 
 
     }

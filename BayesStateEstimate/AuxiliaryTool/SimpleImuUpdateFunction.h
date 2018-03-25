@@ -70,6 +70,7 @@ namespace BSE {
 
 //            auto rotation = rbn;
             auto rotation = Sophus::SO3::exp(state.block(6,0,3,1));
+
 //            Sophus::SO3 ro = Sophus::SO3::exp(state.block(6, 0, 3, 1));
             Eigen::Vector3d gyr = input.block(3, 0, 3, 1) * time_interval_;
 //            std::cout << time_interval_ << std::endl;
@@ -92,6 +93,7 @@ namespace BSE {
                     acc * time_interval_;
             out_state.block(6, 0, 3, 1) = rotation.log();
             rbn = rotation;
+
             return out_state;
 
         }
