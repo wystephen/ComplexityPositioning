@@ -57,7 +57,15 @@ public:
      * @return
      */
     std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd state, Eigen::MatrixXd input) {
-        return d(compress(state, input));
+//        return d(compress(state, input));
+        Eigen::MatrixXd jac_state,jac_input;
+        jac_state.resize(OutDim,jac_state.rows());
+        jac_input.resize(OutDim,jac_input.rows());
+        jac_state.setZero();
+        jac_input.setZero();
+
+
+
     }
 
 
