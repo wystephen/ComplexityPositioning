@@ -69,7 +69,7 @@ public:
         auto original_value = operator()(compress(state,input));
 
         // jacobian of input
-        for(int j(0);j<jac_input.rows();++j){
+        for(int j(0);j<jac_input.cols();++j){
             tmp_input(j) += epsilon_;
             auto tmp_value = operator()(compress(state,tmp_input));
             auto t_d = tmp_value-original_value;
@@ -78,8 +78,8 @@ public:
         }
 
         // jacobian of state
-        for(int j(0);j<jac_state.rows();++j){
-            if(j<6){
+        for(int j(0);j<jac_state.cols();++j){
+            if(j<10){
                 tmp_state(j) += epsilon_;
             }else{
                 Sophus::SO3 r(state(6),state(7),state(8));
@@ -88,9 +88,9 @@ public:
                 r = r * Sophus::SO3::exp(td);
                 tmp_state.block(6,0,3,1) = r.log();
             }
-            auto tmp_value = operator()(compress(state,tmp_input));
+            auto tmp_value = operator()(compress(tmp_state,input));
             auto t_d = tmp_value-original_value;
-            jac_state.block(0,j,jac_state.rows(),1) = t_d/double(tmp_state(j)-state(j));
+            jac_state.block(0,j,jac_state.rows(),1) = t_d/double(epsilon_);
         }
 
 

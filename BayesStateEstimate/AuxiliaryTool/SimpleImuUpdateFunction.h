@@ -92,7 +92,7 @@ namespace BSE {
             out_state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) +
                     acc * time_interval_;
             out_state.block(6, 0, 3, 1) = rotation.log();
-            rbn = rotation;
+//            rbn = rotation;
 
             return out_state;
 
