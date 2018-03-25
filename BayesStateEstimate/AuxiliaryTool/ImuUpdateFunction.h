@@ -59,8 +59,8 @@ public:
     std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd state, Eigen::MatrixXd input) {
 //        return d(compress(state, input));
         Eigen::MatrixXd jac_state,jac_input;
-        jac_state.resize(OutDim,jac_state.rows());
-        jac_input.resize(OutDim,jac_input.rows());
+        jac_state.resize(OutDim,state.rows());
+        jac_input.resize(OutDim,input.rows());
         jac_state.setZero();
         jac_input.setZero();
 
@@ -78,7 +78,7 @@ public:
         }
 
         // jacobian of state
-        for(int j(0);j<jac_state;++j){
+        for(int j(0);j<jac_state.rows();++j){
             if(j<6){
                 tmp_state(j) += epsilon_;
             }else{
@@ -90,7 +90,7 @@ public:
             }
             auto tmp_value = operator()(compress(state,tmp_input));
             auto t_d = tmp_value-original_value;
-            jac_state.block(0,j,jac_state.rows(0,1) = t_d/double(tmp_state(j)-state(j)));
+            jac_state.block(0,j,jac_state.rows(),1) = t_d/double(tmp_state(j)-state(j));
         }
 
 
