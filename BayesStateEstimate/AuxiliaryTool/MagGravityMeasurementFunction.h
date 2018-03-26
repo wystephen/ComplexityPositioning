@@ -45,14 +45,11 @@ public:
      * @return
      */
     Eigen::MatrixXd compute(Eigen::MatrixXd state) {
-        Eigen::Quaterniond q = Eigen::AngleAxisd(state(6), Eigen::Vector3d::UnitX()) *
-                               Eigen::AngleAxisd(state(7), Eigen::Vector3d::UnitY()) *
-                               Eigen::AngleAxisd(state(8), Eigen::Vector3d::UnitZ());
-//        q = q.inverse();
 
         Eigen::Matrix<double, 6, 1> out;
-        out.block(0, 0, 3, 1) = 1.0 * q.toRotationMatrix().transpose() * gravity_nav_;
-        out.block(3, 0, 3, 1) = q.toRotationMatrix().transpose() * mag_nav_;
+        Sophus::SO3 rbn = Sophus::SO3::exp(state.block(6,0,3,1));
+        out.block(0, 0, 3, 1) = rbn.matrix().transpose() * gravity_nav_;
+        out.block(3, 0, 3, 1) = rbn.matrix().transpose() * mag_nav_;
 //        std::cout << "gravity nav :" << gravity_nav_ << std::endl;
         return out;
     }

@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     std::cout.precision(10);
     // parameters
 //    std::string dir_name = "/home/steve/Data/NewFusingLocationData/0018/";
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0010/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 
 
 
@@ -219,11 +219,11 @@ int main(int argc, char *argv[]) {
                 tmp_gm.block(0, 0, 3, 1) = imu_data.block(i, 1, 1, 3).transpose();
                 tmp_gm.block(3, 0, 3, 1) = imu_data.block(i, 7, 1, 3).transpose();
                 Eigen::Matrix<double, 6, 6> cov_matrix = Eigen::Matrix<double, 6, 6>::Identity();
-                cov_matrix.block(0, 0, 3, 3) *= 0.3;
-                cov_matrix.block(3, 3, 3, 3) *= 2.801;
+                cov_matrix.block(0, 0, 3, 3) *= 0.03;
+                cov_matrix.block(3, 3, 3, 3) *= 0.03;
 
 
-//                if( current_diff < 0.1)
+                if( current_diff < 0.1)
                 filter_complex.MeasurementAngleCorrectMG(tmp_gm, cov_matrix);
 
                 if (zv_flag.size() > 3 &&
