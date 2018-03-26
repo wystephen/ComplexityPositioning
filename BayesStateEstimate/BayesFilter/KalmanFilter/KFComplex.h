@@ -324,6 +324,7 @@ namespace BSE {
         void MeasurementUwb(Eigen::Matrix<double, 4, 1> input,
                             Eigen::Matrix<double, 1, 1> cov_m) {
             auto uwbFunc = UwbMeasurementFunction(input.block(0, 0, 3, 1));
+            uwbFunc.setEpsilon_(1e-8);
 
             auto d_vec = uwbFunc.derivate(state_x_);
             H_ = d_vec[0];
@@ -333,8 +334,8 @@ namespace BSE {
             prob_state_ = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * prob_state_;
             prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
-            Eigen::Matrix<double,1,1> t_m;
-            t_m(0,0) = input(3);
+            Eigen::Matrix<double, 1, 1> t_m;
+            t_m(0, 0) = input(3);
             dX_ = K_ * (t_m - uwbFunc.compute(state_x_));
 //            std::cout << "diff: "
 //                      << (g_and_mag - mg_fuc.compute(state_x_)).transpose()
@@ -353,7 +354,8 @@ namespace BSE {
 
 
             rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
-            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
+//            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
+            rbn_ = Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
             state_x_.block(6, 0, 3, 1) = rbn_.log();
         }
 

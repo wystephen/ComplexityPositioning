@@ -238,7 +238,7 @@ namespace BSE {
 
                          H_.resize(1, 9);
                          H_.setZero();
-                         H_.block(0, 0, 1, 3) = 2 * (state.block(0, 0, 3, 1) - b).transpose();
+                         H_.block(0, 0, 1, 3) =  (state.block(0, 0, 3, 1) - b).transpose()/y(0);
 
                          K_ = (state_prob * H_.transpose().eval()) *
                               (H_ * state_prob * H_.transpose().eval() + cov_m).inverse();
