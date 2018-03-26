@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
 
 
                     filter.MeasurementState(measurement_data,
-                                            measurement_noise_matrix*0.01,
+                                            measurement_noise_matrix*0.001,
                                             BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
                     complex_filter.MeasurementUwb(measurement_data,

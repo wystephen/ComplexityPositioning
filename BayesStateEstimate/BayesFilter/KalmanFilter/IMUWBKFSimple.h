@@ -238,7 +238,7 @@ namespace BSE {
 
                          H_.resize(1, 9);
                          H_.setZero();
-                         H_.block(0, 0, 1, 3) =  (state.block(0, 0, 3, 1) - b).transpose()/y(0);
+                         H_.block(0, 0, 1, 3) = (state.block(0, 0, 3, 1) - b).transpose() / y(0);
 
                          K_ = (state_prob * H_.transpose().eval()) *
                               (H_ * state_prob * H_.transpose().eval() + cov_m).inverse();
@@ -246,9 +246,10 @@ namespace BSE {
                          dx = K_ * (z - y);
 
                          state.block(0, 0, 6, 1) += dx.block(0, 0, 6, 1);
-                         Sophus::SO3 r(state(6),state(7),state(8));
-                         r = r * Sophus::SO3::exp(dx.block(6,0,3,1));
-                         state.block(6,0,3,1) = r.log();
+                         Sophus::SO3 r(state(6), state(7), state(8));
+                         r = r * Sophus::SO3::exp(dx.block(6, 0, 3, 1));
+                         state.block(6, 0, 3, 1) = r.log();
+                         rotate_q_ = r.unit_quaternion();
 
 
 //                std::cout << "dx:" << dx.transpose() << std::endl;
