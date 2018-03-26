@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 
     std::cout.precision(30);
 
-    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0001/";
+    std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0004/";
 
     AWF::FileReader imu_file(dir_name + "imu.data");
     AWF::FileReader uwb_file(dir_name + "uwb_data.csv");
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
             for (int k(1); k < uwb_data.cols(); ++k) {
                 if (uwb_data(uwb_index, k) < 0.0 ||
                     uwb_data(uwb_index, k) > 28.0 ||
-                    optimize_trace(uwb_index, 3) > 20.0) {
+                    optimize_trace(uwb_index, 3) > 10.0) {
                     break;
                 } else {
 
