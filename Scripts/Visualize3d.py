@@ -28,10 +28,17 @@ import os
 
 import numpy as np
 
+import pyqtgraph as pg
+
+
+
 
 def plot_file(ax_handle, file_name, flag='+-'):
     data = np.loadtxt(file_name, delimiter=',')
     ax_handle.plot(data[:, 0], data[:, 1], data[:, 2], flag, label=file_name)
+    pg.plot(data[:,0],data[:,1])
+
+
 
 
 if __name__ == '__main__':
@@ -40,6 +47,8 @@ if __name__ == '__main__':
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1, projection='3d')
+    pg.mkQApp()
+
 
     for file_name in os.listdir(dir_name):
         print(file_name)
@@ -54,5 +63,8 @@ if __name__ == '__main__':
 
     ax.legend()
     ax.grid()
+
+    # pg.plot()
+
 
     plt.show()

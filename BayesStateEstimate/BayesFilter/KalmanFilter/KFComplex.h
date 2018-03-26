@@ -279,7 +279,7 @@ namespace BSE {
             g_and_mag.block(0, 0, 3, 1) = tmp_acc / tmp_acc.norm();
             g_and_mag.block(3, 0, 3, 1) = tmp_mag / tmp_mag.norm();
 
-            mg_fuc.setEpsilon_(1e-2);
+            mg_fuc.setEpsilon_(1e-8);
             auto t_vec = mg_fuc.derivative(state_x_);
             H_ = t_vec[0];
             ////TODO: correct this.
