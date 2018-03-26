@@ -124,13 +124,13 @@ int main(int argc, char *argv[]) {
     }
 
 
-    auto imu_tool = BSE::ImuTools();
+//    auto imu_tool = BSE::ImuTools();
 
 
     //process
-    imu_tool.processImuData(left_imu_data);
-    imu_tool.processImuData(right_imu_data);
-    imu_tool.processImuData(head_imu_data);
+    BSE::ImuTools::processImuData(left_imu_data);
+    BSE::ImuTools::processImuData(right_imu_data);
+    BSE::ImuTools::processImuData(head_imu_data);
 
     Eigen::MatrixXd process_noise_matrix =
             Eigen::MatrixXd::Identity(6, 6);
@@ -376,7 +376,7 @@ int main(int argc, char *argv[]) {
             ///update left index
 //            std::cout << "left foot" ;//<< std::endl;
             bool zv_flag =
-                    imu_tool.GLRT_Detector(
+                    BSE::ImuTools::GLRT_Detector(
                             left_imu_data.block(left_index - 5, 1, 10, 6)) > 0.5;
 
             // non-zero velocity to zero velocity
@@ -419,7 +419,7 @@ int main(int argc, char *argv[]) {
 //            std::cout << "right foot";//<< std::endl;
 
             bool zv_flag =
-                    imu_tool.GLRT_Detector(
+                    BSE::ImuTools::GLRT_Detector(
                             right_imu_data.block(right_index - 5, 1, 10, 6)
                     );
 

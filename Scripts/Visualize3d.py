@@ -50,7 +50,7 @@ if __name__ == '__main__':
             #     plot_file(ax, file_name)
             # if 'uwb' in file_name:
             #     plot_file(ax, file_name, '*')
-            plot_file(ax, file_name)
+            plot_file(ax, file_nameu
 
     ax.legend()
     ax.grid()

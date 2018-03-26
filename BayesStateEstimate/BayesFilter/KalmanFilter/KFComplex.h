@@ -279,6 +279,7 @@ namespace BSE {
             g_and_mag.block(0, 0, 3, 1) = tmp_acc / tmp_acc.norm();
             g_and_mag.block(3, 0, 3, 1) = tmp_mag / tmp_mag.norm();
 
+            mg_fuc.setEpsilon_(1e-2);
             auto t_vec = mg_fuc.derivative(state_x_);
             H_ = t_vec[0];
             ////TODO: correct this.
@@ -305,9 +306,13 @@ namespace BSE {
                                          dX_.block(0, 0, 6, 1);
 
 
-            state_x_.block(6, 0, 3, 1) =
-                    BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
-                                            dX_.block(6, 0, 3, 1));
+//            state_x_.block(6, 0, 3, 1) =
+//                    BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
+//                                            dX_.block(6, 0, 3, 1));
+            rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
+//            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
+            rbn_ =  Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
+            state_x_.block(6, 0, 3, 1) = rbn_.log();
 //            std::cout << "input:"
 //                      << input.transpose()
 //            std::cout << "reve:"

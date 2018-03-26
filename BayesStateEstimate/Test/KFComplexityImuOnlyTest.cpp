@@ -224,7 +224,7 @@ int main(int argc, char *argv[]) {
 
 
 //                if( current_diff < 0.1)
-//                filter_complex.MeasurementAngleCorrectMG(tmp_gm, cov_matrix);
+                filter_complex.MeasurementAngleCorrectMG(tmp_gm, cov_matrix);
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
