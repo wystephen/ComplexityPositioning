@@ -41,9 +41,8 @@ public:
     }
 
     Eigen::MatrixXd compute(Eigen::MatrixXd state) {
-        Sophus::SO3 rbn = Sophus::SO3::exp(state);
-
-
+        Sophus::SO3 rbn = Sophus::SO3::exp(state.block(6,0,3,1));
+        return rbn.inverse().matrix() * mag_nav_;
     }
 
     Eigen::MatrixXd operator()(std::vector<Eigen::MatrixXd> in_vec) {
