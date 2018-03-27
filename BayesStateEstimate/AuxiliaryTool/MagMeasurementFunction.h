@@ -41,10 +41,7 @@ public:
     }
 
     Eigen::MatrixXd compute(Eigen::MatrixXd state) {
-        Eigen::Quaterniond q = Eigen::AngleAxisd(state(6, 0), Eigen::Vector3d::UnitX()) *
-                               Eigen::AngleAxisd(state(7, 0), Eigen::Vector3d::UnitY()) *
-                               Eigen::AngleAxisd(state(8, 0), Eigen::Vector3d::UnitZ());
-        return q.inverse() * mag_nav_;
+        Sophus::SO3 rbn = Sophus::SO3::exp(state);
 
 
     }
