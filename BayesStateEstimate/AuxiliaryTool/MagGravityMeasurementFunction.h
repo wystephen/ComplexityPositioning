@@ -47,7 +47,7 @@ public:
     Eigen::MatrixXd compute(Eigen::MatrixXd state) {
 
         Eigen::Matrix<double, 6, 1> out;
-        Sophus::SO3 rbn = Sophus::SO3::exp(state.block(6,0,3,1));
+        Sophus::SO3 rbn = Sophus::SO3::exp(state.block(6, 0, 3, 1));
         out.block(0, 0, 3, 1) = rbn.matrix().transpose() * gravity_nav_;
         out.block(3, 0, 3, 1) = rbn.matrix().transpose() * mag_nav_;
 //        std::cout << "gravity nav :" << gravity_nav_ << std::endl;
