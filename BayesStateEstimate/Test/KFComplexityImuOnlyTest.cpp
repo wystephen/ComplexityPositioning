@@ -220,10 +220,10 @@ int main(int argc, char *argv[]) {
                 tmp_gm.block(3, 0, 3, 1) = imu_data.block(i, 7, 1, 3).transpose();
                 Eigen::Matrix<double, 6, 6> cov_matrix = Eigen::Matrix<double, 6, 6>::Identity();
                 cov_matrix.block(0, 0, 3, 3) *= 0.03;
-                cov_matrix.block(3, 3, 3, 3) *= 0.03;
+                cov_matrix.block(3, 3, 3, 3) *= 0.0003;
 
 
-                if( current_diff < 0.1)
+//                if( current_diff < 0.1)
                 filter_complex.MeasurementAngleCorrectMG(tmp_gm, cov_matrix);
 
                 if (zv_flag.size() > 3 &&
@@ -311,7 +311,7 @@ int main(int argc, char *argv[]) {
         plt::legend();
 
         plt::figure();
-        plt::named_plot("ekf trace", pose[0], pose[1], "-+");
+        plt::named_plot("complex trace", pose[0], pose[1], "-+");
         plt::named_plot("simple trace", pose_simple[0], pose_simple[1], "-+");
         plt::named_plot("optimized trace",
                         optimize_trace_vec[0],
