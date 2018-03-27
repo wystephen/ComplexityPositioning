@@ -221,6 +221,7 @@ namespace BSE {
         void MeasurementAngleCorrect(Eigen::Matrix<double, 3, 1> input,
                                      Eigen::Matrix<double, 3, 3> cov_m) {
             Eigen::Vector3d tmp_mag = input;
+            input = input / double(input.norm());
 
             rotation_q_.normalize();
             state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
@@ -237,28 +238,16 @@ namespace BSE {
             dX_ = K_ * (input - mag_func.compute(state_x_));
             std::cout << " diff: " << (input - mag_func.compute(state_x_)).transpose();
 
-            state_x_ += dX_;
+            state_x_.block(0, 0, 6, 1) += dX_.block(0, 0, 6, 1);
+            rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
+            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
+            state_x_.block(6, 0, 3, 1) = rbn_.log();
 
 
-            Eigen::Matrix3d rotation_m(rotation_q_.toRotationMatrix());
-            Eigen::Matrix3d omega = Eigen::Matrix3d::Zero();
-            omega << 0.0, dX_(8), -dX_(7),
-                    -dX_(8), 0.0, dX_(6),
-                    dX_(7), -dX_(6), 0.0;
-            omega *= -1.0;
-//                         rotation_m = (2.0 * Eigen::Matrix3d::Identity() + omega) *
-//                                      (2.0 * Eigen::Matrix3d::Identity() - omega).inverse()
-//                                      * rotation_m;
-            rotation_m = (Eigen::Matrix3d::Identity() - omega) * rotation_m;
-
-//                         rotate_q_ = delta_q.inverse() * rotate_q_;
-            rotation_q_ = Eigen::Quaterniond(rotation_m);
-            rotation_q_.normalize();
-            state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
             std::cout << "input:"
                       << input.transpose()
                       << "reverted input:"
-                      << (rotation_q_ * input).transpose()
+                      << (rbn_.matrix() * input).transpose()
                       << std::endl;
 
             return;
@@ -279,7 +268,7 @@ namespace BSE {
             g_and_mag.block(0, 0, 3, 1) = tmp_acc / tmp_acc.norm();
             g_and_mag.block(3, 0, 3, 1) = tmp_mag / tmp_mag.norm();
 
-            mg_fuc.setEpsilon_(1e-2*M_PI/180.0);
+            mg_fuc.setEpsilon_(1e-2 * M_PI / 180.0);
             auto t_vec = mg_fuc.derivative(state_x_);
             H_ = t_vec[0];
             ////TODO: correct this.
@@ -311,7 +300,7 @@ namespace BSE {
 //                                            dX_.block(6, 0, 3, 1));
             rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
 //            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
-            rbn_ =  Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
+            rbn_ = Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
             state_x_.block(6, 0, 3, 1) = rbn_.log();
 //            std::cout << "input:"
 //                      << input.transpose()
