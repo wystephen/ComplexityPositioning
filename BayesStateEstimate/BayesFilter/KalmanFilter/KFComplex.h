@@ -101,6 +101,7 @@ namespace BSE {
                       << mag_nav.transpose()
                       << std::endl;
             mag_func.setMag_nav(rotation_q_ * mag);
+            mag_func.setEpsilon_(1e-8);
             mg_fuc.setEpsilon_(1e-6);
             mg_fuc.setMag_nav(rotation_q_ * mag);
             mg_fuc.setGravity_nav_(Eigen::Vector3d(0, 0, 1.0));
@@ -236,7 +237,7 @@ namespace BSE {
             prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
             dX_ = K_ * (input - mag_func.compute(state_x_));
-            std::cout << " diff: " << (input - mag_func.compute(state_x_)).transpose();
+            std::cout << " standard: " << (mag_func.compute(state_x_)).transpose();
 
             state_x_.block(0, 0, 6, 1) += dX_.block(0, 0, 6, 1);
             rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
@@ -248,6 +249,8 @@ namespace BSE {
                       << input.transpose()
                       << "reverted input:"
                       << (rbn_.matrix() * input).transpose()
+                      << "world:"
+                      << mag_func.mag_nav_.transpose()
                       << std::endl;
 
             return;

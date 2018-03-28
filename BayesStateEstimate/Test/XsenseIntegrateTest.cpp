@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
             for (int k(1); k < uwb_data.cols(); ++k) {
                 if (uwb_data(uwb_index, k) < 0.0 ||
                     uwb_data(uwb_index, k) > 28.0 ||
-                    optimize_trace(uwb_index, 3) > 10.0) {
+                    optimize_trace(uwb_index, 3) > 1000.0) {
                     break;
                 } else {
 
