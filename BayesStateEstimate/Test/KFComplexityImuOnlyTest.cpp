@@ -44,6 +44,7 @@ int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/NewFusingLocationData/0018/";
     std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 
+    auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 
 
     // load data
@@ -96,6 +97,9 @@ int main(int argc, char *argv[]) {
     initial_prob_matrix.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
 //    initial_prob_matrix.block(9, 9, 3, 3) *= 0.001;
 //    initial_prob_matrix.block(12, 12, 3, 3) *= 0.001 * (M_PI / 180.0);
+
+
+
     Eigen::MatrixXd initial_prob_matrix_complex = Eigen::MatrixXd::Identity(15, 15);
     initial_prob_matrix_complex.block(0, 0, 3, 3) *= 0.001;
     initial_prob_matrix_complex.block(3, 3, 3, 3) *= 0.001;
@@ -103,13 +107,15 @@ int main(int argc, char *argv[]) {
     initial_prob_matrix_complex.block(9, 9, 3, 3) *= 0.001;
     initial_prob_matrix_complex.block(12, 12, 3, 3) *= 0.001 * (M_PI / 180.0);
 
+
     auto f = [&process_noise_matrix,
             &initial_prob_matrix,
             &initial_prob_matrix_complex,
             &initial_pos,
             &initial_ori,
-            &optimize_trace_vec](const Eigen::MatrixXd &imu_data,
-                                 std::string data_name) {
+            &optimize_trace_vec,
+            &logger_ptr](const Eigen::MatrixXd &imu_data,
+                         std::string data_name) {
         auto filter = BSE::IMUWBKFSimple(
                 initial_prob_matrix);
 
@@ -131,7 +137,7 @@ int main(int argc, char *argv[]) {
         filter.setLocal_g_(-9.884);
         filter_complex.local_g_ = -9.884;
 //    filter.IS_DEBUG = true;
-
+        std::vector<double> zv_flag = {};
 
         auto time_begin = AWF::getDoubleSecondTime();
         filter.initial_state(imu_data.block(10, 1, 100, 6),
@@ -144,32 +150,6 @@ int main(int argc, char *argv[]) {
                                      initial_pos);
         std::cout << "costed time :" << AWF::getDoubleSecondTime() - time_begin
                   << std::endl;
-        std::vector<std::vector<double>> pose_simple = {{},
-                                                        {},
-                                                        {}};
-        std::vector<std::vector<double>> pose = {{},
-                                                 {},
-                                                 {}};
-        std::vector<std::vector<double>> velocity = {{},
-                                                     {},
-                                                     {}};
-        std::vector<std::vector<double>> angle = {{},
-                                                  {},
-                                                  {}};
-
-        std::vector<std::vector<double>> mag = {{},
-                                                {},
-                                                {}};
-        std::vector<double> zv_flag = {};
-
-        std::vector<std::vector<double>> angle_velocity = {{},
-                                                           {},
-                                                           {}};
-
-        std::vector<std::vector<double>> acc = {
-                {},
-                {},
-                {}};
 
 //    filter.sett
         for (int i(5); i < imu_data.rows() - 5; ++i) {
@@ -189,6 +169,7 @@ int main(int argc, char *argv[]) {
             bool tmp_break_flag = false;
 
 
+//            std::vector<double> zv_
             if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
                 /// zero velocity detector
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
@@ -244,103 +225,19 @@ int main(int argc, char *argv[]) {
 
             Eigen::VectorXd state_simple = filter.getState_();
             Eigen::VectorXd state = filter_complex.state_x_;
-//        std::cout << state.transpose() << std::endl;
-            for (int j(0); j < 3; ++j) {
-                pose_simple[j].push_back(state_simple(j));
-                pose[j].push_back(state(j));
-                velocity[j].push_back(state(j + 3));
-                angle[j].push_back(state(j + 6));
-                acc[j].push_back(imu_data(i, j + 1));
-                angle_velocity[j].push_back(imu_data(i, j + 4));
-                mag[j].push_back(imu_data(i, j + 7));
-            }
+
+            logger_ptr->addPlotEvent(data_name + "velocity", "velocity_simple", state_simple.block(3, 0, 3, 1));
+            logger_ptr->addPlotEvent(data_name + "velocity", "velocity_complex", state.block(3, 0, 3, 1));
+
+            logger_ptr->addPlotEvent(data_name + "angle", "angle_simple", state_simple.block(6, 0, 3, 1));
+            logger_ptr->addPlotEvent(data_name + "angle", "angle_complex", state.block(6, 0, 3, 1));
+
+
+            logger_ptr->addTrace3dEvent(data_name, "simple", state_simple.block(0, 0, 3, 1));
+            logger_ptr->addTrace3dEvent(data_name, "complex", state_simple.block(0, 0, 3, 1));
 
         }
 
-
-        plt::figure();
-        for (int i(0); i < 3; ++i) {
-            plt::named_plot(std::to_string(i), pose[i]);
-        }
-        plt::title(data_name + "pose");
-        plt::grid(true);
-        plt::legend();
-
-        plt::figure();
-        for (int i(0); i < 3; ++i) {
-            plt::named_plot(std::to_string(i), mag[i]);
-        }
-        plt::title(data_name + "mag");
-        plt::grid(true);
-        plt::legend();
-
-
-        plt::figure();
-        for (int i(0); i < 3; ++i) {
-            plt::named_plot(std::to_string(i), velocity[i]);
-        }
-        plt::title(data_name + "vel");
-        plt::grid(true);
-        plt::legend();
-
-        plt::figure();
-        for (int i(0); i < 3; ++i) {
-            plt::named_plot(std::to_string(i), angle[i]);
-        }
-        plt::named_plot("zv_falg", zv_flag);
-        plt::title(data_name + "angle");
-        plt::grid(true);
-        plt::legend();
-
-
-        plt::figure();
-        for (int i(0); i < 3; ++i) {
-            plt::named_plot(std::to_string(i), angle_velocity[i]);
-        }
-        plt::named_plot("zv_falg", zv_flag);
-        plt::title(data_name + "angle velocity");
-        plt::grid(true);
-        plt::legend();
-
-
-        plt::figure();
-        for (int i(0); i < 3; ++i) {
-            plt::named_plot(std::to_string(i), acc[i]);
-        }
-        plt::named_plot("zv_falg", zv_flag);
-        plt::title(data_name + "acc");
-        plt::grid(true);
-        plt::legend();
-
-        plt::figure();
-        plt::named_plot("complex trace", pose[0], pose[1], "-+");
-        plt::named_plot("simple trace", pose_simple[0], pose_simple[1], "-+");
-        plt::named_plot("optimized trace",
-                        optimize_trace_vec[0],
-                        optimize_trace_vec[1], "*");
-
-
-        AWF::writeVectorsToCsv("./XsenseResult/ekf.csv", pose);
-        AWF::writeVectorsToCsv("./XsenseResult/pose.csv", pose_simple);
-
-        double min_v(0.0), max_v(0.0);
-        min_v = std::min(std::min(*std::min_element(pose[0].begin(), pose[0].end()),
-                                  *std::min_element(pose[1].begin(), pose[1].end())),
-                         std::min(*std::min_element(optimize_trace_vec[0].begin(), optimize_trace_vec[0].end()),
-                                  *std::min_element(optimize_trace_vec[1].begin(),
-                                                    optimize_trace_vec[1].end())));
-
-        max_v = std::max(std::max(*std::max_element(pose[0].begin(), pose[0].end()),
-                                  *std::max_element(pose[1].begin(), pose[1].end())),
-                         std::max(*std::max_element(optimize_trace_vec[0].begin(), optimize_trace_vec[0].end()),
-                                  *std::max_element(optimize_trace_vec[1].begin(),
-                                                    optimize_trace_vec[1].end())));
-//        plt::xlim(min_v, max_v);
-//        plt::ylim(min_v, max_v);
-
-        plt::legend();
-        plt::grid(true);
-        plt::title(data_name + "trace");
 
     };
 
@@ -350,6 +247,7 @@ int main(int argc, char *argv[]) {
 //    f(head_imu_data, "head");
 
     std::cout << "time:" << AWF::getDoubleSecondTime() - start_time << std::endl;
-    plt::show();
+
+    logger_ptr->outputAllEvent(true);
 
 }
