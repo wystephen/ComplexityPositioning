@@ -208,7 +208,6 @@ namespace BSE {
 
             rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
             rbn_ = Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
-//            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) ;
             state_x_.block(6, 0, 3, 1) = rbn_.log();
 
 
@@ -224,8 +223,6 @@ namespace BSE {
             Eigen::Vector3d tmp_mag = input;
             input = input / double(input.norm());
 
-            rotation_q_.normalize();
-            state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
             auto t_vec = mag_func.derivative(state_x_);
             H_ = t_vec[0];
@@ -254,7 +251,7 @@ namespace BSE {
 //                      << std::endl;
             auto logger_ptr = AWF::AlgorithmLogger::getInstance();
             logger_ptr->addPlotEvent("angle_correct","input",input);
-            logger_ptr->addPlotEvent("angle_correct","reverted",rbn_.matrix()*input);
+            logger_ptr->addPlotEvent("angle_correct","reverted",Eigen::Vector3d(rbn_.matrix()*input));
             logger_ptr->addPlotEvent("angle_correct","world_value",mag_func.mag_nav_);
 
             return;

@@ -179,9 +179,6 @@ int main(int argc, char *argv[]) {
                 filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00025);
 
                 /// angle constraint through acc.
-                double last_diff = std::abs(imu_data.block(i - 1, 1, 1, 3).norm() - 9.884);
-                double current_diff = std::abs(imu_data.block(i, 1, 1, 3).norm() - 9.884);
-                double next_diff = std::abs(imu_data.block(i + 1, 1, 1, 3).norm() - 9.884);
                 int zv_index = zv_flag.size() - 1;
                 bool last_zv_flag = true;
                 for (int d(0); d < 5; ++d) {
@@ -196,8 +193,8 @@ int main(int argc, char *argv[]) {
 //                                        BSE::MeasurementMethodType::NormalAngleConstraint);
 
 
-//                filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-//                                                       Eigen::Matrix3d::Identity() * 0.5);
+                filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
+                                                       Eigen::Matrix3d::Identity() * 0.2);
                 Eigen::Matrix<double, 6, 1> tmp_gm;
                 tmp_gm.block(0, 0, 3, 1) = imu_data.block(i, 1, 1, 3).transpose();
                 tmp_gm.block(3, 0, 3, 1) = imu_data.block(i, 7, 1, 3).transpose();
