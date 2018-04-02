@@ -236,14 +236,17 @@ int main(int argc, char *argv[]) {
             logger_ptr->addTrace3dEvent(data_name, "simple", state_simple.block(0, 0, 3, 1));
             logger_ptr->addTrace3dEvent(data_name, "complex", state.block(0, 0, 3, 1));
 
+            logger_ptr->addTraceEvent(data_name, "simple", state_simple.block(0, 0, 2, 1));
+            logger_ptr->addTraceEvent(data_name, "complex", state.block(0, 0, 2, 1));
+
         }
 
 
     };
 
 //
-//    f(left_imu_data, "left_foot");
-    f(right_imu_data, "right_foot");
+    f(left_imu_data, "left_foot");
+//    f(right_imu_data, "right_foot");
 //    f(head_imu_data, "head");
 
     std::cout << "time:" << AWF::getDoubleSecondTime() - start_time << std::endl;
