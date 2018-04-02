@@ -36,7 +36,6 @@ find_package(Thrust REQUIRED)
 # cuda
 find_package(CUDA REQUIRED)
 
-#find_package(MKL REQUIRED)
 
 #OPENMP
 find_package(OpenMP)
