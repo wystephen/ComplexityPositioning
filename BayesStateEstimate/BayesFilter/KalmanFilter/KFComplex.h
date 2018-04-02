@@ -238,7 +238,8 @@ namespace BSE {
 
             state_x_.block(0, 0, 6, 1) += dX_.block(0, 0, 6, 1);
             rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
-            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
+//            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
+            rbn_ = Sophus::SO3::exp(dX_.block(6,0,3,1)) * rbn_;
             state_x_.block(6, 0, 3, 1) = rbn_.log();
 
 
@@ -253,6 +254,7 @@ namespace BSE {
             logger_ptr->addPlotEvent("angle_correct","input",input);
             logger_ptr->addPlotEvent("angle_correct","reverted",Eigen::Vector3d(rbn_.matrix()*input));
             logger_ptr->addPlotEvent("angle_correct","world_value",mag_func.mag_nav_);
+            logger_ptr->addPlotEvent("probability","P",prob_state_);
 
             return;
 
@@ -299,9 +301,9 @@ namespace BSE {
                                          dX_.block(0, 0, 6, 1);
 
 
-//            state_x_.block(6, 0, 3, 1) =
-//                    BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
-//                                            dX_.block(6, 0, 3, 1));
+            state_x_.block(6, 0, 3, 1) =
+                    BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
+                                            dX_.block(6, 0, 3, 1));
             rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
 //            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
             rbn_ = Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
