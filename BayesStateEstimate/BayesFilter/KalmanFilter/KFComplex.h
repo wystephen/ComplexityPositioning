@@ -237,7 +237,7 @@ namespace BSE {
             prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
 
             dX_ = K_ * (input - mag_func.compute(state_x_));
-            std::cout << " standard: " << (mag_func.compute(state_x_)).transpose();
+//            std::cout << " standard: " << (mag_func.compute(state_x_)).transpose();
 
             state_x_.block(0, 0, 6, 1) += dX_.block(0, 0, 6, 1);
             rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
@@ -245,13 +245,17 @@ namespace BSE {
             state_x_.block(6, 0, 3, 1) = rbn_.log();
 
 
-            std::cout << "input:"
-                      << input.transpose()
-                      << "reverted input:"
-                      << (rbn_.matrix() * input).transpose()
-                      << "world:"
-                      << mag_func.mag_nav_.transpose()
-                      << std::endl;
+//            std::cout << "input:"
+//                      << input.transpose()
+//                      << "reverted input:"
+//                      << (rbn_.matrix() * input).transpose()
+//                      << "world:"
+//                      << mag_func.mag_nav_.transpose()
+//                      << std::endl;
+            auto logger_ptr = AWF::AlgorithmLogger::getInstance();
+            logger_ptr->addPlotEvent("angle_correct","input",input);
+            logger_ptr->addPlotEvent("angle_correct","reverted",rbn_.matrix()*input);
+            logger_ptr->addPlotEvent("angle_correct","world_value",mag_func.mag_nav_);
 
             return;
 

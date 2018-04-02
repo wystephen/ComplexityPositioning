@@ -161,8 +161,8 @@ int main(int argc, char *argv[]) {
 
             auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
                                                               process_noise_matrix);
-            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-                                                   Eigen::Matrix3d::Identity() * 0.1);
+//            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
+//                                                   Eigen::Matrix3d::Identity() * 0.1);
 
             double uwb_index = 0;
             /// uwb measurement
@@ -211,11 +211,11 @@ int main(int argc, char *argv[]) {
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
-                    std::cout << i
-                              << " lacc:"
-                              << (filter_complex.rotation_q_.toRotationMatrix() *
-                                  imu_data.block(i, 1, 1, 3).transpose()).transpose()
-                              << std::endl;
+//                    std::cout << i
+//                              << " lacc:"
+//                              << (filter_complex.rotation_q_.toRotationMatrix() *
+//                                  imu_data.block(i, 1, 1, 3).transpose()).transpose()
+//                              << std::endl;
                 }
 
                 zv_flag.push_back(1.0);
@@ -226,15 +226,15 @@ int main(int argc, char *argv[]) {
             Eigen::VectorXd state_simple = filter.getState_();
             Eigen::VectorXd state = filter_complex.state_x_;
 
-            logger_ptr->addPlotEvent(data_name + "velocity", "velocity_simple", state_simple.block(3, 0, 3, 1));
-            logger_ptr->addPlotEvent(data_name + "velocity", "velocity_complex", state.block(3, 0, 3, 1));
+            logger_ptr->addPlotEvent(data_name + "velocity", "velocitysimple", state_simple.block(3, 0, 3, 1));
+            logger_ptr->addPlotEvent(data_name + "velocity", "velocitycomplex", state.block(3, 0, 3, 1));
 
-            logger_ptr->addPlotEvent(data_name + "angle", "angle_simple", state_simple.block(6, 0, 3, 1));
-            logger_ptr->addPlotEvent(data_name + "angle", "angle_complex", state.block(6, 0, 3, 1));
+            logger_ptr->addPlotEvent(data_name + "angle", "anglesimple", state_simple.block(6, 0, 3, 1));
+            logger_ptr->addPlotEvent(data_name + "angle", "anglecomplex", state.block(6, 0, 3, 1));
 
 
             logger_ptr->addTrace3dEvent(data_name, "simple", state_simple.block(0, 0, 3, 1));
-            logger_ptr->addTrace3dEvent(data_name, "complex", state_simple.block(0, 0, 3, 1));
+            logger_ptr->addTrace3dEvent(data_name, "complex", state.block(0, 0, 3, 1));
 
         }
 
