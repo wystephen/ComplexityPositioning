@@ -52,7 +52,7 @@ namespace BSE {
             double sigma_a_ = 0.05;
             double sigma_g_ = 0.05 * M_PI / 180.0;
             double ZeroDetectorWindowSize_ = u.rows();
-            double gamma_ = 200;
+            double gamma_ = 240;
 
             double T(0.0);
 
