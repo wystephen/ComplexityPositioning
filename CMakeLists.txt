@@ -151,7 +151,7 @@ add_executable(KFCImuTester BayesStateEstimate/Test/KFComplexityImuOnlyTest.cpp)
 target_link_libraries(KFCImuTester ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES})
 
 add_executable(XsenseIntegrateTest BayesStateEstimate/Test/XsenseIntegrateTest.cpp)
-target_link_libraries(XsenseIntegrateTest ${PYTHON_LIBRARIES}  ${Sophus_LIBRARIES})
+target_link_libraries(XsenseIntegrateTest ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES})
 
 add_executable(UwbOptTest BayesStateEstimate/Test/UwbOptimizationTest.cpp)
 target_link_libraries(UwbOptTest ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES})
