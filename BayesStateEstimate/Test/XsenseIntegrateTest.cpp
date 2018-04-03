@@ -176,6 +176,7 @@ int main(int argc, char *argv[]) {
             measurement_noise_matrix(0, 0) = 0.1;
 
             logger_ptr->addPlotEvent("xsens_uwb","uwb",uwb_data.block(uwb_index,1,1,uwb_data.cols()-1));
+            logger_ptr->addPlotEvent("xsens_uwb","uwb_error",optimize_trace.block(uwb_index,2,1,1));
             for (int k(1); k < uwb_data.cols(); ++k) {
                 if (uwb_data(uwb_index, k) < 0.0 ||
                     uwb_data(uwb_index, k) > 28.0 ||
@@ -209,6 +210,11 @@ int main(int argc, char *argv[]) {
 
         logger_ptr->addTrace3dEvent("xsense_uwb","filter_trace",filter_state.block(0,0,3,1));
         logger_ptr->addTrace3dEvent("xsense_uwb","complex_trace",complex_state.block(0,0,3,1));
+        logger_ptr->addTrace3dEvent("xsense_uwb","uwb_optimize",optimize_trace.block(uwb_index,0,1,3));
+
+        logger_ptr->addPlotEvent("xsense_uwb_complex","pos",complex_state.block(0,0,3,1));
+        logger_ptr->addPlotEvent("xsense_uwb_complex","vel",complex_state.block(3,0,3,1));
+        logger_ptr->addPlotEvent("xsense_uwb_complex","ang",complex_state.block(6,0,3,1));
 
 
 
@@ -216,7 +222,7 @@ int main(int argc, char *argv[]) {
     }
 
 
-    logger_ptr->outputAllEvent();
+    logger_ptr->outputAllEvent(true);
 
 
 }
