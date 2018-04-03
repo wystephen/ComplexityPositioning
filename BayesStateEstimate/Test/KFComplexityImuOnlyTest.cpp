@@ -196,18 +196,16 @@ int main(int argc, char *argv[]) {
 //                                        BSE::MeasurementMethodType::NormalAngleConstraint);
 
 
-//                filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-//                                                       Eigen::Matrix3d::Identity() * 0.0001);
                 Eigen::Matrix<double, 6, 1> tmp_gm;
                 tmp_gm.block(0, 0, 3, 1) = imu_data.block(i, 1, 1, 3).transpose();
                 tmp_gm.block(3, 0, 3, 1) = imu_data.block(i, 7, 1, 3).transpose();
                 Eigen::Matrix<double, 6, 6> cov_matrix = Eigen::Matrix<double, 6, 6>::Identity();
-                cov_matrix.block(0, 0, 3, 3) *= 0.03;
+                cov_matrix.block(0, 0, 3, 3) *= 0.00003;
                 cov_matrix.block(3, 3, 3, 3) *= 0.0003;
 
 
 //                if( current_diff < 0.1)
-//                filter_complex.MeasurementAngleCorrectMG(tmp_gm, cov_matrix);
+                filter_complex.MeasurementAngleCorrectMG(tmp_gm, cov_matrix);
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {
@@ -245,8 +243,8 @@ int main(int argc, char *argv[]) {
     };
 
 //
-//    f(left_imu_data, "left_foot");
-    f(right_imu_data, "right_foot");
+    f(left_imu_data, "left_foot");
+//    f(right_imu_data, "right_foot");
 //    f(head_imu_data, "head");
 
     std::cout << "time:" << AWF::getDoubleSecondTime() - start_time << std::endl;

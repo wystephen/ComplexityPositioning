@@ -293,18 +293,17 @@ namespace BSE {
                                          dX_.block(0, 0, 6, 1);
 
 
-            state_x_.block(6, 0, 3, 1) =
-                    BSE::ImuTools::angleAdd(state_x_.block(6, 0, 3, 1),
-                                            dX_.block(6, 0, 3, 1));
             rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
 //            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
             rbn_ = Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
             state_x_.block(6, 0, 3, 1) = rbn_.log();
-//            std::cout << "input:"
-//                      << input.transpose()
-//            std::cout << "reve:"
-//                      << (rotation_q_ * tmp_acc).transpose()
-//                      << std::endl;
+
+            auto logger_ptr = AWF::AlgorithmLogger::getInstance();
+            logger_ptr->addPlotEvent("gravity", "before_acc", g_and_mag.block(0, 0, 3, 1));
+            logger_ptr->addPlotEvent("gravity", "converted_acc", rbn_.matrix() * g_and_mag.block(0, 0, 3, 1));
+            logger_ptr->addPlotEvent("gravity", "nav_acc", mg_fuc.gravity_nav_);
+
+
             return;
         }
 
