@@ -86,7 +86,9 @@ namespace BSE {
 
             state_x_.block(0, 0, 3, 1) = initial_pose;
             state_x_.block(3, 0, 3, 1).setZero();
-            state_x_.block(6, 0, 3, 1) = Eigen::Vector3d(tr, tp, initial_ori);
+//            state_x_.block(6, 0, 3, 1) = Eigen::Vector3d(tr, tp, initial_ori);
+            rbn_ = Sophus::SO3::exp(Eigen::Vector3d(tr, tp, initial_ori));
+            state_x_.block(6, 0, 3, 1) = rbn_.log();
 
             rotation_q_ = (Eigen::AngleAxisd(tr, Eigen::Vector3d::UnitX())
                            * Eigen::AngleAxisd(tp, Eigen::Vector3d::UnitY())
@@ -100,10 +102,10 @@ namespace BSE {
                       << " mag nava:"
                       << mag_nav.transpose()
                       << std::endl;
-            mag_func.setMag_nav(rotation_q_.inverse() * mag);
+            mag_func.setMag_nav(rbn_.inverse().matrix() * mag);
             mag_func.setEpsilon_(1e-8);
             mg_fuc.setEpsilon_(1e-6);
-            mg_fuc.setMag_nav(rotation_q_.inverse() * mag);
+            mg_fuc.setMag_nav(rbn_.inverse().matrix() * mag);
             mg_fuc.setGravity_nav_(Eigen::Vector3d(0, 0, 1.0));
 
 
@@ -239,7 +241,7 @@ namespace BSE {
             state_x_.block(0, 0, 6, 1) += dX_.block(0, 0, 6, 1);
             rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
 //            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
-            rbn_ = Sophus::SO3::exp(dX_.block(6,0,3,1)) * rbn_;
+            rbn_ = Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
             state_x_.block(6, 0, 3, 1) = rbn_.log();
 
 
@@ -251,10 +253,10 @@ namespace BSE {
 //                      << mag_func.mag_nav_.transpose()
 //                      << std::endl;
             auto logger_ptr = AWF::AlgorithmLogger::getInstance();
-            logger_ptr->addPlotEvent("angle_correct","input",input);
-            logger_ptr->addPlotEvent("angle_correct","reverted",Eigen::Vector3d(rbn_.matrix()*input));
-            logger_ptr->addPlotEvent("angle_correct","world_value",mag_func.mag_nav_);
-            logger_ptr->addPlotEvent("probability","P",prob_state_);
+            logger_ptr->addPlotEvent("angle_correct", "input", input);
+            logger_ptr->addPlotEvent("angle_correct", "reverted", Eigen::Vector3d(rbn_.matrix() * input));
+            logger_ptr->addPlotEvent("angle_correct", "world_value", mag_func.mag_nav_);
+            logger_ptr->addPlotEvent("probability", "P", prob_state_);
 
             return;
 
