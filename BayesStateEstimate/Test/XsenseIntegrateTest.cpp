@@ -177,6 +177,8 @@ int main(int argc, char *argv[]) {
 
             logger_ptr->addPlotEvent("xsens_uwb", "uwb", uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1));
             logger_ptr->addPlotEvent("xsens_uwb", "uwb_error", optimize_trace.block(uwb_index, 3, 1, 1));
+            std::vector<Eigen::Vector4d> m_stack;
+            std::vector<Eigen::Matrix<double,1,1>> cov_stack;
             for (int k(1); k < uwb_data.cols(); ++k) {
                 if (uwb_data(uwb_index, k) < 0.0 ||
                     uwb_data(uwb_index, k) > 208.0 ||
@@ -196,9 +198,20 @@ int main(int argc, char *argv[]) {
 
                     complex_filter.MeasurementUwb(measurement_data,
                                                   measurement_noise_matrix * 0.001);
+                    m_stack.push_back(measurement_data);
+                    cov_stack.push_back(measurement_noise_matrix*0.001);
                 }
 
+
             }
+
+            Eigen::MatrixXd m_matrix(m_stack.size(),4);
+            Eigen::MatrixXd cov_matrix(cov_stack.size(),1);
+            for(int k(0);k<m_stack.size();++k){
+                m_matrix.block(k,0,1,4) = m_stack[k].transpose();
+                cov_matrix(k,0) = cov_matrix[k](0,0);
+            }
+//            complex_filter.MeasurementUwbFull(m_matrix,cov_matrix);
 
             uwb_index++;
 
