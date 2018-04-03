@@ -188,11 +188,11 @@ int main(int argc, char *argv[]) {
 
 
                     filter.MeasurementState(measurement_data,
-                                            measurement_noise_matrix*0.00001,
+                                            measurement_noise_matrix * 0.00001,
                                             BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
                     complex_filter.MeasurementUwb(measurement_data,
-                                                  measurement_noise_matrix*0.001);
+                                                  measurement_noise_matrix * 0.001);
                 }
 
             }
@@ -218,9 +218,8 @@ int main(int argc, char *argv[]) {
     }
 
     AWF::writeVectorsToCsv<double>("./XsenseResult/trace.csv", trace);
-    AWF::writeVectorsToCsv<double>("./XsenseResult/complex_trace.csv",complex_trace);
-    AWF::writeVectorsToCsv<double>("./XsenseResult/optimize_trace.csv",optimize_trace_vec);
-
+    AWF::writeVectorsToCsv<double>("./XsenseResult/complex_trace.csv", complex_trace);
+    AWF::writeVectorsToCsv<double>("./XsenseResult/optimize_trace.csv", optimize_trace_vec);
 
 
     plt::figure();
