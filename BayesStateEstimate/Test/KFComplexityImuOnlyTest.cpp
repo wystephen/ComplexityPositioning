@@ -242,8 +242,8 @@ int main(int argc, char *argv[]) {
     };
 
 //
-    f(left_imu_data, "left_foot");
-//    f(right_imu_data, "right_foot");
+//    f(left_imu_data, "left_foot");
+    f(right_imu_data, "right_foot");
 //    f(head_imu_data, "head");
 
     std::cout << "time:" << AWF::getDoubleSecondTime() - start_time << std::endl;
