@@ -71,17 +71,17 @@ namespace BSE {
             double tr = res_vec[0](0);
             double tp = res_vec[0](1);
 
-            auto f = [](double a) -> double {
-                while (a > M_PI + 1e-3) {
-                    a -= 2.0 * M_PI;
-                }
-                while (a < M_PI - 1e-3) {
-                    a += 2.0 * M_PI;
-                }
-                return a;
-            };
-            tr = f(tr);
-            tp = f(tp);
+//            auto f = [](double a) -> double {
+//                while (a > M_PI + 1e-3) {
+//                    a -= 2.0 * M_PI;
+//                }
+//                while (a < M_PI - 1e-3) {
+//                    a += 2.0 * M_PI;
+//                }
+//                return a;
+//            };
+//            tr = f(tr);
+//            tp = f(tp);
 
 
             state_x_.block(0, 0, 3, 1) = initial_pose;
