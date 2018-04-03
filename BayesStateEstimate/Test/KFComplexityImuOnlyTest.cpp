@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
             auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
                                                               process_noise_matrix);
             filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-                                                   Eigen::Matrix3d::Identity() * 0.0001);
+                                                   Eigen::Matrix3d::Identity() * 0.00001);
 
             double uwb_index = 0;
             /// uwb measurement
@@ -196,8 +196,8 @@ int main(int argc, char *argv[]) {
 //                                        BSE::MeasurementMethodType::NormalAngleConstraint);
 
 
-                filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-                                                       Eigen::Matrix3d::Identity() * 2);
+//                filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
+//                                                       Eigen::Matrix3d::Identity() * 0.0001);
                 Eigen::Matrix<double, 6, 1> tmp_gm;
                 tmp_gm.block(0, 0, 3, 1) = imu_data.block(i, 1, 1, 3).transpose();
                 tmp_gm.block(3, 0, 3, 1) = imu_data.block(i, 7, 1, 3).transpose();
