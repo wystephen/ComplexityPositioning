@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     std::cout.precision(10);
     // parameters
 //    std::string dir_name = "/home/steve/Data/NewFusingLocationData/0018/";
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0014/";
 
     auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 
@@ -137,8 +137,8 @@ int main(int argc, char *argv[]) {
             filter.setTime_interval_(tmp_time_interval);
             filter_complex.time_interval_ = tmp_time_interval;
         }
-        filter.setLocal_g_(-9.884);
-        filter_complex.local_g_ = -9.884;
+        filter.setLocal_g_(-9.3);
+        filter_complex.local_g_ = -9.3;
 //    filter.IS_DEBUG = true;
         std::vector<double> zv_flag = {};
 
@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
                 tmp_gm.block(0, 0, 3, 1) = imu_data.block(i, 1, 1, 3).transpose();
                 tmp_gm.block(3, 0, 3, 1) = imu_data.block(i, 7, 1, 3).transpose();
                 Eigen::Matrix<double, 6, 6> cov_matrix = Eigen::Matrix<double, 6, 6>::Identity();
-                cov_matrix.block(0, 0, 3, 3) *= 0.00003;
+                cov_matrix.block(0, 0, 3, 3) *= 0.00001;
                 cov_matrix.block(3, 3, 3, 3) *= 0.0003;
 
 

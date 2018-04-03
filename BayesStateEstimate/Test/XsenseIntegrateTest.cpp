@@ -61,6 +61,7 @@ int main(int argc, char *argv[]) {
     AWF::FileReader uwb_file(dir_name + "uwb_data.csv");
     AWF::FileReader beacon_file(dir_name + "beaconset_no_mac.csv");
 
+    auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 
     Eigen::MatrixXd imu_data = imu_file.extractDoulbeMatrix(",");
     Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
@@ -174,7 +175,7 @@ int main(int argc, char *argv[]) {
             measurement_noise_matrix.resize(1, 1);
             measurement_noise_matrix(0, 0) = 0.1;
 
-
+            logger_ptr->addPlotEvent("xsens_uwb","uwb",uwb_data.block(uwb_index,1,1,uwb_data.cols()-1));
             for (int k(1); k < uwb_data.cols(); ++k) {
                 if (uwb_data(uwb_index, k) < 0.0 ||
                     uwb_data(uwb_index, k) > 28.0 ||
@@ -185,6 +186,7 @@ int main(int argc, char *argv[]) {
                     Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
                     measurement_data.block(0, 0, 3, 1) = beacon_data.block(k - 1, 0, 1, 3).transpose();
 //                std::cout << measurement_data.transpose() << std::endl;
+
 
 
                     filter.MeasurementState(measurement_data,
@@ -202,59 +204,19 @@ int main(int argc, char *argv[]) {
 
         }
 
+        auto filter_state = filter.getState_();
+        auto complex_state = complex_filter.state_x_;
 
-//        for (int j(0); j < 3; ++j) {
-//
-////            angle[j].push_back(state_x(j+6,0));
-//            acc[j].push_back(imu_data(i, j + 1));
-//            gyr[j].push_back(imu_data(i, j + 4));
-//            angle[j].push_back(imu_data(i, j + 10));
-//
-//            trace[j].push_back(state_x(j, 0));
-//            complex_trace[j].push_back(complex_x(j, 0));
-//            velocity[j].push_back(complex_x(j + 3, 0));
-//            attitude[j].push_back(complex_x(j + 6, 0));
-//        }
+        logger_ptr->addTrace3dEvent("xsense_uwb","filter_trace",filter_state.block(0,0,3,1));
+        logger_ptr->addTrace3dEvent("xsense_uwb","complex_trace",complex_state.block(0,0,3,1));
+
+
+
+
     }
 
-//    AWF::writeVectorsToCsv<double>("./XsenseResult/trace.csv", trace);
-//    AWF::writeVectorsToCsv<double>("./XsenseResult/complex_trace.csv", complex_trace);
-//    AWF::writeVectorsToCsv<double>("./XsenseResult/optimize_trace.csv", optimize_trace_vec);
 
-//
-//    plt::figure();
-//    plt::title("trace");
-//    plt::named_plot("ekf", trace[0], trace[1], "-+");
-//    plt::named_plot("complex", complex_trace[0], complex_trace[1], "-+");
-//    plt::grid(true);
-//    plt::figure();
-//    plt::title("uwb trace");
-//    plt::named_plot("uwb", optimize_trace_vec[0], optimize_trace_vec[1], "-*");
-//    plt::legend();
-//    plt::grid(true);
-//    plt::title(dir_name);
-//    plt::grid(true);
-
-//    auto show_func = [&](vec_data d, std::string name) {
-//        plt::figure();
-//        plt::title(name);
-//        for (int i(0); i < d.size(); ++i) {
-//            plt::named_plot(std::to_string(i), d[i], "-+");
-//        }
-//        plt::grid(true);
-//        plt::legend();
-//    };
-
-
-//    show_func(acc, "acc");
-//    show_func(gyr, "gyr");
-//    show_func(angle, "angle");
-
-//    show_func(trace, "trace-state");
-//    show_func(velocity, "velocity-state");
-//    show_func(attitude, "orientation-state");
-
-    plt::show();
+    logger_ptr->outputAllEvent();
 
 
 }
