@@ -351,7 +351,16 @@ namespace BSE {
         }
 
 
-//        void MeasurementUwb
+        /**
+         * Use all the uwb measurement in each epoch to correct the system state.
+         * @param input
+         * @param cov_m
+         */
+        void MeasurementUwbFull(Eigen::MatrixXd input,
+                                Eigen::MatrixXd cov_m) {
+
+
+        }
 
         /**
          * dax day daz : offset of acc measurements.
