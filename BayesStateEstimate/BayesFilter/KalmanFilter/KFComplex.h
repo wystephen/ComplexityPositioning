@@ -102,10 +102,10 @@ namespace BSE {
                       << " mag nava:"
                       << mag_nav.transpose()
                       << std::endl;
-            mag_func.setMag_nav(rbn_.inverse().matrix() * mag);
+            mag_func.setMag_nav(rbn_.matrix() * mag);
             mag_func.setEpsilon_(1e-8);
             mg_fuc.setEpsilon_(1e-6);
-            mg_fuc.setMag_nav(rbn_.inverse().matrix() * mag);
+            mg_fuc.setMag_nav(rbn_.matrix() * mag);
             mg_fuc.setGravity_nav_(Eigen::Vector3d(0, 0, 1.0));
 
 

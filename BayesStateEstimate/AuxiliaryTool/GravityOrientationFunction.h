@@ -103,7 +103,7 @@ public:
                                double initial_yaw) :
             SingleFunctionAbstract(1) {
         acc_ = acc;
-        g_ = g;
+        g_ = acc.norm();
         yaw_ = initial_yaw;
 
     }
@@ -124,11 +124,12 @@ public:
 
     Eigen::MatrixXd g_error(double roll, double pitch, double yaw) {
 
-        auto rotate_matrix = (Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX())
-                              * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
-                              * Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()));
+//        auto rotate_matrix = (Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX())
+//                              * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
+//                              * Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()));
+        Sophus::SO3 rbn_ = Sophus::SO3(roll,pitch,yaw);
         Eigen::MatrixXd error_matrix(1, 1);
-        error_matrix(0, 0) = std::abs(g_ - (rotate_matrix * acc_)(2));
+        error_matrix(0, 0) = std::abs(g_ - (rbn_.matrix() * acc_)(2));
 //        std::cout << error_matrix(0,0) << std::endl;
         return error_matrix;
     }

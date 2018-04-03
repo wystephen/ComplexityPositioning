@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     std::cout.precision(10);
     // parameters
 //    std::string dir_name = "/home/steve/Data/NewFusingLocationData/0018/";
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0014/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 
     auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 
@@ -164,8 +164,8 @@ int main(int argc, char *argv[]) {
 
             auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
                                                               process_noise_matrix);
-            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-                                                   Eigen::Matrix3d::Identity() * 0.31);
+//            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
+//                                                   Eigen::Matrix3d::Identity() * 0.31);
 
             double uwb_index = 0;
             /// uwb measurement
