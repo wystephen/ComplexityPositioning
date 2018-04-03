@@ -192,12 +192,13 @@ int main(int argc, char *argv[]) {
 
 
 
+                    // Correcting state according to uwb measurement.
                     filter.MeasurementState(measurement_data,
                                             measurement_noise_matrix * 0.00001,
                                             BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
-                    complex_filter.MeasurementUwb(measurement_data,
-                                                  measurement_noise_matrix * 0.001);
+//                    complex_filter.MeasurementUwb(measurement_data,
+//                                                  measurement_noise_matrix * 0.001);
                     m_stack.push_back(measurement_data);
                     cov_stack.push_back(measurement_noise_matrix*0.001);
                 }
@@ -209,7 +210,7 @@ int main(int argc, char *argv[]) {
             Eigen::MatrixXd cov_matrix(cov_stack.size(),1);
             for(int k(0);k<m_stack.size();++k){
                 m_matrix.block(k,0,1,4) = m_stack[k].transpose();
-                cov_matrix(k,0) = cov_matrix[k](0,0);
+                cov_matrix(k,0) = cov_stack[k](0);
             }
 //            complex_filter.MeasurementUwbFull(m_matrix,cov_matrix);
 

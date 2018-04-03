@@ -318,7 +318,7 @@ namespace BSE {
             uwbFunc.setEpsilon_(1e-8);
 
             auto d_vec = uwbFunc.derivate(state_x_);
-            H_ = d_vec[0];
+            H_ = d_vec[0];//1x9 matrix
             K_ = (prob_state_ * H_.transpose().eval()) *
                  (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
 
@@ -351,10 +351,28 @@ namespace BSE {
         void MeasurementUwbFull(Eigen::MatrixXd input,
                                 Eigen::MatrixXd cov_m) {
 
-            assert(input.cols()==4);
-            assert(input.cols()==cov_m.rows());
+            assert(input.cols() == 4);
+            assert(input.cols() == cov_m.rows());
 
+            H_ = Eigen::MatrixXd(input.rows(), state_x_.rows());
 
+            auto y = Eigen::MatrixXd(input.rows(), 1);
+
+            for (int i(0); i < input.rows(); ++i) {
+                auto uwbFunc = UwbMeasurementFunction(input.block(i, 0, 1, 3).transpose());
+                uwbFunc.setEpsilon_(1e-8);
+
+                H_.block(i, 0, 1, H_.cols()) = uwbFunc.derivate(state_x_)[0];
+                y(i, 0) = uwbFunc.compute(state_x_)(0);
+            }
+
+            K_ = (prob_state_ * H_.transpose().eval()) *
+                 (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
+
+            prob_state_ = (Eigen::Matrix<double, 9, 9>::Identity() - K_ * H_) * prob_state_;
+            prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose().eval());
+
+            dX_ = K_ * (input.block(0, 3, input.rows(), 1) - y);
 
 
         }
