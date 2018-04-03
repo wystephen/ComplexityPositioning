@@ -203,56 +203,56 @@ int main(int argc, char *argv[]) {
         }
 
 
-        for (int j(0); j < 3; ++j) {
-
-//            angle[j].push_back(state_x(j+6,0));
-            acc[j].push_back(imu_data(i, j + 1));
-            gyr[j].push_back(imu_data(i, j + 4));
-            angle[j].push_back(imu_data(i, j + 10));
-
-            trace[j].push_back(state_x(j, 0));
-            complex_trace[j].push_back(complex_x(j, 0));
-            velocity[j].push_back(complex_x(j + 3, 0));
-            attitude[j].push_back(complex_x(j + 6, 0));
-        }
+//        for (int j(0); j < 3; ++j) {
+//
+////            angle[j].push_back(state_x(j+6,0));
+//            acc[j].push_back(imu_data(i, j + 1));
+//            gyr[j].push_back(imu_data(i, j + 4));
+//            angle[j].push_back(imu_data(i, j + 10));
+//
+//            trace[j].push_back(state_x(j, 0));
+//            complex_trace[j].push_back(complex_x(j, 0));
+//            velocity[j].push_back(complex_x(j + 3, 0));
+//            attitude[j].push_back(complex_x(j + 6, 0));
+//        }
     }
 
-    AWF::writeVectorsToCsv<double>("./XsenseResult/trace.csv", trace);
-    AWF::writeVectorsToCsv<double>("./XsenseResult/complex_trace.csv", complex_trace);
-    AWF::writeVectorsToCsv<double>("./XsenseResult/optimize_trace.csv", optimize_trace_vec);
+//    AWF::writeVectorsToCsv<double>("./XsenseResult/trace.csv", trace);
+//    AWF::writeVectorsToCsv<double>("./XsenseResult/complex_trace.csv", complex_trace);
+//    AWF::writeVectorsToCsv<double>("./XsenseResult/optimize_trace.csv", optimize_trace_vec);
 
-
-    plt::figure();
-    plt::title("trace");
-    plt::named_plot("ekf", trace[0], trace[1], "-+");
-    plt::named_plot("complex", complex_trace[0], complex_trace[1], "-+");
+//
+//    plt::figure();
+//    plt::title("trace");
+//    plt::named_plot("ekf", trace[0], trace[1], "-+");
+//    plt::named_plot("complex", complex_trace[0], complex_trace[1], "-+");
 //    plt::grid(true);
 //    plt::figure();
 //    plt::title("uwb trace");
-    plt::named_plot("uwb", optimize_trace_vec[0], optimize_trace_vec[1], "-*");
-    plt::legend();
-    plt::grid(true);
+//    plt::named_plot("uwb", optimize_trace_vec[0], optimize_trace_vec[1], "-*");
+//    plt::legend();
+//    plt::grid(true);
 //    plt::title(dir_name);
 //    plt::grid(true);
 
-    auto show_func = [&](vec_data d, std::string name) {
-        plt::figure();
-        plt::title(name);
-        for (int i(0); i < d.size(); ++i) {
-            plt::named_plot(std::to_string(i), d[i], "-+");
-        }
-        plt::grid(true);
-        plt::legend();
-    };
+//    auto show_func = [&](vec_data d, std::string name) {
+//        plt::figure();
+//        plt::title(name);
+//        for (int i(0); i < d.size(); ++i) {
+//            plt::named_plot(std::to_string(i), d[i], "-+");
+//        }
+//        plt::grid(true);
+//        plt::legend();
+//    };
 
 
-    show_func(acc, "acc");
-    show_func(gyr, "gyr");
-    show_func(angle, "angle");
+//    show_func(acc, "acc");
+//    show_func(gyr, "gyr");
+//    show_func(angle, "angle");
 
-    show_func(trace, "trace-state");
-    show_func(velocity, "velocity-state");
-    show_func(attitude, "orientation-state");
+//    show_func(trace, "trace-state");
+//    show_func(velocity, "velocity-state");
+//    show_func(attitude, "orientation-state");
 
     plt::show();
 

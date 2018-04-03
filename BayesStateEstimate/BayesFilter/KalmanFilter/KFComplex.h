@@ -56,6 +56,13 @@ namespace BSE {
         }
 
 
+        /**
+         * Initial filter.
+         * @param imu_data : source data of IMU when it in static state.
+         * @param initial_ori : orientation in x-o-y plane.
+         * @param initial_pose : initial pose(3-axis)
+         * @return
+         */
         bool initial_state(Eigen::MatrixXd imu_data,
                            double initial_ori = 0.0,
                            Eigen::Vector3d initial_pose = Eigen::Vector3d(0, 0, 0)) {
@@ -71,32 +78,15 @@ namespace BSE {
             double tr = res_vec[0](0);
             double tp = res_vec[0](1);
 
-//            auto f = [](double a) -> double {
-//                while (a > M_PI + 1e-3) {
-//                    a -= 2.0 * M_PI;
-//                }
-//                while (a < M_PI - 1e-3) {
-//                    a += 2.0 * M_PI;
-//                }
-//                return a;
-//            };
-//            tr = f(tr);
-//            tp = f(tp);
-
 
             state_x_.block(0, 0, 3, 1) = initial_pose;
             state_x_.block(3, 0, 3, 1).setZero();
-//            state_x_.block(6, 0, 3, 1) = Eigen::Vector3d(tr, tp, initial_ori);
+
             rbn_ = Sophus::SO3::exp(Eigen::Vector3d(tr, tp, initial_ori));
             state_x_.block(6, 0, 3, 1) = rbn_.log();
 
-            rotation_q_ = (Eigen::AngleAxisd(tr, Eigen::Vector3d::UnitX())
-                           * Eigen::AngleAxisd(tp, Eigen::Vector3d::UnitY())
-                           * Eigen::AngleAxisd(initial_ori, Eigen::Vector3d::UnitZ()));
-
-//            mag_func.mag_nav_ = rotation_q_ * (mag/mag.norm());
-            auto acc_nav = rotation_q_ * acc;
-            auto mag_nav = rotation_q_ * mag;
+            auto acc_nav = rbn_.matrix() * acc;
+            auto mag_nav = rbn_.matrix() * mag;
             std::cout << "acc nav:"
                       << acc_nav.transpose()
                       << " mag nava:"
