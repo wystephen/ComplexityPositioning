@@ -57,7 +57,7 @@ public:
      * @return
      */
     std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd state, Eigen::MatrixXd input) {
-        int methond_id = 2;
+        int methond_id = 1;
         if (methond_id == 0) {
 
             return d(compress(state, input));
@@ -94,7 +94,7 @@ public:
                 if (j < 6) {
                     tmp_state(j) += epsilon_;
                 } else {
-                    tmp_state(j) += epsilon_ / 180.0 * M_PI;
+//                    tmp_state(j) += epsilon_ / 180.0 * M_PI;
 
                 }
                 if (j >= 6 && j < 9) {
@@ -104,18 +104,18 @@ public:
 //                    while(tmp_state(j) < -M_PI){
 //                        tmp_state(j) += 2.0 * M_PI;
 //                    }
-//                    Sophus::SO3 r = Sophus::SO3::exp(tmp_state.block(6, 0, 3, 1));
-//                    Eigen::Vector3d so3_diff(0.0, 0.0, 0.0);
-//                    so3_diff(j - 6) = epsilon_;
-//                    Sophus::SO3::
-//                    r = r * Sophus::SO3::exp(so3_diff);
-//                    tmp_state.block(6, 0, 3, 1) = r.log();
+                    Sophus::SO3 r = Sophus::SO3::exp(tmp_state.block(6, 0, 3, 1));
+                    Eigen::Vector3d so3_diff(0.0, 0.0, 0.0);
+                    so3_diff(j - 6) = epsilon_;
+                    r = Sophus::SO3::exp(so3_diff) * r;
+                    tmp_state.block(6, 0, 3, 1) = r.log();
                 }
                 auto tmp_value = operator()(compress(tmp_state, input));
                 auto t_d = tmp_value - original_value;
                 jac_state.block(0, j, jac_state.rows(), 1) = t_d / double(tmp_epsilon);
 
-                tmp_state(j) = state(j);
+//                tmp_state(j) = state(j);
+                tmp_state = state;
 
             }
 
@@ -138,7 +138,7 @@ public:
 
 
             auto f_t = Eigen::Vector3d(input.block(0, 0, 3, 1));
-            f_t = rotation.matrix() * f_t + Eigen::Vector3d(0, 0, local_gravity_);
+            f_t = rotation.matrix() * f_t;
 
             Eigen::Matrix3d st;
             st << 0.0, -f_t(2), f_t(1),
@@ -153,8 +153,8 @@ public:
 
 
             /////////////////
-            G.block(3, 0, 3, 3) = rotation.matrix();
-            G.block(6, 3, 3, 3) = -1.0 * rotation.matrix();
+            G.block(3, 0, 3, 3) = rotation.matrix().eval();
+            G.block(6, 3, 3, 3) = -1.0 * rotation.matrix().eval();
             G = time_interval_ * G;
 
             return compress(F, G);
