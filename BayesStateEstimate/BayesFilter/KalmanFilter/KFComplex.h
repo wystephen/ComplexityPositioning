@@ -370,9 +370,9 @@ namespace BSE {
                 y(i, 0) = uwbFunc.compute(state_x_)(0);
             }
 
-            logger_ptr->addPlotEvent("uwb_measurement", "src", input.block(0, 3, input.rows(), 1));
-            logger_ptr->addPlotEvent("uwb_measurement", "y", y);
-            logger_ptr->addPlotEvent("uwb_measurement", "diff", input.block(0, 3, input.rows(), 1) - y);
+//            logger_ptr->addPlotEvent("uwb_measurement", "src", input.block(0, 3, input.rows(), 1));
+//            logger_ptr->addPlotEvent("uwb_measurement", "y", y);
+//            logger_ptr->addPlotEvent("uwb_measurement", "diff", input.block(0, 3, input.rows(), 1) - y);
 
 
 //            std::cout << "H:" << H_ << std::endl;
