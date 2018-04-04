@@ -64,6 +64,12 @@ namespace BSE {
             state_x_.block(9, 0, 6, 1).setZero();
         }
 
+        Eigen::Matrix<double, 15, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
+                                                   Eigen::Matrix<double, 6, 6> noise_matrix) {
+
+
+        };
+
 
         /**
          * dax day daz : offset of acc measurements.

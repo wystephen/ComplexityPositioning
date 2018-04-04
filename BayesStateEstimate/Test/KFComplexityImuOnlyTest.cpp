@@ -30,6 +30,7 @@
 
 
 #include <omp.h>
+#include <BayesFilter/KalmanFilter/KFComplexFull.h>
 
 namespace plt = matplotlibcpp;
 
@@ -124,6 +125,8 @@ int main(int argc, char *argv[]) {
 
         auto filter_complex = BSE::KFComplex(initial_prob_matrix);
 
+        auto complex_full_filter = BSE::KFComplexFull(initial_prob_matrix_complex);
+
         double tmp_time_interval = (imu_data(imu_data.rows() - 1, 0) - imu_data(0, 0))
                                    / double(imu_data.rows());
         std::cout << "time interval :" << tmp_time_interval << std::endl;
@@ -165,7 +168,7 @@ int main(int argc, char *argv[]) {
             auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
                                                               process_noise_matrix);
             filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-                                                   Eigen::Matrix3d::Identity() * 0.00046);
+                                                   Eigen::Matrix3d::Identity() * 0.0000046);
 
             double uwb_index = 0;
             /// uwb measurement
