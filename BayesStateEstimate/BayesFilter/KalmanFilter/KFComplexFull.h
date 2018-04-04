@@ -81,35 +81,35 @@ namespace BSE {
 
         Eigen::Matrix<double, 15, 15> prob_state_ = Eigen::Matrix<double, 15, 15>::Identity(); // probability of state
 
-//
-//        Sophus::SO3 rbn_ = Sophus::SO3(0, 0, 0);// rotation matrix from sensor frame to navigation frame
-//
-//        /**
-//        * X_i=A*X_{i-1}+B*u_i+w_i
-//         * z_i=H*X_i+v_i
-//         * w_i \in Q
-//         * v_i \in R
-//         */
-//        Eigen::MatrixXd A_ = Eigen::MatrixXd();
-//        Eigen::MatrixXd B_ = Eigen::MatrixXd();
-//        Eigen::MatrixXd H_ = Eigen::MatrixXd();
-//        Eigen::MatrixXd Q_ = Eigen::MatrixXd();
-//        Eigen::MatrixXd R_ = Eigen::MatrixXd();
-//        Eigen::MatrixXd K_ = Eigen::MatrixXd();
-//        Eigen::MatrixXd dX_ = Eigen::MatrixXd();
-//
-//
-//        double time_interval_ = 0.005;// time interval
-//
-//        MagMeasurementFunction mag_func = MagMeasurementFunction();
-//        MagGravityMeasurementFunction mg_fuc = MagGravityMeasurementFunction();
-//
-//
-//        double local_g_ = -9.81; // local gravity acc.
-//
-//
-//        bool IS_DEBUG = false; // debug flag.
-//
+
+        Sophus::SO3 rbn_ = Sophus::SO3(0, 0, 0);// rotation matrix from sensor frame to navigation frame
+
+        /**
+        * X_i=A*X_{i-1}+B*u_i+w_i
+         * z_i=H*X_i+v_i
+         * w_i \in Q
+         * v_i \in R
+         */
+        Eigen::MatrixXd A_ = Eigen::MatrixXd();
+        Eigen::MatrixXd B_ = Eigen::MatrixXd();
+        Eigen::MatrixXd H_ = Eigen::MatrixXd();
+        Eigen::MatrixXd Q_ = Eigen::MatrixXd();
+        Eigen::MatrixXd R_ = Eigen::MatrixXd();
+        Eigen::MatrixXd K_ = Eigen::MatrixXd();
+        Eigen::MatrixXd dX_ = Eigen::MatrixXd();
+
+
+        double time_interval_ = 0.005;// time interval
+
+        MagMeasurementFunction mag_func = MagMeasurementFunction();
+        MagGravityMeasurementFunction mg_fuc = MagGravityMeasurementFunction();
+
+
+        double local_g_ = -9.81; // local gravity acc.
+
+
+        bool IS_DEBUG = false; // debug flag.
+
 
 
     };
