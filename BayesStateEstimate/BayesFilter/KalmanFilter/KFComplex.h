@@ -352,7 +352,7 @@ namespace BSE {
                                 Eigen::MatrixXd cov_m) {
 
             assert(input.cols() == 4);
-            assert(input.cols() == cov_m.rows());
+            assert(input.rows() == cov_m.rows());
 
             H_ = Eigen::MatrixXd(input.rows(), state_x_.rows());
 
