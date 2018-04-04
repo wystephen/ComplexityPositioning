@@ -94,7 +94,7 @@ public:
                 if (j < 6) {
                     tmp_state(j) += epsilon_;
                 } else {
-//                    tmp_state(j) += epsilon_ / 180.0 * M_PI;
+                    tmp_state(j) += epsilon_ / 180.0 * M_PI;
 
                 }
                 if (j >= 6 && j < 9) {
@@ -104,11 +104,12 @@ public:
 //                    while(tmp_state(j) < -M_PI){
 //                        tmp_state(j) += 2.0 * M_PI;
 //                    }
-                    Sophus::SO3 r = Sophus::SO3::exp(tmp_state.block(6, 0, 3, 1));
-                    Eigen::Vector3d so3_diff(0.0, 0.0, 0.0);
-                    so3_diff(j - 6) = epsilon_;
-                    r = Sophus::SO3::exp(so3_diff) * r;
-                    tmp_state.block(6, 0, 3, 1) = r.log();
+//                    Sophus::SO3 r = Sophus::SO3::exp(tmp_state.block(6, 0, 3, 1));
+//                    Eigen::Vector3d so3_diff(0.0, 0.0, 0.0);
+//                    so3_diff(j - 6) = epsilon_;
+////                    r = Sophus::SO3::exp(so3_diff) * r;
+//                    r = r * Sophus::SO3::exp(so3_diff);
+//                    tmp_state.block(6, 0, 3, 1) = r.log();
                 }
                 auto tmp_value = operator()(compress(tmp_state, input));
                 auto t_d = tmp_value - original_value;
