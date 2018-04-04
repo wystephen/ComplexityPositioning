@@ -57,7 +57,7 @@ public:
      * @return
      */
     std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd state, Eigen::MatrixXd input) {
-        int methond_id = 1;
+        int methond_id = 2;
         if (methond_id == 0) {
 
             return d(compress(state, input));
@@ -74,11 +74,11 @@ public:
 
             // jacobian of input
             for (int j(0); j < jac_input.cols(); ++j) {
-                if(j<3){
+                if (j < 3) {
 
                     tmp_input(j) += epsilon_;
-                }else{
-                    tmp_input(j) += epsilon_ /180.0 * M_PI;
+                } else {
+                    tmp_input(j) += epsilon_ / 180.0 * M_PI;
                 }
                 auto tmp_value = operator()(compress(state, tmp_input));
                 auto t_d = tmp_value - original_value;
@@ -94,18 +94,22 @@ public:
                 if (j < 6) {
                     tmp_state(j) += epsilon_;
                 } else {
-                     tmp_state(j) += epsilon_ /180.0 * M_PI;
+                    tmp_state(j) += epsilon_ / 180.0 * M_PI;
 
                 }
-                if (j >= 6) {
+                if (j >= 6 && j < 9) {
 //                    while(tmp_state(j) > M_PI){
 //                        tmp_state(j) -= 2.0 * M_PI;
 //                    }
 //                    while(tmp_state(j) < -M_PI){
 //                        tmp_state(j) += 2.0 * M_PI;
 //                    }
-                    Sophus::SO3 r = Sophus::SO3::exp(tmp_state.block(6,0,3,1));
-                    tmp_state.block(6, 0, 3, 1) = r.log();
+//                    Sophus::SO3 r = Sophus::SO3::exp(tmp_state.block(6, 0, 3, 1));
+//                    Eigen::Vector3d so3_diff(0.0, 0.0, 0.0);
+//                    so3_diff(j - 6) = epsilon_;
+//                    Sophus::SO3::
+//                    r = r * Sophus::SO3::exp(so3_diff);
+//                    tmp_state.block(6, 0, 3, 1) = r.log();
                 }
                 auto tmp_value = operator()(compress(tmp_state, input));
                 auto t_d = tmp_value - original_value;
@@ -134,7 +138,7 @@ public:
 
 
             auto f_t = Eigen::Vector3d(input.block(0, 0, 3, 1));
-            f_t = rotation.matrix() * f_t;
+            f_t = rotation.matrix() * f_t + Eigen::Vector3d(0, 0, local_gravity_);
 
             Eigen::Matrix3d st;
             st << 0.0, -f_t(2), f_t(1),
@@ -146,18 +150,13 @@ public:
             F = F * time_interval_;
             F += Eigen::Matrix<double, 9, 9>::Identity();
 
-//            F.block(0,0,3,3) = Eigen::Matrix3d::Identity();
-//            F.block(0,3,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
 
-//            F.block(3,3,3,3) = Eigen::Matrix3d::Identity();
-//            F.block(6,6,3,3) = Eigen::Matrix3d::Identity();
 
             /////////////////
             G.block(3, 0, 3, 3) = rotation.matrix();
             G.block(6, 3, 3, 3) = -1.0 * rotation.matrix();
             G = time_interval_ * G;
-//            G.block(3,0,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
-//            G.block(6,3,3,3) = Eigen::Matrix3d::Identity() * time_interval_;
+
             return compress(F, G);
 
 
