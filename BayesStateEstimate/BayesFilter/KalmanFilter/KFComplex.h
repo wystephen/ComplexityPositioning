@@ -353,6 +353,10 @@ namespace BSE {
 
             assert(input.cols() == 4);
             assert(input.rows() == cov_m.rows());
+//            std::cout <<"input:"<< input << std::endl;
+//            std::cout << "cov m:" << cov_m << std::endl;
+
+            auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 
             H_ = Eigen::MatrixXd(input.rows(), state_x_.rows());
 
@@ -366,6 +370,13 @@ namespace BSE {
                 y(i, 0) = uwbFunc.compute(state_x_)(0);
             }
 
+            logger_ptr->addPlotEvent("uwb_measurement", "src", input.block(0, 3, input.rows(), 1));
+            logger_ptr->addPlotEvent("uwb_measurement", "y", y);
+            logger_ptr->addPlotEvent("uwb_measurement", "diff", input.block(0, 3, input.rows(), 1) - y);
+
+
+//            std::cout << "H:" << H_ << std::endl;
+//            std::cout << "y:" << y << std::endl;
             K_ = (prob_state_ * H_.transpose().eval()) *
                  (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
 
