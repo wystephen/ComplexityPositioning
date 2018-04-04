@@ -207,12 +207,12 @@ int main(int argc, char *argv[]) {
             }
 
             Eigen::MatrixXd m_matrix(m_stack.size(),4);
-            Eigen::MatrixXd cov_matrix(cov_stack.size(),1);
+            Eigen::MatrixXd cov_matrix(cov_stack.size(),cov_stack.size());
             for(int k(0);k<m_stack.size();++k){
                 m_matrix.block(k,0,1,4) = m_stack[k].transpose();
-                cov_matrix(k,0) = cov_stack[k](0);
+                cov_matrix(k,k) = cov_stack[k](0);
             }
-//            complex_filter.MeasurementUwbFull(m_matrix,cov_matrix);
+            complex_filter.MeasurementUwbFull(m_matrix,cov_matrix);
 
             uwb_index++;
 

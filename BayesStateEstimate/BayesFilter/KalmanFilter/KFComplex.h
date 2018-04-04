@@ -374,7 +374,17 @@ namespace BSE {
 
             dX_ = K_ * (input.block(0, 3, input.rows(), 1) - y);
 
+            auto t = mg_fuc.compute(state_x_);
 
+
+            state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) +
+                                         dX_.block(0, 0, 6, 1);
+
+
+            rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
+//            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
+            rbn_ = Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
+            state_x_.block(6, 0, 3, 1) = rbn_.log();
         }
 
         /**
