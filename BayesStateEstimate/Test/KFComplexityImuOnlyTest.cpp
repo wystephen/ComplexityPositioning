@@ -120,6 +120,8 @@ int main(int argc, char *argv[]) {
             &optimize_trace_vec,
             &logger_ptr](const Eigen::MatrixXd &imu_data,
                          std::string data_name) {
+
+        /// Define and Initialize Filter.
         auto filter = BSE::IMUWBKFSimple(
                 initial_prob_matrix);
 
@@ -140,10 +142,14 @@ int main(int argc, char *argv[]) {
             filter.setTime_interval_(tmp_time_interval);
             filter_complex.time_interval_ = tmp_time_interval;
         }
+        complex_full_filter.time_interval_ = filter_complex.time_interval_;
+
         filter.setLocal_g_(-9.3);
         filter_complex.local_g_ = -9.3;
+        complex_full_filter.local_g_ = filter_complex.local_g_;
 //    filter.IS_DEBUG = true;
         std::vector<double> zv_flag = {};
+
 
         auto time_begin = AWF::getDoubleSecondTime();
         filter.initial_state(imu_data.block(10, 1, 100, 6),
@@ -154,8 +160,12 @@ int main(int argc, char *argv[]) {
         filter_complex.initial_state(imu_data.block(10, 1, 100, 9),
                                      initial_ori,
                                      initial_pos);
-        std::cout << "costed time :" << AWF::getDoubleSecondTime() - time_begin
+        std::cout << "initial state costed time :" << AWF::getDoubleSecondTime() - time_begin
                   << std::endl;
+        complex_full_filter.initial_state(imu_data.block(10, 1, 100, 9),
+                                          initial_ori,
+                                          initial_pos);
+
 
 //    filter.sett
         for (int i(5); i < imu_data.rows() - 5; ++i) {
@@ -168,7 +178,7 @@ int main(int argc, char *argv[]) {
             auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
                                                               process_noise_matrix);
             filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-                                                   Eigen::Matrix3d::Identity() * 0.0000046);
+                                                   Eigen::Matrix3d::Identity() * 0.000026);
 
             double uwb_index = 0;
             /// uwb measurement
