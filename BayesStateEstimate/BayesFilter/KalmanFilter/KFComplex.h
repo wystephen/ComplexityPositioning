@@ -372,7 +372,9 @@ namespace BSE {
 
 //            logger_ptr->addPlotEvent("uwb_measurement", "src", input.block(0, 3, input.rows(), 1));
 //            logger_ptr->addPlotEvent("uwb_measurement", "y", y);
-//            logger_ptr->addPlotEvent("uwb_measurement", "diff", input.block(0, 3, input.rows(), 1) - y);
+            Eigen::MatrixXd tmd(1,1);
+            tmd(0,0) = (input.block(0, 3, input.rows(), 1) - y).norm();
+            logger_ptr->addPlotEvent("uwb_measurement", "diff", tmd);
 
 
 //            std::cout << "H:" << H_ << std::endl;
