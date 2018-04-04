@@ -101,10 +101,8 @@ namespace BSE {
 
             std::cout << "complex value angle:" << state_x_.block(6, 0, 3, 1).transpose()
                       << std::endl;
-            std::cout << "complex eular angle:" << rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2).transpose()
-                      << std::endl;
             std::cout << "complex before acc:" << acc.transpose() << std::endl;
-            std::cout << "complex after acc:" << (rotation_q_ * acc).transpose() << std::endl;
+            std::cout << "complex after acc:" << (rbn_ * acc).transpose() << std::endl;
             std::cout << "complex after mg func:" << mg_fuc.compute(state_x_).transpose() << std::endl;
 
         }
@@ -243,10 +241,10 @@ namespace BSE {
 //                      << mag_func.mag_nav_.transpose()
 //                      << std::endl;
             auto logger_ptr = AWF::AlgorithmLogger::getInstance();
-            logger_ptr->addPlotEvent("angle_correct", "input", input);
-            logger_ptr->addPlotEvent("angle_correct", "reverted", Eigen::Vector3d(rbn_.matrix() * input));
-            logger_ptr->addPlotEvent("angle_correct", "world_value", mag_func.mag_nav_);
-            logger_ptr->addPlotEvent("probability", "P", prob_state_);
+            logger_ptr->addPlotEvent(class_name_+"angle_correct", "input", input);
+            logger_ptr->addPlotEvent(class_name_+"angle_correct", "reverted", Eigen::Vector3d(rbn_.matrix() * input));
+            logger_ptr->addPlotEvent(class_name_+"angle_correct", "world_value", mag_func.mag_nav_);
+            logger_ptr->addPlotEvent(class_name_+"probability", "P", prob_state_);
 
             return;
 
@@ -299,9 +297,9 @@ namespace BSE {
             state_x_.block(6, 0, 3, 1) = rbn_.log();
 
             auto logger_ptr = AWF::AlgorithmLogger::getInstance();
-            logger_ptr->addPlotEvent("gravity", "before_acc", g_and_mag.block(0, 0, 3, 1));
-            logger_ptr->addPlotEvent("gravity", "converted_acc", rbn_.matrix() * g_and_mag.block(0, 0, 3, 1));
-            logger_ptr->addPlotEvent("gravity", "nav_acc", mg_fuc.gravity_nav_);
+            logger_ptr->addPlotEvent(class_name_+"gravity", "before_acc", g_and_mag.block(0, 0, 3, 1));
+            logger_ptr->addPlotEvent(class_name_+"gravity", "converted_acc", rbn_.matrix() * g_and_mag.block(0, 0, 3, 1));
+            logger_ptr->addPlotEvent(class_name_+"gravity", "nav_acc", mg_fuc.gravity_nav_);
 
 
             return;
@@ -374,7 +372,7 @@ namespace BSE {
 //            logger_ptr->addPlotEvent("uwb_measurement", "y", y);
             Eigen::MatrixXd tmd(1,1);
             tmd(0,0) = (input.block(0, 3, input.rows(), 1) - y).norm();
-            logger_ptr->addPlotEvent("uwb_measurement", "diff", tmd);
+            logger_ptr->addPlotEvent("xsense_uwb", class_name_+"diff", tmd);
 
 
 //            std::cout << "H:" << H_ << std::endl;
@@ -404,12 +402,11 @@ namespace BSE {
          * dax day daz : offset of acc measurements.
          * dgx dgy dgz : offset of gyr measurements.
          */
-        Eigen::Matrix<double, 9, 1> state_x_ = Eigen::Matrix<double, 9, 1>::Zero();//x y z vx vy vz wx wy wz dax day daz dgx dgy dgz
-
-        Eigen::Quaterniond rotation_q_ = Eigen::Quaterniond::Identity();
+        Eigen::MatrixXd state_x_ = Eigen::Matrix<double, 9, 1>::Zero();//x y z vx vy vz wx wy wz dax day daz dgx dgy dgz
 
 
-        Eigen::Matrix<double, 9, 9> prob_state_ = Eigen::Matrix<double, 9, 9>::Identity(); // probability of state
+
+        Eigen::MatrixXd prob_state_ = Eigen::Matrix<double, 9, 9>::Identity(); // probability of state
 
 
 
@@ -441,6 +438,8 @@ namespace BSE {
 
 
         Sophus::SO3 rbn_ = Sophus::SO3(0, 0, 0);// rotation matrix from sensor frame to navigation frame
+
+        std::string class_name_= "KFComplex";
 
 
     };

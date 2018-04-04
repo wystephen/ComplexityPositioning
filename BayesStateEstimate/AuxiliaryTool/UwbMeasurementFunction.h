@@ -37,6 +37,11 @@ public:
 
     }
 
+    /**
+     * There is not other condition except the first three dimension should be pose.
+     * @param in
+     * @return
+     */
     Eigen::MatrixXd compute(Eigen::MatrixXd in) {
         auto t = Eigen::MatrixXd(OutDim, 1);
         t(0, 0) = (in.block(0, 0, 3, 1) - beacon_set_).norm();
@@ -45,7 +50,7 @@ public:
     }
 
 
-    Eigen::MatrixXd beacon_set_;
+    Eigen::MatrixXd beacon_set_; // beaconset.
 
 };
 

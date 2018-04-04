@@ -33,6 +33,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <BayesFilter/KalmanFilter/KFComplex.h>
+#include <BayesFilter/KalmanFilter/KFComplexFull.h>
 //#include <AWF.h>dd
 
 
@@ -105,11 +106,19 @@ int main(int argc, char *argv[]) {
     initial_prob_matrix.block(3, 3, 3, 3) *= 0.001;
     initial_prob_matrix.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
 
+    Eigen::MatrixXd initial_prob_full_matrix = Eigen::MatrixXd::Identity(15, 15);
+    initial_prob_full_matrix.block(0, 0, 9, 9) = initial_prob_matrix;
+    initial_prob_full_matrix.block(9, 9, 3, 3) *= 0.001;
+    initial_prob_full_matrix.block(12, 12, 3, 3) *= 0.001 * (M_PI / 180.0);
+
 
     auto filter = BSE::IMUWBKFSimple(initial_prob_matrix);
     filter.setTime_interval_(0.01);
     auto complex_filter = BSE::KFComplex(initial_prob_matrix);
     complex_filter.time_interval_ = 0.01;
+
+    auto complex_full_filter = BSE::KFComplexFull(initial_prob_full_matrix);
+    complex_full_filter.time_interval_ = 0.01;
 
     filter.initial_state(imu_data.block(0, 1, 10, 6),
                          initial_ori + 10.0 / 180.0 * M_PI,
@@ -121,8 +130,14 @@ int main(int argc, char *argv[]) {
                                  initial_pos);
 
 
+    complex_full_filter.initial_state(imu_data.block(0, 1, 10, 9),
+                                      initial_ori + 10.0 / 180.0 * M_PI,
+                                      initial_pos);
+
     filter.setLocal_g_(-9.884);
     complex_filter.local_g_ = -9.884;
+    complex_full_filter.local_g_ = -9.884;
+
 //    filter.IS_DEBUG = true;
 
 
@@ -151,8 +166,8 @@ int main(int argc, char *argv[]) {
             measurement_noise_matrix.resize(1, 1);
             measurement_noise_matrix(0, 0) = 0.1;
 
-            logger_ptr->addPlotEvent("xsens_uwb", "uwb", uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1));
-            logger_ptr->addPlotEvent("xsens_uwb", "uwb_error", optimize_trace.block(uwb_index, 3, 1, 1));
+            logger_ptr->addPlotEvent("xsense_uwb", "uwb", uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1));
+            logger_ptr->addPlotEvent("xsense_uwb", "uwb_error", optimize_trace.block(uwb_index, 3, 1, 1));
             std::vector<Eigen::Vector4d> m_stack;
             std::vector<Eigen::Matrix<double, 1, 1>> cov_stack;
             for (int k(1); k < uwb_data.cols(); ++k) {
