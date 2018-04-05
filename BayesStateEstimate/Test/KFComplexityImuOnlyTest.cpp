@@ -189,10 +189,10 @@ int main(int argc, char *argv[]) {
             if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
                 /// zero velocity detector
                 filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-                                        Eigen::Matrix3d::Identity() * 0.0000251001,
+                                        Eigen::Matrix3d::Identity() * 0.00000251001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 
-                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00025);
+                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.025);
 
                 /// angle constraint through acc.
                 int zv_index = zv_flag.size() - 1;
