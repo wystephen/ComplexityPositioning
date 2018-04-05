@@ -33,7 +33,7 @@
 #include <BSE.h>
 #include "ImuTools.h"
 
-#include <sophus/so3.h>
+#include <sophus/so3.hpp>
 
 
 namespace BSE {

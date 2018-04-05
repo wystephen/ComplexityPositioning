@@ -28,7 +28,7 @@
 #define COMPLEXITYPOSITIONING_KFCOMPLEXFULL_H
 
 #include <sophus/so3.hpp>
-#include <sophus/se3.h>
+#include <sophus/se3.hpp>
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
