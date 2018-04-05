@@ -47,7 +47,7 @@ public:
     Eigen::MatrixXd compute(Eigen::MatrixXd state) {
 
         Eigen::Matrix<double, 6, 1> out;
-        Sophus::SO3 rbn = Sophus::SO3::exp(state.block(6, 0, 3, 1));
+        Sophus::SO3d rbn = Sophus::SO3d::exp(state.block(6, 0, 3, 1));
         out.block(0, 0, 3, 1) = rbn.inverse().matrix() * gravity_nav_;
         out.block(3, 0, 3, 1) = rbn.inverse().matrix() * mag_nav_;
         return out;

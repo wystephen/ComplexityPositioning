@@ -84,7 +84,7 @@ namespace BSE {
         Eigen::Matrix<double, 15, 15> prob_state_ = Eigen::Matrix<double, 15, 15>::Identity(); // probability of state
 
 
-        Sophus::SO3 rbn_ = Sophus::SO3(0, 0, 0);// rotation matrix from sensor frame to navigation frame
+        Sophus::SO3d rbn_ = Sophus::SO3d::exp(Eigen::Vector3d(0, 0, 0));// rotation matrix from sensor frame to navigation frame
 
         /**
         * X_i=A*X_{i-1}+B*u_i+w_i

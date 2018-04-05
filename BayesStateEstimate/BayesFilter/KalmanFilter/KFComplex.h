@@ -82,7 +82,7 @@ namespace BSE {
             state_x_.block(0, 0, 3, 1) = initial_pose;
             state_x_.block(3, 0, 3, 1).setZero();
 
-            rbn_ = Sophus::SO3::exp(Eigen::Vector3d(tr, tp, initial_ori));
+            rbn_ = Sophus::SO3d::exp(Eigen::Vector3d(tr, tp, initial_ori));
             state_x_.block(6, 0, 3, 1) = rbn_.log();
 
             auto acc_nav = rbn_.matrix() * acc;
@@ -137,7 +137,7 @@ namespace BSE {
 
             state_x_ = siuf.compute(state_x_, input);
 //            rbn_ = siuf.rbn;
-            rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
+            rbn_ = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
 //            rotation_q_ = Eigen::AngleAxisd(state_x_(6, 0), Eigen::Vector3d::UnitX()) *
 //                          Eigen::AngleAxisd(state_x_(7, 0), Eigen::Vector3d::UnitY()) *
 //                          Eigen::AngleAxisd(state_x_(8, 0), Eigen::Vector3d::UnitZ());
@@ -196,8 +196,8 @@ namespace BSE {
 
             state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
 
-            rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
-            rbn_ = Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
+            rbn_ = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
+            rbn_ = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * rbn_;
             state_x_.block(6, 0, 3, 1) = rbn_.log();
 
 
@@ -227,9 +227,9 @@ namespace BSE {
 //            std::cout << " standard: " << (mag_func.compute(state_x_)).transpose();
 
             state_x_.block(0, 0, 6, 1) += dX_.block(0, 0, 6, 1);
-            rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
+            rbn_ = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
 //            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
-            rbn_ = Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
+            rbn_ = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * rbn_;
             state_x_.block(6, 0, 3, 1) = rbn_.log();
 
 
@@ -291,9 +291,9 @@ namespace BSE {
                                          dX_.block(0, 0, 6, 1);
 
 
-            rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
+            rbn_ = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
 //            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
-            rbn_ = Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
+            rbn_ = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * rbn_;
             state_x_.block(6, 0, 3, 1) = rbn_.log();
 
             auto logger_ptr = AWF::AlgorithmLogger::getInstance();
@@ -334,9 +334,9 @@ namespace BSE {
                                          dX_.block(0, 0, 6, 1);
 
 
-            rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
+            rbn_ = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
 //            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
-            rbn_ = Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
+            rbn_ = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * rbn_;
             state_x_.block(6, 0, 3, 1) = rbn_.log();
         }
 
@@ -392,9 +392,9 @@ namespace BSE {
                                          dX_.block(0, 0, 6, 1);
 
 
-            rbn_ = Sophus::SO3::exp(state_x_.block(6, 0, 3, 1));
+            rbn_ = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
 //            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
-            rbn_ = Sophus::SO3::exp(dX_.block(6, 0, 3, 1)) * rbn_;
+            rbn_ = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * rbn_;
             state_x_.block(6, 0, 3, 1) = rbn_.log();
         }
 
@@ -437,7 +437,7 @@ namespace BSE {
         bool IS_DEBUG = false; // debug flag.
 
 
-        Sophus::SO3 rbn_ = Sophus::SO3(0, 0, 0);// rotation matrix from sensor frame to navigation frame
+        Sophus::SO3d rbn_ = Sophus::SO3d::exp(Eigen::Vector3d(0, 0, 0));// rotation matrix from sensor frame to navigation frame
 
         std::string class_name_= "KFComplex";
 

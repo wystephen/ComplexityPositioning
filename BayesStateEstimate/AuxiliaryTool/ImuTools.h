@@ -148,7 +148,7 @@ namespace BSE {
 ////            q = q * dq;
 //            q.normalize();
 //            x = q.toRotationMatrix().eulerAngles(0, 1, 2);
-            Sophus::SO3 r(x(0),x(1),x(2)),tr(dx(0),dx(1),dx(2));
+            Sophus::SO3d r(Sophus::SO3d::exp(x)),tr(Sophus::SO3d::exp(dx));
 //            r = tr * r;
 
             r = r * tr;

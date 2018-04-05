@@ -133,9 +133,7 @@ public:
             F.setZero();
             G.setZero();
 
-            auto rotation = Sophus::SO3(c_state(6),
-                                        c_state(7),
-                                        c_state(8));
+            auto rotation = Sophus::SO3d::exp(c_state.block(6, 0, 3, 1));
 
 
             auto f_t = Eigen::Vector3d(input.block(0, 0, 3, 1));

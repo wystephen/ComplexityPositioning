@@ -127,7 +127,7 @@ public:
 //        auto rotate_matrix = (Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX())
 //                              * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
 //                              * Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()));
-        Sophus::SO3 rbn_ = Sophus::SO3(roll,pitch,yaw);
+        Sophus::SO3d rbn_ = Sophus::SO3d::exp(Eigen::Vector3d(roll, pitch, yaw));
         Eigen::MatrixXd error_matrix(1, 1);
         error_matrix(0, 0) = std::abs(g_ - (rbn_.matrix() * acc_)(2));
 //        std::cout << error_matrix(0,0) << std::endl;
