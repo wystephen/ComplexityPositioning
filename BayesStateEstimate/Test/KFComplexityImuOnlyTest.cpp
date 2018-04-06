@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
         complex_full_filter.time_interval_ = filter_complex.time_interval_;
 
         filter.setLocal_g_(-9.3);
-        filter_complex.local_g_ = -9.3;
+        filter_complex.local_g_ = 9.3;
         complex_full_filter.local_g_ = filter_complex.local_g_;
 //    filter.IS_DEBUG = true;
         std::vector<double> zv_flag = {};

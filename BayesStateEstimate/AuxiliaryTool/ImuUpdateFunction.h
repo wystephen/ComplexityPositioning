@@ -57,7 +57,7 @@ public:
      * @return
      */
     std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd state, Eigen::MatrixXd input) {
-        int methond_id = 1;
+        int methond_id = 2;
         if (methond_id == 0) {
 
             return d(compress(state, input));
