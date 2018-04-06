@@ -32,6 +32,9 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
+
+
+
 class ImuUpdateFunction : public AWF::FunctionAbstract {
 public:
     ImuUpdateFunction(int out_dim, double time_interval, double local_gravity) :
@@ -91,10 +94,12 @@ public:
             for (int j(0); j < jac_state.cols(); ++j) {
 
                 double tmp_epsilon = epsilon_;
-                if (j < 6) {
+                if (j < 6 || j >= 9) {
                     tmp_state(j) += epsilon_;
                 } else {
                     tmp_state(j) += epsilon_ / 180.0 * M_PI;
+
+
 
                 }
                 if (j >= 6 && j < 9) {

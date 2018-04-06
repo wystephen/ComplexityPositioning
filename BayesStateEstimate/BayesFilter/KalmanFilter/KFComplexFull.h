@@ -67,6 +67,27 @@ namespace BSE {
         Eigen::Matrix<double, 15, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
                                                    Eigen::Matrix<double, 6, 6> noise_matrix) {
 
+            auto siuf = FullImuUpdateFunction(rbn_,
+                                                time_interval_,
+                                                local_g_);
+            siuf.setEpsilon_(1e-1);
+
+            auto jac_vec = siuf.derivative(state_x_,
+                                           input);
+
+            auto A = jac_vec[0];
+            auto B = jac_vec[1];
+
+            prob_state_ = A * prob_state_ * A.transpose() +
+                          B * noise_matrix * B.transpose();
+
+            prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose());
+            if (std::isnan(prob_state_.sum())) {
+                ERROR_MSG_FLAG("porb_state_ is nan.");
+            }
+
+            state_x_ = siuf.compute(state_x_, input);
+            rbn_ = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
 
 
 

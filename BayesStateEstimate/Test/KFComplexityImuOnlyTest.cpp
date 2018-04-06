@@ -46,7 +46,10 @@ int main(int argc, char *argv[]) {
     std::cout.precision(10);
     // parameters
 //    std::string dir_name = "/home/steve/Data/NewFusingLocationData/0018/";
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0010/";
+//    std::string dir_name = "/home/steve/Data/FusingLocationData/0010/";
+//    std::string dir_name = "/home/steve/Data/FusingLocationData/0010/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+
 
     auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 
@@ -126,7 +129,8 @@ int main(int argc, char *argv[]) {
         auto filter = BSE::IMUWBKFSimple(
                           initial_prob_matrix);
 
-        auto filter_complex = BSE::KFComplex(initial_prob_matrix);
+//        auto filter_complex = BSE::KFComplex(initial_prob_matrix);
+        auto filter_complex = BSE::KFComplexFull(initial_prob_matrix);
 
         auto complex_full_filter = BSE::KFComplexFull(initial_prob_matrix_complex);
 
@@ -179,7 +183,7 @@ int main(int argc, char *argv[]) {
             auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
                                  process_noise_matrix);
 //            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-//                                                   Eigen::Matrix3d::Identity() * 0.00000026);
+//                                                   Eigen::Matrix3d::Identity() * 0.000246);
 
             double uwb_index = 0;
             /// uwb measurement
@@ -193,7 +197,7 @@ int main(int argc, char *argv[]) {
                                         Eigen::Matrix3d::Identity() * 0.00000251001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 
-                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.025);
+                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000025);
 
                 /// angle constraint through acc.
                 int zv_index = zv_flag.size() - 1;

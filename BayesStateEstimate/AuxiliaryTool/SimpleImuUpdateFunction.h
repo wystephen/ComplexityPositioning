@@ -37,6 +37,72 @@
 
 
 namespace BSE {
+
+
+    class FullImuUpdateFunction :
+            public ImuUpdateFunction {
+    public:
+        /**
+         *
+         * @param so3
+         * @param time_interval
+         * @param local_gravity
+         */
+        FullImuUpdateFunction(Sophus::SO3d so3,
+                              double time_interval,
+                              double local_gravity) :
+                ImuUpdateFunction(15,
+                                  time_interval,
+                                  local_gravity) {
+            epsilon_ = 1e-8;
+            rbn = so3;
+
+        }
+
+        Sophus::SO3d rbn = Sophus::SO3d::exp(Eigen::Vector3d(0, 0, 0));
+
+        /**
+         * Core
+         * @param state
+         * @param input
+         * @return
+         */
+        Eigen::MatrixXd compute(Eigen::MatrixXd state,
+                                Eigen::MatrixXd input) {
+            Eigen::MatrixXd out_state(9, 1);
+
+            auto rotation = Sophus::SO3d::exp(state.block(6, 0, 3, 1));
+
+            Eigen::Vector3d gyr = (input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1)) * time_interval_;
+//            std::cout << time_interval_ << std::endl;
+            assert(time_interval_ > 0.0 && time_interval_ < 0.1);
+
+            if (input.block(3, 0, 3, 1).norm() > 1e-10) {
+                rotation = rotation * Sophus::SO3d::exp(gyr);
+//                rotation = Sophus::SO3::exp(gyr) * rotation;
+
+            }
+
+            Eigen::Vector3d acc = rotation.matrix() * input.block(0, 0, 3, 1) +
+                                  Eigen::Vector3d(0, 0, local_gravity_) + state.block(9, 0, 3, 1);
+//            std::cout << "acc:" << acc.transpose() << std::endl;
+
+            out_state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +
+                                          state.block(3, 0, 3, 1) * time_interval_;
+//                                          + 0.5 * acc * time_interval_ * time_interval_;
+            out_state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) +
+                                          acc * time_interval_;
+            out_state.block(6, 0, 3, 1) = rotation.log();
+//            rbn = rotation;
+
+            return out_state;
+
+        }
+
+
+    };
+
+
     class SimpleImuUpdateFunction :
             public ImuUpdateFunction {
     public:
