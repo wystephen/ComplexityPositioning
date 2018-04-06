@@ -237,10 +237,10 @@ namespace BSE {
 //                      << mag_func.mag_nav_.transpose()
 //                      << std::endl;
             auto logger_ptr = AWF::AlgorithmLogger::getInstance();
-            logger_ptr->addPlotEvent(class_name_+"angle_correct", "input", input);
-            logger_ptr->addPlotEvent(class_name_+"angle_correct", "reverted", Eigen::Vector3d(rbn_.matrix() * input));
-            logger_ptr->addPlotEvent(class_name_+"angle_correct", "world_value", mag_func.mag_nav_);
-            logger_ptr->addPlotEvent(class_name_+"probability", "P", prob_state_);
+            logger_ptr->addPlotEvent(class_name_ + "angle_correct", "input", input);
+            logger_ptr->addPlotEvent(class_name_ + "angle_correct", "reverted", Eigen::Vector3d(rbn_.matrix() * input));
+            logger_ptr->addPlotEvent(class_name_ + "angle_correct", "world_value", mag_func.mag_nav_);
+            logger_ptr->addPlotEvent(class_name_ + "probability", "P", prob_state_);
 
             return;
 
@@ -293,9 +293,10 @@ namespace BSE {
             state_x_.block(6, 0, 3, 1) = rbn_.log();
 
             auto logger_ptr = AWF::AlgorithmLogger::getInstance();
-            logger_ptr->addPlotEvent(class_name_+"gravity", "before_acc", g_and_mag.block(0, 0, 3, 1));
-            logger_ptr->addPlotEvent(class_name_+"gravity", "converted_acc", rbn_.matrix() * g_and_mag.block(0, 0, 3, 1));
-            logger_ptr->addPlotEvent(class_name_+"gravity", "nav_acc", mg_fuc.gravity_nav_);
+            logger_ptr->addPlotEvent(class_name_ + "gravity", "before_acc", g_and_mag.block(0, 0, 3, 1));
+            logger_ptr->addPlotEvent(class_name_ + "gravity", "converted_acc",
+                                     rbn_.matrix() * g_and_mag.block(0, 0, 3, 1));
+            logger_ptr->addPlotEvent(class_name_ + "gravity", "nav_acc", mg_fuc.gravity_nav_);
 
 
             return;
@@ -366,9 +367,9 @@ namespace BSE {
 
 //            logger_ptr->addPlotEvent("uwb_measurement", "src", input.block(0, 3, input.rows(), 1));
 //            logger_ptr->addPlotEvent("uwb_measurement", "y", y);
-            Eigen::MatrixXd tmd(1,1);
-            tmd(0,0) = (input.block(0, 3, input.rows(), 1) - y).norm();
-            logger_ptr->addPlotEvent("xsense_uwb", class_name_+"diff", tmd);
+            Eigen::MatrixXd tmd(1, 1);
+            tmd(0, 0) = (input.block(0, 3, input.rows(), 1) - y).norm();
+            logger_ptr->addPlotEvent("xsense_uwb", class_name_ + "diff", tmd);
 
 
 //            std::cout << "H:" << H_ << std::endl;
@@ -433,9 +434,10 @@ namespace BSE {
         bool IS_DEBUG = false; // debug flag.
 
 
-        Sophus::SO3d rbn_ = Sophus::SO3d::exp(Eigen::Vector3d(0, 0, 0));// rotation matrix from sensor frame to navigation frame
+        Sophus::SO3d rbn_ = Sophus::SO3d::exp(
+                Eigen::Vector3d(0, 0, 0));// rotation matrix from sensor frame to navigation frame
 
-        std::string class_name_= "KFComplex";
+        std::string class_name_ = "KFComplex";
 
 
     };
