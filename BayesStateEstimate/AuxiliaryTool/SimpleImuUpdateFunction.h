@@ -56,7 +56,8 @@ namespace BSE {
             rbn = so3;
 
         }
-        Sophus::SO3d rbn=Sophus::SO3d::exp(Eigen::Vector3d(0,0,0));
+
+        Sophus::SO3d rbn = Sophus::SO3d::exp(Eigen::Vector3d(0, 0, 0));
 
         /**
          * Core
@@ -68,7 +69,7 @@ namespace BSE {
                                 Eigen::MatrixXd input) {
             Eigen::MatrixXd out_state(9, 1);
 
-            auto rotation = Sophus::SO3d::exp(state.block(6,0,3,1));
+            auto rotation = Sophus::SO3d::exp(state.block(6, 0, 3, 1));
 
             Eigen::Vector3d gyr = input.block(3, 0, 3, 1) * time_interval_;
 //            std::cout << time_interval_ << std::endl;
@@ -81,14 +82,14 @@ namespace BSE {
             }
 
             Eigen::Vector3d acc = rotation.matrix() * input.block(0, 0, 3, 1) +
-                    Eigen::Vector3d(0, 0, local_gravity_);
+                                  Eigen::Vector3d(0, 0, local_gravity_);
 //            std::cout << "acc:" << acc.transpose() << std::endl;
 
             out_state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +
-                    state.block(3, 0, 3, 1) * time_interval_;
+                                          state.block(3, 0, 3, 1) * time_interval_;
 //                                          + 0.5 * acc * time_interval_ * time_interval_;
             out_state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) +
-                    acc * time_interval_;
+                                          acc * time_interval_;
             out_state.block(6, 0, 3, 1) = rotation.log();
 //            rbn = rotation;
 

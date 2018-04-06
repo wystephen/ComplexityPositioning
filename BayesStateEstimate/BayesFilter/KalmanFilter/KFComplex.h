@@ -151,7 +151,7 @@ namespace BSE {
 
 
             } else {
-                ERROR_MSG_FLAG("error not exist method type: " + method_type);
+                ERROR_MSG_FLAG("error not exist method type: " + std::to_string(method_type));
             }
 
 
