@@ -29,6 +29,7 @@
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <sophus/so3.hpp>
 #include "AWF.h"
 
 class MagMeasurementFunction : public AWF::FunctionAbstract {
