@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
                           initial_prob_matrix);
 
 //        auto filter_complex = BSE::KFComplex(initial_prob_matrix);
-        auto filter_complex = BSE::KFComplexFull(initial_prob_matrix);
+        auto filter_complex = BSE::KFComplexFull(initial_prob_matrix_complex);
 
         auto complex_full_filter = BSE::KFComplexFull(initial_prob_matrix_complex);
 
