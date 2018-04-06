@@ -177,8 +177,8 @@ int main(int argc, char *argv[]) {
 
             auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
                                                               process_noise_matrix);
-            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-                                                   Eigen::Matrix3d::Identity() * 0.00000026);
+//            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
+//                                                   Eigen::Matrix3d::Identity() * 0.00000026);
 
             double uwb_index = 0;
             /// uwb measurement
@@ -218,7 +218,7 @@ int main(int argc, char *argv[]) {
 
 
 //                if( current_diff < 0.1)
-                filter_complex.MeasurementAngleCorrectMG(tmp_gm, cov_matrix);
+//                filter_complex.MeasurementAngleCorrectMG(tmp_gm, cov_matrix);
 
                 if (zv_flag.size() > 3 &&
                     zv_flag.at(zv_flag.size() - 2) < 0.5) {

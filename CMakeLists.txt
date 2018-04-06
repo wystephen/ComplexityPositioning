@@ -126,6 +126,14 @@ link_directories(
         #        /opt/intel/mkl/lib/intel64_lin/
 )
 
+#link_libraries(
+#        /home/steve/Code/AlgorithmWorkFlowTools/lib/libAWF.so
+#)
+set(AWF_LIBRARY /home/steve/Code/AlgorithmWorkFlowTools/lib/libAWF.so)
+link_libraries(
+        ${AWF_LIBRARY}
+)
+
 #add_library(BayesStateEstimate  STATIC BayesStateEstimate/BSE.h)
 
 #add_subdirectory(BayesStateEstimate)
@@ -148,7 +156,7 @@ add_executable(KFComplexityTester BayesStateEstimate/Test/KFComplexityTest.cpp)
 target_link_libraries(KFComplexityTester ${PYTHON_LIBRARIES})
 
 add_executable(KFCImuTester BayesStateEstimate/Test/KFComplexityImuOnlyTest.cpp)
-target_link_libraries(KFCImuTester ${PYTHON_LIBRARIES} )
+target_link_libraries(KFCImuTester ${PYTHON_LIBRARIES})
 
 add_executable(XsenseIntegrateTest BayesStateEstimate/Test/XsenseIntegrateTest.cpp)
 target_link_libraries(XsenseIntegrateTest ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES})
