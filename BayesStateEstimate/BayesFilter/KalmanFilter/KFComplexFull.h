@@ -68,8 +68,8 @@ namespace BSE {
                                                    Eigen::Matrix<double, 6, 6> noise_matrix) {
 
             auto siuf = FullImuUpdateFunction(rbn_,
-                                                time_interval_,
-                                                local_g_);
+                                              time_interval_,
+                                              local_g_);
             siuf.setEpsilon_(1e-1);
 
             auto jac_vec = siuf.derivative(state_x_,
@@ -90,9 +90,65 @@ namespace BSE {
             rbn_ = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
 
 
-
         };
 
+        /**
+               * zero velocity measuremnt upd
+               * @param cov_matrix
+               */
+        void MeasurementStateZV(Eigen::Matrix3d cov_matrix) {
+            H_ = Eigen::MatrixXd::Zero(3, 15);
+            H_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * 1.0;
+            if (IS_DEBUG) {
+                std::cout << H_ << std::endl;
+                std::cout << " p * H^T :" << prob_state_ * H_.transpose().eval() << std::endl;
+                std::cout << " H * P * H^T + cosv:" << H_ * prob_state_ * H_.transpose().eval() + cov_matrix
+                          << std::endl;
+                std::cout << "inverse " << (H_ * prob_state_ * H_.transpose().eval() + cov_matrix).inverse()
+                          << std::endl;
+
+            }
+
+            K_ = (prob_state_ * H_.transpose().eval()) *
+                 (H_ * prob_state_ * H_.transpose().eval() + cov_matrix).inverse();
+            if (std::isnan(K_.sum()) || std::isinf(K_.sum())) {
+                std::cout << "K is nan" << std::endl;
+            }
+
+            /*
+             * update probability
+             */
+            prob_state_ = (Eigen::Matrix<double, 15, 15>::Identity() - K_ * H_) * prob_state_;
+            prob_state_ = (prob_state_ + prob_state_.transpose().eval()) * 0.5;
+            if (prob_state_.norm() > 10000) {
+                std::cout << __FILE__
+                          << ":"
+                          << __LINE__
+                          << " Error state prob is too big"
+                          << prob_state_.norm()
+                          << std::endl;
+                prob_state_ /= 100.0;
+            }
+            if (std::isnan(prob_state_.sum()) || std::isinf(prob_state_.sum())) {
+                std::cout << "state prob has nan" << std::endl;
+            }
+
+            /*
+             * update state
+             */
+            Eigen::Vector3d m(0, 0, 0); // pseudo velocity measurement.
+            dX_ = K_ * (m - state_x_.block(3, 0, 3, 1));
+
+            state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
+
+            rbn_ = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
+//            rbn_ = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * rbn_;
+            rbn_ = rbn_ * Sophus::SO3d::exp(dX_.block(6, 0, 3, 1));
+            state_x_.block(6, 0, 3, 1) = rbn_.log();
+            state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
+
+
+        }
 
         /**
          * dax day daz : offset of acc measurements.
@@ -105,7 +161,8 @@ namespace BSE {
         Eigen::Matrix<double, 15, 15> prob_state_ = Eigen::Matrix<double, 15, 15>::Identity(); // probability of state
 
 
-        Sophus::SO3d rbn_ = Sophus::SO3d::exp(Eigen::Vector3d(0, 0, 0));// rotation matrix from sensor frame to navigation frame
+        Sophus::SO3d rbn_ = Sophus::SO3d::exp(
+                Eigen::Vector3d(0, 0, 0));// rotation matrix from sensor frame to navigation frame
 
         /**
         * X_i=A*X_{i-1}+B*u_i+w_i

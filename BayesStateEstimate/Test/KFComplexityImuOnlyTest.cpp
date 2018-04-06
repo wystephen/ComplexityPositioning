@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
                                         Eigen::Matrix3d::Identity() * 0.00000251001,
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 
-                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000025);
+                filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000000025);
 
                 /// angle constraint through acc.
                 int zv_index = zv_flag.size() - 1;
