@@ -147,6 +147,10 @@ namespace BSE {
             state_x_.block(6, 0, 3, 1) = rbn_.log();
             state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
 
+            auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
+            logger_ptr_->addPlotEvent("complexfull","offset_acc",state_x_.block(9,0,3,1));
+            logger_ptr_->addPlotEvent("complexfull","offset_gyr",state_x_.block(12,0,3,1));
+
 
         }
 
