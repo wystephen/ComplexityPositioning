@@ -122,8 +122,8 @@ int main(int argc, char *argv[]) {
 	Eigen::MatrixXd initial_prob_matrix_ff = Eigen::MatrixXd::Identity(21, 21);
 	initial_prob_matrix_ff.block(0, 0, 15, 15) = initial_prob_matrix_complex * 1.0;
 
-	initial_prob_matrix_ff.block(15, 15, 3, 3) *= 0.0001;
-	initial_prob_matrix_ff.block(18, 18, 3, 3) *= 0.0001 * (M_PI / 180.0);
+	initial_prob_matrix_ff.block(15, 15, 3, 3) *= 0.0000001;
+	initial_prob_matrix_ff.block(18, 18, 3, 3) *= 0.000001 * (M_PI / 180.0);
 
 
 	auto f = [&process_noise_matrix,
@@ -211,8 +211,8 @@ int main(int argc, char *argv[]) {
 
 //            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
 //                                                   Eigen::Matrix3d::Identity() * 0.000246);
-//			complex_full_filter.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-//			                                            Eigen::Matrix3d::Identity() * 0.00001);
+			complex_full_filter.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
+			                                            Eigen::Matrix3d::Identity() * 0.00001);
 
 			double uwb_index = 0;
 			/// uwb measurement
@@ -220,7 +220,6 @@ int main(int argc, char *argv[]) {
 
 
 
-//            std::vector<double> zv_
 			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
 				/// zero velocity detector
 				filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
@@ -231,7 +230,7 @@ int main(int argc, char *argv[]) {
 
 				complex_full_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00000025);
 
-				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00000025);
+				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000025);
 
 
 				/// angle constraint through acc.
@@ -242,11 +241,6 @@ int main(int argc, char *argv[]) {
 						last_zv_flag = false;
 					}
 				}
-//                if((imu_data.block(i,1,1,3).transpose()-
-//                        Eigen::Vector3d(-1.263,0.5163,9.742)).norm()<0.02)
-//                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-//                                        Eigen::Matrix3d::Identity() * 0.1 * M_PI / 180.0,
-//                                        BSE::MeasurementMethodType::NormalAngleConstraint);
 
 
 				Eigen::Matrix<double, 6, 1> tmp_gm;
@@ -297,6 +291,7 @@ int main(int argc, char *argv[]) {
 
 			logger_ptr->addTraceEvent(data_name, "simple", state_simple.block(0, 0, 2, 1));
 			logger_ptr->addTraceEvent(data_name, "complex", state.block(0, 0, 2, 1));
+			logger_ptr->addTraceEvent(data_name, "full", full_state.block(0, 0, 2, 1));
 			logger_ptr->addTraceEvent(data_name, "ff", ff_state.block(0, 0, 2, 1));
 
 		}

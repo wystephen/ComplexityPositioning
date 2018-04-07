@@ -101,6 +101,7 @@ namespace BSE {
 
 			Eigen::Vector3d acc = rotation.matrix() * (acc_scale * input.block(0, 0, 3, 1)) +
 			                      Eigen::Vector3d(0, 0, local_gravity_) + state.block(9, 0, 3, 1);
+
 //            std::cout << "acc:" << acc.transpose() << std::endl;
 
 			out_state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +
