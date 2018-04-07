@@ -50,6 +50,7 @@
 
 namespace BSE {
 	class UKFComplex : public KFComplex {
+	public:
 		/**
 		 * 15-state UKF for IMU
 		 */
@@ -89,7 +90,8 @@ namespace BSE {
 			                   noise_matrix.cols()) = noise_matrix;
 
 			// lower-triangle matrix
-			auto L = Sigma_matrix.triangularView<Eigen::Lower>();
+//			auto L = Sigma_matrix.triangularView<Eigen::Lower>();
+			auto L = Sigma_matrix.llt().matrixL();
 
 			int sigma_point_size = L.rows();// number of sigma point.
 
@@ -101,8 +103,8 @@ namespace BSE {
 			state_stack[0] = siuf.compute(state_x_, input);
 			state_stack[1] = state_stack[1];
 
-			rotation_stack[0] = Sophus::SO3::exp(state_stack[0].block(6, 0, 3, 1));
-			rotation_stack[1] = Sophus::SO3::exp(state_stack[1].block(6, 0, 3, 1));
+			rotation_stack[0] = Sophus::SO3d::exp(state_stack[0].block(6, 0, 3, 1));
+			rotation_stack[1] = Sophus::SO3d::exp(state_stack[1].block(6, 0, 3, 1));
 
 
 			double coeff = std::sqrt(sigma_point_size + 1);
@@ -114,8 +116,9 @@ namespace BSE {
 						state_x_ - L.block(0, i, state_x_.rows(), 1) * coeff,
 						input - L.block(state_x_.rows(), i, input.rows(), 1) * coeff);
 
-				rotation_stack[i+2 ] = Sophus::SO3d::exp(state_stack[i+2].block(6,0,3,1));
-				rotation_stack[i+sigma_point_size+2] = Sophus::SO3d::exp(state_stack[i+2+sigma_point_size].block(6,0,3,1));
+				rotation_stack[i + 2] = Sophus::SO3d::exp(state_stack[i + 2].block(6, 0, 3, 1));
+				rotation_stack[i + sigma_point_size + 2] = Sophus::SO3d::exp(
+						state_stack[i + 2 + sigma_point_size].block(6, 0, 3, 1));
 
 			}
 
@@ -125,27 +128,20 @@ namespace BSE {
 //			if(average_roation.bool())
 
 			state_x_.setZero();
-			for(auto state :state_stack){
-				state_x_ += double(1./(sigma_point_size*2.0+2.0)) * state;
+			for (auto state :state_stack) {
+				state_x_ += double(1. / (sigma_point_size * 2.0 + 2.0)) * state;
 			}
 
-			if(average_roation.bool()){
 
-				state_x_.block(6,0,3,1) = average_roation->log();
-			}else{
-				ERROR_MSG_FLAG("Sohpus average returns error");
-			}
+			state_x_.block(6, 0, 3, 1) = average_roation->log();
 
 			prob_state_.setZero();
-			for(auto state :state_stack){
-				auto  dx = state - state_x_;
-				prob_state_ += double(1./(sigma_point_size*2.0+2.0)) * dx * dx.transpose();
+			for (auto state :state_stack) {
+				auto dx = state - state_x_;
+				prob_state_ += double(1. / (sigma_point_size * 2.0 + 2.0)) * dx * dx.transpose();
 			}
 
 			return state_x_;
-
-
-
 
 
 		};
