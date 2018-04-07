@@ -56,8 +56,8 @@ int main(int argc, char *argv[]) {
 
     // load data
     AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
-        right_foot_file(dir_name + "RIGHT_FOOT.data"),
-        head_imu_file(dir_name + "HEAD.data");
+            right_foot_file(dir_name + "RIGHT_FOOT.data"),
+            head_imu_file(dir_name + "HEAD.data");
 //            uwb_file(dir_name + "uwb_result.csv"),
 //            beacon_set_file(dir_name + "beaconSet.csv");
 
@@ -81,8 +81,8 @@ int main(int argc, char *argv[]) {
     double initial_ori = 0.0;
 
     std::vector<std::vector<double>> optimize_trace_vec = {{},
-        {},
-        {}
+                                                           {},
+                                                           {}
     };
 
 
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
     BSE::ImuTools::processImuData(head_imu_data);
 
     Eigen::MatrixXd process_noise_matrix =
-        Eigen::MatrixXd::Identity(6, 6);
+            Eigen::MatrixXd::Identity(6, 6);
     process_noise_matrix.block(0, 0, 3, 3) *= 0.1;
     process_noise_matrix.block(3, 3, 3, 3) *= (0.1 * M_PI / 180.0);
 
@@ -117,20 +117,20 @@ int main(int argc, char *argv[]) {
 
 
     auto f = [&process_noise_matrix,
-              &initial_prob_matrix,
-              &initial_prob_matrix_complex,
-              &initial_pos,
-              &initial_ori,
-              &optimize_trace_vec,
-              &logger_ptr](const Eigen::MatrixXd &imu_data,
-    std::string data_name) {
+            &initial_prob_matrix,
+            &initial_prob_matrix_complex,
+            &initial_pos,
+            &initial_ori,
+            &optimize_trace_vec,
+            &logger_ptr](const Eigen::MatrixXd &imu_data,
+                         std::string data_name) {
 
         /// Define and Initialize Filter.
         auto filter = BSE::IMUWBKFSimple(
-                          initial_prob_matrix);
+                initial_prob_matrix);
 
-//        auto filter_complex = BSE::KFComplex(initial_prob_matrix);
-        auto filter_complex = BSE::KFComplexFull(initial_prob_matrix_complex);
+        auto filter_complex = BSE::KFComplex(initial_prob_matrix);
+//        auto filter_complex = BSE::KFComplexFull(initial_prob_matrix_complex);
 
         auto complex_full_filter = BSE::KFComplexFull(initial_prob_matrix_complex);
 
@@ -181,7 +181,11 @@ int main(int argc, char *argv[]) {
 
 
             auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
-                                 process_noise_matrix);
+                                                              process_noise_matrix);
+            auto complex_full_state = complex_full_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+                                                                        process_noise_matrix);
+
+
 //            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
 //                                                   Eigen::Matrix3d::Identity() * 0.000246);
 
@@ -198,6 +202,8 @@ int main(int argc, char *argv[]) {
                                         BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 
                 filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000000025);
+
+                complex_full_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00000025);
 
                 /// angle constraint through acc.
                 int zv_index = zv_flag.size() - 1;
@@ -226,7 +232,7 @@ int main(int argc, char *argv[]) {
 //                filter_complex.MeasurementAngleCorrectMG(tmp_gm, cov_matrix);
 
                 if (zv_flag.size() > 3 &&
-                        zv_flag.at(zv_flag.size() - 2) < 0.5) {
+                    zv_flag.at(zv_flag.size() - 2) < 0.5) {
 //                    std::cout << i
 //                              << " lacc:"
 //                              << (filter_complex.rotation_q_.toRotationMatrix() *
@@ -241,19 +247,24 @@ int main(int argc, char *argv[]) {
 
             Eigen::VectorXd state_simple = filter.getState_();
             Eigen::VectorXd state = filter_complex.state_x_;
+            Eigen::VectorXd full_state = complex_full_filter.state_x_;
 
             logger_ptr->addPlotEvent(data_name + "velocity", "velocitysimple", state_simple.block(3, 0, 3, 1));
             logger_ptr->addPlotEvent(data_name + "velocity", "velocitycomplex", state.block(3, 0, 3, 1));
+            logger_ptr->addPlotEvent(data_name + "velocity", "velocityfull", full_state.block(3, 0, 3, 1));
 
             logger_ptr->addPlotEvent(data_name + "angle", "anglesimple", state_simple.block(6, 0, 3, 1));
             logger_ptr->addPlotEvent(data_name + "angle", "anglecomplex", state.block(6, 0, 3, 1));
+            logger_ptr->addPlotEvent(data_name + "angle", "anglefull", full_state.block(6, 0, 3, 1));
 
 
             logger_ptr->addTrace3dEvent(data_name, "simple", state_simple.block(0, 0, 3, 1));
             logger_ptr->addTrace3dEvent(data_name, "complex", state.block(0, 0, 3, 1));
+            logger_ptr->addTrace3dEvent(data_name, "full", full_state.block(0, 0, 3, 1));
 
             logger_ptr->addTraceEvent(data_name, "simple", state_simple.block(0, 0, 2, 1));
             logger_ptr->addTraceEvent(data_name, "complex", state.block(0, 0, 2, 1));
+            logger_ptr->addTraceEvent(data_name, "full", full_state.block(0, 0, 2, 1));
 
         }
 
