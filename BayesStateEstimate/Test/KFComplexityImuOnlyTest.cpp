@@ -35,6 +35,7 @@
 
 #include <iostream>
 #include <BayesFilter/KalmanFilter/KFComplexFF.h>
+#include <BayesFilter/KalmanFilter/UKFComplex.h>
 
 namespace plt = matplotlibcpp;
 
@@ -140,7 +141,8 @@ int main(int argc, char *argv[]) {
 		auto filter = BSE::IMUWBKFSimple(
 				initial_prob_matrix);
 
-		auto filter_complex = BSE::KFComplex(initial_prob_matrix);
+//		auto filter_complex = BSE::KFComplex(initial_prob_matrix);
+		auto filter_complex = BSE::UKFComplex(initial_prob_matrix);
 //        auto filter_complex = BSE::KFComplexFull(initial_prob_matrix_complex);
 
 		auto complex_full_filter = BSE::KFComplexFull(initial_prob_matrix_complex);
@@ -211,8 +213,8 @@ int main(int argc, char *argv[]) {
 
 //            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
 //                                                   Eigen::Matrix3d::Identity() * 0.000246);
-			complex_full_filter.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-			                                            Eigen::Matrix3d::Identity() * 0.00001);
+//			complex_full_filter.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
+//			                                            Eigen::Matrix3d::Identity() * 0.00001);
 
 			double uwb_index = 0;
 			/// uwb measurement
