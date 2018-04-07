@@ -83,6 +83,7 @@ namespace BSE {
 
 
 			auto gyr_scale_m = v2m(state.block(18, 0, 3, 1));
+
 			Eigen::Vector3d gyr =
 					(gyr_scale_m * input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1)) *
 					time_interval_;
@@ -95,8 +96,8 @@ namespace BSE {
 
 			}
 
-			auto acc_scale = Eigen::Matrix3d::Identity();
-//			auto acc_scale = v2m(state.block(15, 0, 3, 1));
+//			auto acc_scale = Eigen::Matrix3d::Identity();
+			auto acc_scale = v2m(state.block(15, 0, 3, 1));
 
 			Eigen::Vector3d acc = rotation.matrix() * (acc_scale * input.block(0, 0, 3, 1)) +
 			                      Eigen::Vector3d(0, 0, local_gravity_) + state.block(9, 0, 3, 1);

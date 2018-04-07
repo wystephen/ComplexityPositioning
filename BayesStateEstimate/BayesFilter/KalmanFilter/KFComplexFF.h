@@ -134,7 +134,9 @@ namespace BSE {
 			 * update probability
 			 */
 			auto identity_matrix = Eigen::MatrixXd(state_x_.rows(), state_x_.rows());
-			identity_matrix.setZero();
+			identity_matrix.setIdentity();
+
+
 			prob_state_ = (identity_matrix - K_ * H_) * prob_state_;
 			prob_state_ = (prob_state_ + prob_state_.transpose().eval()) * 0.5;
 			if (prob_state_.norm() > 10000) {
