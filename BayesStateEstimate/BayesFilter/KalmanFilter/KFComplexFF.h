@@ -61,7 +61,8 @@ namespace BSE {
 		                   Eigen::Vector3d initial_pose = Eigen::Vector3d(0, 0, 0)) {
 			std::cout << "complex full initial." << std::endl;
 			KFComplex::initial_state(imu_data, initial_ori, initial_pose);
-			state_x_.block(9, 0, 12, 1).setZero();
+			state_x_.block(9, 0, 6, 1).setZero();
+			state_x_.block(15,0,6,1).setOnes();
 		}
 
 		Eigen::Matrix<double, 15, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
