@@ -191,12 +191,13 @@ int main(int argc, char *argv[]) {
 
 //            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
 //                                                   Eigen::Matrix3d::Identity() * 0.000246);
-			complex_full_filter.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
-			                                            Eigen::Matrix3d::Identity() * 0.00001);
+//			complex_full_filter.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
+//			                                            Eigen::Matrix3d::Identity() * 0.00001);
 
 			double uwb_index = 0;
 			/// uwb measurement
 			bool tmp_break_flag = false;
+
 
 
 //            std::vector<double> zv_
