@@ -68,7 +68,7 @@ namespace BSE {
 		 */
 		Eigen::MatrixXd compute(Eigen::MatrixXd state,
 		                        Eigen::MatrixXd input) {
-			Eigen::MatrixXd out_state(15, 1);
+			Eigen::MatrixXd out_state(state.rows(), 1);
 
 			auto rotation = Sophus::SO3d::exp(state.block(6, 0, 3, 1));
 

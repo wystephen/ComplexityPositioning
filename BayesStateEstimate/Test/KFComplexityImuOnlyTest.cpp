@@ -129,6 +129,7 @@ int main(int argc, char *argv[]) {
 	auto f = [&process_noise_matrix,
 			&initial_prob_matrix,
 			&initial_prob_matrix_complex,
+			&initial_prob_matrix_ff,
 			&initial_pos,
 			&initial_ori,
 			&optimize_trace_vec,
