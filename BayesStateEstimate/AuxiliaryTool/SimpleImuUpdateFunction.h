@@ -72,6 +72,7 @@ namespace BSE {
 
 			auto rotation = Sophus::SO3d::exp(state.block(6, 0, 3, 1));
 
+			/// vector to matrix (vector as diag).
 			auto v2m = [](Eigen::VectorXd &&v) -> Eigen::MatrixXd {
 				Eigen::MatrixXd m(v.rows(), v.rows());
 				m.setZero();
@@ -95,7 +96,10 @@ namespace BSE {
 
 			}
 
-			Eigen::Vector3d acc = rotation.matrix() * (v2m(state.block(15, 0, 3, 1)) * input.block(0, 0, 3, 1)) +
+			auto acc_scale = Eigen::Matrix3d::Identity();
+//			auto acc_scale = v2m(state.block(15, 0, 3, 1));
+
+			Eigen::Vector3d acc = rotation.matrix() * (acc_scale * input.block(0, 0, 3, 1)) +
 			                      Eigen::Vector3d(0, 0, local_gravity_) + state.block(9, 0, 3, 1);
 //            std::cout << "acc:" << acc.transpose() << std::endl;
 

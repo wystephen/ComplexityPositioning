@@ -56,21 +56,34 @@ namespace BSE {
 		}
 
 
+		/**
+		 * Initial state of 21 state function.
+		 * @param imu_data
+		 * @param initial_ori
+		 * @param initial_pose
+		 */
 		void initial_state(Eigen::MatrixXd imu_data,
 		                   double initial_ori = 0.0,
-		                   Eigen::Vector3d initial_pose = Eigen::Vector3d(0, 0, 0)) {
+		                   Eigen::Vector3d initial_pose = Eigen::Vector3d(0.0, 0.0, 0.0)) {
 			std::cout << "complex full initial." << std::endl;
 			KFComplex::initial_state(imu_data, initial_ori, initial_pose);
 			state_x_.block(9, 0, 6, 1).setZero();
-			state_x_.block(15,0,6,1).setOnes();
+			state_x_.block(15, 0, 6, 1).setOnes();
 		}
 
-		Eigen::Matrix<double, 15, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
+		/**
+		 * State transaction function of IMU.
+		 * update system state vector and state probability matrix.
+		 * @param input
+		 * @param noise_matrix
+		 * @return
+		 */
+		Eigen::Matrix<double, 21, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
 		                                           Eigen::Matrix<double, 6, 6> noise_matrix) {
 
 			auto siuf = FFImuUpdateFunction(rbn_,
-			                                  time_interval_,
-			                                  local_g_);
+			                                time_interval_,
+			                                local_g_);
 			siuf.setEpsilon_(1e-1);
 
 			auto jac_vec = siuf.derivative(state_x_,
@@ -89,9 +102,10 @@ namespace BSE {
 
 			state_x_ = siuf.compute(state_x_, input);
 			rbn_ = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
+			return state_x_;
 
 
-		};
+		}
 
 		/**
 			   * zero velocity measuremnt upd
