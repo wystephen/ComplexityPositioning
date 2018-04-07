@@ -21,11 +21,12 @@
          佛祖保佑       永无BUG 
 */
 //
-// Created by steve on 18-4-3.
+// Created by steve on 18-4-7.
 //
 
-#ifndef COMPLEXITYPOSITIONING_KFCOMPLEXFULL_H
-#define COMPLEXITYPOSITIONING_KFCOMPLEXFULL_H
+#ifndef COMPLEXITYPOSITIONING_KFCOMPLEXFF_H
+#define COMPLEXITYPOSITIONING_KFCOMPLEXFF_H
+
 
 #include <sophus/so3.hpp>
 #include <sophus/se3.hpp>
@@ -45,14 +46,9 @@
 #include "KFComplex.h"
 
 namespace BSE {
-
-
-	/**
-	 * 15-state Kalman filter for Imu.
-	 */
-	class KFComplexFull : public KFComplex {
+	class KFComplexFF : public KFComplex {
 	public:
-		KFComplexFull(Eigen::Matrix<double, 15, 15> init_prob) :
+		KFComplexFF(Eigen::Matrix<double, 21, 21> init_prob) :
 				KFComplex(init_prob.block(0, 0, 9, 9)) {
 			prob_state_ = init_prob;
 			state_x_.setZero();
@@ -65,7 +61,7 @@ namespace BSE {
 		                   Eigen::Vector3d initial_pose = Eigen::Vector3d(0, 0, 0)) {
 			std::cout << "complex full initial." << std::endl;
 			KFComplex::initial_state(imu_data, initial_ori, initial_pose);
-			state_x_.block(9, 0, 6, 1).setZero();
+			state_x_.block(9, 0, 12, 1).setZero();
 		}
 
 		Eigen::Matrix<double, 15, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
@@ -124,7 +120,7 @@ namespace BSE {
 			 */
 			auto identity_matrix = Eigen::MatrixXd(state_x_.rows(), state_x_.rows());
 			identity_matrix.setZero();
-			prob_state_ = (Eigen::Matrix<double, 15, 15>::Identity() - K_ * H_) * prob_state_;
+			prob_state_ = (identity_matrix - K_ * H_) * prob_state_;
 			prob_state_ = (prob_state_ + prob_state_.transpose().eval()) * 0.5;
 			if (prob_state_.norm() > 10000) {
 				std::cout << __FILE__
@@ -151,11 +147,13 @@ namespace BSE {
 //            rbn_ = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * rbn_;
 			rbn_ = rbn_ * Sophus::SO3d::exp(dX_.block(6, 0, 3, 1));
 			state_x_.block(6, 0, 3, 1) = rbn_.log();
-			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
+			state_x_.block(9, 0, 12, 1) = state_x_.block(9, 0, 12, 1) + dX_.block(9, 0, 12, 1);
 
 			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
-			logger_ptr_->addPlotEvent("complexfull", "offset_acc", state_x_.block(9, 0, 3, 1));
-			logger_ptr_->addPlotEvent("complexfull", "offset_gyr", state_x_.block(12, 0, 3, 1));
+			logger_ptr_->addPlotEvent("complexff", "offset_acc", state_x_.block(9, 0, 3, 1));
+			logger_ptr_->addPlotEvent("complexff", "offset_gyr", state_x_.block(12, 0, 3, 1));
+			logger_ptr_->addPlotEvent("complexff", "scale_acc", state_x_.block(15, 0, 3, 1));
+			logger_ptr_->addPlotEvent("complexff", "scale_gyr", state_x_.block(18, 0, 3, 1));
 
 
 		}
@@ -163,12 +161,14 @@ namespace BSE {
 		/**
 		 * dax day daz : offset of acc measurements.
 		 * dgx dgy dgz : offset of gyr measurements.
+		 * sax say saz : scale of acc measurements.
+		 * sgx sgy sgz : scale of gyr measurements.
 		 */
-		Eigen::Matrix<double, 15, 1>
-				state_x_ = Eigen::Matrix<double, 15, 1>::Zero();//x y z vx vy vz wx wy wz dax day daz dgx dgy dgz
+		Eigen::Matrix<double, 21, 1>
+				state_x_ = Eigen::Matrix<double, 21, 1>::Zero();//x y z vx vy vz wx wy wz dax day daz dgx dgy dgz
 
 
-		Eigen::Matrix<double, 15, 15> prob_state_ = Eigen::Matrix<double, 15, 15>::Identity(); // probability of state
+		Eigen::Matrix<double, 21, 21> prob_state_ = Eigen::Matrix<double, 21, 21>::Identity(); // probability of state
 
 
 		Sophus::SO3d rbn_ = Sophus::SO3d::exp(
@@ -203,9 +203,7 @@ namespace BSE {
 
 
 
-
 	};
 }
 
-
-#endif //COMPLEXITYPOSITIONING_KFCOMPLEXFULL_H
+#endif //COMPLEXITYPOSITIONING_KFCOMPLEXFF_H
