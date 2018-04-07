@@ -9,12 +9,13 @@
 
 #define EIGEN_USE_MKL_ALL
 
+#include <Eigen/Core>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 //#include <AWF.h>dd
 
 
-#include "AWF.h"
+#include <AWF.h>
 
 #include "BayesFilter/KalmanFilter/IMUWBKFSimple.h"
 #include "BayesFilter/KalmanFilter/IMUWBKFSimple.cpp"
@@ -31,6 +32,8 @@
 
 #include <omp.h>
 #include <BayesFilter/KalmanFilter/KFComplexFull.h>
+
+#include <iostream>
 
 namespace plt = matplotlibcpp;
 
