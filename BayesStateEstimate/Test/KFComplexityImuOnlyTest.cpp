@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
 				filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000000025);
 
 				complex_full_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00000025);
-				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.000000002);
+				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000002);
 
 
 				/// angle constraint through acc.
