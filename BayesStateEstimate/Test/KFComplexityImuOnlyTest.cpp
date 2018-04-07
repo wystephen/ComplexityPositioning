@@ -165,8 +165,8 @@ int main(int argc, char *argv[]) {
 		ff_filter.time_interval_ = complex_full_filter.time_interval_;
 
 
-		filter.setLocal_g_(-9.3);
-		filter_complex.local_g_ = -9.3;
+		filter.setLocal_g_(-9.8);
+		filter_complex.local_g_ = -9.8;
 		complex_full_filter.local_g_ = filter_complex.local_g_;
 		ff_filter.local_g_ = complex_full_filter.local_g_;
 //    filter.IS_DEBUG = true;
