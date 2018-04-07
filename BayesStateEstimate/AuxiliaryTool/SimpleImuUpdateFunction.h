@@ -148,9 +148,9 @@ namespace BSE {
 		 */
 		Eigen::MatrixXd compute(Eigen::MatrixXd state,
 		                        Eigen::MatrixXd input) {
-			Eigen::MatrixXd out_state(15, 1);
+			thread_local Eigen::MatrixXd out_state(15, 1);
 
-			auto rotation = Sophus::SO3d::exp(state.block(6, 0, 3, 1));
+			thread_local auto rotation = Sophus::SO3d::exp(state.block(6, 0, 3, 1));
 
 			Eigen::Vector3d gyr = (input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1)) * time_interval_;
 //            std::cout << time_interval_ << std::endl;
@@ -242,7 +242,6 @@ namespace BSE {
 			return out_state;
 
 		}
-
 
 
 	};
