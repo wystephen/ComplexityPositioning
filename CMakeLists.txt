@@ -159,14 +159,14 @@ add_executable(KFCImuTester BayesStateEstimate/Test/KFComplexityImuOnlyTest.cpp)
 target_link_libraries(KFCImuTester ${PYTHON_LIBRARIES})
 
 add_executable(XsenseIntegrateTest BayesStateEstimate/Test/XsenseIntegrateTest.cpp)
-target_link_libraries(XsenseIntegrateTest ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES})
+target_link_libraries(XsenseIntegrateTest ${PYTHON_LIBRARIES})
 
 add_executable(UwbOptTest BayesStateEstimate/Test/UwbOptimizationTest.cpp)
-target_link_libraries(UwbOptTest ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES})
+target_link_libraries(UwbOptTest ${PYTHON_LIBRARIES} )
 
 
 add_executable(KalmanFilterSimulatorTester BayesStateEstimate/Test/KalmanFilterSimulatorTester.cpp)
-target_link_libraries(KalmanFilterSimulatorTester ${PYTHON_LIBRARIES} ${Sophus_LIBRARIES})
+target_link_libraries(KalmanFilterSimulatorTester ${PYTHON_LIBRARIES} )
 
 add_executable(MonteCarloTester BayesStateEstimate/Test/MonteCarloTester.cpp)
 target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${OpenCL_LIBRARY})
