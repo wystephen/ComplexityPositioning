@@ -122,8 +122,8 @@ int main(int argc, char *argv[]) {
 	Eigen::MatrixXd initial_prob_matrix_ff = Eigen::MatrixXd::Identity(21, 21);
 	initial_prob_matrix_ff.block(0, 0, 15, 15) = initial_prob_matrix_complex * 1.0;
 
-	initial_prob_matrix_ff.block(15, 15, 3, 3) *= 0.00001;
-	initial_prob_matrix_ff.block(18, 18, 3, 3) *= 0.00001 * (M_PI / 180.0);
+	initial_prob_matrix_ff.block(15, 15, 3, 3) *= 0.0001;
+	initial_prob_matrix_ff.block(18, 18, 3, 3) *= 0.0001 * (M_PI / 180.0);
 
 
 	auto f = [&process_noise_matrix,
@@ -230,7 +230,8 @@ int main(int argc, char *argv[]) {
 				filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000000025);
 
 				complex_full_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00000025);
-				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000002);
+
+				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00000025);
 
 
 				/// angle constraint through acc.
