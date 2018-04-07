@@ -34,6 +34,7 @@
 #include <BayesFilter/KalmanFilter/KFComplexFull.h>
 
 #include <iostream>
+#include <BayesFilter/KalmanFilter/KFComplexFF.h>
 
 namespace plt = matplotlibcpp;
 
@@ -118,6 +119,12 @@ int main(int argc, char *argv[]) {
 	initial_prob_matrix_complex.block(9, 9, 3, 3) *= 0.001;
 	initial_prob_matrix_complex.block(12, 12, 3, 3) *= 0.001 * (M_PI / 180.0);
 
+	Eigen::MatrixXd initial_prob_matrix_ff = Eigen::MatrixXd::Identity(21, 21);
+	initial_prob_matrix_ff.block(0, 0, 15, 15) = initial_prob_matrix_complex * 1.0;
+
+	initial_prob_matrix_ff.block(15, 15, 3, 3) *= 0.00001;
+	initial_prob_matrix_ff.block(18, 18, 3, 3) *= 0.00001 * (M_PI / 180.0);
+
 
 	auto f = [&process_noise_matrix,
 			&initial_prob_matrix,
@@ -137,8 +144,11 @@ int main(int argc, char *argv[]) {
 
 		auto complex_full_filter = BSE::KFComplexFull(initial_prob_matrix_complex);
 
+		auto ff_filter = BSE::KFComplexFF(initial_prob_matrix_ff);
+
 		double tmp_time_interval = (imu_data(imu_data.rows() - 1, 0) - imu_data(0, 0))
 		                           / double(imu_data.rows());
+
 		std::cout << "time interval :" << tmp_time_interval << std::endl;
 		if (std::abs(tmp_time_interval - 0.005) < 0.0001) {
 			filter.setTime_interval_(0.005);
@@ -151,10 +161,13 @@ int main(int argc, char *argv[]) {
 			filter_complex.time_interval_ = tmp_time_interval;
 		}
 		complex_full_filter.time_interval_ = filter_complex.time_interval_;
+		ff_filter.time_interval_ = complex_full_filter.time_interval_;
+
 
 		filter.setLocal_g_(-9.3);
 		filter_complex.local_g_ = -9.3;
 		complex_full_filter.local_g_ = filter_complex.local_g_;
+		ff_filter.local_g_ = complex_full_filter.local_g_;
 //    filter.IS_DEBUG = true;
 		std::vector<double> zv_flag = {};
 
@@ -173,6 +186,9 @@ int main(int argc, char *argv[]) {
 		complex_full_filter.initial_state(imu_data.block(10, 1, 100, 9),
 		                                  initial_ori,
 		                                  initial_pos);
+		ff_filter.initial_state(imu_data.block(10, 1, 100, 9),
+		                        initial_ori,
+		                        initial_pos);
 
 
 //    filter.sett
@@ -187,6 +203,9 @@ int main(int argc, char *argv[]) {
 			                                                  process_noise_matrix);
 			auto complex_full_state = complex_full_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
 			                                                            process_noise_matrix);
+
+			auto ff_full_state = ff_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+			                                             process_noise_matrix);
 
 
 //            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
@@ -210,6 +229,7 @@ int main(int argc, char *argv[]) {
 				filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000000025);
 
 				complex_full_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00000025);
+				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000002);
 
 				/// angle constraint through acc.
 				int zv_index = zv_flag.size() - 1;
@@ -254,23 +274,27 @@ int main(int argc, char *argv[]) {
 			Eigen::VectorXd state_simple = filter.getState_();
 			Eigen::VectorXd state = filter_complex.state_x_;
 			Eigen::VectorXd full_state = complex_full_filter.state_x_;
+			Eigen::VectorXd ff_state = ff_filter.state_x_;
 
 			logger_ptr->addPlotEvent(data_name + "velocity", "velocitysimple", state_simple.block(3, 0, 3, 1));
 			logger_ptr->addPlotEvent(data_name + "velocity", "velocitycomplex", state.block(3, 0, 3, 1));
 			logger_ptr->addPlotEvent(data_name + "velocity", "velocityfull", full_state.block(3, 0, 3, 1));
+			logger_ptr->addPlotEvent(data_name + "velocity", "velocityff", ff_state.block(3, 0, 3, 1));
 
 			logger_ptr->addPlotEvent(data_name + "angle", "anglesimple", state_simple.block(6, 0, 3, 1));
 			logger_ptr->addPlotEvent(data_name + "angle", "anglecomplex", state.block(6, 0, 3, 1));
 			logger_ptr->addPlotEvent(data_name + "angle", "anglefull", full_state.block(6, 0, 3, 1));
+			logger_ptr->addPlotEvent(data_name + "angle", "angleff", ff_state.block(6, 0, 3, 1));
 
 
 			logger_ptr->addTrace3dEvent(data_name, "simple", state_simple.block(0, 0, 3, 1));
 			logger_ptr->addTrace3dEvent(data_name, "complex", state.block(0, 0, 3, 1));
 			logger_ptr->addTrace3dEvent(data_name, "full", full_state.block(0, 0, 3, 1));
+			logger_ptr->addTrace3dEvent(data_name, "ff", ff_state.block(0, 0, 3, 1));
 
 			logger_ptr->addTraceEvent(data_name, "simple", state_simple.block(0, 0, 2, 1));
 			logger_ptr->addTraceEvent(data_name, "complex", state.block(0, 0, 2, 1));
-			logger_ptr->addTraceEvent(data_name, "full", full_state.block(0, 0, 2, 1));
+			logger_ptr->addTraceEvent(data_name, "ff", ff_state.block(0, 0, 2, 1));
 
 		}
 

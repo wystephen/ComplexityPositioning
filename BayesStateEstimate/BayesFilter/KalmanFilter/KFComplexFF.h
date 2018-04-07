@@ -67,7 +67,7 @@ namespace BSE {
 		Eigen::Matrix<double, 15, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
 		                                           Eigen::Matrix<double, 6, 6> noise_matrix) {
 
-			auto siuf = FullImuUpdateFunction(rbn_,
+			auto siuf = FFImuUpdateFunction(rbn_,
 			                                  time_interval_,
 			                                  local_g_);
 			siuf.setEpsilon_(1e-1);
