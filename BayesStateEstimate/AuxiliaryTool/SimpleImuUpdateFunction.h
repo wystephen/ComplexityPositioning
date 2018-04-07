@@ -46,7 +46,7 @@ namespace BSE {
 		 * @param time_interval
 		 * @param local_gravity
 		 */
-		FFImuUpdateFunction(Sophus::SO3d so3,
+		FFImuUpdateFunction(Sophus::SO3d &so3,
 		                    double time_interval,
 		                    double local_gravity
 		) :
@@ -54,11 +54,10 @@ namespace BSE {
 				                  time_interval,
 				                  local_gravity) {
 			epsilon_ = 1e-8;
-			rbn = so3;
+			rbn_ = so3;
 
 		}
 
-		Sophus::SO3d rbn = Sophus::SO3d::exp(Eigen::Vector3d(0, 0, 0));
 
 		/**
 		 * Core
@@ -109,7 +108,6 @@ namespace BSE {
 			out_state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) +
 			                              acc * time_interval_;
 			out_state.block(6, 0, 3, 1) = rotation.log();
-//            rbn = rotation;
 			out_state.block(9, 0, 12, 1) = state.block(9, 0, 12, 1);
 
 			return out_state;
@@ -135,11 +133,10 @@ namespace BSE {
 				                  time_interval,
 				                  local_gravity) {
 			epsilon_ = 1e-8;
-			rbn = so3;
+			rbn_ = so3;
 
 		}
 
-		Sophus::SO3d rbn = Sophus::SO3d::exp(Eigen::Vector3d(0, 0, 0));
 
 		/**
 		 * Core
@@ -170,10 +167,11 @@ namespace BSE {
 			out_state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +
 			                              state.block(3, 0, 3, 1) * time_interval_;
 //                                          + 0.5 * acc * time_interval_ * time_interval_;
+
 			out_state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) +
 			                              acc * time_interval_;
 			out_state.block(6, 0, 3, 1) = rotation.log();
-//            rbn = rotation;
+//            rbn_ = rotation;
 			out_state.block(9, 0, 6, 1) = state.block(9, 0, 6, 1);
 
 			return out_state;
@@ -200,11 +198,10 @@ namespace BSE {
 				                  time_interval,
 				                  local_gravity) {
 			epsilon_ = 1e-8;
-			rbn = so3;
+			rbn_ = so3;
 
 		}
 
-		Sophus::SO3d rbn = Sophus::SO3d::exp(Eigen::Vector3d(0, 0, 0));
 
 		/**
 		 * Core
@@ -238,11 +235,12 @@ namespace BSE {
 			out_state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) +
 			                              acc * time_interval_;
 			out_state.block(6, 0, 3, 1) = rotation.log();
-//            rbn = rotation;
+//            rbn_ = rotation;
 
 			return out_state;
 
 		}
+
 
 
 	};
