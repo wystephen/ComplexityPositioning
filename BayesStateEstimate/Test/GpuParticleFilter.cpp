@@ -52,47 +52,46 @@ namespace compute = boost::compute;
 
 
 namespace plt = matplotlibcpp;
+#ifdef _OPENACC
+#include<openacc.h>
+#endif
+
+int main() {
+#ifdef OPENACC
+	printf("Number of device :%d\n",acc_get_num_devices(acc_device_not_host));
+#else
+	printf("OpenACC is not support.\n");
+#endif
+	/// Load Data from files
+	std::cout.precision(30);
+	// parameters
+	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 
 
-int main(){
 
-    /// Load Data from files
-    std::cout.precision(30);
-    // parameters
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+	// load data
+	AWF::FileReader imu_file(dir_name + "LEFT_FOOT.data"),
+//            right_foot_file(dir_name + "RIGHT_FOOT.data"),
+//            head_imu_file(dir_name + "HEAD.data"),
+			uwb_file(dir_name + "uwb_result.csv"),
+			beacon_set_file(dir_name + "beaconSet.csv");
 
+	Eigen::MatrixXd imu_data = imu_file.extractDoulbeMatrix(",");
+//    Eigen::MatrixXd right_imu_data = right_foot_file.extractDoulbeMatrix(",");
+//    Eigen::MatrixXd head_imu_data = head_imu_file.extractDoulbeMatrix(",");
+	Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
+	Eigen::MatrixXd beacon_set_data = beacon_set_file.extractDoulbeMatrix(",");
 
+	assert(beacon_set_data.rows() == (uwb_data.cols() - 1));
 
-    // load data
-    AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
-            right_foot_file(dir_name + "RIGHT_FOOT.data"),
-            head_imu_file(dir_name + "HEAD.data"),
-            uwb_file(dir_name + "uwb_result.csv"),
-            beacon_set_file(dir_name + "beaconSet.csv");
+//	auto imu_tool = BSE::ImuTools();
 
-    Eigen::MatrixXd left_imu_data = left_foot_file.extractDoulbeMatrix(",");
-    Eigen::MatrixXd right_imu_data = right_foot_file.extractDoulbeMatrix(",");
-    Eigen::MatrixXd head_imu_data = head_imu_file.extractDoulbeMatrix(",");
-    Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
-    Eigen::MatrixXd beacon_set_data = beacon_set_file.extractDoulbeMatrix(",");
-
-    assert(beacon_set_data.rows() == (uwb_data.cols() - 1));
-
-    auto imu_tool = BSE::ImuTools();
-    //process
-    imu_tool.processImuData(left_imu_data);
-    imu_tool.processImuData(right_imu_data);
-    imu_tool.processImuData(head_imu_data);
+	BSE::ImuTools::processImuData(imu_data);
 
 
 //    for()
-    
-    auto gpu_pf = BSE::GpuParticleFilter<float,6>(1000,Eigen::Matrix<float,1,6>::Zero());
-    
-    
 
-
-
+	auto gpu_pf = BSE::GpuParticleFilter<float, 6>(1000, Eigen::Matrix<float, 1, 6>::Zero());
 
 
 }

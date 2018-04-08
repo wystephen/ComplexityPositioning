@@ -153,22 +153,22 @@ namespace BSE {
 
 			auto rotation = Sophus::SO3d::exp(state.block(6, 0, 3, 1));
 
-//			Eigen::Vector3d gyr = (input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1)) * time_interval_;
-			Eigen::Vector3d gyr = (input.block(3, 0, 3, 1)) * time_interval_;
+			Eigen::Vector3d gyr = (input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1)) * time_interval_;
+//			Eigen::Vector3d gyr = (input.block(3, 0, 3, 1)) * time_interval_;
 //            std::cout << time_interval_ << std::endl;
 			assert(time_interval_ > 0.0 && time_interval_ < 0.1);
 
-			if (input.block(3, 0, 3, 1).norm() > 1e-15) {
-				rotation = rotation * Sophus::SO3d::exp(gyr);
-//				rotation = Sophus::SO3d::exp(gyr) * rotation;
+			if (input.block(3, 0, 3, 1).norm() > 1e-8) {
+//				rotation = rotation * Sophus::SO3d::exp(gyr);
+				rotation = Sophus::SO3d::exp(gyr) * rotation;
 
 			}
 
-//			Eigen::Vector3d acc = rotation.matrix() * input.block(0, 0, 3, 1) +
-//			                      Eigen::Vector3d(0, 0, local_gravity_) + state.block(9, 0, 3, 1);
-
 			Eigen::Vector3d acc = rotation.matrix() * input.block(0, 0, 3, 1) +
-			                      Eigen::Vector3d(0, 0, local_gravity_);
+			                      Eigen::Vector3d(0, 0, local_gravity_) + state.block(9, 0, 3, 1);
+//			Eigen::Vector3d acc = rotation.matrix() * input.block(0, 0, 3, 1) +
+//			                      Eigen::Vector3d(0, 0, local_gravity_);
+
 //            std::cout << "acc:" << acc.transpose() << std::endl;
 
 			out_state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +

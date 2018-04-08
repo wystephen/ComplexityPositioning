@@ -50,7 +50,6 @@ namespace BSE {
                     context, gpu,compute::command_queue::enable_profiling
             );
 
-//            compute::
 
 
         }

@@ -31,6 +31,7 @@
 #include <iostream>
 
 #include <Eigen/Dense>
+#include <sophus/so3.hpp>
 
 namespace BSE {
     namespace ImuTools {

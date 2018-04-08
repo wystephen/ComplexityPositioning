@@ -100,7 +100,7 @@ namespace BSE {
 			auto siuf = FullImuUpdateFunction(rbn_, time_interval_, local_g_);
 
 			state_stack[0] = siuf.compute(state_x_, input);
-			state_stack[1] = state_stack[0];
+			state_stack[1] = state_stack[0].eval() * 1.0;
 
 			rotation_stack[0] = Sophus::SO3d::exp(state_stack[0].block(6, 0, 3, 1));
 			rotation_stack[1] = Sophus::SO3d::exp(state_stack[1].block(6, 0, 3, 1));
@@ -109,7 +109,7 @@ namespace BSE {
 			double coeff = std::sqrt(sigma_point_size + 1);
 
 #pragma omp parallel for
-			for (int i=(0); i < sigma_point_size; ++i) {
+			for (int i = (0); i < sigma_point_size; ++i) {
 				state_stack[i + 2] = siuf.compute(state_x_ + L.block(0, i, state_x_.rows(), 1) * coeff,
 				                                  input + L.block(state_x_.rows(), i, input.rows(), 1) * coeff);
 				state_stack[i + sigma_point_size + 2] = siuf.compute(
@@ -140,6 +140,10 @@ namespace BSE {
 				auto dx = state - state_x_;
 				prob_state_ += double(1. / (sigma_point_size * 2.0 + 2.0)) * dx * dx.transpose();
 			}
+			prob_state_ = 0.5 * (prob_state_.eval() + prob_state_.transpose().eval());
+
+			auto logger_ptr = AWF::AlgorithmLogger::getInstance();
+			logger_ptr->addPlotEvent("ukf", "probability", prob_state_);
 
 			return state_x_;
 
@@ -198,8 +202,8 @@ namespace BSE {
 			state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
 
 			rbn_ = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
-            rbn_ = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * rbn_;
-//			rbn_ = rbn_ * Sophus::SO3d::exp(dX_.block(6, 0, 3, 1));
+//            rbn_ = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * rbn_;
+			rbn_ = rbn_ * Sophus::SO3d::exp(dX_.block(6, 0, 3, 1));
 			state_x_.block(6, 0, 3, 1) = rbn_.log();
 			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
 
@@ -209,6 +213,7 @@ namespace BSE {
 
 
 		}
+
 		/**
 			 * dax day daz : offset of acc measurements.
 			 * dgx dgy dgz : offset of gyr measurements.
