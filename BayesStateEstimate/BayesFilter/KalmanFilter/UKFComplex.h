@@ -91,7 +91,8 @@ namespace BSE {
 
 			// lower-triangle matrix
 //			auto L = Sigma_matrix.triangularView<Eigen::Lower>();
-			auto L = Sigma_matrix.llt().matrixL();
+
+			Eigen::MatrixXd L(Sigma_matrix.llt().matrixL());
 
 			int sigma_point_size = L.rows();// number of sigma point.
 
