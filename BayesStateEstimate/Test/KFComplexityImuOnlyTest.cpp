@@ -145,8 +145,8 @@ int main(int argc, char *argv[]) {
 //		auto filter_complex = BSE::UKFComplex(initial_prob_matrix);
 //        auto filter_complex = BSE::KFComplexFull(initial_prob_matrix_complex);
 
-		auto complex_full_filter = BSE::KFComplexFull(initial_prob_matrix_complex);
-//		auto complex_full_filter = BSE::UKFComplex(initial_prob_matrix_complex);
+//		auto complex_full_filter = BSE::KFComplexFull(initial_prob_matrix_complex);
+		auto complex_full_filter = BSE::UKFComplex(initial_prob_matrix_complex);
 
 		auto ff_filter = BSE::KFComplexFF(initial_prob_matrix_ff);
 
@@ -231,7 +231,7 @@ int main(int argc, char *argv[]) {
 
 				filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.025);
 
-				complex_full_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00000025);
+				complex_full_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.025);
 
 				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.025);
 
