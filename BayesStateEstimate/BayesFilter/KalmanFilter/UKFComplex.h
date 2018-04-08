@@ -90,11 +90,9 @@ namespace BSE {
 			                   noise_matrix.cols()) = noise_matrix;
 
 			// lower-triangle matrix
-//			auto L = Sigma_matrix.triangularView<Eigen::Lower>();
-
 			Eigen::MatrixXd L(Sigma_matrix.llt().matrixL());
 
-			int sigma_point_size = L.rows();// number of sigma point.
+			int sigma_point_size = L.rows();// number of sigma point. (Dim of L)
 
 			std::vector<Eigen::VectorXd> state_stack(sigma_point_size * 2 + 2);
 			std::vector<Sophus::SO3d> rotation_stack(sigma_point_size * 2 + 2);
@@ -102,7 +100,7 @@ namespace BSE {
 			auto siuf = FullImuUpdateFunction(rbn_, time_interval_, local_g_);
 
 			state_stack[0] = siuf.compute(state_x_, input);
-			state_stack[1] = state_stack[1];
+			state_stack[1] = state_stack[0];
 
 			rotation_stack[0] = Sophus::SO3d::exp(state_stack[0].block(6, 0, 3, 1));
 			rotation_stack[1] = Sophus::SO3d::exp(state_stack[1].block(6, 0, 3, 1));
@@ -110,7 +108,8 @@ namespace BSE {
 
 			double coeff = std::sqrt(sigma_point_size + 1);
 
-			for (int i(0); i < sigma_point_size; ++i) {
+#pragma omp parallel for
+			for (int i=(0); i < sigma_point_size; ++i) {
 				state_stack[i + 2] = siuf.compute(state_x_ + L.block(0, i, state_x_.rows(), 1) * coeff,
 				                                  input + L.block(state_x_.rows(), i, input.rows(), 1) * coeff);
 				state_stack[i + sigma_point_size + 2] = siuf.compute(
@@ -133,7 +132,7 @@ namespace BSE {
 				state_x_ += double(1. / (sigma_point_size * 2.0 + 2.0)) * state;
 			}
 
-
+			// use average of SO(3) rather than normal average.
 			state_x_.block(6, 0, 3, 1) = average_roation->log();
 
 			prob_state_.setZero();
@@ -210,6 +209,45 @@ namespace BSE {
 
 
 		}
+		/**
+			 * dax day daz : offset of acc measurements.
+			 * dgx dgy dgz : offset of gyr measurements.
+			 */
+		Eigen::Matrix<double, 15, 1>
+				state_x_ = Eigen::Matrix<double, 15, 1>::Zero();//x y z vx vy vz wx wy wz dax day daz dgx dgy dgz
+
+
+		Eigen::Matrix<double, 15, 15> prob_state_ = Eigen::Matrix<double, 15, 15>::Identity(); // probability of state
+
+
+		Sophus::SO3d rbn_ = Sophus::SO3d::exp(
+				Eigen::Vector3d(0, 0, 0));// rotation matrix from sensor frame to navigation frame
+
+		/**
+		* X_i=A*X_{i-1}+B*u_i+w_i
+		 * z_i=H*X_i+v_i
+		 * w_i \in Q
+		 * v_i \in R
+		 */
+		Eigen::MatrixXd A_ = Eigen::MatrixXd();
+		Eigen::MatrixXd B_ = Eigen::MatrixXd();
+		Eigen::MatrixXd H_ = Eigen::MatrixXd();
+		Eigen::MatrixXd Q_ = Eigen::MatrixXd();
+		Eigen::MatrixXd R_ = Eigen::MatrixXd();
+		Eigen::MatrixXd K_ = Eigen::MatrixXd();
+		Eigen::MatrixXd dX_ = Eigen::MatrixXd();
+
+
+		double time_interval_ = 0.005;// time interval
+
+		MagMeasurementFunction mag_func = MagMeasurementFunction();
+		MagGravityMeasurementFunction mg_fuc = MagGravityMeasurementFunction();
+
+
+		double local_g_ = -9.81; // local gravity acc.
+
+
+		bool IS_DEBUG = false; // debug flag.
 
 	};
 

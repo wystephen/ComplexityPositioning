@@ -145,8 +145,8 @@ int main(int argc, char *argv[]) {
 //		auto filter_complex = BSE::UKFComplex(initial_prob_matrix);
 //        auto filter_complex = BSE::KFComplexFull(initial_prob_matrix_complex);
 
-//		auto complex_full_filter = BSE::KFComplexFull(initial_prob_matrix_complex);
-		auto complex_full_filter = BSE::UKFComplex(initial_prob_matrix_complex);
+		auto complex_full_filter = BSE::KFComplexFull(initial_prob_matrix_complex);
+//		auto complex_full_filter = BSE::UKFComplex(initial_prob_matrix_complex);
 
 		auto ff_filter = BSE::KFComplexFF(initial_prob_matrix_ff);
 
@@ -226,14 +226,14 @@ int main(int argc, char *argv[]) {
 			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
 				/// zero velocity detector
 				filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-				                        Eigen::Matrix3d::Identity() * 0.00000251001,
+				                        Eigen::Matrix3d::Identity() * 0.0251001,
 				                        BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 
-				filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000000025);
+				filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.025);
 
 				complex_full_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00000025);
 
-				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000025);
+				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.025);
 
 
 				/// angle constraint through acc.
@@ -303,8 +303,8 @@ int main(int argc, char *argv[]) {
 	};
 
 //
-	f(left_imu_data, "left_foot");
-//    f(right_imu_data, "right_foot");
+//	f(left_imu_data, "left_foot");
+    f(right_imu_data, "right_foot");
 //    f(head_imu_data, "head");
 
 	std::cout << "time:" << AWF::getDoubleSecondTime() - start_time << std::endl;
