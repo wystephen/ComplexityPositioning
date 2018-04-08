@@ -222,7 +222,6 @@ int main(int argc, char *argv[]) {
 			bool tmp_break_flag = false;
 
 
-
 			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
 				/// zero velocity detector
 				filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
@@ -304,7 +303,7 @@ int main(int argc, char *argv[]) {
 
 //
 //	f(left_imu_data, "left_foot");
-    f(right_imu_data, "right_foot");
+	f(right_imu_data, "right_foot");
 //    f(head_imu_data, "head");
 
 	std::cout << "time:" << AWF::getDoubleSecondTime() - start_time << std::endl;
