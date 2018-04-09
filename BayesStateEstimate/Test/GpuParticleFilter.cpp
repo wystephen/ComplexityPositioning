@@ -52,16 +52,16 @@ namespace compute = boost::compute;
 
 
 namespace plt = matplotlibcpp;
-#ifdef _OPENACC
-#include<openacc.h>
-#endif
+//#ifdef _OPENACC
+//#include<openacc.h>
+//#endif
 
 int main() {
-#ifdef OPENACC
-	printf("Number of device :%d\n",acc_get_num_devices(acc_device_not_host));
-#else
-	printf("OpenACC is not support.\n");
-#endif
+//#ifdef OPENACC
+//	printf("Number of device :%d\n",acc_get_num_devices(acc_device_not_host));
+//#else
+//	printf("OpenACC is not support.\n");
+//#endif
 	/// Load Data from files
 	std::cout.precision(30);
 	// parameters
