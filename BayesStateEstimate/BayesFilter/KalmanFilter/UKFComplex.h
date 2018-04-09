@@ -215,9 +215,9 @@ namespace BSE {
 		}
 
 		/**
-			 * dax day daz : offset of acc measurements.
-			 * dgx dgy dgz : offset of gyr measurements.
-			 */
+		* dax day daz : offset of acc measurements.
+		* dgx dgy dgz : offset of gyr measurements.
+		*/
 		Eigen::Matrix<double, 15, 1>
 				state_x_ = Eigen::Matrix<double, 15, 1>::Zero();//x y z vx vy vz wx wy wz dax day daz dgx dgy dgz
 
