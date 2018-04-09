@@ -159,8 +159,8 @@ namespace BSE {
 			assert(time_interval_ > 0.0 && time_interval_ < 0.1);
 
 			if (input.block(3, 0, 3, 1).norm() > 1e-8) {
-//				rotation = rotation * Sophus::SO3d::exp(gyr);
-				rotation = Sophus::SO3d::exp(gyr) * rotation;
+				rotation = rotation * Sophus::SO3d::exp(gyr);
+//				rotation = Sophus::SO3d::exp(gyr) * rotation;
 
 			}
 
