@@ -34,45 +34,45 @@
 
 class MagMeasurementFunction : public AWF::FunctionAbstract {
 public:
-    MagMeasurementFunction() : FunctionAbstract(3, 1) {
+	MagMeasurementFunction() : FunctionAbstract(3, 1) {
 //        mag_nav_ = mag_in_navigation_frame / mag_in_navigation_frame.norm();
 //        std::cout << "mag nav:"
 //                  << mag_nav_ << std::endl;
 
-    }
+	}
 
-    Eigen::MatrixXd compute(Eigen::MatrixXd state) {
-        Sophus::SO3d rbn = Sophus::SO3d::exp(state.block(6, 0, 3, 1));
-        return rbn.inverse().matrix() * mag_nav_;
-    }
+	Eigen::MatrixXd compute(Eigen::MatrixXd state) {
+		Sophus::SO3d rbn = Sophus::SO3d::exp(state.block(6, 0, 3, 1));
+		return rbn.inverse().matrix() * mag_nav_;
+	}
 
-    Eigen::MatrixXd operator()(std::vector<Eigen::MatrixXd> in_vec) {
-        return compute(in_vec[0]);
-    }
+	Eigen::MatrixXd operator()(std::vector<Eigen::MatrixXd> in_vec) {
+		return compute(in_vec[0]);
+	}
 
-    std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd in1) {
+	std::vector<Eigen::MatrixXd> derivative(Eigen::MatrixXd in1) {
 
-        return d(compress(in1));
-    }
+		return d(compress(in1));
+	}
 
 //    std::vector<Eigen::MatrixXd> minimize_error()
 
-    std::vector<Eigen::MatrixXd> compress(Eigen::MatrixXd input_state) {
-        std::vector<Eigen::MatrixXd> t = {};
-        t.push_back(input_state);
-        return t;
-    }
+	std::vector<Eigen::MatrixXd> compress(Eigen::MatrixXd input_state) {
+		std::vector<Eigen::MatrixXd> t = {};
+		t.push_back(input_state);
+		return t;
+	}
 
 
-    Eigen::Vector3d mag_nav_ = Eigen::Vector3d(0, 0, 1.0);
+	Eigen::Vector3d mag_nav_ = Eigen::Vector3d(0, 0, 1.0);
 
 //    const Eigen::Vector3d &getMag_nav_() const {
 //        return mag_nav_;
 //    }
 
-    void setMag_nav(const Eigen::Vector3d &mag_nav_) {
-        MagMeasurementFunction::mag_nav_ = mag_nav_ / mag_nav_.norm();
-    }
+	void setMag_nav(const Eigen::Vector3d &mag_nav_) {
+		MagMeasurementFunction::mag_nav_ = mag_nav_ / mag_nav_.norm();
+	}
 
 };
 
