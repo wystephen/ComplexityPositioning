@@ -1,4 +1,5 @@
-/** 
+# Created by steve on 18-4-10 上午9:17
+'''
                    _ooOoo_ 
                   o8888888o 
                   88" . "88 
@@ -19,20 +20,18 @@
                    `=---=' 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
          佛祖保佑       永无BUG 
-*/
-//
-// Created by steve on 18-4-10.
-//
+'''
+from numba import jit
+import math
 
-#ifndef COMPLEXITYPOSITIONING_PFCOMPLEX_H
-#define COMPLEXITYPOSITIONING_PFCOMPLEX_H
+@jit
+def hypot(x, y):
+	# Implementation from https://en.wikipedia.org/wiki/Hypot
+	x = abs(x);
+	y = abs(y);
+	t = min(x, y);
+	x = max(x, y);
+	t = t / x;
+	return x * math.sqrt(1+t*t)
 
-namespace BSE {
-	class PFComplex {
-
-
-	};
-}
-
-
-#endif //COMPLEXITYPOSITIONING_PFCOMPLEX_H
+print(hypot(3.0,4.0))
