@@ -24,7 +24,7 @@
 // Created by steve on 18-2-3.
 //
 
-#include <ldap.h>
+//#include <ldap.h>
 #include "UwbTools.h"
 
 namespace BSE{

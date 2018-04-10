@@ -20,17 +20,6 @@ endif (CCACHE_FOUND)
 # add cmake module
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
-# boost
-find_package(Boost)
-
-# boost compute
-find_package(BoostCompute REQUIRED)
-# OPENCL
-set(OpenCL_LIBRARY /usr/local/cuda-8.0/lib64/libOpenCL.so)
-set(OpenCL_INCLUDE_DIR /usr/local/cuda/include)
-find_package(OpenCL REQUIRED)
-
-
 
 
 #OPENMP
