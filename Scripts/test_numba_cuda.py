@@ -30,7 +30,7 @@ import numpy as np
 from numba import cuda, float32
 
 
-bpg = 50 * 6
+bpg = 50 * 3
 tpb = 32
 n = bpg * tpb
 
