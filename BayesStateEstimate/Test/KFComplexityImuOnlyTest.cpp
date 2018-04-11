@@ -42,6 +42,7 @@ namespace plt = matplotlibcpp;
 
 int main(int argc, char *argv[]) {
 
+	omp_set_num_threads(12);
 
 	double start_time = AWF::getDoubleSecondTime();
 

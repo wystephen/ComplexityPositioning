@@ -135,6 +135,7 @@ namespace BSE {
 			// use average of SO(3) rather than normal average.
 			state_x_.block(6, 0, 3, 1) = average_roation->log();
 
+			double before_p_norm = prob_state_.norm();
 			prob_state_.setZero();
 			for (auto state :state_stack) {
 				auto dx = state - state_x_;
@@ -144,6 +145,27 @@ namespace BSE {
 
 			auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 			logger_ptr->addPlotEvent("ukf", "probability", prob_state_);
+
+			double after_p_norm = prob_state_.norm();
+			if (after_p_norm > 10.0 * before_p_norm || after_p_norm > 4.0) {
+
+
+				std::cout << "average rotation:" << average_roation->unit_quaternion().w()
+				          << "," << average_roation->unit_quaternion().x()
+				          << "," << average_roation->unit_quaternion().y()
+				          << "," << average_roation->unit_quaternion().z() << std::endl;
+				for (auto q :rotation_stack) {
+					std::cout << q.unit_quaternion().w()
+					          << ","
+					          << q.unit_quaternion().x()
+					          << ","
+					          << q.unit_quaternion().y()
+					          << ","
+					          << q.unit_quaternion().z() << std::endl;
+				}
+				std::cout << "p norm is really big:"
+				          << after_p_norm << std::endl;
+			}
 
 			return state_x_;
 
