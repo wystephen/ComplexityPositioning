@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
 	Eigen::MatrixXd head_imu_data = head_imu_file.extractDoulbeMatrix(",");
 
 	Eigen::Vector3d initial_pos = Eigen::Vector3d(0, 0, 0);
+
 	double initial_ori = 0.0;
 
 	std::vector<std::vector<double>> optimize_trace_vec = {{},
