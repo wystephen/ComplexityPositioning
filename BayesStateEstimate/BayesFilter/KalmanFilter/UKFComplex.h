@@ -138,7 +138,15 @@ namespace BSE {
 			double before_p_norm = prob_state_.norm();
 			prob_state_.setZero();
 			for (auto state :state_stack) {
-				auto dx = state - state_x_;
+				Eigen::VectorXd dx = state - state_x_;
+				for(int i(6);i<9;++i){
+					while(dx(i)>2.0*M_PI){
+						dx(i) -= 2.0 * M_PI;
+					}
+					while(dx(i)< -2.0 *M_PI){
+						dx(i) += 2.0 * M_PI;
+					}
+				}
 				prob_state_ += double(1. / (sigma_point_size * 2.0 + 2.0)) * dx * dx.transpose();
 			}
 			prob_state_ = 0.5 * (prob_state_.eval() + prob_state_.transpose().eval());
