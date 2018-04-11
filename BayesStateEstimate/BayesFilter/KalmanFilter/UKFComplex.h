@@ -110,11 +110,39 @@ namespace BSE {
 
 #pragma omp parallel for
 			for (int i = (0); i < sigma_point_size; ++i) {
-				state_stack[i + 2] = siuf.compute(state_x_ + L.block(0, i, state_x_.rows(), 1) * coeff,
+
+				// rotation
+
+				Eigen::VectorXd tmp_state_plus = (state_x_ * 1.0).eval();
+				Eigen::VectorXd tmp_state_minus = (state_x_ * 1.0).eval();
+
+				tmp_state_plus += L.block(0,i,state_x_.rows(),1) * coeff;
+				tmp_state_minus -= L.block(0,i,state_x_.rows(),1) * coeff;
+
+				tmp_state_plus.block(6, 0, 3, 1) = (Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1)) *
+				                                    Sophus::SO3d::exp(L.block(6, i, 3, 1) * coeff)).log();
+				tmp_state_minus.block(6, 0, 3, 1) = (Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1)) *
+				                                     Sophus::SO3d::exp(L.block(6, i, 3, 1) * coeff).inverse()).log();
+
+
+				Eigen::VectorXd tmp_input_plus = (input * 1.0).eval();
+				Eigen::VectorXd tmp_input_minus = (input * 1.0).eval();
+
+
+//				state_stack[i + 2] = siuf.compute(state_x_ + L.block(0, i, state_x_.rows(), 1) * coeff,
+//				                                  input + L.block(state_x_.rows(), i, input.rows(), 1) * coeff);
+//				state_stack[i + sigma_point_size + 2] = siuf.compute(
+//						state_x_ - L.block(0, i, state_x_.rows(), 1) * coeff,
+//						input - L.block(state_x_.rows(), i, input.rows(), 1) * coeff);
+
+
+				state_stack[i + 2] = siuf.compute(tmp_state_plus,
 				                                  input + L.block(state_x_.rows(), i, input.rows(), 1) * coeff);
-				state_stack[i + sigma_point_size + 2] = siuf.compute(
-						state_x_ - L.block(0, i, state_x_.rows(), 1) * coeff,
-						input - L.block(state_x_.rows(), i, input.rows(), 1) * coeff);
+				state_stack[i + sigma_point_size + 2] = siuf.compute(tmp_state_minus,
+				                                                     input -
+				                                                     L.block(state_x_.rows(), i, input.rows(), 1) *
+				                                                     coeff);
+
 
 				rotation_stack[i + 2] = Sophus::SO3d::exp(state_stack[i + 2].block(6, 0, 3, 1));
 				rotation_stack[i + sigma_point_size + 2] = Sophus::SO3d::exp(

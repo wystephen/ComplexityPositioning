@@ -1,0 +1,16 @@
+//
+// Created by steve on 18-4-11.
+//
+
+#ifndef COMPLEXITYPOSITIONING_KFCOMPLEXOPENSHOE_H
+#define COMPLEXITYPOSITIONING_KFCOMPLEXOPENSHOE_H
+
+
+namespace BSE {
+	class KFComplexOpenShoe {
+
+	};
+}
+
+
+#endif //COMPLEXITYPOSITIONING_KFCOMPLEXOPENSHOE_H
