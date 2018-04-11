@@ -116,8 +116,8 @@ namespace BSE {
 				Eigen::VectorXd tmp_state_plus = (state_x_ * 1.0).eval();
 				Eigen::VectorXd tmp_state_minus = (state_x_ * 1.0).eval();
 
-				tmp_state_plus += L.block(0,i,state_x_.rows(),1) * coeff;
-				tmp_state_minus -= L.block(0,i,state_x_.rows(),1) * coeff;
+				tmp_state_plus += L.block(0, i, state_x_.rows(), 1) * coeff;
+				tmp_state_minus -= L.block(0, i, state_x_.rows(), 1) * coeff;
 
 				tmp_state_plus.block(6, 0, 3, 1) = (Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1)) *
 				                                    Sophus::SO3d::exp(L.block(6, i, 3, 1) * coeff)).log();
