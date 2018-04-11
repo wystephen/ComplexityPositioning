@@ -119,10 +119,10 @@ namespace BSE {
 				tmp_state_plus += L.block(0, i, state_x_.rows(), 1) * coeff;
 				tmp_state_minus -= L.block(0, i, state_x_.rows(), 1) * coeff;
 
-				tmp_state_plus.block(6, 0, 3, 1) = (Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1)) *
-				                                    Sophus::SO3d::exp(L.block(6, i, 3, 1) * coeff)).log();
-				tmp_state_minus.block(6, 0, 3, 1) = (Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1)) *
-				                                     Sophus::SO3d::exp(L.block(6, i, 3, 1) * coeff).inverse()).log();
+//				tmp_state_plus.block(6, 0, 3, 1) = (Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1)) *
+//				                                    Sophus::SO3d::exp(L.block(6, i, 3, 1) * coeff)).log();
+//				tmp_state_minus.block(6, 0, 3, 1) = (Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1)) *
+//				                                     Sophus::SO3d::exp(-1.0 * L.block(6, i, 3, 1) * coeff)).log();
 
 
 				Eigen::VectorXd tmp_input_plus = (input * 1.0).eval();
@@ -166,16 +166,20 @@ namespace BSE {
 			double before_p_norm = prob_state_.norm();
 			prob_state_.setZero();
 			// difference between angle.
-			for (auto state :state_stack) {
+			for (int i(0); i < state_stack.size(); ++i) {
+				auto state = state_stack[i];
+
+
 				Eigen::VectorXd dx = state - state_x_;
-				for (int i(6); i < 9; ++i) {
-					while (dx(i) > 2.0 * M_PI) {
-						dx(i) -= 2.0 * M_PI;
-					}
-					while (dx(i) < -2.0 * M_PI) {
-						dx(i) += 2.0 * M_PI;
-					}
-				}
+				dx.block(6, 0, 3, 1) = (rotation_stack[i].inverse() * (*average_roation)).log();
+//				for (int i(6); i < 9; ++i) {
+//					while (dx(i) > 2.0 * M_PI) {
+//						dx(i) -= 2.0 * M_PI;
+//					}
+//					while (dx(i) < -2.0 * M_PI) {
+//						dx(i) += 2.0 * M_PI;
+//					}
+//				}
 				prob_state_ += double(1. / (sigma_point_size * 2.0 + 2.0)) * dx * dx.transpose();
 			}
 			prob_state_ = 0.5 * (prob_state_.eval() + prob_state_.transpose().eval());

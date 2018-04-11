@@ -101,6 +101,12 @@ namespace BSE {
 
 			Eigen::Vector3d acc = rotation.matrix() * (acc_scale * input.block(0, 0, 3, 1)) +
 			                      Eigen::Vector3d(0, 0, local_gravity_) + state.block(9, 0, 3, 1);
+			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
+			logger_ptr_->addPlotEvent("imu_update", "src_acc", input.block(0, 0, 3, 1));
+			logger_ptr_->addPlotEvent("imu_update", "acc", acc);
+			logger_ptr_->addPlotEvent("imu_update", "gyr_src", input.block(3, 0, 3, 1));
+			logger_ptr_->addPlotEvent("imu_update", "gyr", gyr);
+
 
 //            std::cout << "acc:" << acc.transpose() << std::endl;
 

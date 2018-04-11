@@ -103,13 +103,13 @@ int main(int argc, char *argv[]) {
 	initial_prob_matrix_complex.block(0, 0, 3, 3) *= 0.001;
 	initial_prob_matrix_complex.block(3, 3, 3, 3) *= 0.001;
 	initial_prob_matrix_complex.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
-	initial_prob_matrix_complex.block(9, 9, 3, 3) *= 0.0000001;
+	initial_prob_matrix_complex.block(9, 9, 3, 3) *= 0.00000001;
 	initial_prob_matrix_complex.block(12, 12, 3, 3) *= 0.0000001 * (M_PI / 180.0);
 
 	Eigen::MatrixXd initial_prob_matrix_ff = Eigen::MatrixXd::Identity(21, 21);
 	initial_prob_matrix_ff.block(0, 0, 15, 15) = initial_prob_matrix_complex * 1.0;
 
-	initial_prob_matrix_ff.block(15, 15, 3, 3) *= 0.0000001;
+	initial_prob_matrix_ff.block(15, 15, 3, 3) *= 0.00000000001;
 	initial_prob_matrix_ff.block(18, 18, 3, 3) *= 0.000001 * (M_PI / 180.0);
 
 
@@ -218,7 +218,7 @@ int main(int argc, char *argv[]) {
 
 				complex_full_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.000025);
 
-				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.025);
+				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00025);
 
 
 				/// angle constraint through acc.

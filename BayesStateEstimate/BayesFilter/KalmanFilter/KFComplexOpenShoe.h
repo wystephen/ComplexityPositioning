@@ -7,7 +7,7 @@
 
 
 namespace BSE {
-	class KFComplexOpenShoe {
+	class UKFComplexOpenShoe {
 
 	};
 }
