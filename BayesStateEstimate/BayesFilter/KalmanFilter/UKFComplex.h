@@ -137,13 +137,14 @@ namespace BSE {
 
 			double before_p_norm = prob_state_.norm();
 			prob_state_.setZero();
+			// difference between angle.
 			for (auto state :state_stack) {
 				Eigen::VectorXd dx = state - state_x_;
-				for(int i(6);i<9;++i){
-					while(dx(i)>2.0*M_PI){
+				for (int i(6); i < 9; ++i) {
+					while (dx(i) > 2.0 * M_PI) {
 						dx(i) -= 2.0 * M_PI;
 					}
-					while(dx(i)< -2.0 *M_PI){
+					while (dx(i) < -2.0 * M_PI) {
 						dx(i) += 2.0 * M_PI;
 					}
 				}
