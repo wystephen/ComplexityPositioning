@@ -164,5 +164,5 @@ add_executable(GpuPF BayesStateEstimate/Test/GpuParticleFilter.cpp)
 target_link_libraries(GpuPF ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${OpenCL_LIBRARY})
 
 add_executable(test_cu GpuAlgorithm/src/test_cu.cu)
-set_property(TARGET test_cu              PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+#set_property(TARGET test_cu              PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 
