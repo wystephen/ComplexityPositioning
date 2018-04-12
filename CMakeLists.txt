@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(ComplexityPositioning)
+project(ComplexityPositioning  LANGUAGES CXX CUDA )
 
 
 set(CMAKE_CXX_STANDARD 14)
@@ -162,3 +162,7 @@ target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${
 
 add_executable(GpuPF BayesStateEstimate/Test/GpuParticleFilter.cpp)
 target_link_libraries(GpuPF ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${OpenCL_LIBRARY})
+
+add_executable(test_cu GpuAlgorithm/src/test_cu.cu)
+set_property(TARGET test_cu              PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+
