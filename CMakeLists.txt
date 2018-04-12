@@ -167,7 +167,8 @@ target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${
 add_executable(GpuPF BayesStateEstimate/Test/GpuParticleFilter.cpp)
 target_link_libraries(GpuPF ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${OpenCL_LIBRARY})
 
-CUDA_ADD_EXECUTABLE(test_cu GpuAlgorithm/src/test_cu.cu)
-set_property(TARGET test_cu PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+#CUDA_ADD_EXECUTABLE(test_cu GpuAlgorithm/src/test_cu.cu)
+add_executable(test_cu GpuAlgorithm/src/test_cu.cu)
+#set_property(TARGET test_cu PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 
 #CUDA_ADD_EXECUTABLE(CUDA_Test ${CPP_LIST} ${CU_LIST})

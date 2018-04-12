@@ -18,7 +18,7 @@ int main() {
 	int blocks = 1024;
 	int thread_pre_blocks = 30;
 	float *array_host = new float[blocks * thread_pre_blocks];
-	float *array_device;
+	float *array_device=0;
 	std::cout << "before" << std::endl;
 	cudaMalloc((void**)&array_device, blocks * thread_pre_blocks);
 
@@ -30,6 +30,7 @@ int main() {
 	for (int i(0); i < blocks * thread_pre_blocks; ++i) {
 		std::cout << array_host[i] << std::endl;
 	}
+	std::cout << "end" << std::endl;
 	cudaFree(array_device);
 
 }
