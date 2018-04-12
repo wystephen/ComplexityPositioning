@@ -171,15 +171,8 @@ namespace BSE {
 
 
 				Eigen::VectorXd dx = state - state_x_;
-				dx.block(6, 0, 3, 1) = (rotation_stack[i].inverse() * (*average_roation)).log();
-//				for (int i(6); i < 9; ++i) {
-//					while (dx(i) > 2.0 * M_PI) {
-//						dx(i) -= 2.0 * M_PI;
-//					}
-//					while (dx(i) < -2.0 * M_PI) {
-//						dx(i) += 2.0 * M_PI;
-//					}
-//				}
+				dx.block(6, 0, 3, 1) = (rotation_stack[i].inverse() * (*average_roation)).inverse().log();
+
 				prob_state_ += double(1. / (sigma_point_size * 2.0 + 2.0)) * dx * dx.transpose();
 			}
 			prob_state_ = 0.5 * (prob_state_.eval() + prob_state_.transpose().eval());
@@ -265,8 +258,8 @@ namespace BSE {
 			state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
 
 			rbn_ = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
-//            rbn_ = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * rbn_;
-			rbn_ = rbn_ * Sophus::SO3d::exp(dX_.block(6, 0, 3, 1));
+            rbn_ = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * rbn_;
+//			rbn_ = rbn_ * Sophus::SO3d::exp(dX_.block(6, 0, 3, 1));
 			state_x_.block(6, 0, 3, 1) = rbn_.log();
 			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
 
