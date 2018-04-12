@@ -1,5 +1,5 @@
 #ifdef __JETBRAINS_IDE__
-    #include "math.h"
+//    #include "math.h"
     #define __CUDACC__ 1
     #define __host__
     #define __device__

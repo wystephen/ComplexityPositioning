@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(ComplexityPositioning  LANGUAGES CXX CUDA )
+project(ComplexityPositioning LANGUAGES CXX CUDA)
 
 
 set(CMAKE_CXX_STANDARD 14)
@@ -20,7 +20,11 @@ endif (CCACHE_FOUND)
 # add cmake module
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
-
+# packages
+find_package(CUDA REQUIRED)
+find_package(Thrust REQUIRED)
+# nvcc flags
+set(CUDA_NVCC_FLAGS -gencode arch=compute_30,code=sm_30;-G;-g)
 
 #OPENMP
 find_package(OpenMP)
@@ -163,6 +167,7 @@ target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${
 add_executable(GpuPF BayesStateEstimate/Test/GpuParticleFilter.cpp)
 target_link_libraries(GpuPF ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${OpenCL_LIBRARY})
 
-add_executable(test_cu GpuAlgorithm/src/test_cu.cu)
-#set_property(TARGET test_cu              PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+CUDA_ADD_EXECUTABLE(test_cu GpuAlgorithm/src/test_cu.cu)
+set_property(TARGET test_cu PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 
+#CUDA_ADD_EXECUTABLE(CUDA_Test ${CPP_LIST} ${CU_LIST})
