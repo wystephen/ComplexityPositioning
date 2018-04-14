@@ -203,6 +203,13 @@ namespace BSE {
 		}
 
 
+		template<typename T>
+		Eigen::Matrix<T, 3, 3> quaternion2r_mat(Eigen::Quaternion<T> q) {
+
+
+		};
+
+
 	};
 
 };
