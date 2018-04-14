@@ -301,7 +301,8 @@ namespace BSE {
 		 * @param q quternion
 		 * @return  rotation matrix
 		 */
-		Eigen::Matrix3d q2dcm(Eigen::Vector4d q) {
+		 template <typename T>
+		Eigen::Matrix<T,3,3> q2dcm(Eigen::Quaternion<T> q) {
 //        MYCHECK(1);
 
 			Eigen::VectorXd p;
@@ -322,7 +323,8 @@ namespace BSE {
 				p(5) = 0.0;
 			}
 
-			Eigen::Matrix3d R(Eigen::Matrix3d::Identity());
+
+			Eigen::Matrix R(Eigen::Matrix3d::Identity());
 //        R.setZero();
 
 			R(0, 0) = 1 - p(5) * p(4);
