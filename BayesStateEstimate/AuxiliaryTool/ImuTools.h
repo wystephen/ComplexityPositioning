@@ -301,15 +301,18 @@ namespace BSE {
 		 * @param q quternion
 		 * @return  rotation matrix
 		 */
-		 template <typename T>
-		Eigen::Matrix<T,3,3> q2dcm(Eigen::Quaternion<T> q) {
-//        MYCHECK(1);
+		template<typename T>
+		Eigen::Matrix<T, 3, 3> q2dcm(Eigen::Quaternion<T> qua) {
+			Eigen::Matrix<T,4,1> q;
+			q(0) = qua.w();
+			q(1) = qua.x();
+			q(2) = qua.y();
+			q(3) = qua.z();
 
-			Eigen::VectorXd p;
-			p.resize(6);
+
+			Eigen::Matrix<T,6,1> p;
 			p.setZero();
 
-//        p.block(0, 0, 4, 1) = q.array().pow(2.0);
 			for (int i(0); i < 4; ++i) {
 				p(i) = q(i) * q(i);
 			}
@@ -324,7 +327,7 @@ namespace BSE {
 			}
 
 
-			Eigen::Matrix R(Eigen::Matrix3d::Identity());
+			Eigen::Matrix<T, 3, 3> R(Eigen::Matrix3d::Identity());
 //        R.setZero();
 
 			R(0, 0) = 1 - p(5) * p(4);
