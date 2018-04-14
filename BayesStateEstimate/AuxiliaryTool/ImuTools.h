@@ -203,11 +203,154 @@ namespace BSE {
 		}
 
 
+		/**
+		 * eular angle
+		 * @param ang
+		 * @return rotation matrix.
+		 */
 		template<typename T>
-		Eigen::Matrix<T, 3, 3> quaternion2r_mat(Eigen::Quaternion<T> q) {
+		Eigen::Matrix<T, 3, 3> Rt2b(Eigen::Matrix<T, 3, 1> ang) {
+			T cr(cos(ang[0])), sr(sin(ang[0]));
+			T cp(cos(ang[1])), sp(sin(ang[1]));
+			T cy(cos(ang[2])), sy(sin(ang[2]));
+
+			Eigen::Matrix<T, 3, 3> R;
+
+			R(0, 0) = cy * cp;
+			R(0, 1) = sy * cp;
+			R(0, 2) = -sp;
+
+			R(1, 0) = -sy * cr + cy * sp * sr;
+			R(1, 1) = cy * cr + sy * sp * sr;
+			R(1, 2) = cp * sr;
+
+			R(2, 0) = sy * sr + cy * sp * cr;
+			R(2, 1) = -cy * sr + sy * sp * cr;
+			R(2, 2) = cp * cr;
+
+			return R;
+		}
 
 
-		};
+		/**
+		 *  Rotation matrix to quanternions
+		 * @param R rotation matrix
+		 * @return quanternions
+		 */
+		template<typename Type>
+		Eigen::Quaternion<Type> dcm2q(Eigen::Matrix<Type, 3, 3> R) {
+			Type T(1.0 + R(0, 0) + R(1, 1) + R(2, 2));
+
+			Type qw(0.0), qx(0.0), qy(0.0), qz(0.0);
+			Type S(0.0);
+
+
+			try {
+				// 1e-3  ==>>>  fabs(T) != 0
+				if (fabs(T) > 1e-8) {
+					S = 0.5 / sqrt(fabs(T));
+
+					qw = 0.25 / S;
+					qx = (R(2, 1) - R(1, 2)) * S;
+					qy = (R(0, 2) - R(2, 0)) * S;
+					qz = (R(1, 0) - R(0, 1)) * S;
+
+				} else {
+					if (R(0, 0) > R(1, 1) && R(0, 0) > R(2, 2)) {
+						S = sqrt(1 + R(0, 0) - R(1, 1) - R(2, 2)) * 2.0;
+
+						qw = (R(2, 1) - R(1, 2)) / S;
+						qx = 0.25 * S;
+						qy = (R(0, 1) + R(1, 0)) / S;
+						qz = (R(0, 2) + R(2, 0)) / S;
+					} else if (R(1, 1) > R(2, 2)) {
+						S = sqrt(1 + R(1, 1) - R(0, 0) - R(2, 2)) * 2.0;
+
+						qw = (R(0, 2) - R(2, 0)) / S;
+						qx = (R(0, 1) + R(1, 0)) / S;
+						qy = 0.25 * S;
+						qz = (R(1, 2) + R(2, 1)) / S;
+					} else {
+
+						S = sqrt(1 + R(2, 2) - R(0, 0) - R(1, 1)) * 2.0;
+
+						qw = (R(1, 0) - R(0, 1)) / S;
+						qx = (R(0, 2) + R(2, 0)) / S;
+						qy = (R(1, 2) + R(2, 1)) / S;
+						qz = 0.25 * S;
+
+					}
+
+				}
+
+
+				Eigen::Quaternion<Type> q(qw, qx, qy, qz);
+//				q.normalize();
+
+				return q.normalize();
+
+			} catch (...) {
+				std::cout << "THERE ARE SOME ERROR!" << std::endl;
+				return Eigen::Vector4d(0, 0, 0, 1.0);
+			}
+		}
+
+
+		/**
+		 * Quternon to rotation matrix
+		 * @param q quternion
+		 * @return  rotation matrix
+		 */
+		Eigen::Matrix3d q2dcm(Eigen::Vector4d q) {
+//        MYCHECK(1);
+
+			Eigen::VectorXd p;
+			p.resize(6);
+			p.setZero();
+
+//        p.block(0, 0, 4, 1) = q.array().pow(2.0);
+			for (int i(0); i < 4; ++i) {
+				p(i) = q(i) * q(i);
+			}
+
+			p(4) = p(1) + p(2);
+
+			if (fabs(p(0) + p(3) + p(4)) > 1e-10) {
+				p(5) = 2.0 / (p(0) + p(3) + p(4));
+
+			} else {
+				p(5) = 0.0;
+			}
+
+			Eigen::Matrix3d R(Eigen::Matrix3d::Identity());
+//        R.setZero();
+
+			R(0, 0) = 1 - p(5) * p(4);
+			R(1, 1) = 1 - p(5) * (p(0) + p(2));
+			R(2, 2) = 1 - p(5) * (p(0) + p(1));
+
+			p(0) = p(5) * q(0);
+			p(1) = p(5) * q(1);
+			p(4) = p(5) * q(2) * q(3);
+			p(5) = p(0) * q(1);
+
+			R(0, 1) = p(5) - p(4);
+			R(1, 0) = p(5) + p(4);
+
+			p(4) = p(1) * q(3);
+			p(5) = p(0) * q(2);
+
+			R(0, 2) = p(5) + p(4);
+			R(2, 0) = p(5) - p(4);
+
+			p(4) = p(0) * q(3);
+			p(5) = p(1) * q(2);
+
+			R(1, 2) = p(5) - p(4);
+			R(2, 1) = p(5) + p(4);
+
+			return R;
+		}
 
 
 	};
