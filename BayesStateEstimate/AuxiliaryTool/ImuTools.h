@@ -159,22 +159,47 @@ namespace BSE {
 		}
 
 
+		/**
+		 * quaternion update function adopted in
+		 * @tparam T
+		 * @param q_in
+		 * @param angle_velocity
+		 * @param time_interval
+		 * @return
+		 */
 		template<typename T>
 		Eigen::Quaternion<T> quaternion_update(Eigen::Quaternion<T> q_in,
 		                                       Eigen::Matrix<T, 3, 1> angle_velocity,
 		                                       double time_interval) {
-			Eigen::Matrix<double, 4, 1> tmp_q;
+			Eigen::Matrix<T, 4, 1> tmp_q;
 			tmp_q(0) = q_in.w();
 			tmp_q(1) = q_in.x();
 			tmp_q(2) = q_in.y();
 			tmp_q(3) = q_in.z();
 
-			Eigen::Matrix<double, 3, 1> tmp_w = angle_velocity * time_interval;
+			Eigen::Matrix<T, 3, 1> tmp_w = angle_velocity * time_interval;
+			T w_norm = tmp_w.norm();
 
 			Eigen::Matrix<T, 4, 4> Theta;
 			Theta.setZero();
 
+			T c = 0.0;
+			T s = 0.0;
+			c = 1 - w_norm * w_norm / 8.0 + pow(w_norm, 4.0) / 384.0;
+			s = 0.5 - w_norm * w_norm / 48.0;
 
+			if (w_norm > 1e-10) {
+				Theta << c, -tmp_w(0) * s, -tmp_w(1) * s, -tmp_w(2) * s,
+						tmp_w(0) * s, c, tmp_w(2) * s, -tmp_w(1),
+						tmp_w(1) * s, -tmp_w(2) * s, c, tmp_w(0) * s,
+						tmp_w(2) * s, tmp_w(1) * s, -tmp_w(0) * s, c;
+
+				tmp_q = Theta * tmp_q;
+				tmp_q = tmp_q / tmp_q.norm();
+			}
+			Eigen::Quaternion<double> q_out(tmp_q(0), tmp_q(1), tmp_q(2), tmp_q(3));
+
+			return q_out;
 		}
 
 
