@@ -24,6 +24,18 @@ namespace BSE {
 
 
 		/**
+		 * state transaction function
+		 * @param input
+		 * @param noise_matrix
+		 * @return
+		 */
+		Eigen::Matrix<double, 15, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
+		                                           Eigen::Matrix<double, 6, 6> noise_matrix) {
+
+		};
+
+
+		/**
 		 * initial own pose.
 		 * @param imu_data
 		 * @param initial_ori
