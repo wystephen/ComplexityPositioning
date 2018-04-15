@@ -5,6 +5,10 @@
 #ifndef COMPLEXITYPOSITIONING_UKFCOMPLEXH_H
 #define COMPLEXITYPOSITIONING_UKFCOMPLEXH_H
 
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
+
+
 namespace BSE {
 	class UKFComplexCraft {
 
