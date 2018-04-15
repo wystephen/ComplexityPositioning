@@ -303,14 +303,14 @@ namespace BSE {
 		 */
 		template<typename T>
 		Eigen::Matrix<T, 3, 3> q2dcm(Eigen::Quaternion<T> qua) {
-			Eigen::Matrix<T,4,1> q;
+			Eigen::Matrix<T, 4, 1> q;
 			q(0) = qua.w();
 			q(1) = qua.x();
 			q(2) = qua.y();
 			q(3) = qua.z();
 
 
-			Eigen::Matrix<T,6,1> p;
+			Eigen::Matrix<T, 6, 1> p;
 			p.setZero();
 
 			for (int i(0); i < 4; ++i) {
