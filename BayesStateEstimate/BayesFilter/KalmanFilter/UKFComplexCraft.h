@@ -5,10 +5,11 @@
 #ifndef COMPLEXITYPOSITIONING_UKFCOMPLEXH_H
 #define COMPLEXITYPOSITIONING_UKFCOMPLEXH_H
 
+namespace BSE {
+	class UKFComplexCraft {
 
-class UKFComplexh {
-
-};
+	};
+}
 
 
 #endif //COMPLEXITYPOSITIONING_UKFCOMPLEXH_H
