@@ -11,6 +11,8 @@
 
 namespace BSE {
 	class UKFComplexCraft {
+	public:
+
 
 	};
 }
