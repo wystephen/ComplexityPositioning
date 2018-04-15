@@ -32,8 +32,19 @@ namespace BSE {
 		Eigen::Matrix<double, 15, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
 		                                           Eigen::Matrix<double, 6, 6> noise_matrix) {
 
+			Eigen::MatrixXd Sigma_matrix(prob_state_.rows() + noise_matrix.rows(),
+			                             prob_state_.cols() + noise_matrix.cols());
+			Sigma_matrix.setZero();
+			Sigma_matrix.block(0, 0, prob_state_.rows(), prob_state_.cols()) = prob_state_;
+			Sigma_matrix.block(prob_state_.rows(), prob_state_.cols(),
+			                   noise_matrix.rows(), noise_matrix.cols()) = noise_matrix;
 
+			Eigen::MatrixXd L = (Sigma_matrix.llt().matrixL());
 
+			int sigma_point_size = L.rows();
+
+			std::vector<Eigen::VectorXd> state_stack(sigma_point_size * 2 + 2);
+			std::vector<Eigen::Quaterniond> rotation_stack(sigma_point_size * 2 + 2);
 
 
 		};
