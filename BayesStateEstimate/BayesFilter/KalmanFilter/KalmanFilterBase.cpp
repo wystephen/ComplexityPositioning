@@ -18,7 +18,7 @@ namespace BSE {
             if (StateTransactionEquationMap.count(methodType) > 0) {
                 auto f = StateTransactionEquationMap.at(methodType);
                 f(state_, state_probability_, input, cov_input);
-//                state_probability_ = A_ * state_probability_ * A_.transpose() + Q_;
+//                prob_state_ = A_ * prob_state_ * A_.transpose() + Q_;
                 return true;
             } else {
                 std::cout << "method type [" << methodType
