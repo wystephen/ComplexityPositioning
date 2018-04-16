@@ -166,7 +166,7 @@ namespace BSE {
 			logger_ptr->addPlotEvent("ukf", "probability", prob_state_);
 
 			double after_p_norm = prob_state_.norm();
-			if (after_p_norm > 10.0 * before_p_norm && after_p_norm > 4.0) {
+			if (after_p_norm > 10.0 * before_p_norm && after_p_norm > 4.0e100) {
 
 
 				std::cout << "average rotation:" << average_q.w()
