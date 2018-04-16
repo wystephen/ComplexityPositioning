@@ -186,13 +186,13 @@ int main(int argc, char *argv[]) {
 //    filter.sett
 		for (int i(5); i < imu_data.rows() - 5; ++i) {
 			/// state transaction equation
-			filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
-			                        process_noise_matrix,
-			                        BSE::StateTransactionMethodType::NormalRotation);
+//			filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
+//			                        process_noise_matrix,
+//			                        BSE::StateTransactionMethodType::NormalRotation);
 
 
-			auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
-			                                                  process_noise_matrix);
+//			auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+//			                                                  process_noise_matrix);
 			auto complex_full_state = complex_full_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
 			                                                            process_noise_matrix);
 
@@ -212,11 +212,11 @@ int main(int argc, char *argv[]) {
 
 			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
 				/// zero velocity detector
-				filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-				                        Eigen::Matrix3d::Identity() * 0.0251001,
-				                        BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
+//				filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
+//				                        Eigen::Matrix3d::Identity() * 0.0251001,
+//				                        BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
 
-				filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.025);
+//				filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.025);
 
 				complex_full_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00000025);
 

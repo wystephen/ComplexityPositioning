@@ -72,12 +72,17 @@ namespace BSE {
 
 //			state_stack[0] = upd
 
-			auto tmp_state = state_x_ * 1.0;
-			auto tmp_q = rotation_q_ * 1.0;
+			auto tmp_state = state_x_;
+			auto tmp_q = rotation_q_.normalized();
 			auto tmp_input = input * 1.0;
 
 			update_function(tmp_state, tmp_q, tmp_input, time_interval_, local_g_);
 
+			state_stack[0] = tmp_state;
+			state_stack[1] = tmp_state;
+
+			rotation_stack[0] = tmp_q;
+			rotation_stack[1] = tmp_q;
 
 			double coeff = std::sqrt(sigma_point_size + 1);
 
