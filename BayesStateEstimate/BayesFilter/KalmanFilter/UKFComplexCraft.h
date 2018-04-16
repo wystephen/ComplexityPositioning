@@ -47,17 +47,75 @@ namespace BSE {
 			std::vector<Eigen::Quaterniond> rotation_stack(sigma_point_size * 2 + 2);
 
 
+			/**
+			 * Update function for system state ( 15 -state model).
+			 */
 			auto update_function = [](Eigen::Matrix<double, 15, 1> &state,
 			                          Eigen::Quaterniond &q,
-			                          Eigen::Matrix<double,6,1> input,
+			                          Eigen::Matrix<double, 6, 1> input,
 			                          const double &time_interval_,
 			                          const double &local_g_) -> bool {
-				q = ImuTools::quaternion_update<double>(q,input.block(3,0,3,1),time_interval_);
+				q = ImuTools::quaternion_update<double>(q, input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1),
+				                                        time_interval_);
 
+				Eigen::Vector3d acc = q * input.block(0, 0, 3, 1) +
+				                      Eigen::Vector3d(0, 0, local_g_) + state.block(9, 0, 3, 1);
 
+				state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +
+				                          state.block(3, 0, 3, 1) * time_interval_;
+				state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) + acc * time_interval_;
 
+				state.block(6, 0, 3, 1) = q.toRotationMatrix().eulerAngles(0, 1, 2);
 
+				return true;
 			};
+
+//			state_stack[0] = upd
+
+			auto tmp_state = state_x_ * 1.0;
+			auto tmp_q = rotation_q_ * 1.0;
+			auto tmp_input = input * 1.0;
+
+			update_function(tmp_state, tmp_q, tmp_input, time_interval_, local_g_);
+
+
+			double coeff = std::sqrt(sigma_point_size + 1);
+
+#pragma omp parallel fro num_threads(12)
+			for (int i(0); i < sigma_point_size; ++i) {
+
+				Eigen::VectorXd tmp_state_plus = (state_x_ * 1.0).eval();
+				Eigen::VectorXd tmp_state_minus = (state_x_ * 1.0).eval();
+
+				auto tmp_q_plus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1), coeff);
+				auto tmp_q_minus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1), -1.0 * coeff);
+
+				tmp_state_plus += L.block(0, i, state_x_.rows(), 1) * coeff;
+				tmp_state_minus -= L.block(0, i, state_x_.rows(), 1) * coeff;
+
+
+				Eigen::VectorXd tmp_input_plus = (input * 1.0).eval();
+				Eigen::VectorXd tmp_input_minus = (input * 1.0).eval();
+
+				update_function(tmp_state_plus, tmp_q_plus, tmp_input_plus, time_interval_, local_g_);
+				update_function(tmp_state_minus, tmp_q_minus, tmp_input_minus, time_interval_, local_g_);
+
+				state_stack[i + 2] = tmp_state_plus;
+				state_stack[i + sigma_point_size + 2] = tmp_state_minus;
+
+				rotation_stack[i + 2] = tmp_q_plus;
+				rotation_stack[i + sigma_point_size + 2] = tmp_q_minus;
+			}
+
+
+			// compute average rotation.
+
+
+			// compute average state
+
+
+
+			// compute probability.
 
 
 		};
