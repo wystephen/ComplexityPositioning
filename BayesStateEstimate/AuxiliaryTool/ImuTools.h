@@ -291,7 +291,7 @@ namespace BSE {
 
 			} catch (...) {
 				std::cout << "THERE ARE SOME ERROR!" << std::endl;
-				return Eigen::Vector4d(0, 0, 0, 1.0);
+				return Eigen::Quaternion<Type>(1.0,0.0,0.0,0.0);
 			}
 		}
 

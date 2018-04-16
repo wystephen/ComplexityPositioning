@@ -115,11 +115,11 @@ namespace BSE {
 			}
 
 
-			double weight = 1.0 / (sigma_point_size*2.0+2.0);
+			double weight = 1.0 / (sigma_point_size * 2.0 + 2.0);
 			// compute average rotation.
-			Eigen::Quaterniond average_q(0,0,0,0);
+			Eigen::Quaterniond average_q(0, 0, 0, 0);
 
-			for(auto tq :rotation_stack){
+			for (auto tq :rotation_stack) {
 				average_q.w() += weight * tq.w();
 				average_q.x() += weight * tq.x();
 				average_q.y() += weight * tq.y();
@@ -134,10 +134,10 @@ namespace BSE {
 
 			// compute average state
 			state_x_.setZero();
-			for(auto state: state_stack){
+			for (auto state: state_stack) {
 				state_x_ += weight * state;
 			}
-			state_x_.block(6,0,3,1) = average_q.toRotationMatrix().eulerAngles(0,1,2);
+			state_x_.block(6, 0, 3, 1) = average_q.toRotationMatrix().eulerAngles(0, 1, 2);
 
 
 
@@ -145,11 +145,12 @@ namespace BSE {
 
 			double before_p_norm = prob_state_.norm();
 			prob_state_.setZero();
-			for(int i(0);i<state_stack.size();++i){
+			for (int i(0); i < state_stack.size(); ++i) {
 				auto state = state_stack[i];
 
-				auto dx = state-state_x_;
-				dx.block(6,0,3,1) = (average_q.inverse() * rotation_stack[i]).toRotationMatrix().eulerAngles(0,1,2);
+				auto dx = state - state_x_;
+				Eigen::Vector3d t3d = (average_q.inverse() * rotation_stack[i]).toRotationMatrix().eulerAngles(0, 1, 2);
+				dx.block(6, 0, 3, 1) = t3d;
 				prob_state_ += weight * dx * dx.transpose();
 
 			}
@@ -192,7 +193,7 @@ namespace BSE {
 		void MeasurementStateZV(Eigen::Matrix3d cov_matrix) {
 			H_ = Eigen::MatrixXd::Zero(3, state_x_.rows());
 			H_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * 1.0;
-			bool IS_DEBUG=false;
+			bool IS_DEBUG = false;
 			if (IS_DEBUG) {
 				std::cout << H_ << std::endl;
 				std::cout << " p * H^T :" << prob_state_ * H_.transpose().eval() << std::endl;
@@ -239,15 +240,15 @@ namespace BSE {
 
 			Eigen::Matrix3d rbn = ImuTools::q2dcm(rotation_q_);
 			Eigen::Matrix3d r_update = Eigen::Matrix3d::Identity();
-			Eigen::Vector3d epsilon(dX_(6),dX_(7),dX_(8));
+			Eigen::Vector3d epsilon(dX_(6), dX_(7), dX_(8));
 
-			r_update << 1.0,epsilon(2),-epsilon(1),
-					-epsilon(2),1.0,epsilon(0),
-					epsilon(1),-epsilon(0),1.0;
+			r_update << 1.0, epsilon(2), -epsilon(1),
+					-epsilon(2), 1.0, epsilon(0),
+					epsilon(1), -epsilon(0), 1.0;
 
-			rotation_q_ = ImuTools::dcm2q<double>(r_update*rbn);
+			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
 			rotation_q_.normalize();
-			state_x_.block(6,0,3,1) = rotation_q_.toRotationMatrix().eulerAngles(0,1,2);
+			state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
 
 			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
 
