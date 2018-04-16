@@ -285,9 +285,9 @@ namespace BSE {
 
 
 				Eigen::Quaternion<Type> q(qw, qx, qy, qz);
-//				q.normalize();
+				q.normalize()/**/;
 
-				return q.normalize();
+				return q;
 
 			} catch (...) {
 				std::cout << "THERE ARE SOME ERROR!" << std::endl;

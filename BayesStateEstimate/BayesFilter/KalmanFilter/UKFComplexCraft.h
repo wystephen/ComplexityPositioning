@@ -192,6 +192,7 @@ namespace BSE {
 		void MeasurementStateZV(Eigen::Matrix3d cov_matrix) {
 			H_ = Eigen::MatrixXd::Zero(3, state_x_.rows());
 			H_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * 1.0;
+			bool IS_DEBUG=false;
 			if (IS_DEBUG) {
 				std::cout << H_ << std::endl;
 				std::cout << " p * H^T :" << prob_state_ * H_.transpose().eval() << std::endl;
@@ -244,7 +245,7 @@ namespace BSE {
 					-epsilon(2),1.0,epsilon(0),
 					epsilon(1),-epsilon(0),1.0;
 
-			rotation_q_ = ImuTools::dcm2q(r_update*rbn);
+			rotation_q_ = ImuTools::dcm2q<double>(r_update*rbn);
 			rotation_q_.normalize();
 			state_x_.block(6,0,3,1) = rotation_q_.toRotationMatrix().eulerAngles(0,1,2);
 
