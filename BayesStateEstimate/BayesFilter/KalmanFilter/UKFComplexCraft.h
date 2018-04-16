@@ -151,13 +151,10 @@ namespace BSE {
 
 				Eigen::Matrix<double,15,1> dx = state - state_x_;
 				Eigen::Quaterniond d_q = average_q.inverse() * the_q;
-//				Eigen::Matrix<double,3,1> t3d = (average_q.inverse() * rotation_stack[i]).;
 				Eigen::Matrix<double,3,1> t3d = d_q.toRotationMatrix().eulerAngles(0,1,2);
 
 				dx.block(6, 0, 3, 1) = t3d;
-//				for(int kk(0);kk<3;++kk){
-//					dx(kk+6) = t3d(kk,0)*1.0;
-//				}
+
 				prob_state_ += weight * dx * dx.transpose();
 
 			}
