@@ -47,6 +47,12 @@ namespace BSE {
 			std::vector<Eigen::Quaterniond> rotation_stack(sigma_point_size * 2 + 2);
 
 
+			auto update_function = [](Eigen::Matrix<double,15,1> &state,Eigen::Quaterniond &q,
+			double time_interval_, double local_g_)->bool{
+
+			};
+
+
 		};
 
 
