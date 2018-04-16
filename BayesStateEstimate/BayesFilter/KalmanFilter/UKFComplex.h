@@ -99,6 +99,7 @@ namespace BSE {
 
 			auto siuf = FullImuUpdateFunction(rbn_, time_interval_, local_g_);
 
+
 			state_stack[0] = siuf.compute(state_x_, input);
 			state_stack[1] = state_stack[0].eval() * 1.0;
 
@@ -108,7 +109,7 @@ namespace BSE {
 
 			double coeff = std::sqrt(sigma_point_size + 1);
 
-#pragma omp parallel for
+#pragma omp parallel for num_threads(12)
 			for (int i = (0); i < sigma_point_size; ++i) {
 
 				// rotation

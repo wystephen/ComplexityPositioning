@@ -47,8 +47,15 @@ namespace BSE {
 			std::vector<Eigen::Quaterniond> rotation_stack(sigma_point_size * 2 + 2);
 
 
-			auto update_function = [](Eigen::Matrix<double,15,1> &state,Eigen::Quaterniond &q,
-			double time_interval_, double local_g_)->bool{
+			auto update_function = [](Eigen::Matrix<double, 15, 1> &state,
+			                          Eigen::Quaterniond &q,
+			                          Eigen::Matrix<double,6,1> input,
+			                          const double &time_interval_,
+			                          const double &local_g_) -> bool {
+				q = ImuTools::quaternion_update<double>(q,input.block(3,0,3,1),time_interval_);
+
+
+
 
 			};
 
@@ -148,7 +155,7 @@ namespace BSE {
 			               * Eigen::AngleAxisd(initial_ori, Eigen::Vector3d::UnitZ()));
 
 			std::cout << "value angle:" << state_x_.block(6, 0, 3, 1).transpose() << std::endl;
-			std::cout << "eular angle:" << rotate_q_.toRotationMatrix().eulerAngles(0, 1, 2).transpose()
+			std::cout << "eular angle:" << rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2).transpose()
 			          << std::endl;
 			std::cout << "before acc:" << acc.transpose() << std::endl;
 			std::cout << "after acc:" << (rotation_q_ * acc).transpose() << std::endl;
