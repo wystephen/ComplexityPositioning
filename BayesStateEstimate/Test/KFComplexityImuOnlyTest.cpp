@@ -49,8 +49,8 @@ int main(int argc, char *argv[]) {
 
 	double start_time = AWF::getDoubleSecondTime();
 
-	omp_set_num_threads(6);
-	Eigen::setNbThreads(6);
+//	omp_set_num_threads(6);
+//	Eigen::setNbThreads(6);
 
 	std::cout.precision(10);
 	// parameters

@@ -53,8 +53,8 @@ namespace BSE {
 			auto update_function = [](Eigen::Matrix<double, 15, 1> &state,
 			                          Eigen::Quaterniond &q,
 			                          Eigen::Matrix<double, 6, 1> input,
-			                          const double &time_interval_,
-			                          const double &local_g_) -> bool {
+			                          double time_interval_,
+			                          double local_g_) {
 				q = ImuTools::quaternion_update<double>(q, input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1),
 				                                        time_interval_);
 
@@ -67,14 +67,13 @@ namespace BSE {
 
 				state.block(6, 0, 3, 1) = q.toRotationMatrix().eulerAngles(0, 1, 2);
 
-				return true;
 			};
 
 //			state_stack[0] = upd
 
-			auto tmp_state = state_x_;
-			auto tmp_q = rotation_q_.normalized();
-			auto tmp_input = input * 1.0;
+			Eigen::Matrix<double, 15, 1> tmp_state = state_x_;
+			Eigen::Quaterniond tmp_q = rotation_q_;
+			Eigen::Matrix<double, 6, 1> tmp_input = input * 1.0;
 
 			update_function(tmp_state, tmp_q, tmp_input, time_interval_, local_g_);
 
@@ -86,21 +85,24 @@ namespace BSE {
 
 			double coeff = std::sqrt(sigma_point_size + 1);
 
-#pragma omp parallel fro num_threads(12)
-			for (int i(0); i < sigma_point_size; ++i) {
 
-				Eigen::VectorXd tmp_state_plus = (state_x_ * 1.0).eval();
-				Eigen::VectorXd tmp_state_minus = (state_x_ * 1.0).eval();
+#pragma omp parallel for num_threads(12)
+			for (int i = (0); i < sigma_point_size; ++i) {
 
-				auto tmp_q_plus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1), coeff);
-				auto tmp_q_minus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1), -1.0 * coeff);
+				Eigen::Matrix<double, 15, 1> tmp_state_plus = (state_x_ * 1.0).eval();
+				Eigen::Matrix<double, 15, 1> tmp_state_minus = (state_x_ * 1.0).eval();
+
+				Eigen::Quaterniond tmp_q_plus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1),
+				                                                                    coeff);
+				Eigen::Quaterniond tmp_q_minus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1),
+				                                                                     -1.0 * coeff);
 
 				tmp_state_plus += L.block(0, i, state_x_.rows(), 1) * coeff;
 				tmp_state_minus -= L.block(0, i, state_x_.rows(), 1) * coeff;
 
 
-				Eigen::VectorXd tmp_input_plus = (input * 1.0).eval();
-				Eigen::VectorXd tmp_input_minus = (input * 1.0).eval();
+				Eigen::Matrix<double, 6, 1> tmp_input_plus = (input * 1.0).eval();
+				Eigen::Matrix<double, 6, 1> tmp_input_minus = (input * 1.0).eval();
 
 				update_function(tmp_state_plus, tmp_q_plus, tmp_input_plus, time_interval_, local_g_);
 				update_function(tmp_state_minus, tmp_q_minus, tmp_input_minus, time_interval_, local_g_);
