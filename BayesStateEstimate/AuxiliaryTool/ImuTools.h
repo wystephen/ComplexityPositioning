@@ -357,6 +357,15 @@ namespace BSE {
 			return R;
 		}
 
+		template <typename T>
+		Eigen::Matrix<T,3,1> dcm2ang(Eigen::Matrix<T,3,3> r){
+			Eigen::Matrix<T,3,1> ang(0,0,0);
+			ang(0) = atan2(r(2,1),r(2,2));
+			ang(1) = atan(r(2,0)/sqrt(1-r(2,0)*r(2,0)));
+			ang(2) = atan2(r(1,0),r(0,0));
+			return ang;
+		};
+
 
 	};
 

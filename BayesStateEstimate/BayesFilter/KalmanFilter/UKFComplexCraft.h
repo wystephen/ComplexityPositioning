@@ -57,6 +57,7 @@ namespace BSE {
 			                          double local_g_) {
 				q = ImuTools::quaternion_update<double>(q, input.block(3, 0, 3, 1),//+ state.block(12, 0, 3, 1),
 				                                        time_interval_);
+				std::cout << "time interval :" << time_interval_ << std::endl;
 
 				Eigen::Vector3d acc = q * input.block(0, 0, 3, 1) +
 				                      Eigen::Vector3d(0, 0, local_g_);//+ state.block(9, 0, 3, 1);
@@ -122,14 +123,13 @@ namespace BSE {
 			/**
 			 * Easy way
 			 */
-			for (auto tq :rotation_stack) {
-				average_q.w() += weight * tq.w();
-				average_q.x() += weight * tq.x();
-				average_q.y() += weight * tq.y();
-				average_q.z() += weight * tq.z();
-			}
+//			for (auto tq :rotation_stack) {
+//				average_q.w() += weight * tq.w();
+//				average_q.x() += weight * tq.x();
+//				average_q.y() += weight * tq.y();
+//				average_q.z() += weight * tq.z();
+//			}
 
-			bool counte_inverse_flag = false;
 
 //			while(!counte_inverse_flag){
 //				for(au)
@@ -155,8 +155,9 @@ namespace BSE {
 					max_eigenvector = es.eigenvectors().col(i);
 				}
 			}
-			average_q.coeffs() <<                //
-			                   max_eigenvector[0].real(),  //
+			average_q.coeffs()
+					<<                //
+					max_eigenvector[0].real(),  //
 					max_eigenvector[1].real(),  //
 					max_eigenvector[2].real(),  //
 					max_eigenvector[3].real();
@@ -186,7 +187,7 @@ namespace BSE {
 
 				Eigen::Matrix<double, 15, 1> dx = state - state_x_;
 				Eigen::Quaterniond d_q = average_q.inverse() * the_q;
-				Eigen::Matrix<double, 3, 1> t3d = d_q.toRotationMatrix().eulerAngles(0, 1, 2);
+				Eigen::Matrix<double, 3, 1> t3d = ImuTools::dcm2ang(d_q.toRotationMatrix());
 
 				dx.block(6, 0, 3, 1) = t3d;
 
@@ -195,7 +196,7 @@ namespace BSE {
 			}
 
 			prob_state_ = 0.5 * (prob_state_ * prob_state_.transpose());
-			prob_state_ = 0.5 * (prob_state_.eval() + prob_state_.transpose().eval());
+//			prob_state_ = 0.5 * (prob_state_.eval() + prob_state_.transpose().eval());
 
 			auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 			logger_ptr->addPlotEvent("ukf", "probability", prob_state_);
@@ -224,6 +225,7 @@ namespace BSE {
 			return state_x_;
 
 		};
+
 
 		/**
 		   * zero velocity measuremnt upd
@@ -287,7 +289,8 @@ namespace BSE {
 
 			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
 			rotation_q_.normalize();
-			state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+//			state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
+			state_x_.block(6,0,3,1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
 
 			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
 

@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
 
 
 //    filter.sett
-		for (int i(5); i < imu_data.rows() - 5; ++i) {
+		for (int i(5); i < imu_data.rows()*0.1 - 5; ++i) {
 			/// state transaction equation
 //			filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
 //			                        process_noise_matrix,
@@ -219,7 +219,7 @@ int main(int argc, char *argv[]) {
 
 //				filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.025);
 
-				complex_full_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00000025);
+				complex_full_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00025);
 
 				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000025);
 
