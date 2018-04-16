@@ -55,11 +55,11 @@ namespace BSE {
 			                          Eigen::Matrix<double, 6, 1> input,
 			                          double time_interval_,
 			                          double local_g_) {
-				q = ImuTools::quaternion_update<double>(q, input.block(3, 0, 3, 1) ,//+ state.block(12, 0, 3, 1),
+				q = ImuTools::quaternion_update<double>(q, input.block(3, 0, 3, 1),//+ state.block(12, 0, 3, 1),
 				                                        time_interval_);
 
 				Eigen::Vector3d acc = q * input.block(0, 0, 3, 1) +
-				                      Eigen::Vector3d(0, 0, local_g_) ;//+ state.block(9, 0, 3, 1);
+				                      Eigen::Vector3d(0, 0, local_g_);//+ state.block(9, 0, 3, 1);
 
 				state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +
 				                          state.block(3, 0, 3, 1) * time_interval_;
@@ -119,6 +119,9 @@ namespace BSE {
 			// compute average rotation.
 			Eigen::Quaterniond average_q(0, 0, 0, 0);
 
+			/**
+			 * Easy way
+			 */
 			for (auto tq :rotation_stack) {
 				average_q.w() += weight * tq.w();
 				average_q.x() += weight * tq.x();
@@ -131,6 +134,32 @@ namespace BSE {
 //			while(!counte_inverse_flag){
 //				for(au)
 //			}
+			/**
+			 * Hard way for quaternion average
+			 */
+			Eigen::Matrix<double, 4, Eigen::Dynamic> Q(4, rotation_stack.size());
+			for (int i = 0; i < rotation_stack.size(); ++i) {
+				Q.col(i) = weight * rotation_stack[i].coeffs();
+			}
+
+			Eigen::Matrix<double, 4, 4> QQt = Q * Q.transpose();
+
+			Eigen::EigenSolver<Eigen::Matrix<double, 4, 4>> es(QQt);
+
+			std::complex<Scalar> max_eigenvalue = es.eigenvalues()[0];
+			Eigen::Matrix<std::complex<double>, 4, 1> max_eigenvector =
+					es.eigenvectors().col(0);
+			for (int i = 1; i < 4; i++) {
+				if (std::norm(es.eigenvalues()[i]) > std::norm(max_eigenvalue)) {
+					max_eigenvalue = es.eigenvalues()[i];
+					max_eigenvector = es.eigenvectors().col(i);
+				}
+			}
+			average_q.coeffs() <<                //
+			                   max_eigenvector[0].real(),  //
+					max_eigenvector[1].real(),  //
+					max_eigenvector[2].real(),  //
+					max_eigenvector[3].real();
 
 
 			// TODO: more reliable quaternion average.
