@@ -115,17 +115,147 @@ namespace BSE {
 			}
 
 
+			double weight = 1.0 / (sigma_point_size*2.0+2.0);
 			// compute average rotation.
+			Eigen::Quaterniond average_q(0,0,0,0);
+
+			for(auto tq :rotation_stack){
+				average_q.w() += weight * tq.w();
+				average_q.x() += weight * tq.x();
+				average_q.y() += weight * tq.y();
+				average_q.z() += weight * tq.z();
+			}
+
+
+			// TODO: more reliable quaternion average.
+
+			rotation_q_ = average_q;
 
 
 			// compute average state
+			state_x_.setZero();
+			for(auto state: state_stack){
+				state_x_ += weight * state;
+			}
+			state_x_.block(6,0,3,1) = average_q.toRotationMatrix().eulerAngles(0,1,2);
 
 
 
 			// compute probability.
 
+			double before_p_norm = prob_state_.norm();
+			prob_state_.setZero();
+			for(int i(0);i<state_stack.size();++i){
+				auto state = state_stack[i];
+
+				auto dx = state-state_x_;
+				dx.block(6,0,3,1) = (average_q.inverse() * rotation_stack[i]).toRotationMatrix().eulerAngles(0,1,2);
+				prob_state_ += weight * dx * dx.transpose();
+
+			}
+
+			prob_state_ = 0.5 * (prob_state_ * prob_state_.transpose());
+			prob_state_ = 0.5 * (prob_state_.eval() + prob_state_.transpose().eval());
+
+			auto logger_ptr = AWF::AlgorithmLogger::getInstance();
+			logger_ptr->addPlotEvent("ukf", "probability", prob_state_);
+
+			double after_p_norm = prob_state_.norm();
+			if (after_p_norm > 10.0 * before_p_norm || after_p_norm > 4.0) {
+
+
+				std::cout << "average rotation:" << average_q.w()
+				          << "," << average_q.x()
+				          << "," << average_q.y()
+				          << "," << average_q.z() << std::endl;
+				for (auto q :rotation_stack) {
+					std::cout << q.w()
+					          << ","
+					          << q.x()
+					          << ","
+					          << q.y()
+					          << ","
+					          << q.z() << std::endl;
+				}
+				std::cout << "p norm is really big:"
+				          << after_p_norm << std::endl;
+			}
+
+			return state_x_;
 
 		};
+
+		/**
+		   * zero velocity measuremnt upd
+		   * @param cov_matrix
+		   */
+		void MeasurementStateZV(Eigen::Matrix3d cov_matrix) {
+			H_ = Eigen::MatrixXd::Zero(3, state_x_.rows());
+			H_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * 1.0;
+			if (IS_DEBUG) {
+				std::cout << H_ << std::endl;
+				std::cout << " p * H^T :" << prob_state_ * H_.transpose().eval() << std::endl;
+				std::cout << " H * P * H^T + cosv:" << H_ * prob_state_ * H_.transpose().eval() + cov_matrix
+				          << std::endl;
+				std::cout << "inverse " << (H_ * prob_state_ * H_.transpose().eval() + cov_matrix).inverse()
+				          << std::endl;
+
+			}
+
+			K_ = (prob_state_ * H_.transpose().eval()) *
+			     (H_ * prob_state_ * H_.transpose().eval() + cov_matrix).inverse();
+			if (std::isnan(K_.sum()) || std::isinf(K_.sum())) {
+				std::cout << "K is nan" << std::endl;
+			}
+
+			/*
+			 * update probability
+			 */
+			auto identity_matrix = Eigen::MatrixXd(state_x_.rows(), state_x_.rows());
+			identity_matrix.setZero();
+			prob_state_ = (Eigen::Matrix<double, 15, 15>::Identity() - K_ * H_) * prob_state_;
+			prob_state_ = (prob_state_ + prob_state_.transpose().eval()) * 0.5;
+			if (prob_state_.norm() > 10000) {
+				std::cout << __FILE__
+				          << ":"
+				          << __LINE__
+				          << " Error state prob is too big"
+				          << prob_state_.norm()
+				          << std::endl;
+				prob_state_ /= 100.0;
+			}
+			if (std::isnan(prob_state_.sum()) || std::isinf(prob_state_.sum())) {
+				std::cout << "state prob has nan" << std::endl;
+			}
+
+			/*
+			 * update state
+			 */
+			Eigen::Vector3d m(0, 0, 0); // pseudo velocity measurement.
+			dX_ = K_ * (m - state_x_.block(3, 0, 3, 1));
+
+			state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
+
+			Eigen::Matrix3d rbn = ImuTools::q2dcm(rotation_q_);
+			Eigen::Matrix3d r_update = Eigen::Matrix3d::Identity();
+			Eigen::Vector3d epsilon(dX_(6),dX_(7),dX_(8));
+
+			r_update << 1.0,epsilon(2),-epsilon(1),
+					-epsilon(2),1.0,epsilon(0),
+					epsilon(1),-epsilon(0),1.0;
+
+			rotation_q_ = ImuTools::dcm2q(r_update*rbn);
+			rotation_q_.normalize();
+			state_x_.block(6,0,3,1) = rotation_q_.toRotationMatrix().eulerAngles(0,1,2);
+
+			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
+
+			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
+			logger_ptr_->addPlotEvent("complexfull", "offset_acc", state_x_.block(9, 0, 3, 1));
+			logger_ptr_->addPlotEvent("complexfull", "offset_gyr", state_x_.block(12, 0, 3, 1));
+
+
+		}
 
 
 		/**

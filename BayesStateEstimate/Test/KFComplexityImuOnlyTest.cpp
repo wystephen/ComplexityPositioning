@@ -134,7 +134,8 @@ int main(int argc, char *argv[]) {
 //        auto filter_complex = BSE::KFComplexFull(initial_prob_matrix_complex);
 
 //		auto complex_full_filter = BSE::KFComplexFull(initial_prob_matrix_complex);
-		auto complex_full_filter = BSE::UKFComplex(initial_prob_matrix_complex);
+//		auto complex_full_filter = BSE::UKFComplex(initial_prob_matrix_complex);
+		auto complex_full_filter = BSE::UKFComplexCraft(initial_prob_matrix_complex);
 
 		auto ff_filter = BSE::KFComplexFF(initial_prob_matrix_ff);
 
