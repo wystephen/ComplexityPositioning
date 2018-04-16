@@ -146,7 +146,7 @@ namespace BSE {
 
 			Eigen::EigenSolver<Eigen::Matrix<double, 4, 4>> es(QQt);
 
-			std::complex<Scalar> max_eigenvalue = es.eigenvalues()[0];
+			std::complex<double> max_eigenvalue = es.eigenvalues()[0];
 			Eigen::Matrix<std::complex<double>, 4, 1> max_eigenvector =
 					es.eigenvectors().col(0);
 			for (int i = 1; i < 4; i++) {
