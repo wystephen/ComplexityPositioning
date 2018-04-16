@@ -185,16 +185,19 @@ namespace BSE {
 
 			T c = 0.0;
 			T s = 0.0;
-			c = 1 - w_norm * w_norm / 8.0 + pow(w_norm, 4.0) / 384.0;
-			s = 0.5 - w_norm * w_norm / 48.0;
+//			c = 1 - w_norm * w_norm / 8.0 + pow(w_norm, 4.0) / 384.0;
+//			s = 0.5 - w_norm * w_norm / 48.0;
 
 			if (w_norm > 1e-10) {
+				c = cos(w_norm / 2.0);
+				s = 2 / w_norm * sin(w_norm / 2.0);
+
 				Theta << c, -tmp_w(0) * s, -tmp_w(1) * s, -tmp_w(2) * s,
 						tmp_w(0) * s, c, tmp_w(2) * s, -tmp_w(1),
 						tmp_w(1) * s, -tmp_w(2) * s, c, tmp_w(0) * s,
 						tmp_w(2) * s, tmp_w(1) * s, -tmp_w(0) * s, c;
 
-				tmp_q = Theta * tmp_q;
+				tmp_q = 0.5 * Theta * tmp_q;
 				tmp_q = tmp_q / tmp_q.norm();
 			}
 			Eigen::Quaternion<double> q_out(tmp_q(0), tmp_q(1), tmp_q(2), tmp_q(3));
@@ -291,7 +294,7 @@ namespace BSE {
 
 			} catch (...) {
 				std::cout << "THERE ARE SOME ERROR!" << std::endl;
-				return Eigen::Quaternion<Type>(1.0,0.0,0.0,0.0);
+				return Eigen::Quaternion<Type>(1.0, 0.0, 0.0, 0.0);
 			}
 		}
 
@@ -357,12 +360,12 @@ namespace BSE {
 			return R;
 		}
 
-		template <typename T>
-		Eigen::Matrix<T,3,1> dcm2ang(Eigen::Matrix<T,3,3> r){
-			Eigen::Matrix<T,3,1> ang(0,0,0);
-			ang(0) = atan2(r(2,1),r(2,2));
-			ang(1) = atan(r(2,0)/sqrt(1-r(2,0)*r(2,0)));
-			ang(2) = atan2(r(1,0),r(0,0));
+		template<typename T>
+		Eigen::Matrix<T, 3, 1> dcm2ang(Eigen::Matrix<T, 3, 3> r) {
+			Eigen::Matrix<T, 3, 1> ang(0, 0, 0);
+			ang(0) = atan2(r(2, 1), r(2, 2));
+			ang(1) = atan(r(2, 0) / sqrt(1 - r(2, 0) * r(2, 0)));
+			ang(2) = atan2(r(1, 0), r(0, 0));
 			return ang;
 		};
 

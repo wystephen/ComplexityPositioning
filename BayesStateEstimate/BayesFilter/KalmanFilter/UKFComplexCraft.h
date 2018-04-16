@@ -57,7 +57,7 @@ namespace BSE {
 			                          double local_g_) {
 				q = ImuTools::quaternion_update<double>(q, input.block(3, 0, 3, 1),//+ state.block(12, 0, 3, 1),
 				                                        time_interval_);
-				std::cout << "time interval :" << time_interval_ << std::endl;
+//				std::cout << "time interval :" << time_interval_ << std::endl;
 
 				Eigen::Vector3d acc = q * input.block(0, 0, 3, 1) +
 				                      Eigen::Vector3d(0, 0, local_g_);//+ state.block(9, 0, 3, 1);
