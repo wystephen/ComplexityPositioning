@@ -55,11 +55,11 @@ namespace BSE {
 			                          Eigen::Matrix<double, 6, 1> input,
 			                          double time_interval_,
 			                          double local_g_) {
-				q = ImuTools::quaternion_update<double>(q, input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1),
+				q = ImuTools::quaternion_update<double>(q, input.block(3, 0, 3, 1) ,//+ state.block(12, 0, 3, 1),
 				                                        time_interval_);
 
 				Eigen::Vector3d acc = q * input.block(0, 0, 3, 1) +
-				                      Eigen::Vector3d(0, 0, local_g_) + state.block(9, 0, 3, 1);
+				                      Eigen::Vector3d(0, 0, local_g_) ;//+ state.block(9, 0, 3, 1);
 
 				state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +
 				                          state.block(3, 0, 3, 1) * time_interval_;
@@ -126,6 +126,12 @@ namespace BSE {
 				average_q.z() += weight * tq.z();
 			}
 
+			bool counte_inverse_flag = false;
+
+//			while(!counte_inverse_flag){
+//				for(au)
+//			}
+
 
 			// TODO: more reliable quaternion average.
 
@@ -146,12 +152,12 @@ namespace BSE {
 			double before_p_norm = prob_state_.norm();
 			prob_state_.setZero();
 			for (int i(0); i < state_stack.size(); ++i) {
-				Eigen::Matrix<double,15,1> state = state_stack[i];
+				Eigen::Matrix<double, 15, 1> state = state_stack[i];
 				Eigen::Quaterniond the_q = rotation_stack[i];
 
-				Eigen::Matrix<double,15,1> dx = state - state_x_;
+				Eigen::Matrix<double, 15, 1> dx = state - state_x_;
 				Eigen::Quaterniond d_q = average_q.inverse() * the_q;
-				Eigen::Matrix<double,3,1> t3d = d_q.toRotationMatrix().eulerAngles(0,1,2);
+				Eigen::Matrix<double, 3, 1> t3d = d_q.toRotationMatrix().eulerAngles(0, 1, 2);
 
 				dx.block(6, 0, 3, 1) = t3d;
 
