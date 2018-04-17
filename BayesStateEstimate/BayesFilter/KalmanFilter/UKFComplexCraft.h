@@ -61,7 +61,7 @@ namespace BSE {
 				                                        time_interval_);
 //				std::cout << "time interval :" << time_interval_ << std::endl;
 
-				Eigen::Vector3d acc = q * input.block(0, 0, 3, 1) -
+				Eigen::Vector3d acc = q * input.block(0, 0, 3, 1) +
 				                      Eigen::Vector3d(0, 0, local_g_)+ state.block(9, 0, 3, 1);
 
 				std::cout << "local g:" << local_g_ << " acc:" << acc.transpose() << std::endl;
@@ -299,8 +299,7 @@ namespace BSE {
 
 			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
 			rotation_q_.normalize();
-//			state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
-			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
+			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(r_update*rbn);
 
 			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
 
