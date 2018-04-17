@@ -64,7 +64,7 @@ namespace BSE {
 				Eigen::Vector3d acc = q * input.block(0, 0, 3, 1) +
 				                      Eigen::Vector3d(0, 0, local_g_)+ state.block(9, 0, 3, 1);
 
-				std::cout << "local g:" << local_g_ << " acc:" << acc.transpose() << std::endl;
+//				std::cout << "local g:" << local_g_ << " acc:" << acc.transpose() << std::endl;
 				state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +
 				                          state.block(3, 0, 3, 1) * time_interval_;
 				state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) + acc * time_interval_;
@@ -97,9 +97,9 @@ namespace BSE {
 				Eigen::Matrix<double, 15, 1> tmp_state_minus = (state_x_ * 1.0).eval();
 
 				Eigen::Quaterniond tmp_q_plus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1),
-				                                                                    coeff);
+				                                                                    coeff)*1.0;
 				Eigen::Quaterniond tmp_q_minus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1),
-				                                                                     -1.0 * coeff);
+				                                                                     -1.0 * coeff)*1.0;
 
 				tmp_state_plus += L.block(0, i, state_x_.rows(), 1) * coeff;
 				tmp_state_minus -= L.block(0, i, state_x_.rows(), 1) * coeff;
@@ -127,20 +127,7 @@ namespace BSE {
 			// compute average rotation.
 			Eigen::Quaterniond average_q(0, 0, 0, 0);
 
-			/**
-			 * Easy way
-			 */
-//			for (auto tq :rotation_stack) {
-//				average_q.w() += weight * tq.w();
-//				average_q.x() += weight * tq.x();
-//				average_q.y() += weight * tq.y();
-//				average_q.z() += weight * tq.z();
-//			}
 
-
-//			while(!counte_inverse_flag){
-//				for(au)
-//			}
 			/**
 			 * Hard way for quaternion average
 			 */

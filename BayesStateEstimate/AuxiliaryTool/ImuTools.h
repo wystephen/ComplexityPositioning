@@ -172,10 +172,10 @@ namespace BSE {
 		                                       Eigen::Matrix<T, 3, 1> angle_velocity,
 		                                       double time_interval) {
 			Eigen::Matrix<T, 4, 1> tmp_q;
-			tmp_q(0) = q_in.w();
-			tmp_q(1) = q_in.x();
-			tmp_q(2) = q_in.y();
-			tmp_q(3) = q_in.z();
+			tmp_q(3) = q_in.w();
+			tmp_q(0) = q_in.x();
+			tmp_q(1) = q_in.y();
+			tmp_q(2) = q_in.z();
 
 			Eigen::Matrix<T, 3, 1> tmp_w = angle_velocity * time_interval;
 			T w_norm = tmp_w.norm();
@@ -200,7 +200,7 @@ namespace BSE {
 				tmp_q = 0.5 * Theta * tmp_q;
 				tmp_q = tmp_q / tmp_q.norm();
 			}
-			Eigen::Quaternion<double> q_out(tmp_q(0), tmp_q(1), tmp_q(2), tmp_q(3));
+			Eigen::Quaternion<double> q_out(tmp_q(3), tmp_q(0), tmp_q(1), tmp_q(2));
 
 			return q_out;
 		}
@@ -307,10 +307,10 @@ namespace BSE {
 		template<typename T>
 		Eigen::Matrix<T, 3, 3> q2dcm(Eigen::Quaternion<T> qua) {
 			Eigen::Matrix<T, 4, 1> q;
-			q(0) = qua.w();
-			q(1) = qua.x();
-			q(2) = qua.y();
-			q(3) = qua.z();
+			q(3) = qua.w();
+			q(0) = qua.x();
+			q(1) = qua.y();
+			q(2) = qua.z();
 
 
 			Eigen::Matrix<T, 6, 1> p;
