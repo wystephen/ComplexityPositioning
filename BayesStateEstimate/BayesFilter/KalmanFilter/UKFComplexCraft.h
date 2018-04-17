@@ -101,32 +101,36 @@ namespace BSE {
 //#pragma omp parallel for num_threads(12)
 			for (int i = (0); i < sigma_point_size; ++i) {
 
-				Eigen::Matrix<double, 15, 1> tmp_state_plus = (state_x_ * 1.0).eval();
-				Eigen::Matrix<double, 15, 1> tmp_state_minus = (state_x_ * 1.0).eval();
+				Eigen::Matrix<double, 15, 1> tmp_state_plus = (state_x_ * 1.0);
+				Eigen::Matrix<double, 15, 1> tmp_state_minus = (state_x_ * 1.0);
 
 				Eigen::Quaterniond tmp_q_plus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1),
 				                                                                    coeff);
 				Eigen::Quaterniond tmp_q_minus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1),
 				                                                                     -1.0 * coeff);
 
+				Eigen::Matrix<double,21,1> tmp_L = L.block(0, i, L.rows(), 1);
+
+
 				tmp_state_plus += L.block(0, i, state_x_.rows(), 1) * coeff;
 				tmp_state_minus -= L.block(0, i, state_x_.rows(), 1) * coeff;
 
 
-				Eigen::Matrix<double, 6, 1> tmp_input_plus = (input * 1.0).eval();
-				Eigen::Matrix<double, 6, 1> tmp_input_minus = (input * 1.0).eval();
 
-				tmp_input_plus += L.block(state_x_.rows(), i, noise_matrix.rows(), 1);
-				tmp_input_minus -= L.block(state_x_.rows(), i, noise_matrix.rows(), 1);
+				Eigen::Matrix<double, 6, 1> tmp_input_plus = (input * 1.0);
+				Eigen::Matrix<double, 6, 1> tmp_input_minus = (input * 1.0);
+
+				tmp_input_plus += L.block(state_x_.rows(), i, noise_matrix.rows(), 1) * coeff;
+				tmp_input_minus -= L.block(state_x_.rows(), i, noise_matrix.rows(), 1) * coeff;
 
 //				std::cout << "L block:" << L.block(state_x_.rows(),i ,noise_matrix.rows(),1).transpose() << "\n";
 
 
-				std::cout <<"i:"<<i<< "before:" << tmp_state_plus.transpose() << "\n";
+				std::cout << "i:" << i << "before:" << tmp_state_plus.transpose() << "\n";
 				update_function(tmp_state_plus, tmp_q_plus, tmp_input_plus, time_interval_, local_g_);
-				std::cout <<"i:"<<i<< "after " << tmp_state_plus.transpose() << "\n";
+				std::cout << "i:" << i << "after " << tmp_state_plus.transpose() << "\n";
 				update_function(tmp_state_minus, tmp_q_minus, tmp_input_minus, time_interval_, local_g_);
-				std::cout <<"k:"<<i<< "after" << tmp_state_minus.transpose() << "\n";
+				std::cout << "k:" << i << "after" << tmp_state_minus.transpose() << "\n";
 
 				state_stack[i + 2] = tmp_state_plus;
 				state_stack[i + sigma_point_size + 2] = tmp_state_minus;
