@@ -188,19 +188,33 @@ namespace BSE {
 //			c = 1 - w_norm * w_norm / 8.0 + pow(w_norm, 4.0) / 384.0;
 //			s = 0.5 - w_norm * w_norm / 48.0;
 
-			if (w_norm > 1e-10) {
+			if (w_norm > 1e-6) {
 				c = cos(w_norm / 2.0);
 				s = 2 / w_norm * sin(w_norm / 2.0);
 
-				Theta << c, -tmp_w(0) * s, -tmp_w(1) * s, -tmp_w(2) * s,
-						tmp_w(0) * s, c, tmp_w(2) * s, -tmp_w(1),
-						tmp_w(1) * s, -tmp_w(2) * s, c, tmp_w(0) * s,
-						tmp_w(2) * s, tmp_w(1) * s, -tmp_w(0) * s, c;
+//				Theta << c, -tmp_w(0) * s, -tmp_w(1) * s, -tmp_w(2) * s,
+//						tmp_w(0) * s, c, tmp_w(2) * s, -tmp_w(1),
+//						tmp_w(1) * s, -tmp_w(2) * s, c, tmp_w(0) * s,
+//						tmp_w(2) * s, tmp_w(1) * s, -tmp_w(0) * s, c;
+				double P = tmp_w(0);
+				double Q = tmp_w(1);
+				double R = tmp_w(2);
+//				Theta << c, s * R, -s * Q, s * P,
+//						-s * R, c, s * P, s * Q,
+//						s * Q, -s * P, c, s * R,
+//						-s * P, -s * Q, -s * R, c;
+				Eigen::Matrix<T, 4, 4> OMEGA = Eigen::Matrix<T, 4, 4>::Identity();
+				OMEGA << 0.0, R, -Q, P,
+						-R, 0.0, P, Q,
+						Q, -P, 0.0, R,
+						-P, -Q, -R, 0.0;
+				OMEGA = OMEGA * 0.5;
 
-				tmp_q = 0.5 * Theta * tmp_q;
+				tmp_q = (cos(w_norm / 2.0) * Eigen::Matrix<T, 4, 4>::Identity() +
+				         2.0 / w_norm * sin(w_norm / 2.0) * OMEGA) * tmp_q;
 				tmp_q = tmp_q / tmp_q.norm();
 			}
-			Eigen::Quaternion<double> q_out(tmp_q(3), tmp_q(0), tmp_q(1), tmp_q(2));
+			Eigen::Quaternion<double> q_out(tmp_q(0), tmp_q(1), tmp_q(2), tmp_q(3));
 
 			return q_out;
 		}

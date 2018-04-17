@@ -63,7 +63,8 @@ namespace BSE {
 			                          Eigen::Matrix<double, 6, 1> input,
 			                          double time_interval_,
 			                          double local_g_) {
-				q = ImuTools::quaternion_update<double>(q, input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1),
+				q = ImuTools::quaternion_update<double>(q,
+				                                        input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1),
 				                                        time_interval_);
 //				std::cout << "time interval :" << time_interval_ << std::endl;
 
@@ -89,8 +90,8 @@ namespace BSE {
 
 			update_function(tmp_state, tmp_q, tmp_input, time_interval_, local_g_);
 
-			state_stack[0] = tmp_state;
-			state_stack[1] = tmp_state;
+			state_stack[0] = tmp_state * 1.0;
+			state_stack[1] = tmp_state * 1.0;
 
 			rotation_stack[0] = tmp_q;
 			rotation_stack[1] = tmp_q;
@@ -115,8 +116,8 @@ namespace BSE {
 				Eigen::Matrix<double, 6, 1> tmp_L_input = tmp_L.block(15, 0, 6, 1);
 
 
-				Eigen::Matrix<double, 15, 1> tmp_state_plus = (state_x_ * 1.0)+coeff * tmp_L_state;
-				Eigen::Matrix<double, 15, 1> tmp_state_minus = (state_x_ * 1.0)-coeff * tmp_L_state;
+				Eigen::Matrix<double, 15, 1> tmp_state_plus = (state_x_ * 1.0) + coeff * tmp_L_state;
+				Eigen::Matrix<double, 15, 1> tmp_state_minus = (state_x_ * 1.0) - coeff * tmp_L_state;
 
 
 //				tmp_state_plus += L.block(0, i, state_x_.rows(), 1) * coeff;
@@ -145,7 +146,7 @@ namespace BSE {
 				rotation_stack[i + 2] = tmp_q_plus;
 				rotation_stack[i + sigma_point_size + 2] = tmp_q_minus;
 			}
-			std::cout << "----------------------------------------------------\n";
+//			std::cout << "----------------------------------------------------\n";
 
 
 			double weight = 1.0 / (sigma_point_size * 2.0 + 2.0);
@@ -220,14 +221,14 @@ namespace BSE {
 //			prob_state_ = 0.5 * (prob_state_.eval() + prob_state_.transpose().eval());
 
 
-			std::cout << "update before p:"
-			          << before_p_norm
-			          << "after p:"
-			          << prob_state_.norm()
-			          << "\n";
+//			std::cout << "update before p:"
+//			          << before_p_norm
+//			          << "after p:"
+//			          << prob_state_.norm()
+//			          << "\n";
 
 			auto logger_ptr = AWF::AlgorithmLogger::getInstance();
-			logger_ptr->addPlotEvent("ukf", "probability", prob_state_);
+//			logger_ptr->addPlotEvent("ukf", "probability", prob_state_);
 
 			double after_p_norm = prob_state_.norm();
 			if (after_p_norm > 10.0 * before_p_norm || after_p_norm > 4.0) {
@@ -251,8 +252,8 @@ namespace BSE {
 			}
 
 
-			logger_ptr->addPlotEvent("ukf_state_craft", "state", state_x_);
-			logger_ptr->addPlotEvent("ukf_craft", "P", prob_state_);
+//			logger_ptr->addPlotEvent("ukf_state_craft", "state", state_x_);
+//			logger_ptr->addPlotEvent("ukf_craft", "P", prob_state_);
 
 			return state_x_;
 
@@ -335,7 +336,7 @@ namespace BSE {
 			logger_ptr_->addPlotEvent("complexfull", "offset_acc", state_x_.block(9, 0, 3, 1));
 			logger_ptr_->addPlotEvent("complexfull", "offset_gyr", state_x_.block(12, 0, 3, 1));
 
-			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
+//			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
 
 
 		}
