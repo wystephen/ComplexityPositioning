@@ -101,8 +101,6 @@ namespace BSE {
 //#pragma omp parallel for num_threads(12)
 			for (int i = (0); i < sigma_point_size; ++i) {
 
-				Eigen::Matrix<double, 15, 1> tmp_state_plus = (state_x_ * 1.0);
-				Eigen::Matrix<double, 15, 1> tmp_state_minus = (state_x_ * 1.0);
 
 				Eigen::Quaterniond tmp_q_plus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1),
 				                                                                    coeff);
@@ -110,20 +108,27 @@ namespace BSE {
 				                                                                     -1.0 * coeff);
 
 				Eigen::Matrix<double, 21, 1> tmp_L = L.block(0, i, L.rows(), 1);
-				std::cout << "L:"
-				          << tmp_L.transpose()
-				          << "\n";
+//				std::cout << "L:"
+//				          << tmp_L.transpose()
+//				          << "\n";
+				Eigen::Matrix<double, 15, 1> tmp_L_state = tmp_L.block(0, 0, 15, 1);
+				Eigen::Matrix<double, 6, 1> tmp_L_input = tmp_L.block(15, 0, 6, 1);
 
 
-				tmp_state_plus += L.block(0, i, state_x_.rows(), 1) * coeff;
-				tmp_state_minus -= L.block(0, i, state_x_.rows(), 1) * coeff;
+				Eigen::Matrix<double, 15, 1> tmp_state_plus = (state_x_ * 1.0)+coeff * tmp_L_state;
+				Eigen::Matrix<double, 15, 1> tmp_state_minus = (state_x_ * 1.0)-coeff * tmp_L_state;
 
 
-				Eigen::Matrix<double, 6, 1> tmp_input_plus = (input * 1.0);
-				Eigen::Matrix<double, 6, 1> tmp_input_minus = (input * 1.0);
+//				tmp_state_plus += L.block(0, i, state_x_.rows(), 1) * coeff;
+//				tmp_state_minus -= L.block(0, i, state_x_.rows(), 1) * coeff;
 
-				tmp_input_plus += L.block(state_x_.rows(), i, noise_matrix.rows(), 1) * coeff;
-				tmp_input_minus -= L.block(state_x_.rows(), i, noise_matrix.rows(), 1) * coeff;
+
+				Eigen::Matrix<double, 6, 1> tmp_input_plus = (input * 1.0) + coeff * tmp_L_input;
+				Eigen::Matrix<double, 6, 1> tmp_input_minus = (input * 1.0) - coeff * tmp_L_input;
+
+//				tmp_input_plus += L.block(state_x_.rows(), i, noise_matrix.rows(), 1) * coeff;
+//				tmp_input_minus -= L.block(state_x_.rows(), i, noise_matrix.rows(), 1) * coeff;
+//				tmp_input_plus
 
 //				std::cout << "L block:" << L.block(state_x_.rows(),i ,noise_matrix.rows(),1).transpose() << "\n";
 
@@ -214,6 +219,13 @@ namespace BSE {
 			prob_state_ = 0.5 * (prob_state_ * prob_state_.transpose());
 //			prob_state_ = 0.5 * (prob_state_.eval() + prob_state_.transpose().eval());
 
+
+			std::cout << "update before p:"
+			          << before_p_norm
+			          << "after p:"
+			          << prob_state_.norm()
+			          << "\n";
+
 			auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 			logger_ptr->addPlotEvent("ukf", "probability", prob_state_);
 
@@ -240,7 +252,7 @@ namespace BSE {
 
 
 			logger_ptr->addPlotEvent("ukf_state_craft", "state", state_x_);
-			logger_ptr->addPlotEvent("ukf_craft","P",prob_state_);
+			logger_ptr->addPlotEvent("ukf_craft", "P", prob_state_);
 
 			return state_x_;
 
@@ -276,8 +288,14 @@ namespace BSE {
 			 */
 //			Eigen::MatrixXd identity_matrix(state_x_.rows(),) ;//= Eigen::MatrixXd(state_x_.rows(), state_x_.rows());
 //			identity_matrix.setZero();
+			double before_p_norm = prob_state_.norm();
 			prob_state_ = (Eigen::Matrix<double, 15, 15>::Identity() - K_ * H_) * prob_state_;
 			prob_state_ = (prob_state_ + prob_state_.transpose().eval()) * 0.5;
+			std::cout << "zv before:"
+			          << before_p_norm
+			          << "after "
+			          << prob_state_.norm()
+			          << "\n";
 			if (prob_state_.norm() > 10000) {
 				std::cout << __FILE__
 				          << ":"
@@ -317,7 +335,7 @@ namespace BSE {
 			logger_ptr_->addPlotEvent("complexfull", "offset_acc", state_x_.block(9, 0, 3, 1));
 			logger_ptr_->addPlotEvent("complexfull", "offset_gyr", state_x_.block(12, 0, 3, 1));
 
-			logger_ptr_->addPlotEvent("ukf_craft_zv","P",prob_state_);
+			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
 
 
 		}
