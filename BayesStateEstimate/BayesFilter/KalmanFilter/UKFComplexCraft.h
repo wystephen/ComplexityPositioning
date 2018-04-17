@@ -17,6 +17,8 @@ namespace BSE {
 
 		UKFComplexCraft(Eigen::Matrix<double, 15, 15> init_prob) {
 			prob_state_ = init_prob;
+			std::cout << "initial prob:"
+				<< init_prob << std::endl;
 			state_x_.resize(15, 1);
 			state_x_.setZero();
 
@@ -55,13 +57,14 @@ namespace BSE {
 			                          Eigen::Matrix<double, 6, 1> input,
 			                          double time_interval_,
 			                          double local_g_) {
-				q = ImuTools::quaternion_update<double>(q, input.block(3, 0, 3, 1),//+ state.block(12, 0, 3, 1),
+				q = ImuTools::quaternion_update<double>(q, input.block(3, 0, 3, 1)+ state.block(12, 0, 3, 1),
 				                                        time_interval_);
 //				std::cout << "time interval :" << time_interval_ << std::endl;
 
-				Eigen::Vector3d acc = q * input.block(0, 0, 3, 1) +
-				                      Eigen::Vector3d(0, 0, local_g_);//+ state.block(9, 0, 3, 1);
+				Eigen::Vector3d acc = q * input.block(0, 0, 3, 1) -
+				                      Eigen::Vector3d(0, 0, local_g_)+ state.block(9, 0, 3, 1);
 
+				std::cout << "local g:" << local_g_ << " acc:" << acc.transpose() << std::endl;
 				state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +
 				                          state.block(3, 0, 3, 1) * time_interval_;
 				state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) + acc * time_interval_;
@@ -104,6 +107,10 @@ namespace BSE {
 
 				Eigen::Matrix<double, 6, 1> tmp_input_plus = (input * 1.0).eval();
 				Eigen::Matrix<double, 6, 1> tmp_input_minus = (input * 1.0).eval();
+
+				tmp_input_plus += L.block(state_x_.rows(),i,noise_matrix.rows(),1);
+				tmp_input_minus -= L.block(state_x_.rows(),i,noise_matrix.rows(),1);
+
 
 				update_function(tmp_state_plus, tmp_q_plus, tmp_input_plus, time_interval_, local_g_);
 				update_function(tmp_state_minus, tmp_q_minus, tmp_input_minus, time_interval_, local_g_);
@@ -202,7 +209,7 @@ namespace BSE {
 			logger_ptr->addPlotEvent("ukf", "probability", prob_state_);
 
 			double after_p_norm = prob_state_.norm();
-			if (after_p_norm > 10.0 * before_p_norm && after_p_norm > 4.0e100) {
+			if (after_p_norm > 10.0 * before_p_norm || after_p_norm > 4.0) {
 
 
 				std::cout << "average rotation:" << average_q.w()
@@ -221,6 +228,9 @@ namespace BSE {
 				std::cout << "p norm is really big:"
 				          << after_p_norm << std::endl;
 			}
+
+
+			logger_ptr->addPlotEvent("ukf_state_craft","state",state_x_);
 
 			return state_x_;
 
@@ -254,8 +264,8 @@ namespace BSE {
 			/*
 			 * update probability
 			 */
-			auto identity_matrix = Eigen::MatrixXd(state_x_.rows(), state_x_.rows());
-			identity_matrix.setZero();
+//			Eigen::MatrixXd identity_matrix(state_x_.rows(),) ;//= Eigen::MatrixXd(state_x_.rows(), state_x_.rows());
+//			identity_matrix.setZero();
 			prob_state_ = (Eigen::Matrix<double, 15, 15>::Identity() - K_ * H_) * prob_state_;
 			prob_state_ = (prob_state_ + prob_state_.transpose().eval()) * 0.5;
 			if (prob_state_.norm() > 10000) {
@@ -290,7 +300,7 @@ namespace BSE {
 			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
 			rotation_q_.normalize();
 //			state_x_.block(6, 0, 3, 1) = rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2);
-			state_x_.block(6,0,3,1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
+			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
 
 			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
 
