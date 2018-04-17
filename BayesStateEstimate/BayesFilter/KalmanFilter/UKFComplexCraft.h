@@ -126,6 +126,7 @@ namespace BSE {
 				update_function(tmp_state_plus, tmp_q_plus, tmp_input_plus, time_interval_, local_g_);
 				std::cout <<"i:"<<i<< "after " << tmp_state_plus.transpose() << "\n";
 				update_function(tmp_state_minus, tmp_q_minus, tmp_input_minus, time_interval_, local_g_);
+				std::cout <<"k:"<<i<< "after" << tmp_state_minus.transpose() << "\n";
 
 				state_stack[i + 2] = tmp_state_plus;
 				state_stack[i + sigma_point_size + 2] = tmp_state_minus;
