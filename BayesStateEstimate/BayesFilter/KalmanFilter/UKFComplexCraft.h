@@ -90,16 +90,16 @@ namespace BSE {
 			double coeff = std::sqrt(sigma_point_size + 1);
 
 
-#pragma omp parallel for num_threads(12)
+//#pragma omp parallel for num_threads(12)
 			for (int i = (0); i < sigma_point_size; ++i) {
 
 				Eigen::Matrix<double, 15, 1> tmp_state_plus = (state_x_ * 1.0).eval();
 				Eigen::Matrix<double, 15, 1> tmp_state_minus = (state_x_ * 1.0).eval();
 
 				Eigen::Quaterniond tmp_q_plus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1),
-				                                                                    coeff)*1.0;
+				                                                                    coeff);
 				Eigen::Quaterniond tmp_q_minus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1),
-				                                                                     -1.0 * coeff)*1.0;
+				                                                                     -1.0 * coeff);
 
 				tmp_state_plus += L.block(0, i, state_x_.rows(), 1) * coeff;
 				tmp_state_minus -= L.block(0, i, state_x_.rows(), 1) * coeff;
@@ -110,6 +110,8 @@ namespace BSE {
 
 				tmp_input_plus += L.block(state_x_.rows(),i,noise_matrix.rows(),1);
 				tmp_input_minus -= L.block(state_x_.rows(),i,noise_matrix.rows(),1);
+
+				std::cout << "L block:" << L.block(state_x_.rows(),i ,noise_matrix.rows(),1);
 
 
 				update_function(tmp_state_plus, tmp_q_plus, tmp_input_plus, time_interval_, local_g_);
