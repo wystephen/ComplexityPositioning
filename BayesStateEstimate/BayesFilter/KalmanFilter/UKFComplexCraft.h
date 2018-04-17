@@ -122,9 +122,9 @@ namespace BSE {
 //				std::cout << "L block:" << L.block(state_x_.rows(),i ,noise_matrix.rows(),1).transpose() << "\n";
 
 
-				std::cout << "before:" << tmp_state_plus << "\n";
+				std::cout << "before:" << tmp_state_plus.transpose() << "\n";
 				update_function(tmp_state_plus, tmp_q_plus, tmp_input_plus, time_interval_, local_g_);
-				std::cout << "after " << tmp_state_plus << "\n";
+				std::cout << "after " << tmp_state_plus.transpose() << "\n";
 				update_function(tmp_state_minus, tmp_q_minus, tmp_input_minus, time_interval_, local_g_);
 
 				state_stack[i + 2] = tmp_state_plus;
