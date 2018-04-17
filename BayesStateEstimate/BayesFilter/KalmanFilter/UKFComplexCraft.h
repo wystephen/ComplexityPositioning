@@ -109,12 +109,14 @@ namespace BSE {
 				Eigen::Quaterniond tmp_q_minus = ImuTools::quaternion_update<double>(rotation_q_, L.block(6, i, 3, 1),
 				                                                                     -1.0 * coeff);
 
-				Eigen::Matrix<double,21,1> tmp_L = L.block(0, i, L.rows(), 1);
+				Eigen::Matrix<double, 21, 1> tmp_L = L.block(0, i, L.rows(), 1);
+				std::cout << "L:"
+				          << tmp_L.transpose()
+				          << "\n";
 
 
 				tmp_state_plus += L.block(0, i, state_x_.rows(), 1) * coeff;
 				tmp_state_minus -= L.block(0, i, state_x_.rows(), 1) * coeff;
-
 
 
 				Eigen::Matrix<double, 6, 1> tmp_input_plus = (input * 1.0);
@@ -126,11 +128,11 @@ namespace BSE {
 //				std::cout << "L block:" << L.block(state_x_.rows(),i ,noise_matrix.rows(),1).transpose() << "\n";
 
 
-				std::cout << "i:" << i << "before:" << tmp_state_plus.transpose() << "\n";
+//				std::cout << "i:" << i << "before:" << tmp_state_plus.transpose() << "\n";
 				update_function(tmp_state_plus, tmp_q_plus, tmp_input_plus, time_interval_, local_g_);
-				std::cout << "i:" << i << "after " << tmp_state_plus.transpose() << "\n";
+//				std::cout << "i:" << i << "after " << tmp_state_plus.transpose() << "\n";
 				update_function(tmp_state_minus, tmp_q_minus, tmp_input_minus, time_interval_, local_g_);
-				std::cout << "k:" << i << "after" << tmp_state_minus.transpose() << "\n";
+//				std::cout << "k:" << i << "after" << tmp_state_minus.transpose() << "\n";
 
 				state_stack[i + 2] = tmp_state_plus;
 				state_stack[i + sigma_point_size + 2] = tmp_state_minus;
@@ -138,6 +140,7 @@ namespace BSE {
 				rotation_stack[i + 2] = tmp_q_plus;
 				rotation_stack[i + sigma_point_size + 2] = tmp_q_minus;
 			}
+			std::cout << "----------------------------------------------------\n";
 
 
 			double weight = 1.0 / (sigma_point_size * 2.0 + 2.0);
@@ -237,6 +240,7 @@ namespace BSE {
 
 
 			logger_ptr->addPlotEvent("ukf_state_craft", "state", state_x_);
+			logger_ptr->addPlotEvent("ukf_craft","P",prob_state_);
 
 			return state_x_;
 
@@ -312,6 +316,8 @@ namespace BSE {
 			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
 			logger_ptr_->addPlotEvent("complexfull", "offset_acc", state_x_.block(9, 0, 3, 1));
 			logger_ptr_->addPlotEvent("complexfull", "offset_gyr", state_x_.block(12, 0, 3, 1));
+
+			logger_ptr_->addPlotEvent("ukf_craft_zv","P",prob_state_);
 
 
 		}
