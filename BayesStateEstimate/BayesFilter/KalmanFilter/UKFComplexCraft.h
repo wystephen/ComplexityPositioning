@@ -111,7 +111,7 @@ namespace BSE {
 				tmp_input_plus += L.block(state_x_.rows(),i,noise_matrix.rows(),1);
 				tmp_input_minus -= L.block(state_x_.rows(),i,noise_matrix.rows(),1);
 
-				std::cout << "L block:" << L.block(state_x_.rows(),i ,noise_matrix.rows(),1);
+				std::cout << "L block:" << L.block(state_x_.rows(),i ,noise_matrix.rows(),1).transpose() << "\n";
 
 
 				update_function(tmp_state_plus, tmp_q_plus, tmp_input_plus, time_interval_, local_g_);
