@@ -188,7 +188,7 @@ namespace BSE {
 			rotation_q_ = average_q;
 
 			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
-			logger_ptr_->addPlotEvent("ukf_craft","quaternion",rotation_q_.matrix());
+			logger_ptr_->addPlotEvent("ukf_craft","quaternion",rotation_q_.toRotationMatrix().eulerAngles(0,1,2));
 
 
 			// compute average state
