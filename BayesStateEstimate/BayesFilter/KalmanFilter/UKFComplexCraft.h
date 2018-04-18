@@ -54,7 +54,7 @@ namespace BSE {
 		 * @param noise_matrix
 		 * @return
 		 */
-		Eigen::Matrix<double, 15, 1> StateTransImu_jac(Eigen::Matrix<double, 6, 1> input,
+		Eigen::Matrix<double, 15, 1> StateTransIMU_jac(Eigen::Matrix<double, 6, 1> input,
 		                                               Eigen::Matrix<double, 6, 6> noise_matrix) {
 //			std::cout
 
@@ -74,7 +74,7 @@ namespace BSE {
 			                             state_x_.block(3, 0, 3, 1) * time_interval_;
 			state_x_.block(3, 0, 3, 1) = state_x_.block(3, 0, 3, 1) + acc * time_interval_;
 
-			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(q.toRotationMatrix());
+			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(rotation_q_.toRotationMatrix());
 
 
 			Eigen::Matrix3d Rb2t = ImuTools::q2dcm(rotation_q_);
@@ -90,8 +90,13 @@ namespace BSE {
 
 			Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
 
-			Eigen::Matrix3d Da = Eigen::Matrix3d::diagonal(input.block(0, 0, 3, 1));
-			Eigen::Matrix3d Dg = Eigen::Matrix3d::diagonal(input.block(3, 0, 3, 1));
+			Eigen::Matrix3d Da ;//= Eigen::Matrix3d::diagonal(input.block(0, 0, 3, 1));
+
+			Eigen::Matrix3d Dg ;//= Eigen::Matrix3d::diagonal(input.block(3, 0, 3, 1));
+			for(int i(0);i<3;++i){
+				Da(i,i) = input(i);
+				Dg(i,i) = input(i+3);
+			}
 
 			Eigen::Matrix3d B1 = O * 1.0;
 			Eigen::Matrix3d B2 = O * 1.0;
@@ -122,7 +127,7 @@ namespace BSE {
 				ERROR_MSG_FLAG("porb_state_ is nan.");
 			}
 
-			state_x_.block(6, 0, 3, , 1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
+			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
 
 			return state_x_;
 
