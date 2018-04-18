@@ -172,52 +172,48 @@ namespace BSE {
 		                                       Eigen::Matrix<T, 3, 1> angle_velocity,
 		                                       double time_interval) {
 			Eigen::Matrix<T, 4, 1> tmp_q;
-			tmp_q(3) = q_in.w();
-			tmp_q(0) = q_in.x();
-			tmp_q(1) = q_in.y();
-			tmp_q(2) = q_in.z();
+			tmp_q(0) = q_in.w();
+			tmp_q(1) = q_in.x();
+			tmp_q(2) = q_in.y();
+			tmp_q(3) = q_in.z();
 
-			Eigen::Matrix<T, 3, 1> tmp_w = angle_velocity * time_interval;
-			T w_norm = tmp_w.norm();
 
-			Eigen::Matrix<T, 4, 4> Theta;
-			Theta.setZero();
+			Eigen::Matrix<T, 4, 1> mul_q(1.0, 0.0, 0.0, 0.0);
+			Eigen::Matrix<T, 3, 1> angle_delta = angle_velocity * time_interval;
 
-			T c = 0.0;
-			T s = 0.0;
-//			c = 1 - w_norm * w_norm / 8.0 + pow(w_norm, 4.0) / 384.0;
-//			s = 0.5 - w_norm * w_norm / 48.0;
+			if (angle_delta.norm() > 1e-8) {
+				mul_q.block(1, 0, 3, 1) = angle_delta;
 
-			if (w_norm > 1e-6) {
-				c = cos(w_norm / 2.0);
-				s = 2 / w_norm * sin(w_norm / 2.0);
+				Eigen::Matrix<T, 4, 4> q_R;
+				q_R(0, 0) = mul_q(0);
+				q_R.block(1, 0, 3, 1) = mul_q.block(1, 0, 3, 1);
+				q_R.block(0, 1, 1, 3) = mul_q.block(1, 0, 3, 1).transpose();
+				q_R.block(1,1,3,3) = Eigen::Matrix<T,3,3>::Identity()*mul_q(0)-hat<double>(mul_q.block(1,0,3,1));
 
-//				Theta << c, -tmp_w(0) * s, -tmp_w(1) * s, -tmp_w(2) * s,
-//						tmp_w(0) * s, c, tmp_w(2) * s, -tmp_w(1),
-//						tmp_w(1) * s, -tmp_w(2) * s, c, tmp_w(0) * s,
-//						tmp_w(2) * s, tmp_w(1) * s, -tmp_w(0) * s, cy;
-				double P = tmp_w(2);
-				double Q = tmp_w(1);
-				double R = tmp_w(0);
-//				Theta << c, s * R, -s * Q, s * P,
-//						-s * R, c, s * P, s * Q,
-//						s * Q, -s * P, c, s * R,
-//						-s * P, -s * Q, -s * R, c;
-				Eigen::Matrix<T, 4, 4> OMEGA = Eigen::Matrix<T, 4, 4>::Identity();
-				OMEGA << 0.0, R, -Q, P,
-						-R, 0.0, P, Q,
-						Q, -P, 0.0, R,
-						-P, -Q, -R, 0.0;
-				OMEGA = OMEGA * 0.5;
+				tmp_q = q_R * tmp_q;
 
-				tmp_q = (cos(w_norm / 2.0) * Eigen::Matrix<T, 4, 4>::Identity() +
-				         2.0 / w_norm * sin(w_norm / 2.0) * OMEGA) * tmp_q;
-				tmp_q = tmp_q / tmp_q.norm();
 			}
-			Eigen::Quaternion<double> q_out(tmp_q(0), tmp_q(1), tmp_q(2), tmp_q(3));
 
+
+			Eigen::Quaternion<T> q_out(tmp_q(0), tmp_q(1), tmp_q(2), tmp_q(3));
 			return q_out;
+
 		}
+
+		/**
+		 * Hat of 3-dimension vector
+		 * @tparam T type of data internal.
+		 * @param v 3-dimension vector
+		 * @return
+		 */
+		template<typename T>
+		Eigen::Matrix<T, 3, 3> hat(Eigen::Matrix<T, 3, 1> v) {
+			Eigen::Matrix<T, 3, 3> v_hat;
+			v_hat << 0.0, -v(2), v(1),
+					v(2), 0.0, -v(0),
+					-v(1), v(0), 0.0;
+			return v_hat;
+		};
 
 
 		/**
@@ -320,58 +316,59 @@ namespace BSE {
 		 */
 		template<typename T>
 		Eigen::Matrix<T, 3, 3> q2dcm(Eigen::Quaternion<T> qua) {
-			Eigen::Matrix<T, 4, 1> q;
-			q(3) = qua.w();
-			q(0) = qua.x();
-			q(1) = qua.y();
-			q(2) = qua.z();
+//			Eigen::Matrix<T, 4, 1> q;
+//			q(3) = qua.w();
+//			q(0) = qua.x();
+//			q(1) = qua.y();
+//			q(2) = qua.z();
+//
+//
+//			Eigen::Matrix<T, 6, 1> p;
+//			p.setZero();
+//
+//			for (int i(0); i < 4; ++i) {
+//				p(i) = q(i) * q(i);
+//			}
+//
+//			p(4) = p(1) + p(2);
+//
+//			if (fabs(p(0) + p(3) + p(4)) > 1e-10) {
+//				p(5) = 2.0 / (p(0) + p(3) + p(4));
+//
+//			} else {
+//				p(5) = 0.0;
+//			}
+//
+//
+//			Eigen::Matrix<T, 3, 3> R(Eigen::Matrix3d::Identity());
+////        R.setZero();
+//
+//			R(0, 0) = 1 - p(5) * p(4);
+//			R(1, 1) = 1 - p(5) * (p(0) + p(2));
+//			R(2, 2) = 1 - p(5) * (p(0) + p(1));
+//
+//			p(0) = p(5) * q(0);
+//			p(1) = p(5) * q(1);
+//			p(4) = p(5) * q(2) * q(3);
+//			p(5) = p(0) * q(1);
+//
+//			R(0, 1) = p(5) - p(4);
+//			R(1, 0) = p(5) + p(4);
+//
+//			p(4) = p(1) * q(3);
+//			p(5) = p(0) * q(2);
+//
+//			R(0, 2) = p(5) + p(4);
+//			R(2, 0) = p(5) - p(4);
+//
+//			p(4) = p(0) * q(3);
+//			p(5) = p(1) * q(2);
+//
+//			R(1, 2) = p(5) - p(4);
+//			R(2, 1) = p(5) + p(4);
 
-
-			Eigen::Matrix<T, 6, 1> p;
-			p.setZero();
-
-			for (int i(0); i < 4; ++i) {
-				p(i) = q(i) * q(i);
-			}
-
-			p(4) = p(1) + p(2);
-
-			if (fabs(p(0) + p(3) + p(4)) > 1e-10) {
-				p(5) = 2.0 / (p(0) + p(3) + p(4));
-
-			} else {
-				p(5) = 0.0;
-			}
-
-
-			Eigen::Matrix<T, 3, 3> R(Eigen::Matrix3d::Identity());
-//        R.setZero();
-
-			R(0, 0) = 1 - p(5) * p(4);
-			R(1, 1) = 1 - p(5) * (p(0) + p(2));
-			R(2, 2) = 1 - p(5) * (p(0) + p(1));
-
-			p(0) = p(5) * q(0);
-			p(1) = p(5) * q(1);
-			p(4) = p(5) * q(2) * q(3);
-			p(5) = p(0) * q(1);
-
-			R(0, 1) = p(5) - p(4);
-			R(1, 0) = p(5) + p(4);
-
-			p(4) = p(1) * q(3);
-			p(5) = p(0) * q(2);
-
-			R(0, 2) = p(5) + p(4);
-			R(2, 0) = p(5) - p(4);
-
-			p(4) = p(0) * q(3);
-			p(5) = p(1) * q(2);
-
-			R(1, 2) = p(5) - p(4);
-			R(2, 1) = p(5) + p(4);
-
-			return R;
+//			return R;
+			return qua.toRotationMatrix();
 		}
 
 		template<typename T>

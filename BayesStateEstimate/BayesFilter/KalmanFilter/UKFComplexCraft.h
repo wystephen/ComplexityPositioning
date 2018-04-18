@@ -188,7 +188,7 @@ namespace BSE {
 			rotation_q_ = average_q;
 
 			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
-			logger_ptr_->addPlotEvent("ukf_craft","quaternion",rotation_q_.toRotationMatrix().eulerAngles(0,1,2));
+			logger_ptr_->addPlotEvent("ukf_craft", "quaternion", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2));
 
 
 			// compute average state
@@ -234,7 +234,7 @@ namespace BSE {
 //			logger_ptr->addPlotEvent("ukf", "probability", prob_state_);
 
 			double after_p_norm = prob_state_.norm();
-			if (after_p_norm > 10.0 * before_p_norm || after_p_norm > 4.0) {
+			if (after_p_norm > 10.0 * before_p_norm && after_p_norm > 4.0) {
 
 
 				std::cout << "average rotation:" << average_q.w()
@@ -257,6 +257,7 @@ namespace BSE {
 
 //			logger_ptr->addPlotEvent("ukf_state_craft", "state", state_x_);
 //			logger_ptr->addPlotEvent("ukf_craft", "P", prob_state_);
+			logger_ptr->addPlotEvent("ukf_craft","rotated acc",rotation_q_ * input.block(0,0,3,1));
 
 			return state_x_;
 
