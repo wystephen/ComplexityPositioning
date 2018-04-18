@@ -195,7 +195,7 @@ namespace BSE {
 //				Theta << c, -tmp_w(0) * s, -tmp_w(1) * s, -tmp_w(2) * s,
 //						tmp_w(0) * s, c, tmp_w(2) * s, -tmp_w(1),
 //						tmp_w(1) * s, -tmp_w(2) * s, c, tmp_w(0) * s,
-//						tmp_w(2) * s, tmp_w(1) * s, -tmp_w(0) * s, c;
+//						tmp_w(2) * s, tmp_w(1) * s, -tmp_w(0) * s, cy;
 				double P = tmp_w(0);
 				double Q = tmp_w(1);
 				double R = tmp_w(2);
