@@ -202,7 +202,8 @@ namespace BSE {
 				q_R(0, 0) = mul_q(0);
 				q_R.block(1, 0, 3, 1) = mul_q.block(1, 0, 3, 1);
 				q_R.block(0, 1, 1, 3) = mul_q.block(1, 0, 3, 1).transpose();
-				q_R.block(1,1,3,3) = Eigen::Matrix<T,3,3>::Identity()*mul_q(0)-hat<double>(mul_q.block(1,0,3,1));
+				q_R.block(1, 1, 3, 3) =
+						Eigen::Matrix<T, 3, 3>::Identity() * mul_q(0) - hat<double>(mul_q.block(1, 0, 3, 1));
 
 				tmp_q = q_R * tmp_q;
 
@@ -213,8 +214,6 @@ namespace BSE {
 			return q_out;
 
 		}
-
-
 
 
 		/**
