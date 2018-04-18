@@ -99,7 +99,7 @@ namespace BSE {
 			double coeff = std::sqrt(sigma_point_size + 1);
 
 
-//#pragma omp parallel for num_threads(12)
+#pragma omp parallel for num_threads(12)
 			for (int i = (0); i < sigma_point_size; ++i) {
 
 
@@ -295,11 +295,11 @@ namespace BSE {
 			double before_p_norm = prob_state_.norm();
 			prob_state_ = (Eigen::Matrix<double, 15, 15>::Identity() - K_ * H_) * prob_state_;
 			prob_state_ = (prob_state_ + prob_state_.transpose().eval()) * 0.5;
-			std::cout << "zv before:"
-			          << before_p_norm
-			          << "after "
-			          << prob_state_.norm()
-			          << "\n";
+//			std::cout << "zv before:"
+//			          << before_p_norm
+//			          << "after "
+//			          << prob_state_.norm()
+//			          << "\n";
 			if (prob_state_.norm() > 10000) {
 				std::cout << __FILE__
 				          << ":"
