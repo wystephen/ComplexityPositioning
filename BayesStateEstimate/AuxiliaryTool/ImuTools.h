@@ -196,9 +196,9 @@ namespace BSE {
 //						tmp_w(0) * s, c, tmp_w(2) * s, -tmp_w(1),
 //						tmp_w(1) * s, -tmp_w(2) * s, c, tmp_w(0) * s,
 //						tmp_w(2) * s, tmp_w(1) * s, -tmp_w(0) * s, cy;
-				double P = tmp_w(0);
+				double P = tmp_w(2);
 				double Q = tmp_w(1);
-				double R = tmp_w(2);
+				double R = tmp_w(0);
 //				Theta << c, s * R, -s * Q, s * P,
 //						-s * R, c, s * P, s * Q,
 //						s * Q, -s * P, c, s * R,
