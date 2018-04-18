@@ -109,23 +109,22 @@ namespace BSE {
 				                                                                     -1.0 * coeff);
 
 				Eigen::Matrix<double, 21, 1> tmp_L = L.block(0, i, L.rows(), 1);
-//				std::cout << "L:"
-//				          << tmp_L.transpose()
-//				          << "\n";
+
+
 				Eigen::Matrix<double, 15, 1> tmp_L_state = tmp_L.block(0, 0, 15, 1);
 				Eigen::Matrix<double, 6, 1> tmp_L_input = tmp_L.block(15, 0, 6, 1);
 
 
-				Eigen::Matrix<double, 15, 1> tmp_state_plus = (state_x_ * 1.0) + coeff * tmp_L_state;
-				Eigen::Matrix<double, 15, 1> tmp_state_minus = (state_x_ * 1.0) - coeff * tmp_L_state;
+				Eigen::Matrix<double, 15, 1> tmp_state_plus = (tmp_state) + coeff * tmp_L_state;
+				Eigen::Matrix<double, 15, 1> tmp_state_minus = (tmp_state ) - coeff * tmp_L_state;
 
 
 //				tmp_state_plus += L.block(0, i, state_x_.rows(), 1) * coeff;
 //				tmp_state_minus -= L.block(0, i, state_x_.rows(), 1) * coeff;
 
 
-				Eigen::Matrix<double, 6, 1> tmp_input_plus = (input * 1.0) + coeff * tmp_L_input;
-				Eigen::Matrix<double, 6, 1> tmp_input_minus = (input * 1.0) - coeff * tmp_L_input;
+				Eigen::Matrix<double, 6, 1> tmp_input_plus = (tmp_input) + coeff * tmp_L_input;
+				Eigen::Matrix<double, 6, 1> tmp_input_minus = (tmp_input) - coeff * tmp_L_input;
 
 //				tmp_input_plus += L.block(state_x_.rows(), i, noise_matrix.rows(), 1) * coeff;
 //				tmp_input_minus -= L.block(state_x_.rows(), i, noise_matrix.rows(), 1) * coeff;

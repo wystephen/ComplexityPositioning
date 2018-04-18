@@ -133,9 +133,9 @@ int main(int argc, char *argv[]) {
 //		auto filter_complex = BSE::UKFComplex(initial_prob_matrix);
 //        auto filter_complex = BSE::KFComplexFull(initial_prob_matrix_complex);
 
-//		auto complex_full_filter = BSE::KFComplexFull(initial_prob_matrix_complex);
-//		auto complex_full_filter = BSE::UKFComplex(initial_prob_matrix_complex);
-		auto complex_full_filter = BSE::UKFComplexCraft(initial_prob_matrix_complex);
+//		auto complex_ukf_filter = BSE::KFComplexFull(initial_prob_matrix_complex);
+//		auto complex_ukf_filter = BSE::UKFComplex(initial_prob_matrix_complex);
+		auto complex_ukf_filter = BSE::UKFComplexCraft(initial_prob_matrix_complex);
 
 		auto ff_filter = BSE::KFComplexFF(initial_prob_matrix_ff);
 
@@ -153,14 +153,14 @@ int main(int argc, char *argv[]) {
 			filter.setTime_interval_(tmp_time_interval);
 			filter_complex.time_interval_ = tmp_time_interval;
 		}
-		complex_full_filter.time_interval_ = filter_complex.time_interval_;
-		ff_filter.time_interval_ = complex_full_filter.time_interval_;
+		complex_ukf_filter.time_interval_ = filter_complex.time_interval_;
+		ff_filter.time_interval_ = complex_ukf_filter.time_interval_;
 
 
 		filter.setLocal_g_(-9.8);
 		filter_complex.local_g_ = -9.8;
-		complex_full_filter.local_g_ = filter_complex.local_g_;
-		ff_filter.local_g_ = complex_full_filter.local_g_;
+		complex_ukf_filter.local_g_ = filter_complex.local_g_;
+		ff_filter.local_g_ = complex_ukf_filter.local_g_;
 //    filter.IS_DEBUG = true;
 		std::vector<double> zv_flag = {};
 
@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
 		                             initial_pos);
 		std::cout << "initial state costed time :" << AWF::getDoubleSecondTime() - time_begin
 		          << std::endl;
-		complex_full_filter.initial_state(imu_data.block(10, 1, 100, 9),
+		complex_ukf_filter.initial_state(imu_data.block(10, 1, 100, 9),
 		                                  initial_ori,
 		                                  initial_pos);
 		ff_filter.initial_state(imu_data.block(10, 1, 100, 9),
@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
 
 
 //    filter.sett
-		for (int i(5); i < imu_data.rows() * 0.1 - 5; ++i) {
+		for (int i(5); i < imu_data.rows() * 1.0- 5; ++i) {
 			/// state transaction equation
 //			filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
 //			                        process_noise_matrix,
@@ -195,17 +195,17 @@ int main(int argc, char *argv[]) {
 //			auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
 //			                                                  process_noise_matrix);
 			auto complex_full_state =
-					complex_full_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+					complex_ukf_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
 					                                  process_noise_matrix);
 
-			auto ff_full_state =
-					ff_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+//			auto ff_full_state =
+//					ff_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
 					                        process_noise_matrix);
 
 
 //            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
 //                                                   Eigen::Matrix3d::Identity() * 0.000246);
-//			complex_full_filter.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
+//			complex_ukf_filter.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
 //			                                            Eigen::Matrix3d::Identity() * 0.00001);
 
 			double uwb_index = 0;
@@ -221,9 +221,9 @@ int main(int argc, char *argv[]) {
 
 //				filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.025);
 
-				complex_full_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.000025);
+				complex_ukf_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.000025);
 
-				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000025);
+//				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000025);
 
 
 				/// angle constraint through acc.
@@ -263,7 +263,7 @@ int main(int argc, char *argv[]) {
 
 			Eigen::VectorXd state_simple = filter.getState_();
 			Eigen::VectorXd state = filter_complex.state_x_;
-			Eigen::VectorXd full_state = complex_full_filter.state_x_;
+			Eigen::VectorXd full_state = complex_ukf_filter.state_x_;
 			Eigen::VectorXd ff_state = ff_filter.state_x_;
 
 			logger_ptr->addPlotEvent(data_name + "velocity", "velocitysimple", state_simple.block(3, 0, 3, 1));
