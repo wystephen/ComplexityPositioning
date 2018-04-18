@@ -26,6 +26,19 @@ namespace BSE {
 
 
 		/**
+		 * @brief State update and state probability update based on Jacbian matrix.
+		 * @param input
+		 * @param noise_matrix
+		 * @return
+		 */
+		Eigen::Matrix<double, 15, 1> StateTransImu_jac(Eigen::Matrix<double, 6, 1> input,
+		                                           Eigen::Matrix<double, 6, 6> noise_matrix) {
+//			std::cout
+
+		};
+
+
+		/**
 		 * state transaction function
 		 * @param input
 		 * @param noise_matrix
@@ -34,6 +47,7 @@ namespace BSE {
 		Eigen::Matrix<double, 15, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
 		                                           Eigen::Matrix<double, 6, 6> noise_matrix) {
 
+			std::cout << "time interval:" << time_interval_ << std::endl;
 			Eigen::MatrixXd Sigma_matrix(prob_state_.rows() + noise_matrix.rows(),
 			                             prob_state_.cols() + noise_matrix.cols());
 			Sigma_matrix.setZero();
@@ -190,7 +204,8 @@ namespace BSE {
 
 //				std::cout << state.transpose() << "\n";
 			}
-			state_x_.block(6, 0, 3, 1) = average_q.toRotationMatrix().eulerAngles(0, 1, 2);
+//			state_x_.block(6, 0, 3, 1) = average_q.toRotationMatrix().eulerAngles(0, 1, 2);
+			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(average_q.toRotationMatrix());
 
 
 
@@ -315,7 +330,7 @@ namespace BSE {
 
 			state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
 
-			Eigen::Matrix3d rbn = ImuTools::q2dcm(rotation_q_);
+			Eigen::Matrix3d rbn = ImuTools::q2dcm<double>(rotation_q_);
 			Eigen::Matrix3d r_update = Eigen::Matrix3d::Identity();
 			Eigen::Vector3d epsilon(dX_(6), dX_(7), dX_(8));
 
