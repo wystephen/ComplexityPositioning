@@ -194,9 +194,15 @@ int main(int argc, char *argv[]) {
 
 //			auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
 //			                                                  process_noise_matrix);
+//			auto complex_full_state =
+//					complex_ukf_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+//					                                  process_noise_matrix);
 			auto complex_full_state =
-					complex_ukf_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+					complex_ukf_filter.StateTransIMU_jac(imu_data.block(i, 1, 1, 6).transpose(),
 					                                  process_noise_matrix);
+
+
+
 
 			auto ff_full_state =
 					ff_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),

@@ -32,8 +32,83 @@ namespace BSE {
 		 * @return
 		 */
 		Eigen::Matrix<double, 15, 1> StateTransImu_jac(Eigen::Matrix<double, 6, 1> input,
-		                                           Eigen::Matrix<double, 6, 6> noise_matrix) {
+		                                               Eigen::Matrix<double, 6, 6> noise_matrix) {
 //			std::cout
+			auto update_function = [](Eigen::Matrix<double, 15, 1> &state,
+			                          Eigen::Quaterniond &q,
+			                          Eigen::Matrix<double, 6, 1> &input,
+			                          double time_interval_,
+			                          double local_g_) {
+				q = ImuTools::quaternion_update<double>(q,
+				                                        input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1),
+				                                        time_interval_);
+//				std::cout << "time interval :" << time_interval_ << std::endl;
+
+				Eigen::Vector3d acc = q * (input.block(0, 0, 3, 1) + state.block(9, 0, 3, 1)) +
+				                      Eigen::Vector3d(0, 0, local_g_);
+
+//				std::cout << "local g:" << local_g_ << " acc:" << acc.transpose() << std::endl;
+				state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +
+				                          state.block(3, 0, 3, 1) * time_interval_;
+				state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) + acc * time_interval_;
+
+				state.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(q.toRotationMatrix());
+
+//				state.block(9,0,6,1) =
+
+			};
+
+			update_function(state_x_, rotation_q_, input, time_interval_, local_g_);
+
+			Eigen::Matrix3d Rb2t = ImuTools::q2dcm(rotation_q_);
+
+			Eigen::Vector3d f_t = Rb2t * input.block(0, 0, 3, 1);
+
+			Eigen::Matrix3d St;
+			St << 0.0, -f_t(2), f_t(1),
+					f_t(2), 0.0, -f_t(0),
+					-f_t(1), f_t(0), 0.0;
+
+			Eigen::Matrix3d O = Eigen::Matrix3d::Zero();
+
+			Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
+
+			Eigen::Matrix3d Da = Eigen::Matrix3d::diagonal(input.block(0, 0, 3, 1));
+			Eigen::Matrix3d Dg = Eigen::Matrix3d::diagonal(input.block(3, 0, 3, 1));
+
+			Eigen::Matrix3d B1 = O * 1.0;
+			Eigen::Matrix3d B2 = O * 1.0;
+
+			Eigen::Matrix<double, 15, 15> Fc;
+			Fc.setZero();
+			Fc.block(0, 3, 3, 3) = I;
+
+			Fc.block(3, 6, 3, 3) = St;
+			Fc.block(3, 9, 3, 3) = Rb2t;
+
+			Fc.block(6, 12, 3, 3) = -1.0 * Rb2t;
+
+
+			Eigen::Matrix<double, 15, 6> Gc;
+			Gc.setZero();
+
+			Gc.block(3, 0, 3, 3) = Rb2t;
+			Gc.block(6, 3, 3, 3) = -1.0 * Rb2t;
+
+			prob_state_ = Fc * prob_state_ * Fc.transpose() +
+			              Gc * noise_matrix * Gc.transpose();
+
+			prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose());
+
+
+			if (std::isnan(prob_state_.sum())) {
+				ERROR_MSG_FLAG("porb_state_ is nan.");
+			}
+
+			state_x_.block(6,0,3,,1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
+
+			return state_x_;
+
 
 		};
 
@@ -47,7 +122,7 @@ namespace BSE {
 		Eigen::Matrix<double, 15, 1> StateTransIMU(Eigen::Matrix<double, 6, 1> input,
 		                                           Eigen::Matrix<double, 6, 6> noise_matrix) {
 
-			std::cout << "time interval:" << time_interval_ << std::endl;
+//			std::cout << "time interval:" << time_interval_ << std::endl;
 			Eigen::MatrixXd Sigma_matrix(prob_state_.rows() + noise_matrix.rows(),
 			                             prob_state_.cols() + noise_matrix.cols());
 			Sigma_matrix.setZero();
