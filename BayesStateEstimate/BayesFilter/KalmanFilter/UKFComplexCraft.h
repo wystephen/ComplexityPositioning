@@ -96,7 +96,7 @@ namespace BSE {
 			rotation_stack[0] = tmp_q;
 			rotation_stack[1] = tmp_q;
 
-			double coeff = 1.0 / std::sqrt(sigma_point_size + 1);
+			double coeff =  std::sqrt(sigma_point_size + 1.0);
 
 
 #pragma omp parallel for num_threads(12)
