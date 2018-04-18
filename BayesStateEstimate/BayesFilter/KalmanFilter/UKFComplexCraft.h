@@ -329,7 +329,7 @@ namespace BSE {
 					-epsilon(2), 1.0, epsilon(0),
 					epsilon(1), -epsilon(0), 1.0;
 
-			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
+//			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
 			rotation_q_.normalize();
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(r_update * rbn);
 
