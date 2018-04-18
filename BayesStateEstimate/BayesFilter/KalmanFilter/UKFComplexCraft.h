@@ -24,6 +24,29 @@ namespace BSE {
 
 		}
 
+		void update_function(Eigen::Matrix<double, 15, 1> &state,
+		                     Eigen::Quaterniond &q,
+		                     Eigen::Matrix<double, 6, 1> &input,
+		                     double time_interval_,
+		                     double local_g_) {
+			q = ImuTools::quaternion_update<double>(q,
+			                                        input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1),
+			                                        time_interval_);
+//				std::cout << "time interval :" << time_interval_ << std::endl;
+
+			Eigen::Vector3d acc = q * (input.block(0, 0, 3, 1) + state.block(9, 0, 3, 1)) +
+			                      Eigen::Vector3d(0, 0, local_g_);
+
+//				std::cout << "local g:" << local_g_ << " acc:" << acc.transpose() << std::endl;
+			state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +
+			                          state.block(3, 0, 3, 1) * time_interval_;
+			state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) + acc * time_interval_;
+
+			state.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(q.toRotationMatrix());
+
+//				state.block(9,0,6,1) =
+
+		}
 
 		/**
 		 * @brief State update and state probability update based on Jacbian matrix.
@@ -34,31 +57,25 @@ namespace BSE {
 		Eigen::Matrix<double, 15, 1> StateTransImu_jac(Eigen::Matrix<double, 6, 1> input,
 		                                               Eigen::Matrix<double, 6, 6> noise_matrix) {
 //			std::cout
-			auto update_function = [](Eigen::Matrix<double, 15, 1> &state,
-			                          Eigen::Quaterniond &q,
-			                          Eigen::Matrix<double, 6, 1> &input,
-			                          double time_interval_,
-			                          double local_g_) {
-				q = ImuTools::quaternion_update<double>(q,
-				                                        input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1),
-				                                        time_interval_);
-//				std::cout << "time interval :" << time_interval_ << std::endl;
 
-				Eigen::Vector3d acc = q * (input.block(0, 0, 3, 1) + state.block(9, 0, 3, 1)) +
-				                      Eigen::Vector3d(0, 0, local_g_);
 
-//				std::cout << "local g:" << local_g_ << " acc:" << acc.transpose() << std::endl;
-				state.block(0, 0, 3, 1) = state.block(0, 0, 3, 1) +
-				                          state.block(3, 0, 3, 1) * time_interval_;
-				state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) + acc * time_interval_;
+//			Eigen::MatrixXd tmp_x = state_x_;
+//			Eigen::MatrixXd tmp_q = rotation_q_;
+//			update_function(state_x_, rotation_q_, input, time_interval_, local_g_);
 
-				state.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(q.toRotationMatrix());
 
-//				state.block(9,0,6,1) =
+			rotation_q_ = ImuTools::quaternion_update<double>(rotation_q_,
+			                                                  input.block(3, 0, 3, 1) + state_x_.block(12, 0, 3, 1),
+			                                                  time_interval_);
 
-			};
+			Eigen::Vector3d acc = rotation_q_ * (input.block(0, 0, 3, 1) + state_x_.block(9, 0, 3, 1)) +
+			                      Eigen::Vector3d(0, 0, local_g_);
+			state_x_.block(0, 0, 3, 1) = state_x_.block(0, 0, 3, 1) +
+			                             state_x_.block(3, 0, 3, 1) * time_interval_;
+			state_x_.block(3, 0, 3, 1) = state_x_.block(3, 0, 3, 1) + acc * time_interval_;
 
-			update_function(state_x_, rotation_q_, input, time_interval_, local_g_);
+			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(q.toRotationMatrix());
+
 
 			Eigen::Matrix3d Rb2t = ImuTools::q2dcm(rotation_q_);
 
@@ -105,7 +122,7 @@ namespace BSE {
 				ERROR_MSG_FLAG("porb_state_ is nan.");
 			}
 
-			state_x_.block(6,0,3,,1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
+			state_x_.block(6, 0, 3, , 1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
 
 			return state_x_;
 
