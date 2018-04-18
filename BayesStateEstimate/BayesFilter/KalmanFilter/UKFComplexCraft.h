@@ -96,7 +96,7 @@ namespace BSE {
 			rotation_stack[0] = tmp_q;
 			rotation_stack[1] = tmp_q;
 
-			double coeff = std::sqrt(sigma_point_size + 1);
+			double coeff =1.0/ std::sqrt(sigma_point_size + 1);
 
 
 #pragma omp parallel for num_threads(12)
@@ -119,18 +119,12 @@ namespace BSE {
 				Eigen::Matrix<double, 15, 1> tmp_state_minus = (tmp_state ) - coeff * tmp_L_state;
 
 
-//				tmp_state_plus += L.block(0, i, state_x_.rows(), 1) * coeff;
-//				tmp_state_minus -= L.block(0, i, state_x_.rows(), 1) * coeff;
-
 
 				Eigen::Matrix<double, 6, 1> tmp_input_plus = (tmp_input) + coeff * tmp_L_input;
 				Eigen::Matrix<double, 6, 1> tmp_input_minus = (tmp_input) - coeff * tmp_L_input;
 
-//				tmp_input_plus += L.block(state_x_.rows(), i, noise_matrix.rows(), 1) * coeff;
-//				tmp_input_minus -= L.block(state_x_.rows(), i, noise_matrix.rows(), 1) * coeff;
-//				tmp_input_plus
 
-//				std::cout << "L block:" << L.block(state_x_.rows(),i ,noise_matrix.rows(),1).transpose() << "\n";
+
 
 
 //				std::cout << "i:" << i << "before:" << tmp_state_plus.transpose() << "\n";
