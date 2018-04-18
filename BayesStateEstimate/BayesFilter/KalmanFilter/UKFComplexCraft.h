@@ -76,7 +76,7 @@ namespace BSE {
 				                          state.block(3, 0, 3, 1) * time_interval_;
 				state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) + acc * time_interval_;
 
-				state.block(6, 0, 3, 1) = q.toRotationMatrix().eulerAngles(0, 1, 2);
+				state.block(6, 0, 3, 1) = ImuTools::q
 
 //				state.block(9,0,6,1) =
 
