@@ -76,7 +76,7 @@ namespace BSE {
 				                          state.block(3, 0, 3, 1) * time_interval_;
 				state.block(3, 0, 3, 1) = state.block(3, 0, 3, 1) + acc * time_interval_;
 
-				state.block(6, 0, 3, 1) = ImuTools::q
+				state.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(q.toRotationMatrix());
 
 //				state.block(9,0,6,1) =
 
@@ -96,7 +96,7 @@ namespace BSE {
 			rotation_stack[0] = tmp_q;
 			rotation_stack[1] = tmp_q;
 
-			double coeff =1.0/ std::sqrt(sigma_point_size + 1);
+			double coeff = 1.0 / std::sqrt(sigma_point_size + 1);
 
 
 #pragma omp parallel for num_threads(12)
@@ -116,8 +116,7 @@ namespace BSE {
 
 
 				Eigen::Matrix<double, 15, 1> tmp_state_plus = (tmp_state) + coeff * tmp_L_state;
-				Eigen::Matrix<double, 15, 1> tmp_state_minus = (tmp_state ) - coeff * tmp_L_state;
-
+				Eigen::Matrix<double, 15, 1> tmp_state_minus = (tmp_state) - coeff * tmp_L_state;
 
 
 				Eigen::Matrix<double, 6, 1> tmp_input_plus = (tmp_input) + coeff * tmp_L_input;
