@@ -158,6 +158,20 @@ namespace BSE {
 			return r.log();
 		}
 
+		/**
+		 * Hat of 3-dimension vector
+		 * @tparam T type of data internal.
+		 * @param v 3-dimension vector
+		 * @return
+		 */
+		template<typename T>
+		Eigen::Matrix<T, 3, 3> hat(Eigen::Matrix<T, 3, 1> v) {
+			Eigen::Matrix<T, 3, 3> v_hat;
+			v_hat << 0.0, -v(2), v(1),
+					v(2), 0.0, -v(0),
+					-v(1), v(0), 0.0;
+			return v_hat;
+		};
 
 		/**
 		 * quaternion update function adopted in
@@ -200,20 +214,7 @@ namespace BSE {
 
 		}
 
-		/**
-		 * Hat of 3-dimension vector
-		 * @tparam T type of data internal.
-		 * @param v 3-dimension vector
-		 * @return
-		 */
-		template<typename T>
-		Eigen::Matrix<T, 3, 3> hat(Eigen::Matrix<T, 3, 1> v) {
-			Eigen::Matrix<T, 3, 3> v_hat;
-			v_hat << 0.0, -v(2), v(1),
-					v(2), 0.0, -v(0),
-					-v(1), v(0), 0.0;
-			return v_hat;
-		};
+
 
 
 		/**

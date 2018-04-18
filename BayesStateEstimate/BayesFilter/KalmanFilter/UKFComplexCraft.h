@@ -257,7 +257,8 @@ namespace BSE {
 
 //			logger_ptr->addPlotEvent("ukf_state_craft", "state", state_x_);
 //			logger_ptr->addPlotEvent("ukf_craft", "P", prob_state_);
-			logger_ptr->addPlotEvent("ukf_craft","rotated acc",rotation_q_ * input.block(0,0,3,1));
+			logger_ptr->addPlotEvent("ukf_craft", "rotated acc", rotation_q_ * input.block(0, 0, 3, 1));
+			logger_ptr->addPlotEvent("ukf_craft", "q_norm", rotation_q_.norm());
 
 			return state_x_;
 
