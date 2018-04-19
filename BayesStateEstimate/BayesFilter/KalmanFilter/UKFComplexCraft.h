@@ -134,10 +134,12 @@ namespace BSE {
 			G = time_interval_ * Gc;
 
 
+			double old_p_norm = prob_state_.norm();
 			prob_state_ = F * prob_state_ * F.transpose() +
 			              G * noise_matrix * G.transpose();
 
 			prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose());
+			double new_p_norm = prob_state_.norm();
 
 
 			if (std::isnan(prob_state_.sum())) {
@@ -157,10 +159,13 @@ namespace BSE {
 			logger_ptr_->addPlotEvent("ukf_craft_jac", "before_q", before_q.toRotationMatrix().eulerAngles(0, 1, 2));
 			logger_ptr_->addPlotEvent("ukf_craft_jac", "input", input.block(3, 0, 3, 1));
 			logger_ptr_->addPlotEvent("ukf_craft_jac", "after_q", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2));
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "after_q",
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "diff_q",
 			                          (before_q.inverse() * rotation_q_).toRotationMatrix().eulerAngles(0, 1, 2));
 
 			logger_ptr_->addPlotEvent("ukf_craft_jac", "pos", state_x_.block(0, 0, 3, 1));
+
+			logger_ptr_->addPlotEvent("craft_jac","b_p_norm",old_p_norm);
+			logger_ptr_->addPlotEvent("craft_jac","after_p_norm",new_p_norm);
 
 
 			return state_x_;
@@ -437,6 +442,7 @@ namespace BSE {
 			double before_p_norm = prob_state_.norm();
 			prob_state_ = (Eigen::Matrix<double, 15, 15>::Identity() - K_ * H_) * prob_state_;
 			prob_state_ = (prob_state_ + prob_state_.transpose().eval()) * 0.5;
+			double after_p_norm = prob_state_.norm();
 //			std::cout << "zv before:"
 //			          << before_p_norm
 //			          << "after "
@@ -491,6 +497,7 @@ namespace BSE {
 			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
 
 			logger_ptr_->addPlotEvent("ukf_craft", "epsilon", epsilon);
+			logger_ptr_->addPlotEvent("ukf_craft", "angle_before", tmp_before_q.toRotationMatrix().eulerAngles(0, 1, 2));
 			logger_ptr_->addPlotEvent("ukf_craft", "angle_after", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2));
 			logger_ptr_->addPlotEvent("ukf_craft", "angle_diff", (rotation_q_.inverse() *
 			                                                      tmp_before_q).toRotationMatrix().eulerAngles(0, 1,
@@ -499,6 +506,9 @@ namespace BSE {
 			logger_ptr_->addPlotEvent("ukf_craft_state", "pos", state_x_.block(0, 0, 3, 1));
 			logger_ptr_->addPlotEvent("ukf_craft_state", "vel", state_x_.block(3, 0, 3, 1));
 
+
+			logger_ptr_->addPlotEvent("craft_zv","b_p_norm",before_p_norm);
+			logger_ptr_->addPlotEvent("craft_zv","after_p_norm",after_p_norm);
 
 		}
 
