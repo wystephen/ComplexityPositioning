@@ -303,6 +303,7 @@ int main(int argc, char *argv[]) {
 //    f(head_imu_data, "head");
 
 	std::cout << "time:" << AWF::getDoubleSecondTime() - start_time << std::endl;
+	std::cout << "data time:" << right_imu_data(right_imu_data.rows() - 5, 0) - right_imu_data(0, 0) << std::endl;
 
 	logger_ptr->outputAllEvent(true);
 
