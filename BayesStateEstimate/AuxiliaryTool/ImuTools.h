@@ -191,7 +191,7 @@ namespace BSE {
 			tmp_q(2) = q_in.y();
 			tmp_q(3) = q_in.z();
 
-			Eigen::Matrix<T, 3, 1> eta = update_angle * coeff * 0.5;
+			Eigen::Matrix<T, 3, 1> eta = update_angle * coeff ;
 			T eta_norm = eta.norm();
 
 			Eigen::Matrix<T, 4, 1> mul_q;
