@@ -457,10 +457,10 @@ namespace BSE {
 			Eigen::Matrix3d r_update = Eigen::Matrix3d::Identity();
 			Eigen::Vector3d epsilon(dX_(6), dX_(7), dX_(8));
 
-//			r_update << 1.0, epsilon(2), -epsilon(1),
-//					-epsilon(2), 1.0, epsilon(0),
-//					epsilon(1), -epsilon(0), 1.0;
-			r_update=Eigen::Matrix3d::Identity()+ImuTools::hat(epsilon);
+			r_update << 1.0, epsilon(2), -epsilon(1),
+					-epsilon(2), 1.0, epsilon(0),
+					epsilon(1), -epsilon(0), 1.0;
+//			r_update=Eigen::Matrix3d::Identity()+ImuTools::hat(epsilon);
 
 			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
 			rotation_q_.normalize();

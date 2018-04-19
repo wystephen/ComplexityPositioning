@@ -185,6 +185,9 @@ namespace BSE {
 		Eigen::Quaternion<T> quaternion_update(Eigen::Quaternion<T> q_in,
 		                                       Eigen::Matrix<T, 3, 1> angle_velocity,
 		                                       double time_interval) {
+			/**
+			 * Typical update way of quaternion.
+			 * */
 			Eigen::Matrix<T, 4, 1> tmp_q;
 			tmp_q(0) = q_in.w();
 			tmp_q(1) = q_in.x();
@@ -205,7 +208,7 @@ namespace BSE {
 				q_R(0, 0) = mul_q(0);
 //				q_R = q_R + Eigen::Matrix<T, 4, 4>::Identity() * mul_q(0);
 				q_R.block(1, 0, 3, 1) = mul_q.block(1, 0, 3, 1);
-				q_R.block(0, 1, 1, 3) = mul_q.block(1, 0, 3, 1).transpose();
+				q_R.block(0, 1, 1, 3) = -1.0 * mul_q.block(1, 0, 3, 1).transpose();
 				q_R.block(1, 1, 3, 3) =
 						Eigen::Matrix<T, 3, 3>::Identity() * mul_q(0) - hat<double>(mul_q.block(1, 0, 3, 1));
 
@@ -221,6 +224,31 @@ namespace BSE {
 			Eigen::Quaternion<T> q_out(tmp_q(0), tmp_q(1), tmp_q(2), tmp_q(3));
 			q_out.normalize();
 			return q_out;
+
+
+//			Eigen::Matrix<T, 3, 1> eta = angle_velocity * 0.5;
+//			T eta_norm = eta.norm();
+//
+//			Eigen::Quaternion<T> mul_q;
+//			if (eta_norm < 1e8) {
+//
+//				mul_q.w() = 1.0;
+//				mul_q.x() = eta(0);
+//				mul_q.y() = eta(1);
+//				mul_q.z() = eta(2);
+//
+//			} else {
+//
+//				mul_q.w() = cos(eta_norm);
+//				mul_q.x() = eta(0) * sin(eta_norm) / eta_norm;
+//				mul_q.y() = eta(1) * sin(eta_norm) / eta_norm;
+//				mul_q.z() = eta(2) * sin(eta_norm) / eta_norm;
+//
+//
+//			}
+//			Eigen::Quaternion<T> out_q = mul_q * q_in;
+//			out_q.normalize();
+//			return out_q;
 
 		}
 
@@ -325,68 +353,70 @@ namespace BSE {
 		 */
 		template<typename T>
 		Eigen::Matrix<T, 3, 3> q2dcm(Eigen::Quaternion<T> qua) {
-//			Eigen::Matrix<T, 4, 1> q;
-//			q(3) = qua.w();
-//			q(0) = qua.x();
-//			q(1) = qua.y();
-//			q(2) = qua.z();
-//
-//
-//			Eigen::Matrix<T, 6, 1> p;
-//			p.setZero();
-//
-//			for (int i(0); i < 4; ++i) {
-//				p(i) = q(i) * q(i);
-//			}
-//
-//			p(4) = p(1) + p(2);
-//
-//			if (fabs(p(0) + p(3) + p(4)) > 1e-10) {
-//				p(5) = 2.0 / (p(0) + p(3) + p(4));
-//
-//			} else {
-//				p(5) = 0.0;
-//			}
-//
-//
-//			Eigen::Matrix<T, 3, 3> R(Eigen::Matrix3d::Identity());
-////        R.setZero();
-//
-//			R(0, 0) = 1 - p(5) * p(4);
-//			R(1, 1) = 1 - p(5) * (p(0) + p(2));
-//			R(2, 2) = 1 - p(5) * (p(0) + p(1));
-//
-//			p(0) = p(5) * q(0);
-//			p(1) = p(5) * q(1);
-//			p(4) = p(5) * q(2) * q(3);
-//			p(5) = p(0) * q(1);
-//
-//			R(0, 1) = p(5) - p(4);
-//			R(1, 0) = p(5) + p(4);
-//
-//			p(4) = p(1) * q(3);
-//			p(5) = p(0) * q(2);
-//
-//			R(0, 2) = p(5) + p(4);
-//			R(2, 0) = p(5) - p(4);
-//
-//			p(4) = p(0) * q(3);
-//			p(5) = p(1) * q(2);
-//
-//			R(1, 2) = p(5) - p(4);
-//			R(2, 1) = p(5) + p(4);
+			Eigen::Matrix<T, 4, 1> q;
+			q(3) = qua.w();
+			q(0) = qua.x();
+			q(1) = qua.y();
+			q(2) = qua.z();
 
-//			return R;
-			return qua.toRotationMatrix();
+
+			Eigen::Matrix<T, 6, 1> p;
+			p.setZero();
+
+			for (int i(0); i < 4; ++i) {
+				p(i) = q(i) * q(i);
+			}
+
+			p(4) = p(1) + p(2);
+
+			if (fabs(p(0) + p(3) + p(4)) > 1e-10) {
+				p(5) = 2.0 / (p(0) + p(3) + p(4));
+
+			} else {
+				p(5) = 0.0;
+			}
+
+
+			Eigen::Matrix<T, 3, 3> R(Eigen::Matrix3d::Identity());
+//        R.setZero();
+
+			R(0, 0) = 1 - p(5) * p(4);
+			R(1, 1) = 1 - p(5) * (p(0) + p(2));
+			R(2, 2) = 1 - p(5) * (p(0) + p(1));
+
+			p(0) = p(5) * q(0);
+			p(1) = p(5) * q(1);
+			p(4) = p(5) * q(2) * q(3);
+			p(5) = p(0) * q(1);
+
+			R(0, 1) = p(5) - p(4);
+			R(1, 0) = p(5) + p(4);
+
+			p(4) = p(1) * q(3);
+			p(5) = p(0) * q(2);
+
+			R(0, 2) = p(5) + p(4);
+			R(2, 0) = p(5) - p(4);
+
+			p(4) = p(0) * q(3);
+			p(5) = p(1) * q(2);
+
+			R(1, 2) = p(5) - p(4);
+			R(2, 1) = p(5) + p(4);
+
+			return R;
+//			qua.normalize();
+//			return qua.toRotationMatrix();
 		}
 
 		template<typename T>
 		Eigen::Matrix<T, 3, 1> dcm2ang(Eigen::Matrix<T, 3, 3> r) {
 			Eigen::Matrix<T, 3, 1> ang(0, 0, 0);
 			ang(0) = atan2(r(2, 1), r(2, 2));
-			ang(1) = atan(r(2, 0) / sqrt(1 - r(2, 0) * r(2, 0)));
+			ang(1) = atan2(r(2, 0), sqrt(1 - r(2, 0) * r(2, 0)));
 			ang(2) = atan2(r(1, 0), r(0, 0));
 			if (std::isnan(ang.norm())) {
+				ERROR_MSG_FLAG("angle with nana in dcm2ang function");
 				std::cout << "ang:"
 				          << ang.transpose()
 				          << "\nrotation matrix;"
