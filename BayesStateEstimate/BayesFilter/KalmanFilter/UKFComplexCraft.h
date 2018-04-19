@@ -67,6 +67,7 @@ namespace BSE {
 			rotation_q_ = ImuTools::quaternion_update<double>(rotation_q_,
 			                                                  input.block(3, 0, 3, 1) + state_x_.block(12, 0, 3, 1),
 			                                                  time_interval_);
+			rotation_q_.normalize();
 
 			Eigen::Vector3d acc = rotation_q_ * (input.block(0, 0, 3, 1) + state_x_.block(9, 0, 3, 1)) +
 			                      Eigen::Vector3d(0, 0, local_g_);
