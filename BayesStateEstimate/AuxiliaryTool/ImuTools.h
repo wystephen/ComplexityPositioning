@@ -195,11 +195,15 @@ namespace BSE {
 			Eigen::Matrix<T, 4, 1> mul_q(1.0, 0.0, 0.0, 0.0);
 			Eigen::Matrix<T, 3, 1> angle_delta = angle_velocity * time_interval;
 
-			if (angle_delta.norm() > 1e-8) {
-				mul_q.block(1, 0, 3, 1) = angle_delta;
+			if (angle_delta.norm() > 1e-18) {
+				mul_q.block(1, 0, 3, 1) = angle_delta * 0.5;
+
+//				mul_q(0) = cos(angle_delta.norm() / 2.0);
+//				mul_q.block(1, 0, 3, 1) = angle_delta * 1.0 / angle_delta.norm() * sin(angle_delta.norm() / 2.0);
 
 				Eigen::Matrix<T, 4, 4> q_R;
 				q_R(0, 0) = mul_q(0);
+//				q_R = q_R + Eigen::Matrix<T, 4, 4>::Identity() * mul_q(0);
 				q_R.block(1, 0, 3, 1) = mul_q.block(1, 0, 3, 1);
 				q_R.block(0, 1, 1, 3) = mul_q.block(1, 0, 3, 1).transpose();
 				q_R.block(1, 1, 3, 3) =
@@ -210,8 +214,8 @@ namespace BSE {
 			}
 
 			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
-			logger_ptr_->addPlotEvent("quaternion_update","q_norm",tmp_q.norm());
-			logger_ptr_->addPlotEvent("quaternion_update","q_before_norm",q_in.norm());
+			logger_ptr_->addPlotEvent("quaternion_update", "q_norm", tmp_q.norm());
+			logger_ptr_->addPlotEvent("quaternion_update", "q_before_norm", q_in.norm());
 
 
 			Eigen::Quaternion<T> q_out(tmp_q(0), tmp_q(1), tmp_q(2), tmp_q(3));
