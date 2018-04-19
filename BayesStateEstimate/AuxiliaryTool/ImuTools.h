@@ -173,6 +173,8 @@ namespace BSE {
 			return v_hat;
 		};
 
+		template <typename T>
+
 		/**
 		 * quaternion update function adopted in
 		 * @tparam T
