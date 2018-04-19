@@ -109,10 +109,10 @@ namespace BSE {
 
 			// vx vy vz
 			Fc.block(3, 6, 3, 3) = St;
-//			Fc.block(3, 9, 3, 3) = Rb2t;
+			Fc.block(3, 9, 3, 3) = Rb2t;
 
 			// wx wy wz
-//			Fc.block(6, 12, 3, 3) = -1.0 * Rb2t;
+			Fc.block(6, 12, 3, 3) = -1.0 * Rb2t;
 
 
 			// bax bay baz
@@ -149,6 +149,11 @@ namespace BSE {
 			}
 
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
+
+			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
+			logger_ptr_->addPlotEvent("ukf_craft_jac","acc",input.block(0,0,3,1));
+			logger_ptr_->addPlotEvent("ukf_craft_jac","acc_rotated",rotation_q_* input.block(0,0,3,1));
+
 
 			return state_x_;
 
@@ -411,6 +416,7 @@ namespace BSE {
 
 			K_ = (prob_state_ * H_.transpose().eval()) *
 			     (H_ * prob_state_ * H_.transpose().eval() + cov_matrix).inverse();
+
 			if (std::isnan(K_.sum()) || std::isinf(K_.sum())) {
 				std::cout << "K is nan" << std::endl;
 			}
@@ -467,7 +473,7 @@ namespace BSE {
 			logger_ptr_->addPlotEvent("complexfull", "offset_acc", state_x_.block(9, 0, 3, 1));
 			logger_ptr_->addPlotEvent("complexfull", "offset_gyr", state_x_.block(12, 0, 3, 1));
 
-//			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
+			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
 
 
 		}
