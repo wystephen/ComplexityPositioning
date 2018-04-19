@@ -59,12 +59,13 @@ namespace BSE {
 
 
 			rotation_q_ = ImuTools::quaternion_update<double>(rotation_q_,
-			                                                  input.block(3, 0, 3, 1)+ state_x_.block(12, 0, 3, 1),
+			                                                  input.block(3, 0, 3, 1) + state_x_.block(12, 0, 3, 1),
 			                                                  time_interval_);
 			rotation_q_.normalize();
 
-			Eigen::Vector3d acc = ImuTools::q2dcm(rotation_q_) * (input.block(0, 0, 3, 1) + state_x_.block(9, 0, 3, 1)) +
-			                      Eigen::Vector3d(0, 0, local_g_);
+			Eigen::Vector3d acc =
+					ImuTools::q2dcm(rotation_q_) * (input.block(0, 0, 3, 1) + state_x_.block(9, 0, 3, 1)) +
+					Eigen::Vector3d(0, 0, local_g_);
 			state_x_.block(0, 0, 3, 1) = state_x_.block(0, 0, 3, 1) +
 			                             state_x_.block(3, 0, 3, 1) * time_interval_;
 			state_x_.block(3, 0, 3, 1) = state_x_.block(3, 0, 3, 1) + acc * time_interval_;
@@ -150,7 +151,7 @@ namespace BSE {
 			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_linear", acc);
 			logger_ptr_->addPlotEvent("ukf_craft_jac", "gyr", input.block(3, 0, 3, 1));
 
-			logger_ptr_->addPlotEvent("ukf_craft_jac_p","p",prob_state_);
+			logger_ptr_->addPlotEvent("ukf_craft_jac_p", "p", prob_state_);
 
 
 			return state_x_;
@@ -460,7 +461,7 @@ namespace BSE {
 			r_update << 1.0, epsilon(2), -epsilon(1),
 					-epsilon(2), 1.0, epsilon(0),
 					epsilon(1), -epsilon(0), 1.0;
-			r_update=Eigen::Matrix3d::Identity()+ImuTools::hat(epsilon);
+			r_update = Eigen::Matrix3d::Identity() + ImuTools::hat(epsilon);
 
 			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
 			rotation_q_.normalize();
