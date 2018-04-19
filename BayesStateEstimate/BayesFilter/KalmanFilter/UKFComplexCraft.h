@@ -166,6 +166,7 @@ namespace BSE {
 
 			logger_ptr_->addPlotEvent("craft_jac","b_p_norm",old_p_norm);
 			logger_ptr_->addPlotEvent("craft_jac","after_p_norm",new_p_norm);
+			logger_ptr_->addPlotEvent("craft_jac","diff_p_norm",new_p_norm-old_p_norm);
 
 
 			return state_x_;
@@ -509,6 +510,7 @@ namespace BSE {
 
 			logger_ptr_->addPlotEvent("craft_zv","b_p_norm",before_p_norm);
 			logger_ptr_->addPlotEvent("craft_zv","after_p_norm",after_p_norm);
+			logger_ptr_->addPlotEvent("craft_zv","diff_p_norm",after_p_norm-before_p_norm);
 
 		}
 
