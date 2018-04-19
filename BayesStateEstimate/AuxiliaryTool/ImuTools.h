@@ -197,7 +197,7 @@ namespace BSE {
 			Eigen::Matrix<T, 4, 1> mul_q;
 			Eigen::Matrix<T, 4, 4> q_L;
 //			q_L.setIdentity();
-			if (eta_norm > 1e180) {
+			if (eta_norm > 1e-18) {
 
 				mul_q(0) = cos(eta_norm);
 				mul_q.block(1, 0, 3, 1) = eta * sin(eta_norm) / eta_norm;

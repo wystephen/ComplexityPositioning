@@ -57,6 +57,7 @@ namespace BSE {
 		Eigen::Matrix<double, 15, 1> StateTransIMU_jac(Eigen::Matrix<double, 6, 1> input,
 		                                               Eigen::Matrix<double, 6, 6> noise_matrix) {
 
+			Eigen::Quaterniond before_q = rotation_q_;
 
 			rotation_q_ = ImuTools::quaternion_update<double>(rotation_q_,
 			                                                  input.block(3, 0, 3, 1) + state_x_.block(12, 0, 3, 1),
@@ -146,12 +147,20 @@ namespace BSE {
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
 
 			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc", input.block(0, 0, 3, 1));
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_rotated", rotation_q_ * input.block(0, 0, 3, 1));
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_linear", acc);
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "gyr", input.block(3, 0, 3, 1));
+//			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc", input.block(0, 0, 3, 1));
+//			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_rotated", rotation_q_ * input.block(0, 0, 3, 1));
+//			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_linear", acc);
+//			logger_ptr_->addPlotEvent("ukf_craft_jac", "gyr", input.block(3, 0, 3, 1));
 
-			logger_ptr_->addPlotEvent("ukf_craft_jac_p", "p", prob_state_);
+//			logger_ptr_->addPlotEvent("ukf_craft_jac_p", "p", prob_state_);
+
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "before_q", before_q.toRotationMatrix().eulerAngles(0, 1, 2));
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "input", input.block(3, 0, 3, 1));
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "after_q", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2));
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "after_q",
+			                          (before_q.inverse() * rotation_q_).toRotationMatrix().eulerAngles(0, 1, 2));
+
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "pos", state_x_.block(0, 0, 3, 1));
 
 
 			return state_x_;
@@ -470,7 +479,7 @@ namespace BSE {
 
 //			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
 //			rotation_q_.normalize();
-			rotation_q_ = ImuTools::quaternion_left_update(rotation_q_,epsilon,-1.0);
+			rotation_q_ = ImuTools::quaternion_left_update(rotation_q_, epsilon, -1.0);
 
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(ImuTools::q2dcm(rotation_q_));
 
@@ -483,12 +492,12 @@ namespace BSE {
 
 			logger_ptr_->addPlotEvent("ukf_craft", "epsilon", epsilon);
 			logger_ptr_->addPlotEvent("ukf_craft", "angle_after", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2));
-			logger_ptr_->addPlotEvent("ukf_craft", "angle_diff", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2) -
-			                                                     tmp_before_q.toRotationMatrix().eulerAngles(0, 1, 2));
+			logger_ptr_->addPlotEvent("ukf_craft", "angle_diff", (rotation_q_.inverse() *
+			                                                      tmp_before_q).toRotationMatrix().eulerAngles(0, 1,
+			                                                                                                   2));
 
-			logger_ptr_->addPlotEvent("ukf_craft_state","pos",state_x_.block(0,0,3,1));
-			logger_ptr_->addPlotEvent("ukf_craft_state","vel",state_x_.block(3,0,3,1));
-
+			logger_ptr_->addPlotEvent("ukf_craft_state", "pos", state_x_.block(0, 0, 3, 1));
+			logger_ptr_->addPlotEvent("ukf_craft_state", "vel", state_x_.block(3, 0, 3, 1));
 
 
 		}

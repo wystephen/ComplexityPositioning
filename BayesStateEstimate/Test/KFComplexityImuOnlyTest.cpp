@@ -75,6 +75,7 @@ int main(int argc, char *argv[]) {
 	Eigen::Vector3d initial_pos = Eigen::Vector3d(0, 0, 0);
 
 	double initial_ori = 0.0;
+//	double initial_ori = 1.0;
 
 	std::vector<std::vector<double>> optimize_trace_vec = {{},
 	                                                       {},
