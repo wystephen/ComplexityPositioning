@@ -56,20 +56,14 @@ namespace BSE {
 		 */
 		Eigen::Matrix<double, 15, 1> StateTransIMU_jac(Eigen::Matrix<double, 6, 1> input,
 		                                               Eigen::Matrix<double, 6, 6> noise_matrix) {
-//			std::cout
-
-
-//			Eigen::MatrixXd tmp_x = state_x_;
-//			Eigen::MatrixXd tmp_q = rotation_q_;
-//			update_function(state_x_, rotation_q_, input, time_interval_, local_g_);
 
 
 			rotation_q_ = ImuTools::quaternion_update<double>(rotation_q_,
-			                                                  input.block(3, 0, 3, 1) + state_x_.block(12, 0, 3, 1),
+			                                                  input.block(3, 0, 3, 1),// + state_x_.block(12, 0, 3, 1),
 			                                                  time_interval_);
 			rotation_q_.normalize();
 
-			Eigen::Vector3d acc = rotation_q_ * (input.block(0, 0, 3, 1) + state_x_.block(9, 0, 3, 1)) +
+			Eigen::Vector3d acc = ImuTools::q2dcm(rotation_q_) * (input.block(0, 0, 3, 1))+// + state_x_.block(9, 0, 3, 1)) +
 			                      Eigen::Vector3d(0, 0, local_g_);
 			state_x_.block(0, 0, 3, 1) = state_x_.block(0, 0, 3, 1) +
 			                             state_x_.block(3, 0, 3, 1) * time_interval_;
@@ -109,10 +103,10 @@ namespace BSE {
 
 			// vx vy vz
 			Fc.block(3, 6, 3, 3) = St;
-			Fc.block(3, 9, 3, 3) = Rb2t;
+//			Fc.block(3, 9, 3, 3) = Rb2t;
 
 			// wx wy wz
-			Fc.block(6, 12, 3, 3) = -1.0 * Rb2t;
+//			Fc.block(6, 12, 3, 3) = -1.0 * Rb2t;
 
 
 			// bax bay baz
@@ -151,8 +145,12 @@ namespace BSE {
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
 
 			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
-			logger_ptr_->addPlotEvent("ukf_craft_jac","acc",input.block(0,0,3,1));
-			logger_ptr_->addPlotEvent("ukf_craft_jac","acc_rotated",rotation_q_* input.block(0,0,3,1));
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc", input.block(0, 0, 3, 1));
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_rotated", rotation_q_ * input.block(0, 0, 3, 1));
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_linear", acc);
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "gyr", input.block(3, 0, 3, 1));
+
+			logger_ptr_->addPlotEvent("ukf_craft_jac_p","p",prob_state_);
 
 
 			return state_x_;
