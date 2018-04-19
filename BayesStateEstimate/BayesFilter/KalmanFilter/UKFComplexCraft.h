@@ -448,7 +448,8 @@ namespace BSE {
 
 
 			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
-			logger_ptr_->addPlotEvent("ukf_craft","angle_before",rotation_q_.toRotationMatrix().eulerAngles(0,1,2));
+			logger_ptr_->addPlotEvent("ukf_craft", "angle_before", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2));
+			Eigen::Quaterniond tmp_before_q = rotation_q_;
 			/*
 			 * update state
 			 */
@@ -465,7 +466,7 @@ namespace BSE {
 			r_update << 1.0, epsilon(2), -epsilon(1),
 					-epsilon(2), 1.0, epsilon(0),
 					epsilon(1), -epsilon(0), 1.0;
-			r_update = Eigen::Matrix3d::Identity() + ImuTools::hat(epsilon);
+//			r_update = Eigen::Matrix3d::Identity() + ImuTools::hat(epsilon);
 
 			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
 			rotation_q_.normalize();
@@ -480,9 +481,10 @@ namespace BSE {
 
 			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
 
-			logger_ptr_->addPlotEvent("ukf_craft","epsilon",epsilon);
-			logger_ptr_->addPlotEvent("ukf_craft","angle_after",rotation_q_.toRotationMatrix().eulerAngles(0,1,2));
-
+			logger_ptr_->addPlotEvent("ukf_craft", "epsilon", epsilon);
+			logger_ptr_->addPlotEvent("ukf_craft", "angle_after", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2));
+			logger_ptr_->addPlotEvent("ukf_craft", "angle_diff", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2) -
+			                                                     tmp_before_q.toRotationMatrix().eulerAngles(0, 1, 2));
 
 
 		}
