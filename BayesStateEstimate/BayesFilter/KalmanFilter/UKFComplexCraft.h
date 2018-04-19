@@ -91,12 +91,12 @@ namespace BSE {
 
 			Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
 
-			Eigen::Matrix3d Da ;//= Eigen::Matrix3d::diagonal(input.block(0, 0, 3, 1));
+			Eigen::Matrix3d Da;//= Eigen::Matrix3d::diagonal(input.block(0, 0, 3, 1));
 
-			Eigen::Matrix3d Dg ;//= Eigen::Matrix3d::diagonal(input.block(3, 0, 3, 1));
-			for(int i(0);i<3;++i){
-				Da(i,i) = input(i);
-				Dg(i,i) = input(i+3);
+			Eigen::Matrix3d Dg;//= Eigen::Matrix3d::diagonal(input.block(3, 0, 3, 1));
+			for (int i(0); i < 3; ++i) {
+				Da(i, i) = input(i);
+				Dg(i, i) = input(i + 3);
 			}
 
 			Eigen::Matrix3d B1 = O * 1.0;
@@ -104,12 +104,23 @@ namespace BSE {
 
 			Eigen::Matrix<double, 15, 15> Fc;
 			Fc.setZero();
+			// x yz
 			Fc.block(0, 3, 3, 3) = I;
 
+			// vx vy vz
 			Fc.block(3, 6, 3, 3) = St;
-			Fc.block(3, 9, 3, 3) = Rb2t;
+//			Fc.block(3, 9, 3, 3) = Rb2t;
 
-			Fc.block(6, 12, 3, 3) = -1.0 * Rb2t;
+			// wx wy wz
+//			Fc.block(6, 12, 3, 3) = -1.0 * Rb2t;
+
+
+			// bax bay baz
+//			Fc.block(9,9,3,3) = I;
+
+
+//			 bwx bwy bwz
+//			Fc.block(12,12,3,3) = I;
 
 
 			Eigen::Matrix<double, 15, 6> Gc;
@@ -118,8 +129,17 @@ namespace BSE {
 			Gc.block(3, 0, 3, 3) = Rb2t;
 			Gc.block(6, 3, 3, 3) = -1.0 * Rb2t;
 
-			prob_state_ = Fc * prob_state_ * Fc.transpose() +
-			              Gc * noise_matrix * Gc.transpose();
+			Eigen::Matrix<double,15,15> F;
+			F.setIdentity();
+			F = F + Fc * time_interval_;
+
+
+			Eigen::Matrix<double,15,6> G;
+			G = time_interval_ * Gc;
+
+
+			prob_state_ = F * prob_state_ * F.transpose() +
+			              G * noise_matrix * G.transpose();
 
 			prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose());
 
@@ -178,6 +198,7 @@ namespace BSE {
 				q = ImuTools::quaternion_update<double>(q,
 				                                        input.block(3, 0, 3, 1) + state.block(12, 0, 3, 1),
 				                                        time_interval_);
+				q.normalize();
 //				std::cout << "time interval :" << time_interval_ << std::endl;
 
 				Eigen::Vector3d acc = q * (input.block(0, 0, 3, 1) + state.block(9, 0, 3, 1)) +
@@ -436,7 +457,7 @@ namespace BSE {
 					-epsilon(2), 1.0, epsilon(0),
 					epsilon(1), -epsilon(0), 1.0;
 
-//			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
+			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
 			rotation_q_.normalize();
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(r_update * rbn);
 
