@@ -446,6 +446,9 @@ namespace BSE {
 				std::cout << "state prob has nan" << std::endl;
 			}
 
+
+			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
+			logger_ptr_->addPlotEvent("ukf_craft","angle_before",rotation_q_.toRotationMatrix().eulerAngles(0,1,2));
 			/*
 			 * update state
 			 */
@@ -457,6 +460,7 @@ namespace BSE {
 			Eigen::Matrix3d rbn = ImuTools::q2dcm<double>(rotation_q_);
 			Eigen::Matrix3d r_update = Eigen::Matrix3d::Identity();
 			Eigen::Vector3d epsilon(dX_(6), dX_(7), dX_(8));
+
 
 			r_update << 1.0, epsilon(2), -epsilon(1),
 					-epsilon(2), 1.0, epsilon(0),
@@ -471,11 +475,14 @@ namespace BSE {
 
 			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
 
-			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
 			logger_ptr_->addPlotEvent("complexfull", "offset_acc", state_x_.block(9, 0, 3, 1));
 			logger_ptr_->addPlotEvent("complexfull", "offset_gyr", state_x_.block(12, 0, 3, 1));
 
 			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
+
+			logger_ptr_->addPlotEvent("ukf_craft","epsilon",epsilon);
+			logger_ptr_->addPlotEvent("ukf_craft","angle_after",rotation_q_.toRotationMatrix().eulerAngles(0,1,2));
+
 
 
 		}
