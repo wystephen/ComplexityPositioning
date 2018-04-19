@@ -59,11 +59,11 @@ namespace BSE {
 
 
 			rotation_q_ = ImuTools::quaternion_update<double>(rotation_q_,
-			                                                  input.block(3, 0, 3, 1),// + state_x_.block(12, 0, 3, 1),
+			                                                  input.block(3, 0, 3, 1)+ state_x_.block(12, 0, 3, 1),
 			                                                  time_interval_);
 			rotation_q_.normalize();
 
-			Eigen::Vector3d acc = ImuTools::q2dcm(rotation_q_) * (input.block(0, 0, 3, 1))+// + state_x_.block(9, 0, 3, 1)) +
+			Eigen::Vector3d acc = ImuTools::q2dcm(rotation_q_) * (input.block(0, 0, 3, 1) + state_x_.block(9, 0, 3, 1)) +
 			                      Eigen::Vector3d(0, 0, local_g_);
 			state_x_.block(0, 0, 3, 1) = state_x_.block(0, 0, 3, 1) +
 			                             state_x_.block(3, 0, 3, 1) * time_interval_;
@@ -103,10 +103,10 @@ namespace BSE {
 
 			// vx vy vz
 			Fc.block(3, 6, 3, 3) = St;
-//			Fc.block(3, 9, 3, 3) = Rb2t;
+			Fc.block(3, 9, 3, 3) = Rb2t;
 
 			// wx wy wz
-//			Fc.block(6, 12, 3, 3) = -1.0 * Rb2t;
+			Fc.block(6, 12, 3, 3) = -1.0 * Rb2t;
 
 
 			// bax bay baz
@@ -457,9 +457,10 @@ namespace BSE {
 			Eigen::Matrix3d r_update = Eigen::Matrix3d::Identity();
 			Eigen::Vector3d epsilon(dX_(6), dX_(7), dX_(8));
 
-			r_update << 1.0, epsilon(2), -epsilon(1),
-					-epsilon(2), 1.0, epsilon(0),
-					epsilon(1), -epsilon(0), 1.0;
+//			r_update << 1.0, epsilon(2), -epsilon(1),
+//					-epsilon(2), 1.0, epsilon(0),
+//					epsilon(1), -epsilon(0), 1.0;
+			r_update=Eigen::Matrix3d::Identity()+ImuTools::hat(epsilon);
 
 			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
 			rotation_q_.normalize();

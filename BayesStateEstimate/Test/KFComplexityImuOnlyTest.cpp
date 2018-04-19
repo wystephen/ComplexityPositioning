@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
 
 
 //    filter.sett
-		for (int i(5); i < imu_data.rows() * 0.3 - 5; ++i) {
+		for (int i(5); i < imu_data.rows() - 5; ++i) {
 			/// state transaction equation
 //			filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
 //			                        process_noise_matrix,
@@ -202,9 +202,9 @@ int main(int argc, char *argv[]) {
 					                                     process_noise_matrix);
 
 
-			auto ff_full_state =
-					ff_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
-					                        process_noise_matrix);
+//			auto ff_full_state =
+//					ff_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+//					                        process_noise_matrix);
 
 
 //            filter_complex.MeasurementAngleCorrect(imu_data.block(i, 7, 1, 3).transpose(),
@@ -227,7 +227,7 @@ int main(int argc, char *argv[]) {
 
 				complex_ukf_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00000025);
 
-				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000025);
+//				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000025);
 
 
 				/// angle constraint through acc.

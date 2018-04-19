@@ -219,6 +219,7 @@ namespace BSE {
 
 
 			Eigen::Quaternion<T> q_out(tmp_q(0), tmp_q(1), tmp_q(2), tmp_q(3));
+			q_out.normalize();
 			return q_out;
 
 		}
