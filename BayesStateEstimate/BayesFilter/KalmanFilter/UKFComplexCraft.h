@@ -129,12 +129,12 @@ namespace BSE {
 			Gc.block(3, 0, 3, 3) = Rb2t;
 			Gc.block(6, 3, 3, 3) = -1.0 * Rb2t;
 
-			Eigen::Matrix<double,15,15> F;
+			Eigen::Matrix<double, 15, 15> F;
 			F.setIdentity();
 			F = F + Fc * time_interval_;
 
 
-			Eigen::Matrix<double,15,6> G;
+			Eigen::Matrix<double, 15, 6> G;
 			G = time_interval_ * Gc;
 
 

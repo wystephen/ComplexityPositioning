@@ -177,15 +177,15 @@ int main(int argc, char *argv[]) {
 		std::cout << "initial state costed time :" << AWF::getDoubleSecondTime() - time_begin
 		          << std::endl;
 		complex_ukf_filter.initial_state(imu_data.block(10, 1, 100, 9),
-		                                  initial_ori,
-		                                  initial_pos);
+		                                 initial_ori,
+		                                 initial_pos);
 		ff_filter.initial_state(imu_data.block(10, 1, 100, 9),
 		                        initial_ori,
 		                        initial_pos);
 
 
 //    filter.sett
-		for (int i(5); i < imu_data.rows()*0.1 - 5; ++i) {
+		for (int i(5); i < imu_data.rows() * 0.1 - 5; ++i) {
 			/// state transaction equation
 //			filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
 //			                        process_noise_matrix,
@@ -199,9 +199,7 @@ int main(int argc, char *argv[]) {
 //					                                  process_noise_matrix);
 			auto complex_full_state =
 					complex_ukf_filter.StateTransIMU_jac(imu_data.block(i, 1, 1, 6).transpose(),
-					                                  process_noise_matrix);
-
-
+					                                     process_noise_matrix);
 
 
 			auto ff_full_state =
@@ -270,7 +268,7 @@ int main(int argc, char *argv[]) {
 			Eigen::VectorXd state_simple = filter.getState_();
 			Eigen::VectorXd state = filter_complex.state_x_;
 			Eigen::VectorXd full_state = complex_ukf_filter.state_x_;
-			assert(full_state.rows()==15 && full_state.cols()==1);
+			assert(full_state.rows() == 15 && full_state.cols() == 1);
 			Eigen::VectorXd ff_state = ff_filter.state_x_;
 
 			logger_ptr->addPlotEvent(data_name + "velocity", "velocitysimple", state_simple.block(3, 0, 3, 1));
