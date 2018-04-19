@@ -191,13 +191,13 @@ namespace BSE {
 			tmp_q(2) = q_in.y();
 			tmp_q(3) = q_in.z();
 
-			Eigen::Matrix<T, 3, 1> eta = update_angle * coeff*0.5;
+			Eigen::Matrix<T, 3, 1> eta = update_angle * coeff * 0.5;
 			T eta_norm = eta.norm();
 
 			Eigen::Matrix<T, 4, 1> mul_q;
 			Eigen::Matrix<T, 4, 4> q_L;
 //			q_L.setIdentity();
-			if (eta_norm > 1e-180) {
+			if (eta_norm > 1e180) {
 
 				mul_q(0) = cos(eta_norm);
 				mul_q.block(1, 0, 3, 1) = eta * sin(eta_norm) / eta_norm;
