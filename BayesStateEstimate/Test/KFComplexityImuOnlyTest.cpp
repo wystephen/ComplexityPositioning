@@ -270,6 +270,7 @@ int main(int argc, char *argv[]) {
 			Eigen::VectorXd state_simple = filter.getState_();
 			Eigen::VectorXd state = filter_complex.state_x_;
 			Eigen::VectorXd full_state = complex_ukf_filter.state_x_;
+			assert(full_state.rows()==15 && full_state.cols()==1);
 			Eigen::VectorXd ff_state = ff_filter.state_x_;
 
 			logger_ptr->addPlotEvent(data_name + "velocity", "velocitysimple", state_simple.block(3, 0, 3, 1));
