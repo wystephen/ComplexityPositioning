@@ -486,6 +486,10 @@ namespace BSE {
 			logger_ptr_->addPlotEvent("ukf_craft", "angle_diff", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2) -
 			                                                     tmp_before_q.toRotationMatrix().eulerAngles(0, 1, 2));
 
+			logger_ptr_->addPlotEvent("ukf_craft_state","pos",state_x_.block(0,0,3,1));
+			logger_ptr_->addPlotEvent("ukf_craft_state","vel",state_x_.block(3,0,3,1));
+
+
 
 		}
 
