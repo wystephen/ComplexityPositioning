@@ -209,6 +209,10 @@ namespace BSE {
 
 			}
 
+			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
+			logger_ptr_->addPlotEvent("quaternion_update","q_norm",tmp_q.norm());
+			logger_ptr_->addPlotEvent("quaternion_update","q_before_norm",q_in.norm());
+
 
 			Eigen::Quaternion<T> q_out(tmp_q(0), tmp_q(1), tmp_q(2), tmp_q(3));
 			return q_out;
