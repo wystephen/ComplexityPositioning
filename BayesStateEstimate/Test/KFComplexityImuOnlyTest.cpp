@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
 
 
 //    filter.sett
-		for (int i(5); i < imu_data.rows() - 5; ++i) {
+		for (int i(5); i < imu_data.rows()*0.1 - 5; ++i) {
 			/// state transaction equation
 //			filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
 //			                        process_noise_matrix,
