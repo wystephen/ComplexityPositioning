@@ -98,8 +98,8 @@ int main(int argc, char *argv[]) {
 	initial_prob_matrix_complex.block(0, 0, 3, 3) *= 0.001;
 	initial_prob_matrix_complex.block(3, 3, 3, 3) *= 0.001;
 	initial_prob_matrix_complex.block(6, 6, 3, 3) *= 0.001 * (M_PI / 180.0);
-	initial_prob_matrix_complex.block(9, 9, 3, 3) *= 0.0001;
-	initial_prob_matrix_complex.block(12, 12, 3, 3) *= 0.0001 * (M_PI / 180.0);
+	initial_prob_matrix_complex.block(9, 9, 3, 3) *= 0.000000001;
+	initial_prob_matrix_complex.block(12, 12, 3, 3) *= 0.000000001 * (M_PI / 180.0);
 
 	Eigen::MatrixXd initial_prob_matrix_ff = Eigen::MatrixXd::Identity(21, 21);
 	initial_prob_matrix_ff.block(0, 0, 15, 15) = initial_prob_matrix_complex * 1.0;
@@ -187,12 +187,12 @@ int main(int argc, char *argv[]) {
 
 //			auto complex_state = filter_complex.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
 //			                                                  process_noise_matrix);
-//			auto complex_full_state =
-//					complex_ukf_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
-//					                                  process_noise_matrix);
 			auto complex_full_state =
-					complex_ukf_filter.StateTransIMU_jac(imu_data.block(i, 1, 1, 6).transpose(),
-					                                     process_noise_matrix);
+					complex_ukf_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+					                                  process_noise_matrix);
+//			auto complex_full_state =
+//					complex_ukf_filter.StateTransIMU_jac(imu_data.block(i, 1, 1, 6).transpose(),
+//					                                     process_noise_matrix);
 
 
 //			auto ff_full_state =

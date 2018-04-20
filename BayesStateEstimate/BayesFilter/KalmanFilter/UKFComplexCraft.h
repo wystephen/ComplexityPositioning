@@ -161,17 +161,17 @@ namespace BSE {
 
 //			logger_ptr_->addPlotEvent("ukf_craft_jac_p", "p", prob_state_);
 
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "before_q", before_q.toRotationMatrix().eulerAngles(0, 1, 2));
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "input", input.block(3, 0, 3, 1));
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "after_q", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2));
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "diff_q",
-			                          (before_q.inverse() * rotation_q_).toRotationMatrix().eulerAngles(0, 1, 2));
-
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "pos", state_x_.block(0, 0, 3, 1));
-
-			logger_ptr_->addPlotEvent("craft_jac", "b_p_norm", old_p_norm);
-			logger_ptr_->addPlotEvent("craft_jac", "after_p_norm", new_p_norm);
-			logger_ptr_->addPlotEvent("craft_jac", "diff_p_norm", new_p_norm - old_p_norm);
+//			logger_ptr_->addPlotEvent("ukf_craft_jac", "before_q", before_q.toRotationMatrix().eulerAngles(0, 1, 2));
+//			logger_ptr_->addPlotEvent("ukf_craft_jac", "input", input.block(3, 0, 3, 1));
+//			logger_ptr_->addPlotEvent("ukf_craft_jac", "after_q", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2));
+//			logger_ptr_->addPlotEvent("ukf_craft_jac", "diff_q",
+//			                          (before_q.inverse() * rotation_q_).toRotationMatrix().eulerAngles(0, 1, 2));
+//
+//			logger_ptr_->addPlotEvent("ukf_craft_jac", "pos", state_x_.block(0, 0, 3, 1));
+//
+//			logger_ptr_->addPlotEvent("craft_jac", "b_p_norm", old_p_norm);
+//			logger_ptr_->addPlotEvent("craft_jac", "after_p_norm", new_p_norm);
+//			logger_ptr_->addPlotEvent("craft_jac", "diff_p_norm", new_p_norm - old_p_norm);
 
 
 			return state_x_;
@@ -492,21 +492,21 @@ namespace BSE {
 
 			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
 
-			logger_ptr_->addPlotEvent("ukf_craft", "epsilon", epsilon);
-			logger_ptr_->addPlotEvent("ukf_craft", "angle_before",
-			                          tmp_before_q.toRotationMatrix().eulerAngles(0, 1, 2));
-			logger_ptr_->addPlotEvent("ukf_craft", "angle_after", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2));
-			logger_ptr_->addPlotEvent("ukf_craft", "angle_diff", (rotation_q_.inverse() *
-			                                                      tmp_before_q).toRotationMatrix().eulerAngles(0, 1,
-			                                                                                                   2));
+//			logger_ptr_->addPlotEvent("ukf_craft", "epsilon", epsilon);
+//			logger_ptr_->addPlotEvent("ukf_craft", "angle_before",
+//			                          tmp_before_q.toRotationMatrix().eulerAngles(0, 1, 2));
+//			logger_ptr_->addPlotEvent("ukf_craft", "angle_after", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2));
+//			logger_ptr_->addPlotEvent("ukf_craft", "angle_diff", (rotation_q_.inverse() *
+//			                                                      tmp_before_q).toRotationMatrix().eulerAngles(0, 1,
+//			                                                                                                   2));
 
-			logger_ptr_->addPlotEvent("ukf_craft_state", "pos", state_x_.block(0, 0, 3, 1));
-			logger_ptr_->addPlotEvent("ukf_craft_state", "vel", state_x_.block(3, 0, 3, 1));
+//			logger_ptr_->addPlotEvent("ukf_craft_state", "pos", state_x_.block(0, 0, 3, 1));
+//			logger_ptr_->addPlotEvent("ukf_craft_state", "vel", state_x_.block(3, 0, 3, 1));
 
 
-			logger_ptr_->addPlotEvent("craft_zv", "b_p_norm", before_p_norm);
-			logger_ptr_->addPlotEvent("craft_zv", "after_p_norm", after_p_norm);
-			logger_ptr_->addPlotEvent("craft_zv", "diff_p_norm", after_p_norm - before_p_norm);
+//			logger_ptr_->addPlotEvent("craft_zv", "b_p_norm", before_p_norm);
+//			logger_ptr_->addPlotEvent("craft_zv", "after_p_norm", after_p_norm);
+//			logger_ptr_->addPlotEvent("craft_zv", "diff_p_norm", after_p_norm - before_p_norm);
 
 		}
 
