@@ -523,7 +523,46 @@ namespace BSE {
 			state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
 
 
-			rotation_q_ = ImuTools::quaternion_left_update(rotation_q_, dX_.block(6, 0, 3, 1), -1.0);
+			Eigen::Vector3d epsilon(dX_(6), dX_(7), dX_(8));
+			rotation_q_ = ImuTools::quaternion_left_update(rotation_q_, epsilon, -1.0);
+//			state_x_.block(6, 0, 3, 1) = r.log();
+
+			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
+
+			prob_state_ = (Eigen::Matrix<double, 15, 15>::Identity() - K_ * H_) * prob_state_;
+			prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose());
+
+			return;
+		}
+
+
+		/**
+ * @brief
+ * @param pose
+ * @param cov_m
+ */
+		void MeasurementUwb(Eigen::Matrix<double, 4, 1> input,
+		                    Eigen::Matrix<double, 1, 1> cov_m) {
+			Eigen::Vector3d b = input.block(0, 0, 3, 1);
+			Eigen::Matrix<double, 1, 1> z;
+			z(0) = input(3);
+			Eigen::Matrix<double, 1, 1> y;
+			y(0) = (state_x_.block(0, 0, 3, 1) - b).norm();
+
+			H_.resize(1, state_x_.rows());
+			H_.setZero();
+			H_.block(0, 0, 1, 3) = (state_x_.block(0, 0, 3, 1) - b).transpose() / y(0);
+
+			K_ = (prob_state_ * H_.transpose()) *
+			     (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
+
+			dX_ = K_ * (z - y);
+
+			state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
+
+
+			Eigen::Vector3d epsilon(dX_(6), dX_(7), dX_(8));
+			rotation_q_ = ImuTools::quaternion_left_update(rotation_q_, epsilon, -1.0);
 //			state_x_.block(6, 0, 3, 1) = r.log();
 
 			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);

@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
 	                                  initial_pos);
 
 	complex_craft_filter.initial_state(imu_data.block(0, 1, 10, 9),
-	                                   initial_ori ,//+ 10.0 / 180.0 * M_PI,
+	                                   initial_ori,//+ 10.0 / 180.0 * M_PI,
 	                                   initial_pos);
 
 	filter.setLocal_g_(-9.884);
@@ -214,6 +214,8 @@ int main(int argc, char *argv[]) {
 //					complex_full_filter.MeasurementUwb(measurement_data,
 //					                                   measurement_noise_matrix * 2.0);
 
+					complex_craft_filter.MeasurementUwb(measurement_data,
+					                                    measurement_noise_matrix * 0.2);
 
 
 					m_stack.push_back(measurement_data);
@@ -237,8 +239,8 @@ int main(int argc, char *argv[]) {
 			complex_full_filter.MeasurementUwbPose(optimize_trace.block(uwb_index, 0, 1, 3).transpose(),
 			                                       pose_cov * 0.1);
 
-			complex_craft_filter.MeasurementUwbPose(optimize_trace.block(uwb_index, 0, 1, 3).transpose(),
-			                                        pose_cov * 0.005);
+//			complex_craft_filter.MeasurementUwbPose(optimize_trace.block(uwb_index, 0, 1, 3).transpose(),
+//			                                        pose_cov * 0.01);
 			uwb_index++;
 
 
