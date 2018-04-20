@@ -125,7 +125,7 @@ namespace BSE {
 			Gc.block(3, 0, 3, 3) = Rb2t;
 			Gc.block(6, 3, 3, 3) = -1.0 * Rb2t;
 
-			Eigen::Matrix<double, 15, 15> F=(Eigen::Matrix<double,15,15>::Identity());
+			Eigen::Matrix<double, 15, 15> F = (Eigen::Matrix<double, 15, 15>::Identity());
 //			F.setIdentity();
 			F = F + Fc * time_interval_;
 
@@ -164,9 +164,9 @@ namespace BSE {
 
 			logger_ptr_->addPlotEvent("ukf_craft_jac", "pos", state_x_.block(0, 0, 3, 1));
 
-			logger_ptr_->addPlotEvent("craft_jac","b_p_norm",old_p_norm);
-			logger_ptr_->addPlotEvent("craft_jac","after_p_norm",new_p_norm);
-			logger_ptr_->addPlotEvent("craft_jac","diff_p_norm",new_p_norm-old_p_norm);
+			logger_ptr_->addPlotEvent("craft_jac", "b_p_norm", old_p_norm);
+			logger_ptr_->addPlotEvent("craft_jac", "after_p_norm", new_p_norm);
+			logger_ptr_->addPlotEvent("craft_jac", "diff_p_norm", new_p_norm - old_p_norm);
 
 
 			return state_x_;
@@ -438,24 +438,13 @@ namespace BSE {
 			/*
 			 * update probability
 			 */
-//			Eigen::MatrixXd identity_matrix(state_x_.rows(),) ;//= Eigen::MatrixXd(state_x_.rows(), state_x_.rows());
-//			identity_matrix.setZero();
 			double before_p_norm = prob_state_.norm();
 			prob_state_ = (Eigen::Matrix<double, 15, 15>::Identity() - K_ * H_) * prob_state_;
 			prob_state_ = (prob_state_ + prob_state_.transpose().eval()) * 0.5;
 			double after_p_norm = prob_state_.norm();
-//			std::cout << "zv before:"
-//			          << before_p_norm
-//			          << "after "
-//			          << prob_state_.norm()
-//			          << "\n";
+
 			if (prob_state_.norm() > 10000) {
-				std::cout << __FILE__
-				          << ":"
-				          << __LINE__
-				          << " Error state prob is too big"
-				          << prob_state_.norm()
-				          << std::endl;
+				ERROR_MSG_FLAG("probability is too big,its norm is:" + std::to_string(prob_state_.norm()));
 				prob_state_ /= 100.0;
 			}
 			if (std::isnan(prob_state_.sum()) || std::isinf(prob_state_.sum())) {
@@ -498,7 +487,8 @@ namespace BSE {
 			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
 
 			logger_ptr_->addPlotEvent("ukf_craft", "epsilon", epsilon);
-			logger_ptr_->addPlotEvent("ukf_craft", "angle_before", tmp_before_q.toRotationMatrix().eulerAngles(0, 1, 2));
+			logger_ptr_->addPlotEvent("ukf_craft", "angle_before",
+			                          tmp_before_q.toRotationMatrix().eulerAngles(0, 1, 2));
 			logger_ptr_->addPlotEvent("ukf_craft", "angle_after", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2));
 			logger_ptr_->addPlotEvent("ukf_craft", "angle_diff", (rotation_q_.inverse() *
 			                                                      tmp_before_q).toRotationMatrix().eulerAngles(0, 1,
@@ -508,9 +498,9 @@ namespace BSE {
 			logger_ptr_->addPlotEvent("ukf_craft_state", "vel", state_x_.block(3, 0, 3, 1));
 
 
-			logger_ptr_->addPlotEvent("craft_zv","b_p_norm",before_p_norm);
-			logger_ptr_->addPlotEvent("craft_zv","after_p_norm",after_p_norm);
-			logger_ptr_->addPlotEvent("craft_zv","diff_p_norm",after_p_norm-before_p_norm);
+			logger_ptr_->addPlotEvent("craft_zv", "b_p_norm", before_p_norm);
+			logger_ptr_->addPlotEvent("craft_zv", "after_p_norm", after_p_norm);
+			logger_ptr_->addPlotEvent("craft_zv", "diff_p_norm", after_p_norm - before_p_norm);
 
 		}
 
