@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(ComplexityPositioning )#LANGUAGES CXX CUDA)
+project(ComplexityPositioning)#LANGUAGES CXX CUDA)
 
 
 set(CMAKE_CXX_STANDARD 14)
@@ -147,6 +147,9 @@ target_link_libraries(KFComplexityTester ${PYTHON_LIBRARIES})
 
 add_executable(KFCImuTester BayesStateEstimate/Test/KFComplexityImuOnlyTest.cpp BayesStateEstimate/BayesFilter/KalmanFilter/UKFComplexCraft.h)
 target_link_libraries(KFCImuTester ${PYTHON_LIBRARIES})
+
+add_executable(RotationTester BayesStateEstimate/Test/RotationReliableTester.cpp)
+target_link_libraries(RotationTester ${PYTHON_LIBRARIES})
 
 add_executable(XsenseIntegrateTest BayesStateEstimate/Test/XsenseIntegrateTest.cpp)
 target_link_libraries(XsenseIntegrateTest ${PYTHON_LIBRARIES})
