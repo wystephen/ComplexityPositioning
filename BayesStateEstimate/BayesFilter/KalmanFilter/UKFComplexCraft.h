@@ -337,11 +337,14 @@ namespace BSE {
 
 			// compute average state
 			state_x_.setZero();
+//			double weight_sum  = 0.0;
 			for (const auto state: state_stack) {
 				state_x_ += weight * state;
+//				weight_sum+=weight;
 
 			}
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(average_q.toRotationMatrix());
+//			logger_ptr_->addPlotEvent("uwk_craft_weight","weight_sum",weight_sum);
 
 
 
@@ -361,6 +364,8 @@ namespace BSE {
 
 				prob_state_ += weight * dx * dx.transpose();
 
+				logger_ptr_->addPlotEvent("ukf_craft_diff_x","d"+std::to_string(i),dx);
+
 			}
 
 			prob_state_ = 0.5 * (prob_state_ * prob_state_.transpose());
@@ -369,8 +374,8 @@ namespace BSE {
 
 
 			auto logger_ptr = AWF::AlgorithmLogger::getInstance();
-//			logger_ptr->addPlotEvent("ukf", "probability", prob_state_);
-			logger_ptr->addPlotEvent("ukf_craft_dx","dx",dX_);
+			logger_ptr->addPlotEvent("ukf", "probability", prob_state_);
+
 
 			double after_p_norm = prob_state_.norm();
 			if (after_p_norm > 10.0 * before_p_norm && after_p_norm > 4.0) {
@@ -471,6 +476,8 @@ namespace BSE {
 
 			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
 
+
+			logger_ptr_->addPlotEvent("ukf_craft_dx","dx",dX_);
 //			logger_ptr_->addPlotEvent("ukf_craft", "epsilon", epsilon);
 //			logger_ptr_->addPlotEvent("ukf_craft", "angle_before",
 //			                          tmp_before_q.toRotationMatrix().eulerAngles(0, 1, 2));
