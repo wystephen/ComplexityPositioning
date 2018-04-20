@@ -329,8 +329,6 @@ namespace BSE {
 					max_eigenvector[3].real();
 
 
-			// TODO: more reliable quaternion average.
-
 			rotation_q_ = average_q;
 
 			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
@@ -342,9 +340,7 @@ namespace BSE {
 			for (const auto state: state_stack) {
 				state_x_ += weight * state;
 
-//				std::cout << state.transpose() << "\n";
 			}
-//			state_x_.block(6, 0, 3, 1) = average_q.toRotationMatrix().eulerAngles(0, 1, 2);
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(average_q.toRotationMatrix());
 
 
@@ -361,7 +357,7 @@ namespace BSE {
 				Eigen::Quaterniond d_q = average_q.inverse() * the_q;
 				Eigen::Matrix<double, 3, 1> t3d = ImuTools::dcm2ang(d_q.toRotationMatrix());
 
-				dx.block(6, 0, 3, 1) = t3d;
+//				dx.block(6, 0, 3, 1) = t3d;
 
 				prob_state_ += weight * dx * dx.transpose();
 
@@ -371,14 +367,10 @@ namespace BSE {
 //			prob_state_ = 0.5 * (prob_state_.eval() + prob_state_.transpose().eval());
 
 
-//			std::cout << "update before p:"
-//			          << before_p_norm
-//			          << "after p:"
-//			          << prob_state_.norm()
-//			          << "\n";
 
 			auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 //			logger_ptr->addPlotEvent("ukf", "probability", prob_state_);
+			logger_ptr->addPlotEvent("ukf_craft_dx","dx",dX_);
 
 			double after_p_norm = prob_state_.norm();
 			if (after_p_norm > 10.0 * before_p_norm && after_p_norm > 4.0) {
