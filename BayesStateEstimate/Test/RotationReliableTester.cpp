@@ -59,8 +59,10 @@ int main() {
 		}
 		while (acc_angle < 4 * M_PI) {
 			acc_angle += step_len;
-			q = BSE::ImuTools::quaternion_update(q, angle_add, 1.0);
-			qr = BSE::ImuTools::quaternion_update(qr, angle_add, -1.0);
+//			q = BSE::ImuTools::quaternion_update(q, angle_add, 1.0);
+//			qr = BSE::ImuTools::quaternion_update(qr, angle_add, -1.0);
+			q = BSE::ImuTools::quaternion_left_update(q, angle_add, 1.0);
+			qr = BSE::ImuTools::quaternion_left_update(qr, angle_add, -1.0);
 
 			logger_ptr->addPlotEvent("test_own_q" + std::to_string(axis_id), "q",
 			                         q.toRotationMatrix().eulerAngles(0, 1, 2));
@@ -71,13 +73,13 @@ int main() {
 
 
 	};
-	
+
 	for(int i(0);i<3;++i){
 		test_own_q(i);
 	}
-	
-	
-	
+
+
+
 	auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 	logger_ptr->outputAllEvent(true);
 
