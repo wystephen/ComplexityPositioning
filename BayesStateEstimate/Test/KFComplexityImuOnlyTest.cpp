@@ -11,30 +11,22 @@
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
-#include <Eigen/Geometry>
 //#include <AWF.h>dd
 
 
 #include <AWF.h>
 
 #include "BayesFilter/KalmanFilter/IMUWBKFSimple.h"
-#include "BayesFilter/KalmanFilter/IMUWBKFSimple.cpp"
 
 
 #include "BayesFilter/KalmanFilter/KFComplex.h"
 
 
-#include "../AuxiliaryTool/UwbTools.h"
 #include "../AuxiliaryTool/UwbTools.cpp"
 
-#include "../AuxiliaryTool/ImuTools.h"
-#include "../AuxiliaryTool/ImuTools.cpp"
 
-
-#include <omp.h>
 #include <BayesFilter/KalmanFilter/KFComplexFull.h>
 
-#include <iostream>
 #include <BayesFilter/KalmanFilter/KFComplexFF.h>
 #include <BayesFilter/KalmanFilter/UKFComplex.h>
 

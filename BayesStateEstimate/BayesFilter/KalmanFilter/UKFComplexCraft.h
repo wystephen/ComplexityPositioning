@@ -62,6 +62,11 @@ namespace BSE {
 			rotation_q_ = ImuTools::quaternion_update<double>(rotation_q_,
 			                                                  input.block(3, 0, 3, 1) + state_x_.block(12, 0, 3, 1),
 			                                                  time_interval_);
+//			rotation_q_ = ImuTools::quaternion_left_update<double>(rotation_q_,
+//			                                                       input.block(3, 0, 3, 1) +
+//			                                                       state_x_.block(12, 0, 3, 1),
+//			                                                       time_interval_);
+
 			rotation_q_.normalize();
 
 			Eigen::Vector3d acc =
@@ -476,6 +481,7 @@ namespace BSE {
 //			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
 //			rotation_q_.normalize();
 			rotation_q_ = ImuTools::quaternion_left_update(rotation_q_, epsilon, -1.0);
+//			rotation_q_ = ImuTools::quaternion_update(rotation_q_, epsilon, 1.0);
 
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(ImuTools::q2dcm(rotation_q_));
 
