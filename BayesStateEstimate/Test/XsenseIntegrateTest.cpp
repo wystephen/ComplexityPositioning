@@ -34,6 +34,7 @@
 #include <Eigen/Geometry>
 #include <BayesFilter/KalmanFilter/KFComplex.h>
 #include <BayesFilter/KalmanFilter/KFComplexFull.h>
+#include <BayesFilter/KalmanFilter/UKFComplexCraft.h>
 //#include <AWF.h>dd
 
 
@@ -108,13 +109,14 @@ int main(int argc, char *argv[]) {
 
 	Eigen::MatrixXd initial_prob_full_matrix = Eigen::MatrixXd::Identity(15, 15);
 	initial_prob_full_matrix.block(0, 0, 9, 9) = initial_prob_matrix;
-	initial_prob_full_matrix.block(9, 9, 3, 3) *= 0.001;
-	initial_prob_full_matrix.block(12, 12, 3, 3) *= 0.001 * (M_PI / 180.0);
+	initial_prob_full_matrix.block(9, 9, 3, 3) *= 0.00001;
+	initial_prob_full_matrix.block(12, 12, 3, 3) *= 0.00001 * (M_PI / 180.0);
 
 
 	auto filter = BSE::IMUWBKFSimple(initial_prob_matrix);
 	filter.setTime_interval_(0.01);
 	auto complex_filter = BSE::KFComplex(initial_prob_matrix);
+	auto complex_craft_filter = BSE::UKFComplexCraft(initial_prob_full_matrix);
 	complex_filter.time_interval_ = 0.01;
 
 	auto complex_full_filter = BSE::KFComplexFull(initial_prob_full_matrix);
@@ -153,6 +155,8 @@ int main(int argc, char *argv[]) {
 		                        BSE::StateTransactionMethodType::NormalRotation);
 		complex_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
 		                             process_noise_matrix);
+		complex_full_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+		                                  process_noise_matrix);
 
 
 		auto state_T = filter.getTransformMatrix();
@@ -188,8 +192,10 @@ int main(int argc, char *argv[]) {
 					                        measurement_noise_matrix * 0.00001,
 					                        BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
-//                    complex_filter.MeasurementUwb(measurement_data,
-//                                                  measurement_noise_matrix * 0.001);
+					complex_filter.MeasurementUwb(measurement_data,
+					                              measurement_noise_matrix * 0.001);
+					complex_full_filter.MeasurementUwb(measurement_data,
+					                                   measurement_noise_matrix * 0.001);
 					m_stack.push_back(measurement_data);
 					cov_stack.push_back(measurement_noise_matrix * 0.0001);
 				}
@@ -205,7 +211,7 @@ int main(int argc, char *argv[]) {
 				m_matrix.block(k, 0, 1, 4) = m_stack[k].transpose();
 				cov_matrix(k, k) = cov_stack[k](0);
 			}
-			complex_filter.MeasurementUwbFull(m_matrix, cov_matrix);
+//			complex_filter.MeasurementUwbFull(m_matrix, cov_matrix);
 
 			uwb_index++;
 
@@ -214,9 +220,11 @@ int main(int argc, char *argv[]) {
 
 		auto filter_state = filter.getState_();
 		auto complex_state = complex_filter.state_x_;
+		auto complex_full_state = complex_full_filter.state_x_;
 
 		logger_ptr->addTrace3dEvent("xsense_uwb", "filter_trace", filter_state.block(0, 0, 3, 1));
 		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_trace", complex_state.block(0, 0, 3, 1));
+		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_full_trace", complex_full_filter.block(0, 0, 3, 1));
 		logger_ptr->addTrace3dEvent("xsense_uwb", "uwb_optimize", optimize_trace.block(uwb_index, 0, 1, 3));
 
 		logger_ptr->addPlotEvent("xsense_uwb_complex", "pos", complex_state.block(0, 0, 3, 1));

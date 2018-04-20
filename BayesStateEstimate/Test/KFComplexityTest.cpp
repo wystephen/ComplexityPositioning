@@ -206,9 +206,9 @@ int main(int argc, char *argv[]) {
 //                break;
 //            }
             if (uwb_data(uwb_index, 0) - imu_data(i, 0) < 0.01) {
-//                filter.MeasurementState(uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1),
-//                                        measurement_noise_matrix,
-//                                        BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+                filter.MeasurementState(uwb_data.block(uwb_index, 1, 1, uwb_data.cols() - 1),
+                                        measurement_noise_matrix,
+                                        BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 //                std::cout << "test uwb :" << uwb_data(uwb_index, 0) << ",imu :"
 //                          << imu_data(i, 0) << std::endl;
 
