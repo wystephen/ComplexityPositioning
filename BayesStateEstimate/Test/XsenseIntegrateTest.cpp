@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
 	                                  initial_pos);
 
 	complex_craft_filter.initial_state(imu_data.block(0, 1, 10, 9),
-	                                   initial_ori + 10.0 / 180.0 * M_PI,
+	                                   initial_ori ,//+ 10.0 / 180.0 * M_PI,
 	                                   initial_pos);
 
 	filter.setLocal_g_(-9.884);
@@ -249,28 +249,28 @@ int main(int argc, char *argv[]) {
 		auto complex_full_state = complex_full_filter.state_x_;
 		auto complex_craft_state = complex_craft_filter.state_x_;
 
-		logger_ptr->addTrace3dEvent("xsense_uwb", "filter_trace", filter_state.block(0, 0, 3, 1));
+//		logger_ptr->addTrace3dEvent("xsense_uwb", "filter_trace", filter_state.block(0, 0, 3, 1));
 //		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_trace", complex_state.block(0, 0, 3, 1));
 //		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_full_trace", complex_full_state.block(0, 0, 3, 1));
 		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_craft_trace", complex_craft_state.block(0, 0, 3, 1));
 		logger_ptr->addTrace3dEvent("xsense_uwb", "uwb_optimize", optimize_trace.block(uwb_index, 0, 1, 3));
 
-		logger_ptr->addTraceEvent("xsense_uwb", "filter_trace", filter_state.block(0, 0, 2, 1));
+//		logger_ptr->addTraceEvent("xsense_uwb", "filter_trace", filter_state.block(0, 0, 2, 1));
 //		logger_ptr->addTraceEvent("xsense_uwb", "complex_trace", complex_state.block(0, 0, 2, 1));
 //		logger_ptr->addTraceEvent("xsense_uwb", "complex_full_trace", complex_full_state.block(0, 0, 2, 1));
 		logger_ptr->addTraceEvent("xsense_uwb", "complex_craft_trace", complex_craft_state.block(0, 0, 2, 1));
 		logger_ptr->addTraceEvent("xsense_uwb", "uwb_optimize", optimize_trace.block(uwb_index, 0, 1, 2));
 
 
-		logger_ptr->addPlotEvent("xsense_uwb_complex", "pos", complex_state.block(0, 0, 3, 1));
-		logger_ptr->addPlotEvent("xsense_uwb_complex", "vel", complex_state.block(3, 0, 3, 1));
-		logger_ptr->addPlotEvent("xsense_uwb_complex", "ang", complex_state.block(6, 0, 3, 1));
+//		logger_ptr->addPlotEvent("xsense_uwb_complex", "pos", complex_state.block(0, 0, 3, 1));
+//		logger_ptr->addPlotEvent("xsense_uwb_complex", "vel", complex_state.block(3, 0, 3, 1));
+//		logger_ptr->addPlotEvent("xsense_uwb_complex", "ang", complex_state.block(6, 0, 3, 1));
 
-		logger_ptr->addPlotEvent("complex_full", "pos", complex_full_state.block(0, 0, 3, 1));
-		logger_ptr->addPlotEvent("complex_full", "vel", complex_full_state.block(3, 0, 3, 1));
-		logger_ptr->addPlotEvent("complex_full", "ang", complex_full_state.block(6, 0, 3, 1));
-		logger_ptr->addPlotEvent("complex_full", "ba", complex_full_state.block(9, 0, 3, 1));
-		logger_ptr->addPlotEvent("complex_full", "bg", complex_full_state.block(12, 0, 3, 1));
+//		logger_ptr->addPlotEvent("complex_full", "pos", complex_full_state.block(0, 0, 3, 1));
+//		logger_ptr->addPlotEvent("complex_full", "vel", complex_full_state.block(3, 0, 3, 1));
+//		logger_ptr->addPlotEvent("complex_full", "ang", complex_full_state.block(6, 0, 3, 1));
+//		logger_ptr->addPlotEvent("complex_full", "ba", complex_full_state.block(9, 0, 3, 1));
+//		logger_ptr->addPlotEvent("complex_full", "bg", complex_full_state.block(12, 0, 3, 1));
 
 		logger_ptr->addPlotEvent("complex_full_craft", "pos", complex_craft_state.block(0, 0, 3, 1));
 		logger_ptr->addPlotEvent("complex_full_craft", "vel", complex_craft_state.block(3, 0, 3, 1));

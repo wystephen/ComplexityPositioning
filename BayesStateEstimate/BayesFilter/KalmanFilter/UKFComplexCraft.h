@@ -468,20 +468,10 @@ namespace BSE {
 
 			state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
 
-			Eigen::Matrix3d rbn = ImuTools::q2dcm<double>(rotation_q_);
-			Eigen::Matrix3d r_update = Eigen::Matrix3d::Identity();
 			Eigen::Vector3d epsilon(dX_(6), dX_(7), dX_(8));
 
 
-			r_update << 1.0, epsilon(2), -epsilon(1),
-					-epsilon(2), 1.0, epsilon(0),
-					epsilon(1), -epsilon(0), 1.0;
-//			r_update = Eigen::Matrix3d::Identity() + ImuTools::hat(epsilon);
-
-//			rotation_q_ = ImuTools::dcm2q<double>(r_update * rbn);
-//			rotation_q_.normalize();
 			rotation_q_ = ImuTools::quaternion_left_update(rotation_q_, epsilon, -1.0);
-//			rotation_q_ = ImuTools::quaternion_update(rotation_q_, epsilon, 1.0);
 
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(ImuTools::q2dcm(rotation_q_));
 
@@ -511,8 +501,6 @@ namespace BSE {
 		}
 
 
-
-
 		/**
 		 * @brief
 		 * @param pose
@@ -520,12 +508,12 @@ namespace BSE {
 		 */
 		void MeasurementUwbPose(Eigen::Matrix<double, 3, 1> pose,
 		                        Eigen::Matrix<double, 3, 3> cov_m) {
-			H_.resize(3,state_x_.rows());
+			H_.resize(3, state_x_.rows());
 			H_.setZero();
-			H_.block(0,0,3,3) = Eigen::Matrix<double,3,3>::Identity();
+			H_.block(0, 0, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity();
 
 			K_ = (prob_state_ * H_.transpose()) *
-			     (H_ * prob_state_ * H_.transpose()+cov_m).inverse();
+			     (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
 
 			K_ = (prob_state_ * H_.transpose()) *
 			     (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
@@ -534,10 +522,9 @@ namespace BSE {
 
 			state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
 
-			Sophus::SO3d r = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
 
-			r = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * r;
-			state_x_.block(6, 0, 3, 1) = r.log();
+			rotation_q_ = ImuTools::quaternion_left_update(rotation_q_, dX_.block(6, 0, 3, 1), -1.0);
+//			state_x_.block(6, 0, 3, 1) = r.log();
 
 			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
 
@@ -546,7 +533,6 @@ namespace BSE {
 
 			return;
 		}
-
 
 
 		/**
