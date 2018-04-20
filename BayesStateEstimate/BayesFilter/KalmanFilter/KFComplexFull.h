@@ -207,12 +207,12 @@ namespace BSE {
 		 */
 		void MeasurementUwbPose(Eigen::Matrix<double, 3, 1> pose,
 		                        Eigen::Matrix<double, 3, 3> cov_m) {
-			H_.resize(3,state_x_.rows());
+			H_.resize(3, state_x_.rows());
 			H_.setZero();
-			H_.block(0,0,3,3) = Eigen::Matrix<double,3,3>::Identity();
+			H_.block(0, 0, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity();
 
 			K_ = (prob_state_ * H_.transpose()) *
-					(H_ * prob_state_ * H_.transpose()+cov_m).inverse();
+			     (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
 
 			K_ = (prob_state_ * H_.transpose()) *
 			     (H_ * prob_state_ * H_.transpose() + cov_m).inverse();

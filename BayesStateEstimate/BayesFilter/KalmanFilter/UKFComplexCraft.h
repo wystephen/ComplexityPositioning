@@ -201,9 +201,6 @@ namespace BSE {
 
 			Eigen::MatrixXd L = (Sigma_matrix.llt().matrixL());
 
-//			std::cout << "L \n"
-//				<< L << "\n Sigma\n"
-//			<< Sigma_matrix << "\n";
 
 			int sigma_point_size = L.rows();
 
