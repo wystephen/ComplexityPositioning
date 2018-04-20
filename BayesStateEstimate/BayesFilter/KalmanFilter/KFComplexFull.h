@@ -160,6 +160,76 @@ namespace BSE {
 
 		}
 
+
+		/**
+ 		*  measurement according to uwb.
+ 		* @param measurement
+ 		*/
+		void MeasurementUwb(Eigen::Matrix<double, 4, 1> input,
+		                    Eigen::Matrix<double, 1, 1> cov_m) {
+
+			Eigen::Vector3d b = input.block(0, 0, 3, 1);
+			Eigen::Matrix<double, 1, 1> z;
+			z(0) = input(3);
+			Eigen::Matrix<double, 1, 1> y;
+			y(0) = (state_x_.block(0, 0, 3, 1) - b).norm();
+
+			H_.resize(1, state_x_.rows());
+			H_.setZero();
+			H_.block(0, 0, 1, 3) = (state_x_.block(0, 0, 3, 1) - b).transpose() / y(0);
+
+			K_ = (prob_state_ * H_.transpose()) *
+			     (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
+
+			dX_ = K_ * (z - y);
+
+			state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
+
+			Sophus::SO3d r = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
+
+			r = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * r;
+			state_x_.block(6, 0, 3, 1) = r.log();
+
+			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
+
+			prob_state_ = (Eigen::Matrix<double, 15, 15>::Identity() - K_ * H_) * prob_state_;
+			prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose());
+
+			return;
+
+		}
+
+
+		void MeasurementUwbPose(Eigen::Matrix<double, 3, 1> pose,
+		                        Eigen::Matrix<double, 3, 3> cov_m) {
+			H_.resize(3,state_x_.rows());
+			H_.setZero();
+			H_.block(0,0,3,3) = Eigen::Matrix<double,3,3>::Identity();
+
+			K_ = (prob_state_ * H_.transpose()) *
+					(H_ * prob_state_ * H_.transpose()+cov_m).inverse();
+
+			K_ = (prob_state_ * H_.transpose()) *
+			     (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
+
+			dX_ = K_ * (pose - H_ * state_x_);
+
+			state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
+
+			Sophus::SO3d r = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
+
+			r = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * r;
+			state_x_.block(6, 0, 3, 1) = r.log();
+
+			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
+
+			prob_state_ = (Eigen::Matrix<double, 15, 15>::Identity() - K_ * H_) * prob_state_;
+			prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose());
+
+			return;
+		}
+
+
 		/**
 		 * dax day daz : offset of acc measurements.
 		 * dgx dgy dgz : offset of gyr measurements.
@@ -199,10 +269,6 @@ namespace BSE {
 
 
 		bool IS_DEBUG = false; // debug flag.
-
-
-
-
 
 	};
 }

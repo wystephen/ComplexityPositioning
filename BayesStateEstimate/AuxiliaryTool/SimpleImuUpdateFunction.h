@@ -170,8 +170,8 @@ namespace BSE {
 
 			}
 
-			Eigen::Vector3d acc = rotation.matrix() * input.block(0, 0, 3, 1) +
-			                      Eigen::Vector3d(0, 0, local_gravity_) + state.block(9, 0, 3, 1);
+			Eigen::Vector3d acc = rotation.matrix() * (input.block(0, 0, 3, 1) + state.block(9, 0, 3, 1)) +
+			                      Eigen::Vector3d(0, 0, local_gravity_);
 //			Eigen::Vector3d acc = rotation.matrix() * input.block(0, 0, 3, 1) +
 //			                      Eigen::Vector3d(0, 0, local_gravity_);
 

@@ -194,8 +194,11 @@ int main(int argc, char *argv[]) {
 
 					complex_filter.MeasurementUwb(measurement_data,
 					                              measurement_noise_matrix * 0.001);
-					complex_full_filter.MeasurementUwb(measurement_data,
-					                                   measurement_noise_matrix * 0.001);
+//					complex_full_filter.MeasurementUwb(measurement_data,
+//					                                   measurement_noise_matrix * 2.0);
+
+
+
 					m_stack.push_back(measurement_data);
 					cov_stack.push_back(measurement_noise_matrix * 0.0001);
 				}
@@ -213,6 +216,10 @@ int main(int argc, char *argv[]) {
 			}
 //			complex_filter.MeasurementUwbFull(m_matrix, cov_matrix);
 
+			Eigen::Matrix<double, 3, 3> pose_cov = (Eigen::Matrix<double, 3, 3>::Identity());
+			complex_full_filter.MeasurementUwbPose(optimize_trace.block(uwb_index, 0, 1, 3).transpose(),
+			                                       pose_cov * 0.000001);
+
 			uwb_index++;
 
 
@@ -224,12 +231,24 @@ int main(int argc, char *argv[]) {
 
 		logger_ptr->addTrace3dEvent("xsense_uwb", "filter_trace", filter_state.block(0, 0, 3, 1));
 		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_trace", complex_state.block(0, 0, 3, 1));
-		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_full_trace", complex_full_filter.block(0, 0, 3, 1));
+		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_full_trace", complex_full_state.block(0, 0, 3, 1));
 		logger_ptr->addTrace3dEvent("xsense_uwb", "uwb_optimize", optimize_trace.block(uwb_index, 0, 1, 3));
+
+		logger_ptr->addTraceEvent("xsense_uwb", "filter_trace", filter_state.block(0, 0, 2, 1));
+		logger_ptr->addTraceEvent("xsense_uwb", "complex_trace", complex_state.block(0, 0, 2, 1));
+		logger_ptr->addTraceEvent("xsense_uwb", "complex_full_trace", complex_full_state.block(0, 0, 2, 1));
+		logger_ptr->addTraceEvent("xsense_uwb", "uwb_optimize", optimize_trace.block(uwb_index, 0, 1, 2));
+
 
 		logger_ptr->addPlotEvent("xsense_uwb_complex", "pos", complex_state.block(0, 0, 3, 1));
 		logger_ptr->addPlotEvent("xsense_uwb_complex", "vel", complex_state.block(3, 0, 3, 1));
 		logger_ptr->addPlotEvent("xsense_uwb_complex", "ang", complex_state.block(6, 0, 3, 1));
+
+		logger_ptr->addPlotEvent("complex_full", "pos", complex_full_state.block(0, 0, 3, 1));
+		logger_ptr->addPlotEvent("complex_full", "vel", complex_full_state.block(3, 0, 3, 1));
+		logger_ptr->addPlotEvent("complex_full", "ang", complex_full_state.block(6, 0, 3, 1));
+		logger_ptr->addPlotEvent("complex_full", "ba", complex_full_state.block(9, 0, 3, 1));
+		logger_ptr->addPlotEvent("complex_full", "bg", complex_full_state.block(12, 0, 3, 1));
 
 
 	}

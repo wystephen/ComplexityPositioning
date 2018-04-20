@@ -349,8 +349,8 @@ namespace BSE {
 
 
             rbn_ = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
-//            rbn_ = rbn_ * Sophus::SO3::exp(dX_.block(6, 0, 3, 1));
-            rbn_ = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * rbn_;
+            rbn_ = rbn_ * Sophus::SO3d::exp(dX_.block(6, 0, 3, 1));
+//            rbn_ = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * rbn_;
             state_x_.block(6, 0, 3, 1) = rbn_.log();
         }
 
