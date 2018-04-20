@@ -154,10 +154,10 @@ namespace BSE {
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
 
 			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
-//			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc", input.block(0, 0, 3, 1));
-//			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_rotated", rotation_q_ * input.block(0, 0, 3, 1));
-//			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_linear", acc);
-//			logger_ptr_->addPlotEvent("ukf_craft_jac", "gyr", input.block(3, 0, 3, 1));
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc", input.block(0, 0, 3, 1));
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_rotated", rotation_q_ * input.block(0, 0, 3, 1));
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_linear", acc);
+			logger_ptr_->addPlotEvent("ukf_craft_jac", "gyr", input.block(3, 0, 3, 1));
 
 //			logger_ptr_->addPlotEvent("ukf_craft_jac_p", "p", prob_state_);
 
@@ -509,6 +509,44 @@ namespace BSE {
 //			logger_ptr_->addPlotEvent("craft_zv", "diff_p_norm", after_p_norm - before_p_norm);
 
 		}
+
+
+
+
+		/**
+		 * @brief
+		 * @param pose
+		 * @param cov_m
+		 */
+		void MeasurementUwbPose(Eigen::Matrix<double, 3, 1> pose,
+		                        Eigen::Matrix<double, 3, 3> cov_m) {
+			H_.resize(3,state_x_.rows());
+			H_.setZero();
+			H_.block(0,0,3,3) = Eigen::Matrix<double,3,3>::Identity();
+
+			K_ = (prob_state_ * H_.transpose()) *
+			     (H_ * prob_state_ * H_.transpose()+cov_m).inverse();
+
+			K_ = (prob_state_ * H_.transpose()) *
+			     (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
+
+			dX_ = K_ * (pose - H_ * state_x_);
+
+			state_x_.block(0, 0, 6, 1) = state_x_.block(0, 0, 6, 1) + dX_.block(0, 0, 6, 1);
+
+			Sophus::SO3d r = Sophus::SO3d::exp(state_x_.block(6, 0, 3, 1));
+
+			r = Sophus::SO3d::exp(dX_.block(6, 0, 3, 1)) * r;
+			state_x_.block(6, 0, 3, 1) = r.log();
+
+			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
+
+			prob_state_ = (Eigen::Matrix<double, 15, 15>::Identity() - K_ * H_) * prob_state_;
+			prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose());
+
+			return;
+		}
+
 
 
 		/**

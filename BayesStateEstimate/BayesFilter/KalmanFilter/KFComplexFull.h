@@ -200,6 +200,11 @@ namespace BSE {
 		}
 
 
+		/**
+		 * @brief uwb lossely constrained correcting funct
+		 * @param pose
+		 * @param cov_m
+		 */
 		void MeasurementUwbPose(Eigen::Matrix<double, 3, 1> pose,
 		                        Eigen::Matrix<double, 3, 3> cov_m) {
 			H_.resize(3,state_x_.rows());
