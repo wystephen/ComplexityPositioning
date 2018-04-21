@@ -70,7 +70,7 @@ if __name__ == '__main__':
 		for j in range(2, len(line_list), 2):
 			uwb_data[i, int(line_list[j])] = float(line_list[j + 1])
 
-	np.savetxt(dir_name + 'uwb_data.data', uwb_data, delimiter=',')
+	np.savetxt(dir_name + 'uwb_data.csv', uwb_data, delimiter=',')
 	plt.figure()
 	plt.title('uwb')
 	for i in range(1, uwb_data.shape[1]):
