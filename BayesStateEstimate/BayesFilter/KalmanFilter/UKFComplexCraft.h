@@ -581,7 +581,7 @@ namespace BSE {
 			H_.setZero();
 			H_.block(0, 0, 1, 3) = (state_x_.block(0, 0, 3, 1) - b).transpose() / y(0);
 
-			Eigen::Matrix<double,3,3>
+//			Eigen::Matrix<double,3,3>
 
 
 //			bool fullfill_flag = false;
@@ -598,9 +598,11 @@ namespace BSE {
 
 			dX_ = K_ * (z - y);
 
-			while(dX_.norm()>1.0){
-				dX_ = dX_ * 0.6;
+			if( z(0)-y(0) > 2.0)
+			{
+				dX_ = 0.5 * dX_;
 			}
+
 
 //			if( dX_.block(3,0,3,1).norm)
 
