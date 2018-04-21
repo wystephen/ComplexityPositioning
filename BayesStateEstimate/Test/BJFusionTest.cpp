@@ -122,8 +122,8 @@ int main(int argc, char *argv[]) {
 
 	Eigen::MatrixXd initial_prob_full_matrix = Eigen::MatrixXd::Identity(15, 15);
 	initial_prob_full_matrix.block(0, 0, 9, 9) = initial_prob_matrix;
-	initial_prob_full_matrix.block(9, 9, 3, 3) *= 0.00001;
-	initial_prob_full_matrix.block(12, 12, 3, 3) *= 0.00001 * (M_PI / 180.0);
+	initial_prob_full_matrix.block(9, 9, 3, 3) *= 0.0001;
+	initial_prob_full_matrix.block(12, 12, 3, 3) *= 0.0001 * (M_PI / 180.0);
 
 
 	double time_interval = 0.005;// for bj dataset.
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
 	filter.setLocal_g_(-9.884);
 	complex_filter.local_g_ = -9.884;
 	complex_full_filter.local_g_ = -9.884;
-	complex_craft_filter.local_g_ = 9.81;
+	complex_craft_filter.local_g_ = -9.81;
 
 //    filter.IS_DEBUG = true;
 
@@ -172,17 +172,17 @@ int main(int argc, char *argv[]) {
 
 	for (int i(0); i < imu_data.rows(); ++i) {
 
-		if(uwb_index== uwb_data.rows()){
+		if (uwb_index == uwb_data.rows()) {
 			break;
 		}
 
-		filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
-		                        process_noise_matrix,
-		                        BSE::StateTransactionMethodType::NormalRotation);
-		complex_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
-		                             process_noise_matrix);
-		complex_full_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
-		                                  process_noise_matrix);
+//		filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
+//		                        process_noise_matrix,
+//		                        BSE::StateTransactionMethodType::NormalRotation);
+//		complex_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+//		                             process_noise_matrix);
+//		complex_full_filter.StateTransIMU(imu_data.block(i, 1, 1, 6).transpose(),
+//		                                  process_noise_matrix);
 
 		complex_craft_filter.StateTransIMU_jac(imu_data.block(i, 1, 1, 6).transpose(),
 		                                       process_noise_matrix);
@@ -193,6 +193,16 @@ int main(int argc, char *argv[]) {
 		Eigen::MatrixXd complex_x = complex_filter.state_x_;
 //        std::cout << state_x.transpose().eval() << std::endl;
 //        std::cout << state_x.transpose() << std::endl;
+
+		if (i > 10 && i < imu_data.rows() - 10) {
+			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
+				complex_craft_filter.MeasurementStateZV(Eigen::Matrix3d::Identity()*0.0001);
+
+
+			}
+		}
+
+
 		if (uwb_data(uwb_index, 0) < imu_data(i, 0)) {
 
 			Eigen::Matrix<double, 1, 1> measurement_noise_matrix;
@@ -206,7 +216,7 @@ int main(int argc, char *argv[]) {
 			for (int k(1); k < uwb_data.cols(); ++k) {
 				if (uwb_data(uwb_index, k) < 0.0 ||
 				    uwb_data(uwb_index, k) > 208.0 ||
-				    optimize_trace(uwb_index, 3) > 1000.0) {
+				    optimize_trace(uwb_index, 3) > 0.5) {
 					break;
 				} else {
 
@@ -217,21 +227,21 @@ int main(int argc, char *argv[]) {
 
 
 					// Correcting state according to uwb measurement.
-					filter.MeasurementState(measurement_data,
-					                        measurement_noise_matrix * 0.00001,
-					                        BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+//					filter.MeasurementState(measurement_data,
+//					                        measurement_noise_matrix * 0.00001,
+//					                        BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
-					complex_filter.MeasurementUwb(measurement_data,
-					                              measurement_noise_matrix * 0.001);
+//					complex_filter.MeasurementUwb(measurement_data,
+//					                              measurement_noise_matrix * 0.001);
 //					complex_full_filter.MeasurementUwb(measurement_data,
 //					                                   measurement_noise_matrix * 2.0);
 
 					complex_craft_filter.MeasurementUwb(measurement_data,
-					                                    measurement_noise_matrix * 0.2);
+					                                    measurement_noise_matrix * 0.5);
 
 
 					m_stack.push_back(measurement_data);
-					cov_stack.push_back(measurement_noise_matrix * 0.0001);
+					cov_stack.push_back(measurement_noise_matrix * 0.00000001);
 				}
 
 
@@ -248,8 +258,8 @@ int main(int argc, char *argv[]) {
 //			complex_filter.MeasurementUwbFull(m_matrix, cov_matrix);
 
 			Eigen::Matrix<double, 3, 3> pose_cov = (Eigen::Matrix<double, 3, 3>::Identity());
-			complex_full_filter.MeasurementUwbPose(optimize_trace.block(uwb_index, 0, 1, 3).transpose(),
-			                                       pose_cov * 0.1);
+//			complex_full_filter.MeasurementUwbPose(optimize_trace.block(uwb_index, 0, 1, 3).transpose(),
+//			                                       pose_cov * 0.1);
 
 //			complex_craft_filter.MeasurementUwbPose(optimize_trace.block(uwb_index, 0, 1, 3).transpose(),
 //			                                        pose_cov * 0.01);
