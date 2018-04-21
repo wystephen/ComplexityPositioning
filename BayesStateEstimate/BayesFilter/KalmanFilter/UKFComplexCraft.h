@@ -581,10 +581,26 @@ namespace BSE {
 			H_.setZero();
 			H_.block(0, 0, 1, 3) = (state_x_.block(0, 0, 3, 1) - b).transpose() / y(0);
 
+			Eigen::Matrix<double,3,3>
+
+
+//			bool fullfill_flag = false;
+//			while(!fullfill_flag){
+//				fullfill_flag=true;
+
+//				auto lambda_k = ()
+//			}
+
+
 			K_ = (prob_state_ * H_.transpose()) *
 			     (H_ * prob_state_ * H_.transpose() + cov_m).inverse();
 
+
 			dX_ = K_ * (z - y);
+
+			while(dX_.norm()>1.0){
+				dX_ = dX_ * 0.6;
+			}
 
 //			if( dX_.block(3,0,3,1).norm)
 
@@ -602,9 +618,9 @@ namespace BSE {
 
 
 			auto logger_ptr = AWF::AlgorithmLogger::getInstance();
-			logger_ptr->addPlotEvent("craft_robust","dx",dX_);
-			logger_ptr->addPlotEvent("craft_robust","dx_norm",dX_.norm());
-			logger_ptr->addPlotEvent("craft_robust","measure",input(3));
+			logger_ptr->addPlotEvent("craft_robust", "dx", dX_);
+			logger_ptr->addPlotEvent("craft_robust", "dx_norm", dX_.norm());
+			logger_ptr->addPlotEvent("craft_robust", "measure", input(3));
 
 
 			return;
