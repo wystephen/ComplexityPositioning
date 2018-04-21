@@ -154,6 +154,10 @@ target_link_libraries(RotationTester ${PYTHON_LIBRARIES})
 add_executable(XsenseIntegrateTest BayesStateEstimate/Test/XsenseIntegrateTest.cpp)
 target_link_libraries(XsenseIntegrateTest ${PYTHON_LIBRARIES})
 
+add_executable(BJFusionTest BayesStateEstimate/Test/BJFusionTest.cpp)
+target_link_libraries(BJFusionTest ${PYTHON_LIBRARIES})
+
+
 add_executable(UwbOptTest BayesStateEstimate/Test/UwbOptimizationTest.cpp)
 target_link_libraries(UwbOptTest ${PYTHON_LIBRARIES})
 
