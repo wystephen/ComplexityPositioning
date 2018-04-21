@@ -41,7 +41,7 @@ namespace BSE {
 		 * @param u
 		 * @return
 		 */
-		bool GLRT_Detector(Eigen::MatrixXd u) {
+		bool GLRT_Detector(Eigen::MatrixXd u,double sigma = 0.05) {
 			if (u.cols() == 6 && u.rows() != 6) {
 				Eigen::MatrixXd tu = u * 1.0;
 //        u = u.transpose();
@@ -50,8 +50,8 @@ namespace BSE {
 			assert(u.rows() == 6 || "u must be a 6 rows matrix(each col represent acc and gyro at one moement");
 			Eigen::Vector3d ya_m;
 			double g = 9.8;
-			double sigma_a_ = 0.05;
-			double sigma_g_ = 0.05 * M_PI / 180.0;
+			double sigma_a_ = sigma;
+			double sigma_g_ = sigma * M_PI / 180.0;
 			double ZeroDetectorWindowSize_ = u.rows();
 			double gamma_ = 240;
 

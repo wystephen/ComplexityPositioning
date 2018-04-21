@@ -194,9 +194,9 @@ int main(int argc, char *argv[]) {
 //        std::cout << state_x.transpose().eval() << std::endl;
 //        std::cout << state_x.transpose() << std::endl;
 
-		if (i > 10 && i < imu_data.rows() - 10) {
-			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
-				complex_craft_filter.MeasurementStateZV(Eigen::Matrix3d::Identity()*0.0001);
+		if (i > 20 && i < imu_data.rows() - 20) {
+			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 15, 1, 30, 6), 0.0005)) {
+				complex_craft_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0001);
 
 
 			}
@@ -216,7 +216,7 @@ int main(int argc, char *argv[]) {
 			for (int k(1); k < uwb_data.cols(); ++k) {
 				if (uwb_data(uwb_index, k) < 0.0 ||
 				    uwb_data(uwb_index, k) > 208.0 ||
-				    optimize_trace(uwb_index, 3) > 0.5) {
+				    optimize_trace(uwb_index, 3) > 1010.5) {
 					break;
 				} else {
 
@@ -236,8 +236,16 @@ int main(int argc, char *argv[]) {
 //					complex_full_filter.MeasurementUwb(measurement_data,
 //					                                   measurement_noise_matrix * 2.0);
 
+					if (uwb_index > 2 && uwb_index < uwb_data.rows() - 2) {
+						double sec_diff = uwb_data(uwb_index + 1, k) + uwb_data(uwb_index - 1, k) -
+						                  2.0 * uwb_data(uwb_index, k);
+						if (sec_diff > 0.60) {
+							break;
+						}
+					}
+
 					complex_craft_filter.MeasurementUwb(measurement_data,
-					                                    measurement_noise_matrix * 0.5);
+					                                    measurement_noise_matrix * optimize_trace(uwb_index, 3));
 
 
 					m_stack.push_back(measurement_data);

@@ -37,8 +37,8 @@ if __name__ == '__main__':
 	'''
 	imu_data = np.loadtxt(dir_name + 'imu.obs')
 
-	new_imu_data = np.zeros([imu_data.shape[0],imu_data.shape[1]+3])
-	new_imu_data[:,:imu_data.shape[1]] = imu_data
+	new_imu_data = np.zeros([imu_data.shape[0], imu_data.shape[1] + 3])
+	new_imu_data[:, :imu_data.shape[1]] = imu_data
 
 	np.savetxt(dir_name + 'imu.data', new_imu_data, delimiter=',')
 
@@ -89,33 +89,32 @@ if __name__ == '__main__':
 	from Scripts.Trilateration import Trilateration
 	from scipy.spatial.distance import *
 
-	beacon_data = np.loadtxt(dir_name+'beaconset_no_mac.csv',delimiter=',')
+	beacon_data = np.loadtxt(dir_name + 'beaconset_no_mac.csv', delimiter=',')
 
+	plt.figure()
+	plt.title('source data')
 
-plt.figure()
-plt.title('source data')
+	for i in range(1, uwb_data.shape[1]):
+		plt.plot(uwb_data[:, 0],
+		         uwb_data[:, i],
+		         '*',
+		         label=str(i))
+	plt.grid()
+	plt.legend()
 
-for i in range(1, uwb_data.shape[1]):
-	plt.plot(uwb_data[:, 0],
-	         uwb_data[:, i],
-	         '*',
-	         label=str(i))
-plt.grid()
-plt.legend()
+	first_order_div = uwb_data[1:, 1:] - uwb_data[:-1, 1:]
+	second_order_div = first_order_div[1:, :] - first_order_div[:-1, :]
 
-first_order_div = uwb_data[1:, 1:] - uwb_data[:-1, 1:]
-second_order_div = first_order_div[1:, :] - first_order_div[:-1, :]
+	plt.figure()
+	plt.title('div')
 
-plt.figure()
-plt.title('div')
-
-for i in range(first_order_div.shape[1]):
-	# plt.plot(first_order_div[:, i],
-	#          '*',
-	#          label='first' + str(i))
-	plt.plot(second_order_div[:, i],
-	         '+',
-	         label='second' + str(i))
+	for i in range(first_order_div.shape[1]):
+		# plt.plot(first_order_div[:, i],
+		#          '*',
+		#          label='first' + str(i))
+		plt.plot(second_order_div[:, i],
+		         '+',
+		         label='second' + str(i))
 
 	plt.legend()
 	plt.grid()
@@ -128,8 +127,8 @@ for i in range(first_order_div.shape[1]):
 	plt.title('processed')
 	for i in range(processed_uwb_data.shape[1]):
 		plt.plot(processed_uwb_data[:, i],
-				 '*',
-				 label='processed' + str(i))
+		         '*',
+		         label='processed' + str(i))
 	plt.legend()
 	plt.grid()
 	# plt.show()
@@ -156,16 +155,12 @@ for i in range(first_order_div.shape[1]):
 	ax.legend()
 	ax.grid()
 
-
 	plt.figure()
 	plt.title('trace')
-	plt.plot(src_pose[:,0],src_pose[:,1],'*',label='src pose')
-	plt.plot(pose[:,0],pose[:,1],'*',label='pose')
+	plt.plot(src_pose[:, 0], src_pose[:, 1], '*', label='src pose')
+	plt.plot(pose[:, 0], pose[:, 1], '*', label='pose')
 	plt.legend()
 	plt.grid()
-
-
-
 
 	plt.figure()
 	plt.title('res error and z-axis value')
@@ -176,22 +171,29 @@ for i in range(first_order_div.shape[1]):
 	plt.grid()
 	plt.legend()
 
-
-	dis_mat = squareform(pdist(uwb_data[:,1:]))
 	plt.figure()
-	plt.imshow(dis_mat)
-	plt.colorbar()
+	plt.subplot(211)
+	plt.title('1-st diff')
+	diff = uwb_data[1:, 1:] - uwb_data[:-1, 1:]
+	plt.plot(diff)
 	plt.grid()
 
+	plt.subplot(212)
+	plt.title('2-nd diff')
+	plt.plot(diff[1:, :] - diff[:-1, :])
+	plt.grid()
 
-	checked_mat = np.zeros_like(dis_mat)
-	checked_mat[np.where(dis_mat<1.0)] = 1.0
-	plt.figure()
-	plt.imshow(checked_mat)
-	plt.colorbar()
-
-
-
-
+	# dis_mat = squareform(pdist(uwb_data[:,1:]))
+	# plt.figure()
+	# plt.imshow(dis_mat)
+	# plt.colorbar()
+	# plt.grid()
+	#
+	#
+	# checked_mat = np.zeros_like(dis_mat)
+	# checked_mat[np.where(dis_mat<1.0)] = 1.0
+	# plt.figure()
+	# plt.imshow(checked_mat)
+	# plt.colorbar()
 
 	plt.show()

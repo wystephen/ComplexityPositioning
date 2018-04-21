@@ -364,7 +364,7 @@ namespace BSE {
 
 				prob_state_ += weight * dx * dx.transpose();
 
-				logger_ptr_->addPlotEvent("ukf_craft_diff_x","d"+std::to_string(i),dx);
+				logger_ptr_->addPlotEvent("ukf_craft_diff_x", "d" + std::to_string(i), dx);
 
 			}
 
@@ -477,7 +477,7 @@ namespace BSE {
 			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
 
 
-			logger_ptr_->addPlotEvent("ukf_craft_dx","dx",dX_);
+			logger_ptr_->addPlotEvent("ukf_craft_dx", "dx", dX_);
 //			logger_ptr_->addPlotEvent("ukf_craft", "epsilon", epsilon);
 //			logger_ptr_->addPlotEvent("ukf_craft", "angle_before",
 //			                          tmp_before_q.toRotationMatrix().eulerAngles(0, 1, 2));
@@ -567,6 +567,11 @@ namespace BSE {
 			prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose());
 
 			return;
+		}
+
+		void MeasurementUwbRobust(Eigen::Matrix<double, 4, 1> input,
+		                          Eigen::Matrix<double, 1, 1> cov_m) {
+
 		}
 
 
