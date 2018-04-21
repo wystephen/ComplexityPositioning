@@ -57,7 +57,8 @@ int main(int argc, char *argv[]) {
 
 	std::cout.precision(30);
 
-	std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0004/";
+//	std::string dir_name = "/home/steve/Data/XsensUwb/MTI700/0004/";
+	std::string dir_name = "/home/steve/Data/BJUwbINS/";
 
 	AWF::FileReader imu_file(dir_name + "imu.data");
 	AWF::FileReader uwb_file(dir_name + "uwb_data.csv");
@@ -84,10 +85,13 @@ int main(int argc, char *argv[]) {
 	double time_offset = double(uwb_data(0, 0) - imu_data(0, 0));
 	std::cout << "time offset:"
 	          << time_offset << std::endl;
-	for (int i(0); i < uwb_data.rows(); ++i) {
+	if (time_offset > 1000.0) {
+		for (int i(0); i < uwb_data.rows(); ++i) {
 //        uwb_data(i, 0) = uwb_data(i, 0) - time_offset;
-		uwb_data(i, 0) = uwb_data(i, 0) - 8.0 * 60.0 * 60.0;//time_offset;
+			uwb_data(i, 0) = uwb_data(i, 0) - 8.0 * 60.0 * 60.0;//time_offset;
+		}
 	}
+
 	auto uwb_tool = BSE::UwbTools(uwb_data,
 	                              beacon_data);
 
@@ -122,14 +126,18 @@ int main(int argc, char *argv[]) {
 	initial_prob_full_matrix.block(12, 12, 3, 3) *= 0.00001 * (M_PI / 180.0);
 
 
+
+	double time_interval = 0.005;// for bj dataset.
 	auto filter = BSE::IMUWBKFSimple(initial_prob_matrix);
-	filter.setTime_interval_(0.01);
+	filter.setTime_interval_(time_interval);
 	auto complex_filter = BSE::KFComplex(initial_prob_matrix);
+
+	complex_filter.time_interval_ = time_interval;
 	auto complex_craft_filter = BSE::UKFComplexCraft(initial_prob_full_matrix);
-	complex_filter.time_interval_ = 0.01;
+	complex_craft_filter.time_interval_ = time_interval;
 
 	auto complex_full_filter = BSE::KFComplexFull(initial_prob_full_matrix);
-	complex_full_filter.time_interval_ = 0.01;
+	complex_full_filter.time_interval_ = time_interval;
 
 	filter.initial_state(imu_data.block(0, 1, 10, 6),
 	                     initial_ori + 10.0 / 180.0 * M_PI,
