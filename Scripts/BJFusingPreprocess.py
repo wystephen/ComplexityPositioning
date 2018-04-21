@@ -36,7 +36,10 @@ if __name__ == '__main__':
 	'''
 	imu_data = np.loadtxt(dir_name + 'imu.obs')
 
-	np.savetxt(dir_name + 'imu.data', imu_data, delimiter=',')
+	new_imu_data = np.zeros([imu_data.shape[0],imu_data.shape[1]+3])
+	new_imu_data[:,:imu_data.shape[1]] = imu_data
+
+	np.savetxt(dir_name + 'imu.data', new_imu_data, delimiter=',')
 
 	plt.figure()
 	plt.subplot(211)

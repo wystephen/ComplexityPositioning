@@ -126,7 +126,6 @@ int main(int argc, char *argv[]) {
 	initial_prob_full_matrix.block(12, 12, 3, 3) *= 0.00001 * (M_PI / 180.0);
 
 
-
 	double time_interval = 0.005;// for bj dataset.
 	auto filter = BSE::IMUWBKFSimple(initial_prob_matrix);
 	filter.setTime_interval_(time_interval);
@@ -263,7 +262,9 @@ int main(int argc, char *argv[]) {
 //		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_trace", complex_state.block(0, 0, 3, 1));
 //		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_full_trace", complex_full_state.block(0, 0, 3, 1));
 		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_craft_trace", complex_craft_state.block(0, 0, 3, 1));
-		logger_ptr->addTrace3dEvent("xsense_uwb", "uwb_optimize", optimize_trace.block(uwb_index, 0, 1, 3));
+
+		if (uwb_index < optimize_trace.rows())
+			logger_ptr->addTrace3dEvent("xsense_uwb", "uwb_optimize", optimize_trace.block(uwb_index, 0, 1, 3));
 
 //		logger_ptr->addTraceEvent("xsense_uwb", "filter_trace", filter_state.block(0, 0, 2, 1));
 //		logger_ptr->addTraceEvent("xsense_uwb", "complex_trace", complex_state.block(0, 0, 2, 1));
