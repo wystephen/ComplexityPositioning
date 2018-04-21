@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
 	filter.setLocal_g_(-9.884);
 	complex_filter.local_g_ = -9.884;
 	complex_full_filter.local_g_ = -9.884;
-	complex_craft_filter.local_g_ = -9.81;
+	complex_craft_filter.local_g_ = 9.81;
 
 //    filter.IS_DEBUG = true;
 
@@ -171,6 +171,11 @@ int main(int argc, char *argv[]) {
 
 
 	for (int i(0); i < imu_data.rows(); ++i) {
+
+		if(uwb_index== uwb_data.rows()){
+			break;
+		}
+
 		filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
 		                        process_noise_matrix,
 		                        BSE::StateTransactionMethodType::NormalRotation);
@@ -253,14 +258,14 @@ int main(int argc, char *argv[]) {
 
 		}
 
-		auto filter_state = filter.getState_();
+		auto filter_state = filter.getState_();;
 		auto complex_state = complex_filter.state_x_;
 		auto complex_full_state = complex_full_filter.state_x_;
 		auto complex_craft_state = complex_craft_filter.state_x_;
+//		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_full_trace", complex_full_state.block(0, 0, 3, 1;
 
 //		logger_ptr->addTrace3dEvent("xsense_uwb", "filter_trace", filter_state.block(0, 0, 3, 1));
-//		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_trace", complex_state.block(0, 0, 3, 1));
-//		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_full_trace", complex_full_state.block(0, 0, 3, 1));
+//		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_trace", complex_state.block(0, 0, 3, 1));;));
 		logger_ptr->addTrace3dEvent("xsense_uwb", "complex_craft_trace", complex_craft_state.block(0, 0, 3, 1));
 
 		if (uwb_index < optimize_trace.rows())
@@ -270,7 +275,8 @@ int main(int argc, char *argv[]) {
 //		logger_ptr->addTraceEvent("xsense_uwb", "complex_trace", complex_state.block(0, 0, 2, 1));
 //		logger_ptr->addTraceEvent("xsense_uwb", "complex_full_trace", complex_full_state.block(0, 0, 2, 1));
 		logger_ptr->addTraceEvent("xsense_uwb", "complex_craft_trace", complex_craft_state.block(0, 0, 2, 1));
-		logger_ptr->addTraceEvent("xsense_uwb", "uwb_optimize", optimize_trace.block(uwb_index, 0, 1, 2));
+		if (uwb_index < optimize_trace.rows())
+			logger_ptr->addTraceEvent("xsense_uwb", "uwb_optimize", optimize_trace.block(uwb_index, 0, 1, 2));
 
 
 //		logger_ptr->addPlotEvent("xsense_uwb_complex", "pos", complex_state.block(0, 0, 3, 1));
