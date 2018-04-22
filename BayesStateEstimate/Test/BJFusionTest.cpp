@@ -196,14 +196,14 @@ int main(int argc, char *argv[]) {
 
 		double zupt_flag = 0.0;
 
-//		if (i > 50 && i < imu_data.rows() - 50) {
-//			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 45, 1, 90, 6), 0.01)) {
-//				complex_craft_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.001);
-//				zupt_flag = 1.0;
-//
-//
-//			}
-//		}
+		if (i > 50 && i < imu_data.rows() - 50) {
+			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 45, 1, 90, 6), 0.1,0.1)) {
+				complex_craft_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.001);
+				zupt_flag = 1.0;
+
+
+			}
+		}
 
 
 		if (uwb_data(uwb_index, 0) < imu_data(i, 0)) {
