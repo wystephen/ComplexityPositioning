@@ -250,8 +250,8 @@ int main(int argc, char *argv[]) {
 					                                    measurement_noise_matrix * 0.5);
 
 
-					m_stack.push_back(measurement_data);
-					cov_stack.push_back(measurement_noise_matrix * 0.00000001);
+//					m_stack.push_back(measurement_data);
+//					cov_stack.push_back(measurement_noise_matrix * 0.00000001);
 				}
 
 

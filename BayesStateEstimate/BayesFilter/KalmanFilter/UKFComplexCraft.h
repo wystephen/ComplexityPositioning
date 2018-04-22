@@ -594,11 +594,11 @@ namespace BSE {
 			while (robust_loop_flag) {
 				robust_loop_flag = false;
 				eta_k = v_k.transpose() * P_v.inverse() * v_k;
+				P_v = H_ * prob_state_ * H_.transpose() + R_k;
 
 				logger_ptr->addPlotEvent("craft_robust_debug", "eta", eta_k);
 
 
-				P_v = H_ * P_v * H_.transpose() + R_k;
 			}
 
 
