@@ -602,19 +602,39 @@ namespace BSE {
 			double T_d = 20.0;
 			while (robust_loop_flag) {
 				robust_loop_flag = false;
-				eta_k = v_k.transpose() * P_v.inverse() * v_k;
-				P_v = H_ * prob_state_ * H_.transpose() + R_k;
 
-				logger_ptr->addPlotEvent("craft_robust_debug", "eta"+std::to_string(id), eta_k);
+				P_v = H_ * prob_state_ * H_.transpose() + R_k;
+				eta_k = v_k.transpose() * P_v.inverse() * v_k;
+				logger_ptr->addPlotEvent("craft_robust_debug", "eta" + std::to_string(id), eta_k);
 				if (eta_k(0, 0) > ka_squard) {
 //					return;
 //					robust_loop_flag=true;
 //					R_k = eta_k / ka_squard * R_k;
 //					if(eta_vector[id].size()>3 && eta_k(0,0)-eta_vector[id][])
 					int vec_size = eta_vector[id].size();
-					if (vec_size > 3 && eta_k(0, 0) - eta_vector[id][vec_size - 3](0, 0) > T_d) {
-						robust_loop_flag = true;
-						R_k = eta_k / ka_squard * R_k;
+					int serias_length = 5;
+					if (vec_size > serias_length) {//} && eta_k(0, 0) - eta_vector[id][vec_size - 3](0, 0) > T_d) {
+
+//						std::vector<double> val_vec = vec_size
+						Eigen::MatrixXd val_vec(serias_length + 1, 1);
+						val_vec(serias_length, 0) = eta_k(0, 0);
+						for (int t(0); t < serias_length; ++t) {
+							val_vec(t, 0) = eta_vector[id][vec_size - t - 1](0, 0);
+						}
+
+						double mean_of_val = val_vec.mean();
+						double lambda_k = 0.0;
+						for (int t(0); t < val_vec.rows(); ++t) {
+							lambda_k += (val_vec(t, 0) - mean_of_val) * (val_vec(t, 0) - mean_of_val);
+						}
+						lambda_k = lambda_k / double(val_vec.rows());
+						logger_ptr->addPlotEvent("robust","lambda"+std::to_string(id),lambda_k);
+
+						if (lambda_k > T_d) {
+							robust_loop_flag = true;
+							R_k = eta_k / ka_squard * R_k;
+						}
+
 					}
 
 
