@@ -239,9 +239,9 @@ int main(int argc, char *argv[]) {
 					if (uwb_index > 2 && uwb_index < uwb_data.rows() - 2) {
 						double sec_diff = uwb_data(uwb_index + 1, k) + uwb_data(uwb_index - 1, k) -
 						                  2.0 * uwb_data(uwb_index, k);
-						if (sec_diff > 0.60) {
-							break;
-						}
+//						if (sec_diff > 0.60) {
+//							break;
+//						}
 					}
 
 //					complex_craft_filter.MeasurementUwb(measurement_data,
