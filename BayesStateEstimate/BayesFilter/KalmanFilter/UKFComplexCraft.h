@@ -605,7 +605,7 @@ namespace BSE {
 				eta_k = v_k.transpose() * P_v.inverse() * v_k;
 				P_v = H_ * prob_state_ * H_.transpose() + R_k;
 
-				logger_ptr->addPlotEvent("craft_robust_debug", "eta", eta_k);
+				logger_ptr->addPlotEvent("craft_robust_debug", "eta"+std::to_string(id), eta_k);
 				if (eta_k(0, 0) > ka_squard) {
 //					return;
 //					robust_loop_flag=true;

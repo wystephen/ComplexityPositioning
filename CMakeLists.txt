@@ -6,17 +6,18 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_BUILD_TOOL Release)
 set(MKLROOT "/opt/intel/mkl/")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -fopenacc -lpthread -fopenmp -mavx -mfma ")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -fopenacc -lpthread -fopenmp -mavx -mfma ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -lpthread -fopenmp -mavx -mfma ")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g  -lpthread -fopenmp -mavx -mfma ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_intel_lp64 -lmkl_gnu_thread -lmkl_core -lgomp -lpthread -lm -ldl ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -m64 -I${MKLROOT}/include ")
 
 # Configure CCache if available
-find_program(CCACHE_FOUND ccache)
-if (CCACHE_FOUND)
-	set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-	set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-endif (CCACHE_FOUND)
+#find_program(CCACHE_FOUND ccache)
+#if (CCACHE_FOUND)
+#	set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+#	set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+#endif (CCACHE_FOUND)
 
 # add cmake module
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
@@ -25,7 +26,7 @@ LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 #find_package(CUDA REQUIRED)
 #find_package(Thrust REQUIRED)
 # nvcc flags
-set(CUDA_NVCC_FLAGS -gencode arch=compute_30,code=sm_30;-G;-g)
+#set(CUDA_NVCC_FLAGS -gencode arch=compute_30,code=sm_30;-G;-g)
 
 #OPENMP
 find_package(OpenMP)

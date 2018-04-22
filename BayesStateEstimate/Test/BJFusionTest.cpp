@@ -194,9 +194,12 @@ int main(int argc, char *argv[]) {
 //        std::cout << state_x.transpose().eval() << std::endl;
 //        std::cout << state_x.transpose() << std::endl;
 
+		double zupt_flag = 0.0;
+
 		if (i > 20 && i < imu_data.rows() - 20) {
-			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 15, 1, 30, 6), 0.0005)) {
+			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 5, 1, 10, 6), 0.005)) {
 				complex_craft_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0001);
+				zupt_flag = 1.0;
 
 
 			}
@@ -315,6 +318,9 @@ int main(int argc, char *argv[]) {
 		logger_ptr->addPlotEvent("complex_full_craft", "ang", complex_craft_state.block(6, 0, 3, 1));
 		logger_ptr->addPlotEvent("complex_full_craft", "ba", complex_craft_state.block(9, 0, 3, 1));
 		logger_ptr->addPlotEvent("complex_full_craft", "bg", complex_craft_state.block(12, 0, 3, 1));
+		logger_ptr->addPlotEvent("complex_full_craft", "zupt", zupt_flag);
+
+
 
 
 	}
