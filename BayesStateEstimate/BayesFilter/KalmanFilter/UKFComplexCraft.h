@@ -571,6 +571,9 @@ namespace BSE {
 
 		void MeasurementUwbRobust(Eigen::Matrix<double, 4, 1> input,
 		                          Eigen::Matrix<double, 1, 1> cov_m) {
+
+			auto logger_ptr = AWF::AlgorithmLogger::getInstance();
+
 			Eigen::Vector3d b = input.block(0, 0, 3, 1);
 			Eigen::Matrix<double, 1, 1> z;
 			z(0) = input(3);
@@ -581,15 +584,24 @@ namespace BSE {
 			H_.setZero();
 			H_.block(0, 0, 1, 3) = (state_x_.block(0, 0, 3, 1) - b).transpose() / y(0);
 
-//			Eigen::Matrix<double,3,3>
+
+			bool robust_loop_flag = true;
+			Eigen::Matrix<double,15,15> P_v = prob_state_;
+			Eigen::Matrix<double,1,1> v_k = z-y;
+			Eigen::Matrix<double,1,1> R_k = cov_m;
+			Eigen::Matrix<double,1,1> eta_k;
+			while(robust_loop_flag){
+				robust_loop_flag = false;
+				P_v = H_ * P_v * H_.transpose()+R_k;
+				eta_k = v_k.transpose() * P_v.inverse()*v_k;
+
+				logger_ptr->addPlotEvent("craft_robust_debug","eta",eta_k);
 
 
-//			bool fullfill_flag = false;
-//			while(!fullfill_flag){
-//				fullfill_flag=true;
 
-//				auto lambda_k = ()
-//			}
+
+			}
+
 
 
 			K_ = (prob_state_ * H_.transpose()) *
@@ -619,7 +631,6 @@ namespace BSE {
 			prob_state_ = 0.5 * (prob_state_ + prob_state_.transpose());
 
 
-			auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 			logger_ptr->addPlotEvent("craft_robust", "dx", dX_);
 			logger_ptr->addPlotEvent("craft_robust", "dx_norm", dX_.norm());
 			logger_ptr->addPlotEvent("craft_robust", "measure", input(3));
