@@ -598,8 +598,8 @@ namespace BSE {
 			Eigen::Matrix<double, 1, 1> v_k = z - y;
 			Eigen::Matrix<double, 1, 1> eta_k;
 
-			double ka_squard = 15.0;
-			double T_d = 20.0;
+			double ka_squard = 18.0;
+			double T_d = 15.0;
 			while (robust_loop_flag) {
 				robust_loop_flag = false;
 
@@ -607,21 +607,19 @@ namespace BSE {
 				eta_k = v_k.transpose() * P_v.inverse() * v_k;
 				logger_ptr->addPlotEvent("craft_robust_debug", "eta" + std::to_string(id), eta_k);
 				if (eta_k(0, 0) > ka_squard) {
-//					return;
-//					robust_loop_flag=true;
-//					R_k = eta_k / ka_squard * R_k;
 //					if(eta_vector[id].size()>3 && eta_k(0,0)-eta_vector[id][])
 					int vec_size = eta_vector[id].size();
 					int serias_length = 5;
 					if (vec_size > serias_length) {//} && eta_k(0, 0) - eta_vector[id][vec_size - 3](0, 0) > T_d) {
 
-//						std::vector<double> val_vec = vec_size
+						// save all eta in a vector(Eigen::Matrix)
 						Eigen::MatrixXd val_vec(serias_length + 1, 1);
 						val_vec(serias_length, 0) = eta_k(0, 0);
 						for (int t(0); t < serias_length; ++t) {
 							val_vec(t, 0) = eta_vector[id][vec_size - t - 1](0, 0);
 						}
 
+						// variance of eta
 						double mean_of_val = val_vec.mean();
 						double lambda_k = 0.0;
 						for (int t(0); t < val_vec.rows(); ++t) {
@@ -635,6 +633,8 @@ namespace BSE {
 							R_k = eta_k / ka_squard * R_k;
 						}
 
+					}else{
+//						R_k = eta_k / ka_squard * R_k;
 					}
 
 
