@@ -569,8 +569,18 @@ namespace BSE {
 			return;
 		}
 
+		/**
+		 * @brief robust kalman filter.
+		 * @param input
+		 * @param cov_m
+		 * @param id id of current observed UWB beacon.
+		 * @param ka_squard determing wether the noise is under guassion distribution.
+		 * @param T_d
+		 */
 		void MeasurementUwbRobust(Eigen::Matrix<double, 4, 1> input,
-		                          Eigen::Matrix<double, 1, 1> cov_m, int id = 0) {
+		                          Eigen::Matrix<double, 1, 1> cov_m, int id = 0,
+		double ka_squard=18.0,
+		double T_d = 15.0) {
 
 			while (id > eta_vector.size() - 1) {
 				eta_vector.push_back(std::vector<Eigen::MatrixXd>());
@@ -598,8 +608,8 @@ namespace BSE {
 			Eigen::Matrix<double, 1, 1> v_k = z - y;
 			Eigen::Matrix<double, 1, 1> eta_k;
 
-			double ka_squard = 18.0;
-			double T_d = 15.0;
+//			double ka_squard = 18.0;
+//			double T_d = 15.0;
 			while (robust_loop_flag) {
 				robust_loop_flag = false;
 
