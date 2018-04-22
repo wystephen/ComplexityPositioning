@@ -13,11 +13,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -L${MKLROOT}/lib/intel64 -Wl,--no-as-ne
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -m64 -I${MKLROOT}/include ")
 
 # Configure CCache if available
-#find_program(CCACHE_FOUND ccache)
-#if (CCACHE_FOUND)
-#	set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-#	set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-#endif (CCACHE_FOUND)
+find_program(CCACHE_FOUND ccache)
+if (CCACHE_FOUND)
+	set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+	set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+endif (CCACHE_FOUND)
 
 # add cmake module
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)

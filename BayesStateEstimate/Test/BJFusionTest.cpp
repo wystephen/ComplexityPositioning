@@ -194,17 +194,21 @@ int main(int argc, char *argv[]) {
 //        std::cout << state_x.transpose().eval() << std::endl;
 //        std::cout << state_x.transpose() << std::endl;
 
-		double zupt_flag = 0.0;
+		double zupt_flag = 1.0;
 
 		if (i > 150 && i < imu_data.rows() - 150) {
 			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 145, 1, 290, 6),
 			                                 0.1,
-			                                 0.05)) {
+			                                 std::stod(argv[1]))) {
 				complex_craft_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.001);
 				zupt_flag = 1.0;
 
 
+			}else{
+				zupt_flag = 0.0;
 			}
+
+
 		}
 
 
