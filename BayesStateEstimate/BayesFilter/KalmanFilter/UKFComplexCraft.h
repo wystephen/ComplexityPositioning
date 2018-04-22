@@ -598,8 +598,8 @@ namespace BSE {
 			Eigen::Matrix<double, 1, 1> v_k = z - y;
 			Eigen::Matrix<double, 1, 1> eta_k;
 
-			double ka_squard = 10.0;
-			double T_d = 10.0;
+			double ka_squard = 15.0;
+			double T_d = 20.0;
 			while (robust_loop_flag) {
 				robust_loop_flag = false;
 				eta_k = v_k.transpose() * P_v.inverse() * v_k;
