@@ -247,7 +247,8 @@ int main(int argc, char *argv[]) {
 //					complex_craft_filter.MeasurementUwb(measurement_data,
 //					                                    measurement_noise_matrix * optimize_trace(uwb_index, 3));
 					complex_craft_filter.MeasurementUwbRobust(measurement_data,
-					                                    measurement_noise_matrix * 0.5);
+					                                          measurement_noise_matrix * 0.5,
+					                                          k);
 
 
 //					m_stack.push_back(measurement_data);

@@ -570,7 +570,13 @@ namespace BSE {
 		}
 
 		void MeasurementUwbRobust(Eigen::Matrix<double, 4, 1> input,
-		                          Eigen::Matrix<double, 1, 1> cov_m) {
+		                          Eigen::Matrix<double, 1, 1> cov_m, int id = 0) {
+
+			while (id > eta_vector.size() - 1) {
+				eta_vector.push_back(std::vector<Eigen::MatrixXd>());
+
+			}
+
 
 			auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 
@@ -591,18 +597,33 @@ namespace BSE {
 			Eigen::Matrix<double, 1, 1> P_v = H_ * prob_state_ * H_.transpose() + R_k;
 			Eigen::Matrix<double, 1, 1> v_k = z - y;
 			Eigen::Matrix<double, 1, 1> eta_k;
+
+			double ka_squard = 10.0;
+			double T_d = 10.0;
 			while (robust_loop_flag) {
 				robust_loop_flag = false;
 				eta_k = v_k.transpose() * P_v.inverse() * v_k;
 				P_v = H_ * prob_state_ * H_.transpose() + R_k;
 
 				logger_ptr->addPlotEvent("craft_robust_debug", "eta", eta_k);
-				if(eta_k(0,0)>50){
-					return;
+				if (eta_k(0, 0) > ka_squard) {
+//					return;
+//					robust_loop_flag=true;
+//					R_k = eta_k / ka_squard * R_k;
+//					if(eta_vector[id].size()>3 && eta_k(0,0)-eta_vector[id][])
+					int vec_size = eta_vector[id].size();
+					if (vec_size > 3 && eta_k(0, 0) - eta_vector[id][vec_size - 3](0, 0) > T_d) {
+						robust_loop_flag = true;
+						R_k = eta_k / ka_squard * R_k;
+					}
+
+
 				}
 
 
 			}
+			eta_vector[id].push_back(eta_k);
+			cov_m = R_k;
 
 
 			K_ = (prob_state_ * H_.transpose()) *
@@ -772,6 +793,13 @@ namespace BSE {
 		double local_g_ = -9.81;
 
 		std::string class_name_ = "UKFComplexCraft";
+
+
+		std::vector<std::vector<Eigen::MatrixXd>> eta_vector = {{},
+		                                                        {},
+		                                                        {},
+		                                                        {},
+		                                                        {}};
 
 	};
 }
