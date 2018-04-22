@@ -53,14 +53,14 @@ set(Sophus_LIBRARIES libSophus.so)
 
 
 #GTSAM
-find_package(GTSAM REQUIRED) # Uses installed package
-include_directories(${GTSAM_INCLUDE_DIR})
-set(GTSAM_LIBRARIES gtsam)   # TODO: automatic search libs
+#find_package(GTSAM REQUIRED) # Uses installed package
+#include_directories(${GTSAM_INCLUDE_DIR})
+#set(GTSAM_LIBRARIES gtsam)   # TODO: automatic search libs
 
-find_package(GTSAMCMakeTools)
-include(GtsamMakeConfigFile)
-include(GtsamBuildTypes)
-include(GtsamTesting)
+#find_package(GTSAMCMakeTools)
+#include(GtsamMakeConfigFile)
+#include(GtsamBuildTypes)
+#include(GtsamTesting)
 
 # G2O
 SET(G2O_ROOT /usr/local/include/g2o)
@@ -92,7 +92,7 @@ include_directories(
 		${G2O_INCLUDE_DIR}
 		${Cholmod_INCLUDE_DIR}
 		${SuiteSparse_INCLUDE_DIR}
-		${GTSAM_INCLUDE_DIR}
+#		${GTSAM_INCLUDE_DIR}
 		/home/steve/Code/AlgorithmWorkFlowTools/
 		${PYTHON_INCLUDE_DIRS}
 		BayesStateEstimate/

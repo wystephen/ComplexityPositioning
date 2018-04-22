@@ -586,22 +586,20 @@ namespace BSE {
 
 
 			bool robust_loop_flag = true;
-			Eigen::Matrix<double,15,15> P_v = prob_state_;
-			Eigen::Matrix<double,1,1> v_k = z-y;
-			Eigen::Matrix<double,1,1> R_k = cov_m;
-			Eigen::Matrix<double,1,1> eta_k;
-			while(robust_loop_flag){
+
+			Eigen::Matrix<double, 1, 1> R_k = cov_m;
+			Eigen::Matrix<double, 1, 1> P_v = H_ * prob_state_ * H_.transpose() + R_k;
+			Eigen::Matrix<double, 1, 1> v_k = z - y;
+			Eigen::Matrix<double, 1, 1> eta_k;
+			while (robust_loop_flag) {
 				robust_loop_flag = false;
-				P_v = H_ * P_v * H_.transpose()+R_k;
-				eta_k = v_k.transpose() * P_v.inverse()*v_k;
+				eta_k = v_k.transpose() * P_v.inverse() * v_k;
 
-				logger_ptr->addPlotEvent("craft_robust_debug","eta",eta_k);
-
+				logger_ptr->addPlotEvent("craft_robust_debug", "eta", eta_k);
 
 
-
+				P_v = H_ * P_v * H_.transpose() + R_k;
 			}
-
 
 
 			K_ = (prob_state_ * H_.transpose()) *
@@ -610,8 +608,7 @@ namespace BSE {
 
 			dX_ = K_ * (z - y);
 
-			if( z(0)-y(0) > 2.0)
-			{
+			if (z(0) - y(0) > 2.0) {
 				dX_ = 0.5 * dX_;
 			}
 
