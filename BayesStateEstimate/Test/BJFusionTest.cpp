@@ -196,8 +196,10 @@ int main(int argc, char *argv[]) {
 
 		double zupt_flag = 0.0;
 
-		if (i > 50 && i < imu_data.rows() - 50) {
-			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 45, 1, 90, 6), 0.1,0.1)) {
+		if (i > 150 && i < imu_data.rows() - 150) {
+			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 145, 1, 290, 6),
+			                                 0.1,
+			                                 0.05)) {
 				complex_craft_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.001);
 				zupt_flag = 1.0;
 
@@ -320,12 +322,9 @@ int main(int argc, char *argv[]) {
 		logger_ptr->addPlotEvent("complex_full_craft", "bg", complex_craft_state.block(12, 0, 3, 1));
 		logger_ptr->addPlotEvent("complex_full_craft", "zupt", zupt_flag);
 
-		logger_ptr->addPlotEvent("src_data","imu",imu_data.block(i,1,1,3).transpose());
-		logger_ptr->addPlotEvent("src_data","gyr",imu_data.block(i,4,1,3).transpose());
-		logger_ptr->addPlotEvent("src_data","zv",zupt_flag);
-
-
-
+		logger_ptr->addPlotEvent("src_data", "imu", imu_data.block(i, 1, 1, 3).transpose());
+		logger_ptr->addPlotEvent("src_data", "gyr", imu_data.block(i, 4, 1, 3).transpose());
+		logger_ptr->addPlotEvent("src_data", "zv", zupt_flag);
 
 
 	}
