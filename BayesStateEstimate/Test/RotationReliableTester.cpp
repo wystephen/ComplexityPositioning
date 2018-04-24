@@ -57,7 +57,7 @@ int main() {
 		if (axis_id < 3) {
 			angle_add(axis_id) = step_len;
 		}
-		while (acc_angle < 4 * M_PI) {
+		while (acc_angle < 2.0 * M_PI) {
 			acc_angle += step_len;
 			q = BSE::ImuTools::quaternion_update(q, angle_add, 1.0);
 			qr = BSE::ImuTools::quaternion_update(qr, angle_add, -1.0);
