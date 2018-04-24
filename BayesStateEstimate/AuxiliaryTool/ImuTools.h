@@ -102,7 +102,7 @@ namespace BSE {
 
 			int row(imu_data.rows());
 			int col(imu_data.cols());
-			imu_data.resize(row, 1 + 3 + 3 + 3 + 1);//
+//			imu_data.resize(row, 1 + 3 + 3 + 3 + 1);//
 			// time
 			imu_data.block(0, 0, row, 1) = tmp_data.block(0, 1, row, 1) * 1.0;
 			imu_data.block(0, 1, row, 3) = tmp_data.block(0, 2, row, 3) * 9.81;
