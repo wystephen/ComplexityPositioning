@@ -218,7 +218,7 @@ int main(int argc, char *argv[]) {
 
 //				filter_complex.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.025);
 
-				complex_ukf_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.00000025);
+				complex_ukf_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.25);
 
 //				ff_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.0000025);
 
