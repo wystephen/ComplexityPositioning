@@ -65,9 +65,9 @@ int main() {
 			qr = BSE::ImuTools::quaternion_left_update(qr, angle_add, -1.0);
 
 			logger_ptr->addPlotEvent("test_own_q" + std::to_string(axis_id), "q",
-			                         q.toRotationMatrix().eulerAngles(0, 1, 2));
+			                         BSE::ImuTools::dcm2ang(BSE::ImuTools::q2dcm(q)));
 			logger_ptr->addPlotEvent("test_own_q" + std::to_string(axis_id), "qr",
-			                         qr.toRotationMatrix().eulerAngles(0, 1, 2));
+			                         BSE::ImuTools::dcm2ang(BSE::ImuTools::q2dcm(qr)));
 
 		}
 
