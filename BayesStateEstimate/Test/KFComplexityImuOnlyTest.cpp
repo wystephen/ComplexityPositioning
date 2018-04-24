@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 		auto filter = BSE::IMUWBKFSimple(
 				initial_prob_matrix);
 
-		auto filter_complex = BSE::KFComplex(initial_prob_matrix);
+//		auto filter_complex = BSE::KFComplex(initial_prob_matrix);
 //		auto filter_complex = BSE::UKFComplex(initial_prob_matrix);
 //        auto filter_complex = BSE::KFComplexFull(initial_prob_matrix_complex);
 
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
 //		auto complex_ukf_filter = BSE::UKFComplex(initial_prob_matrix_complex);
 		auto complex_ukf_filter = BSE::UKFComplexCraft(initial_prob_matrix_complex);
 
-		auto ff_filter = BSE::KFComplexFF(initial_prob_matrix_ff);
+//		auto ff_filter = BSE::KFComplexFF(initial_prob_matrix_ff);
 
 		double tmp_time_interval = (imu_data(imu_data.rows() - 1, 0) - imu_data(0, 0))
 		                           / double(imu_data.rows());
@@ -138,22 +138,23 @@ int main(int argc, char *argv[]) {
 		std::cout << "time interval :" << tmp_time_interval << std::endl;
 		if (std::abs(tmp_time_interval - 0.005) < 0.0001) {
 			filter.setTime_interval_(0.005);
-			filter_complex.time_interval_ = 0.005;
+//			filter_complex.time_interval_ = 0.005;
 		} else if (std::abs(tmp_time_interval - 0.01) < 0.001) {
 			filter.setTime_interval_(0.01);
-			filter_complex.time_interval_ = 0.01;
+//			filter_complex.time_interval_ = 0.01;
 		} else {
 			filter.setTime_interval_(tmp_time_interval);
-			filter_complex.time_interval_ = tmp_time_interval;
+//			filter_complex.time_interval_ = tmp_time_interval;
 		}
-		complex_ukf_filter.time_interval_ = filter_complex.time_interval_;
-		ff_filter.time_interval_ = complex_ukf_filter.time_interval_;
+		complex_ukf_filter.time_interval_ =tmp_time_interval;
+//		ff_filter.time_interval_ = complex_ukf_filter.time_interval_;
 
+		double local_g = -9.81;
 
 		filter.setLocal_g_(-9.8);
-		filter_complex.local_g_ = -9.8;
-		complex_ukf_filter.local_g_ = filter_complex.local_g_;
-		ff_filter.local_g_ = complex_ukf_filter.local_g_;
+//		filter_complex.local_g_ = -9.8;
+		complex_ukf_filter.local_g_ = local_g;
+//		ff_filter.local_g_ = complex_ukf_filter.local_g_;
 //    filter.IS_DEBUG = true;
 		std::vector<double> zv_flag = {};
 
@@ -164,17 +165,17 @@ int main(int argc, char *argv[]) {
 		                     initial_pos);
 
 
-		filter_complex.initial_state(imu_data.block(10, 1, 100, 9),
-		                             initial_ori,
-		                             initial_pos);
+//		filter_complex.initial_state(imu_data.block(10, 1, 100, 9),
+//		                             initial_ori,
+//		                             initial_pos);
 		std::cout << "initial state costed time :" << AWF::getDoubleSecondTime() - time_begin
 		          << std::endl;
 		complex_ukf_filter.initial_state(imu_data.block(10, 1, 100, 9),
 		                                 initial_ori,
 		                                 initial_pos);
-		ff_filter.initial_state(imu_data.block(10, 1, 100, 9),
-		                        initial_ori,
-		                        initial_pos);
+//		ff_filter.initial_state(imu_data.block(10, 1, 100, 9),
+//		                        initial_ori,
+//		                        initial_pos);
 
 
 //    filter.sett
@@ -259,31 +260,31 @@ int main(int argc, char *argv[]) {
 			}
 
 			Eigen::VectorXd state_simple = filter.getState_();
-			Eigen::VectorXd state = filter_complex.state_x_;
+//			Eigen::VectorXd state = filter_complex.state_x_;
 			Eigen::VectorXd full_state = complex_ukf_filter.state_x_;
 			assert(full_state.rows() == 15 && full_state.cols() == 1);
-			Eigen::VectorXd ff_state = ff_filter.state_x_;
+//			Eigen::VectorXd ff_state = ff_filter.state_x_;
 
 			logger_ptr->addPlotEvent(data_name + "velocity", "velocitysimple", state_simple.block(3, 0, 3, 1));
-			logger_ptr->addPlotEvent(data_name + "velocity", "velocitycomplex", state.block(3, 0, 3, 1));
+//			logger_ptr->addPlotEvent(data_name + "velocity", "velocitycomplex", state.block(3, 0, 3, 1));
 			logger_ptr->addPlotEvent(data_name + "velocity", "velocityfull", full_state.block(3, 0, 3, 1));
-			logger_ptr->addPlotEvent(data_name + "velocity", "velocityff", ff_state.block(3, 0, 3, 1));
+//			logger_ptr->addPlotEvent(data_name + "velocity", "velocityff", ff_state.block(3, 0, 3, 1));
 
 			logger_ptr->addPlotEvent(data_name + "angle", "anglesimple", state_simple.block(6, 0, 3, 1));
-			logger_ptr->addPlotEvent(data_name + "angle", "anglecomplex", state.block(6, 0, 3, 1));
+//			logger_ptr->addPlotEvent(data_name + "angle", "anglecomplex", state.block(6, 0, 3, 1));
 			logger_ptr->addPlotEvent(data_name + "angle", "anglefull", full_state.block(6, 0, 3, 1));
-			logger_ptr->addPlotEvent(data_name + "angle", "angleff", ff_state.block(6, 0, 3, 1));
+//			logger_ptr->addPlotEvent(data_name + "angle", "angleff", ff_state.block(6, 0, 3, 1));
 
 
 			logger_ptr->addTrace3dEvent(data_name, "simple", state_simple.block(0, 0, 3, 1));
-			logger_ptr->addTrace3dEvent(data_name, "complex", state.block(0, 0, 3, 1));
+//			logger_ptr->addTrace3dEvent(data_name, "complex", state.block(0, 0, 3, 1));
 			logger_ptr->addTrace3dEvent(data_name, "full", full_state.block(0, 0, 3, 1));
-			logger_ptr->addTrace3dEvent(data_name, "ff", ff_state.block(0, 0, 3, 1));
+//			logger_ptr->addTrace3dEvent(data_name, "ff", ff_state.block(0, 0, 3, 1));
 
 			logger_ptr->addTraceEvent(data_name, "simple", state_simple.block(0, 0, 2, 1));
-			logger_ptr->addTraceEvent(data_name, "complex", state.block(0, 0, 2, 1));
+//			logger_ptr->addTraceEvent(data_name, "complex", state.block(0, 0, 2, 1));
 			logger_ptr->addTraceEvent(data_name, "full", full_state.block(0, 0, 2, 1));
-			logger_ptr->addTraceEvent(data_name, "ff", ff_state.block(0, 0, 2, 1));
+//			logger_ptr->addTraceEvent(data_name, "ff", ff_state.block(0, 0, 2, 1));
 
 		}
 
