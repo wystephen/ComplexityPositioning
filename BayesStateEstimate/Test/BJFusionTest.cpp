@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 	Eigen::MatrixXd imu_data = imu_file.extractDoulbeMatrix(",");
 	Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
 	Eigen::MatrixXd beacon_data = beacon_file.extractDoulbeMatrix(",");
-//    beacon_data.block(0, 1, beacon_data.rows(), 1) *= -1.0;
+    beacon_data.block(0, 1, beacon_data.rows(), 1) *= -1.0;
 
 	double rate = 0.05;
 	Eigen::MatrixXd imu_data_tmp = imu_data * 1.0;
