@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 	Eigen::MatrixXd beacon_data = beacon_file.extractDoulbeMatrix(",");
 //    beacon_data.block(0, 1, beacon_data.rows(), 1) *= -1.0;
 
-	double rate = 0.05;
+	double rate = 0.5;
 	Eigen::MatrixXd imu_data_tmp = imu_data * 1.0;
 	for (int i(1); i < imu_data.rows(); ++i) {
 		for (int j(1); j < 7; ++j) {
@@ -217,10 +217,10 @@ int main(int argc, char *argv[]) {
 //					complex_craft_filter.MeasurementUwb(measurement_data,
 //					                                    measurement_noise_matrix * 0.2);
 					complex_craft_filter.MeasurementUwbRobust(measurement_data,
-					                                          measurement_noise_matrix*0.5,
+					                                          measurement_noise_matrix*0.1,
 					                                          k,
-					                                          10.0,
-					                                          5.0
+					                                          40.0,
+					                                          40.0
 					);
 
 
