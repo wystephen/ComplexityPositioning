@@ -205,21 +205,27 @@ int main(int argc, char *argv[]) {
 
 
 					// Correcting state according to uwb measurement.
-					filter.MeasurementState(measurement_data,
-					                        measurement_noise_matrix * 0.00001,
-					                        BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+//					filter.MeasurementState(measurement_data,
+//					                        measurement_noise_matrix * 0.00001,
+//					                        BSE::MeasurementMethodType::NormalUwbMeasuremnt);
 
-					complex_filter.MeasurementUwb(measurement_data,
-					                              measurement_noise_matrix * 0.001);
+//					complex_filter.MeasurementUwb(measurement_data,
+//					                              measurement_noise_matrix * 0.001);
 //					complex_full_filter.MeasurementUwb(measurement_data,
 //					                                   measurement_noise_matrix * 2.0);
 
-					complex_craft_filter.MeasurementUwb(measurement_data,
-					                                    measurement_noise_matrix * 0.2);
+//					complex_craft_filter.MeasurementUwb(measurement_data,
+//					                                    measurement_noise_matrix * 0.2);
+					complex_craft_filter.MeasurementUwbRobust(measurement_data,
+					                                          measurement_noise_matrix*0.5,
+					                                          k,
+					                                          10.0,
+					                                          5.0
+					);
 
 
-					m_stack.push_back(measurement_data);
-					cov_stack.push_back(measurement_noise_matrix * 0.0001);
+//					m_stack.push_back(measurement_data);
+//					cov_stack.push_back(measurement_noise_matrix * 0.0001);
 				}
 
 

@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
 			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 145, 1, 290, 6),
 			                                 0.1,
 			                                 0.0009)) {
-				complex_craft_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.001);
+//				complex_craft_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.001);
 				zupt_flag = 1.0;
 
 
@@ -259,7 +259,7 @@ int main(int argc, char *argv[]) {
 					                                          measurement_noise_matrix * 0.5,
 					                                          k,
 					                                          10.0,//std::stod(argv[1]),
-					                                          10.0);//std::stod(argv[2]));
+					                                          5.0);//std::stod(argv[2]));
 
 
 //					m_stack.push_back(measurement_data);
