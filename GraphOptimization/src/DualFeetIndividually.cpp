@@ -230,17 +230,32 @@ int main(int argc, char *argv[]) {
     g2o::SparseOptimizer globalOptimizer;
 
 
-    typedef g2o::BlockSolverX SlamBlockSolver;
-    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+//    typedef g2o::BlockSolverX SlamBlockSolver;
+//    typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+//
+//    // Initial solver
+////   std::unique_ptr< SlamLinearSolver> linearSolver (new SlamLinearSolver());
+//	auto linearSolver = g2o::make_unique<
+////    linearSolver->setBlockOrdering(false);
+//    linearSolver->setWriteDebug(true);
+////    std::unique_ptr<SlamBlockSolver> blockSolver (new SlamBlockSolver(linearSolver));
+//	blockSolver = g2o::make_unique<SlamLinearSolver>(std::move(linearSolver)):
 
-    // Initial solver
-    SlamLinearSolver *linearSolver = new SlamLinearSolver();
-//    linearSolver->setBlockOrdering(false);
-    linearSolver->setWriteDebug(true);
-    SlamBlockSolver *blockSolver = new SlamBlockSolver(linearSolver);
-    g2o::OptimizationAlgorithmLevenberg *solver =
-            new g2o::OptimizationAlgorithmLevenberg(blockSolver);
-    globalOptimizer.setAlgorithm(solver);
+    // create the linear solver
+    auto linearSolver = g2o::make_unique<g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType>>();
+
+    // create the block solver on top of the linear solver
+    auto blockSolver = g2o::make_unique<g2o::BlockSolverX>(std::move(linearSolver));
+
+    // create the algorithm to carry out the optimization
+    //OptimizationAlgorithmGaussNewton* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
+    g2o::OptimizationAlgorithmLevenberg* optimizationAlgorithm = new g2o::OptimizationAlgorithmLevenberg(std::move(blockSolver));
+
+
+//    g2o::OptimizationAlgorithmLevenberg *solver =
+//            new g2o::OptimizationAlgorithmLevenberg(blockSolver);
+
+    globalOptimizer.setAlgorithm(optimizationAlgorithm);
 
     int beacon_index_offset(0);
     std::vector<int> beacon_flag;

@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
     std::cout.precision(30);
     // parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-    std::string dir_name = "/home/steve/Data/FusingLocationData/0017/";
+    std::string dir_name = "/home/steve/Data/FusingLocationData/0014/";
 
 
     // 3 300 0.2 5.0 10000 0.2 5.0 5

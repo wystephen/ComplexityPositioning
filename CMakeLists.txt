@@ -50,7 +50,7 @@ find_package(LAPACK)
 
 #Sophus
 find_package(Sophus REQUIRED)
-set(Sophus_LIBRARIES libSophus.so)
+set(Sophus_LIBRARIES)
 
 
 #GTSAM
@@ -113,7 +113,7 @@ link_directories(
 		./include
 		${OpenCL_LIBRARY}
 		/opt/intel/mkl/lib/intel64/
-		#        ${Sophus_LIBRARIES
+		        ${Sophus_LIBRARIES}
 		#        /opt/intel/mkl/lib/intel64_lin/
 )
 
@@ -123,6 +123,8 @@ link_directories(
 set(AWF_LIBRARY /home/steve/Code/AlgorithmWorkFlowTools/lib/libAWF.so)
 link_libraries(
 		${AWF_LIBRARY}
+
+		${Sophus_LIBRARIES}
 )
 
 #add_library(BayesStateEstimate  STATIC BayesStateEstimate/BSE.h)
