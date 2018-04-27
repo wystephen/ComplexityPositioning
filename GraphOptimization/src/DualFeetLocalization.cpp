@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 	std::cout.precision(30);
 	// parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-	std::string dir_name = "/home/steve/Data/FusingLocationData/0014/";
+	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 
 
 	// 3 300 0.2 5.0 10000 0.2 5.0 5
@@ -237,17 +237,17 @@ int main(int argc, char *argv[]) {
 	g2o::SparseOptimizer globalOptimizer;
 
 
-	typedef g2o::BlockSolverX SlamBlockSolver;
-	typedef g2o::LinearSolverCSparse<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+	// create the linear solver
+	auto linearSolver = g2o::make_unique<g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType>>();
 
-	// Initial solver
-	SlamLinearSolver *linearSolver = new SlamLinearSolver();
-//    linearSolver->setBlockOrdering(false);
-	linearSolver->setWriteDebug(true);
-	SlamBlockSolver *blockSolver = new SlamBlockSolver(linearSolver);
-	g2o::OptimizationAlgorithmLevenberg *solver =
-			new g2o::OptimizationAlgorithmLevenberg(blockSolver);
-	globalOptimizer.setAlgorithm(solver);
+	// create the block solver on top of the linear solver
+	auto blockSolver = g2o::make_unique<g2o::BlockSolverX>(std::move(linearSolver));
+
+	// create the algorithm to carry out the optimization
+	//OptimizationAlgorithmGaussNewton* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
+	g2o::OptimizationAlgorithmLevenberg* optimizationAlgorithm = new g2o::OptimizationAlgorithmLevenberg(std::move(blockSolver));
+
+	globalOptimizer.setAlgorithm(optimizationAlgorithm);
 
 	int beacon_index_offset(0);
 	std::vector<int> beacon_flag;
