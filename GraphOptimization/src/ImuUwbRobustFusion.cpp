@@ -129,70 +129,61 @@ int main(int argc, char *argv[]) {
 
 	int uwb_index = 0.0;
 
-	for (int i(5); i < left_imu_data.rows() - 5 && i < right_imu_data.rows(); ++i) {
+	for (int i(5); i < left_imu_data.rows() - 5 && i < right_imu_data.rows() - 5; ++i) {
 		/// state transaction equation
 		left_filter.StateTransIMU_jac(left_imu_data.block(i, 1, 1, 6).transpose(),
 		                              process_noise_matrix
 		);
-		right_filter.StateTransIMU_jac(right_filter.block(i, 1, 1, 6).transpose(),
+		right_filter.StateTransIMU_jac(right_imu_data.block(i, 1, 1, 6).transpose(),
 		                               process_noise_matrix
 		);
 
+
+
+
 		/// uwb measurement
 		bool tmp_break_flag = false;
-//		while (uwb_data(uwb_index, 0) < imu_data(i, 0)) {
-//			uwb_index++;
-//			if (uwb_index == uwb_data.rows()) {
-//				uwb_index--;
-//				break;
-//
-//			}
-//		}
-//		if (uwb_data(uwb_index, 0) - imu_data(i, 0) < 0.01) {
-//
-//			for (int k(1); k < uwb_data.cols(); ++k) {
-//				if (uwb_data(uwb_index, k) > 0
-//				    && uwb_data(uwb_index, k) < 100.0
-//				    && optimize_trace(uwb_index, 3) < 2.0) {
-//
-//					Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
-//					measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
-//					measurement_noise_matrix.resize(1, 1);
-//					if (uwb_index < 15) {
-//
-//						measurement_noise_matrix(0, 0) = 0.01;
-//					} else {
-//						measurement_noise_matrix(0, 0) = 0.1;
-//					}
-//					 correct
-//                        filter.MeasurementState(measurement_data,
-//                                                measurement_noise_matrix,
-//                                                BSE::MeasurementMethodType::NormalUwbMeasuremnt);
+		if (uwb_data(uwb_index, 0) < left_imu_data(i, 0) ) {
 
-//				}
-//			}
-//		}
+			for (int k(1); k < uwb_data.cols(); ++k) {
+				if (uwb_data(uwb_index, k) > 0
+				    && uwb_data(uwb_index, k) < 100.0
+				    && optimize_trace(uwb_index, 3) < 2.0) {
+
+					Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
+					measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
+					measurement_noise_matrix.resize(1, 1);
+					if (uwb_index < 15) {
+
+						measurement_noise_matrix(0, 0) = 0.01;
+					} else {
+						measurement_noise_matrix(0, 0) = 0.1;
+					}
+
+
+
+				}
+			}
+		}
 
 
 		if (BSE::ImuTools::GLRT_Detector(left_imu_data.block(i - 5, 1, 10, 6))) {
 			/// zero velocity detector
-//			filter.MeasurementState(Eigen::Vector3d(0, 0, 0),
-//			                        Eigen::Matrix3d::Identity() * 0.000251001,
-//			                        BSE::MeasurementMethodType::NormalZeroVeclotiMeasurement);
-
-			/// angle constraint through acc.
-//                filter.MeasurementState(imu_data.block(i, 1, 1, 3).transpose(),
-//                                        Eigen::Matrix3d::Identity() * 0.0001,
-//                                        BSE::MeasurementMethodType::NormalAngleConstraint);
-
+			left_filter.MeasurementStateZV(Eigen::Matrix3d::Identity()*0.001);
 
 		}
+		if (BSE::ImuTools::GLRT_Detector(right_imu_data.block(i - 5, 1, 10, 6))) {
+			/// zero velocity detector
+			right_filter.MeasurementStateZV(Eigen::Matrix3d::Identity()*0.001);
 
-	} else {
+		}
+		logger_ptr->addTraceEvent("trace","left",left_filter.state_x_.block(0,0,3,1));
+		logger_ptr->addTraceEvent("trace","right",right_filter.state_x_.block(0,0,3,1));
+
+
 	}
 
-
-}
+	logger_ptr->outputAllEvent(true);
 
 
 }

@@ -153,11 +153,11 @@ namespace BSE {
 
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang(rotation_q_.toRotationMatrix());
 
-			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc", input.block(0, 0, 3, 1));
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_rotated", rotation_q_ * input.block(0, 0, 3, 1));
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_linear", acc);
-			logger_ptr_->addPlotEvent("ukf_craft_jac", "gyr", input.block(3, 0, 3, 1));
+//			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
+//			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc", input.block(0, 0, 3, 1));
+//			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_rotated", rotation_q_ * input.block(0, 0, 3, 1));
+//			logger_ptr_->addPlotEvent("ukf_craft_jac", "acc_linear", acc);
+//			logger_ptr_->addPlotEvent("ukf_craft_jac", "gyr", input.block(3, 0, 3, 1));
 
 //			logger_ptr_->addPlotEvent("ukf_craft_jac_p", "p", prob_state_);
 
@@ -471,13 +471,13 @@ namespace BSE {
 
 			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
 
-			logger_ptr_->addPlotEvent("complexfull", "offset_acc", state_x_.block(9, 0, 3, 1));
-			logger_ptr_->addPlotEvent("complexfull", "offset_gyr", state_x_.block(12, 0, 3, 1));
-
-			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
-
-
-			logger_ptr_->addPlotEvent("ukf_craft_dx", "dx", dX_);
+//			logger_ptr_->addPlotEvent("complexfull", "offset_acc", state_x_.block(9, 0, 3, 1));
+//			logger_ptr_->addPlotEvent("complexfull", "offset_gyr", state_x_.block(12, 0, 3, 1));
+//
+//			logger_ptr_->addPlotEvent("ukf_craft_zv", "P", prob_state_);
+//
+//
+//			logger_ptr_->addPlotEvent("ukf_craft_dx", "dx", dX_);
 //			logger_ptr_->addPlotEvent("ukf_craft", "epsilon", epsilon);
 //			logger_ptr_->addPlotEvent("ukf_craft", "angle_before",
 //			                          tmp_before_q.toRotationMatrix().eulerAngles(0, 1, 2));
