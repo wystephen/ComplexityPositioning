@@ -56,9 +56,9 @@
 #include <OwnEdge/DistanceEdge.cpp>
 
 #include <OwnEdge/SimpleDistanceEdge.h>
- #include <OwnEdge/SimpleRobustDistanceEdge.h>
+#include <OwnEdge/SimpleRobustDistanceEdge.h>
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
 	omp_set_num_threads(12);
 
 	auto logger_ptr = AWF::AlgorithmLogger::getInstance();
@@ -95,6 +95,15 @@ int main(int argc, char *argv[]){
 	BSE::ImuTools::processImuData(right_imu_data);
 	BSE::ImuTools::processImuData(head_imu_data);
 
+	Eigen::MatrixXd process_noise_matrix =
+			Eigen::MatrixXd::Identity(6, 6);
+	process_noise_matrix.block(0, 0, 3, 3) *= 0.1;
+	process_noise_matrix.block(3, 3, 3, 3) *= (0.1 * M_PI / 180.0);
+
+	Eigen::MatrixXd measurement_noise_matrix =
+			Eigen::MatrixXd::Identity(uwb_data.cols() - 1, uwb_data.cols() - 1);
+	measurement_noise_matrix *= 0.1;
+
 
 	Eigen::MatrixXd initial_prob_matrix_complex = Eigen::MatrixXd::Identity(15, 15);
 	initial_prob_matrix_complex.block(0, 0, 3, 3) *= 0.001;
@@ -107,7 +116,7 @@ int main(int argc, char *argv[]){
 	auto right_filter = BSE::UKFComplexCraft(initial_prob_matrix_complex);
 
 	double time_interval = (left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0))
-	                           / double(left_imu_data.rows());
+	                       / double(left_imu_data.rows());
 
 	left_filter.time_interval_ = time_interval;
 	right_filter.time_interval_ = time_interval;
@@ -115,12 +124,20 @@ int main(int argc, char *argv[]){
 	left_filter.local_g_ = -9.81;
 	right_filter.local_g_ = -9.81;
 
-	for (int i(5); i < left_imu_data.rows() - 5; ++i) {
+	left_filter.initial_state(left_imu_data.block(0, 1, 50, 6), initial_ori, initial_pos);
+	right_filter.initial_state(right_imu_data.block(0, 1, 50, 6), initial_ori, initial_pos);
+
+	int uwb_index = 0.0;
+
+	for (int i(5); i < left_imu_data.rows() - 5 && i < right_imu_data.rows(); ++i) {
 		/// state transaction equation
-//		filter.StateTransaction(imu_data.block(i, 1, 1, 6).transpose(),
-//		                        process_noise_matrix,
-//		                        BSE::StateTransactionMethodType::NormalRotation);
-		double uwb_index = 0;
+		left_filter.StateTransIMU_jac(left_imu_data.block(i, 1, 1, 6).transpose(),
+		                              process_noise_matrix
+		);
+		right_filter.StateTransIMU_jac(right_filter.block(i, 1, 1, 6).transpose(),
+		                               process_noise_matrix
+		);
+
 		/// uwb measurement
 		bool tmp_break_flag = false;
 //		while (uwb_data(uwb_index, 0) < imu_data(i, 0)) {
@@ -169,15 +186,13 @@ int main(int argc, char *argv[]){
 //                                        BSE::MeasurementMethodType::NormalAngleConstraint);
 
 
-			}
-
-		} else {
 		}
 
-
-
+	} else {
 	}
 
+
+}
 
 
 }
