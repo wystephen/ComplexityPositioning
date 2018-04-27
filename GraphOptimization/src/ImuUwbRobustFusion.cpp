@@ -146,13 +146,9 @@ int main(int argc, char *argv[]) {
 	auto blockSolver = g2o::make_unique<g2o::BlockSolverX>(std::move(linearSolver));
 
 	// create the algorithm to carry out the optimization
-	//OptimizationAlgorithmGaussNewton* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
-	g2o::OptimizationAlgorithmLevenberg *optimizationAlgorithm = new g2o::OptimizationAlgorithmLevenberg(
-			std::move(blockSolver));
+	g2o::OptimizationAlgorithmLevenberg *optimizationAlgorithm =
+			new g2o::OptimizationAlgorithmLevenberg(std::move(blockSolver));
 
-
-//    g2o::OptimizationAlgorithmLevenberg *solver =
-//            new g2o::OptimizationAlgorithmLevenberg(blockSolver);
 
 	globalOptimizer.setAlgorithm(optimizationAlgorithm);
 
@@ -181,8 +177,56 @@ int main(int argc, char *argv[]) {
 	int right_vertex_index = right_vertex_index_init;
 	int uwb_vertex_index = uwb_vertex_index_init;
 
+	auto last_left_transform = BSE::ImuTools::build_transform_matrix<double>(left_filter.state_x_.block(0, 0, 3, 1),
+	                                                                         left_filter.rotation_q_);
+	auto last_right_transform = BSE::ImuTools::build_transform_matrix<double>(right_filter.state_x_.block(0, 0, 3, 1),
+	                                                                          right_filter.rotation_q_);
 
-	for (int i(5); i < left_imu_data.rows() - 7 && i < right_imu_data.rows() - 7; ++i) {
+	auto *left_first_vertex = new g2o::VertexSE3();
+	left_first_vertex->setId(left_vertex_index);
+	left_vertex_index++;
+	globalOptimizer.addVertex(left_first_vertex);
+
+	auto *right_first_vertex = new g2o::VertexSE3();
+	right_first_vertex->setId(right_vertex_index);
+	right_vertex_index++;
+	globalOptimizer.addVertex(right_first_vertex);
+
+
+
+	/**graph parameter**/
+	/// g2o parameter
+
+	double first_info = 1000.0;
+	double second_info = 1000.0;
+
+
+	double distance_info = 0.1;
+	double distance_sigma = 2.0;
+
+
+	double z_offset = 1.90 - 1.12;
+
+	double turn_threshold = 1.0;
+	double corner_ratio = 10.0;
+
+	int max_optimize_times = 4000;
+
+	double time_offset = 0.0;
+
+
+	double uwb_err_threshold = 0.5;
+
+	int delay_times = 25;
+
+	int out_delay_times = 4;
+
+	int data_num = 5;
+
+	/**
+	 * MAIN LOOP.!!
+	 */
+	for (int i(5); i < left_imu_data.rows() - 17 && i < right_imu_data.rows() - 17; ++i) {
 		/// state transaction equation
 		left_filter.StateTransIMU_jac(left_imu_data.block(i, 1, 1, 6).transpose(),
 		                              process_noise_matrix
@@ -190,6 +234,7 @@ int main(int argc, char *argv[]) {
 		right_filter.StateTransIMU_jac(right_imu_data.block(i, 1, 1, 6).transpose(),
 		                               process_noise_matrix
 		);
+
 
 
 
@@ -202,23 +247,43 @@ int main(int argc, char *argv[]) {
 				if (uwb_data(uwb_index, k) > 0
 				    && uwb_data(uwb_index, k) < 100.0
 				    && optimize_trace(uwb_index, 3) < 2.0) {
+//
+//					Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
+//					measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
+//					measurement_noise_matrix.resize(1, 1);
+//					if (uwb_index < 15) {
+//
+//						measurement_noise_matrix(0, 0) = 0.01;
+//					} else {
+//						measurement_noise_matrix(0, 0) = 0.1;
+//					}
+					Eigen::Matrix<double, 1, 1> info_matrix;
+					info_matrix(0, 0) = distance_info;
 
-					Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
-					measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
-					measurement_noise_matrix.resize(1, 1);
-					if (uwb_index < 15) {
+					auto *left_dis_edge = new DistanceEdge();
+					left_dis_edge->vertices()[0] = globalOptimizer.vertex(k - 1);
+					left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index);
+					left_dis_edge->setMeasurement(uwb_data(uwb_index, k));
+					left_dis_edge->setInformation(info_matrix);
+					globalOptimizer.addEdge(left_dis_edge);
 
-						measurement_noise_matrix(0, 0) = 0.01;
-					} else {
-						measurement_noise_matrix(0, 0) = 0.1;
-					}
+
+					auto *right_dis_edge = new DistanceEdge();
+					right_dis_edge->vertices()[0] = globalOptimizer.vertex(k - 1);
+					right_dis_edge->vertices()[1] = globalOptimizer.vertex(right_vertex_index);
+					right_dis_edge->setMeasurement(uwb_data(uwb_index, k));
+					right_dis_edge->setInformation(info_matrix);
+					globalOptimizer.addEdge(right_dis_edge);
 
 
 				}
 			}
 
-			logger_ptr->addPlotEvent("trace","uwb_optimize",optimize_trace.block(i,1,1,3));
+//			logger_ptr->addPlotEvent("trace", "uwb_optimize", optimize_trace.block(i, 0, 1, 3));
 			uwb_index++;
+			if(uwb_index>uwb_data.rows()-1){
+				break;
+			}
 		}
 
 
@@ -228,6 +293,34 @@ int main(int argc, char *argv[]) {
 
 			if (BSE::ImuTools::GLRT_Detector(left_imu_data.block(i - 4, 1, 10, 6))) {
 				// add left foot vertex
+				auto *vertex_imu = new g2o::VertexSE3();
+				vertex_imu->setId(left_vertex_index);
+				left_vertex_index++;
+				globalOptimizer.addVertex(vertex_imu);
+
+				auto *e = new g2o::EdgeSE3();
+
+				e->vertices()[0] = globalOptimizer.vertex(left_vertex_index - 2);
+				e->vertices()[1] = globalOptimizer.vertex(left_vertex_index - 1);
+
+				Eigen::Matrix<double, 6, 6> information(Eigen::Matrix<double, 6, 6>::Identity());
+
+				information(0, 0) = information(1, 1) = information(2, 2) = first_info;
+				information(3, 3) = information(4, 4) = information(5, 5) = second_info;
+
+//            if (is_corner) {
+//                information(0, 0) = information(1, 1) = information(2, 2) = first_info / corner_ratio;
+//                information(3, 3) = information(4, 4) = information(5, 5) = second_info / corner_ratio;
+//            }
+				Eigen::Isometry3d tmp_transform = BSE::ImuTools::build_transform_matrix<double>(
+						left_filter.state_x_.block(0, 0, 3, 1),
+						left_filter.rotation_q_);
+
+				e->setInformation(information);
+				e->setMeasurement(last_left_transform.inverse() * tmp_transform);
+				globalOptimizer.addEdge(e);
+
+				last_left_transform = tmp_transform;
 
 			}
 
@@ -237,6 +330,34 @@ int main(int argc, char *argv[]) {
 			right_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.001);
 			if (BSE::ImuTools::GLRT_Detector(right_imu_data.block(i - 4, 1, 10, 6))) {
 				// add right foot vertex
+				auto *vertex_imu = new g2o::VertexSE3();
+				vertex_imu->setId(right_vertex_index);
+				right_vertex_index++;
+				globalOptimizer.addVertex(vertex_imu);
+
+				auto *e = new g2o::EdgeSE3();
+
+				e->vertices()[0] = globalOptimizer.vertex(right_vertex_index - 2);
+				e->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
+
+				Eigen::Matrix<double, 6, 6> information(Eigen::Matrix<double, 6, 6>::Identity());
+
+				information(0, 0) = information(1, 1) = information(2, 2) = first_info;
+				information(3, 3) = information(4, 4) = information(5, 5) = second_info;
+
+//            if (is_corner) {
+//                information(0, 0) = information(1, 1) = information(2, 2) = first_info / corner_ratio;
+//                information(3, 3) = information(4, 4) = information(5, 5) = second_info / corner_ratio;
+//            }
+				Eigen::Isometry3d tmp_transform = BSE::ImuTools::build_transform_matrix<double>(
+						right_filter.state_x_.block(0, 0, 3, 1),
+						right_filter.rotation_q_);
+
+				e->setInformation(information);
+				e->setMeasurement(last_right_transform.inverse() * tmp_transform);
+				globalOptimizer.addEdge(e);
+
+				last_right_transform = tmp_transform;
 
 			}
 
@@ -246,6 +367,23 @@ int main(int argc, char *argv[]) {
 		logger_ptr->addTrace3dEvent("trace", "left", left_filter.state_x_.block(0, 0, 3, 1));
 		logger_ptr->addTrace3dEvent("trace", "right", right_filter.state_x_.block(0, 0, 3, 1));
 
+
+	}
+
+	globalOptimizer.initializeOptimization();
+	globalOptimizer.setVerbose(true);
+	globalOptimizer.optimize(1000);
+
+
+	double *data_ptr = new double[10];
+	for (int i(left_vertex_index_init); i < left_vertex_index; ++i) {
+		globalOptimizer.vertex(i)[0].getEstimateData(data_ptr);
+		logger_ptr->addPlotEvent("trace", "left_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
+
+	}
+	for (int i(right_vertex_index_init); i < right_vertex_index; ++i) {
+		globalOptimizer.vertex(i)[0].getEstimateData(data_ptr);
+		logger_ptr->addPlotEvent("trace", "right_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
 
 	}
 

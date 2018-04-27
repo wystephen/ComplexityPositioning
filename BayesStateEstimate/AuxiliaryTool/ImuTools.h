@@ -484,10 +484,19 @@ namespace BSE {
 			return ang;
 		}
 
+		/**
+		 * @brief build up transpose matrix throught quaternion and pos.
+		 * @tparam T
+		 * @param pos
+		 * @param rotation_q
+		 * @return
+		 */
 		template<typename T>
 		Eigen::Isometry3d build_transform_matrix(Eigen::Matrix<T, 3, 1> pos,
 		                                         Eigen::Quaternion<T> rotation_q) {
-			Eigen::Isometry3d t_mat;
+			Eigen::Isometry3d t_mat=Eigen::Isometry3d::Identity();
+			t_mat.matrix().block(0,0,3,3) = q2dcm(rotation_q);
+			t_mat.matrix().block(0,3,3,1) = pos;
 
 			return t_mat;
 		};
