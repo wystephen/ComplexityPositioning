@@ -93,14 +93,18 @@ include_directories(
 		${G2O_INCLUDE_DIR}
 		${Cholmod_INCLUDE_DIR}
 		${SuiteSparse_INCLUDE_DIR}
-#		${GTSAM_INCLUDE_DIR}
+		#		${GTSAM_INCLUDE_DIR}
 		/home/steve/Code/AlgorithmWorkFlowTools/
 		${PYTHON_INCLUDE_DIRS}
-		BayesStateEstimate/
 		${Boost_INCLUDE_DIRS}
 		${BoostCompute_INCLUDE_DIRS}
 		${OpenCL_LIBRARY}
 		/opt/intel/mkl/include
+
+
+		BayesStateEstimate/
+		GraphOptimization/
+		GpuAlgorithm/
 )
 
 link_directories(
@@ -113,7 +117,7 @@ link_directories(
 		./include
 		${OpenCL_LIBRARY}
 		/opt/intel/mkl/lib/intel64/
-		        ${Sophus_LIBRARIES}
+		${Sophus_LIBRARIES}
 		#        /opt/intel/mkl/lib/intel64_lin/
 )
 
@@ -135,11 +139,23 @@ link_libraries(
 
 add_executable(DualFeetLocalization GraphOptimization/src/DualFeetLocalization.cpp)
 target_link_libraries(DualFeetLocalization ${PYTHON_LIBRARIES}
-					  ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
+					  ${Sophus_LIBRARIES}
+					  ${G2O_LIBS}
+					  ${CSPARSE_LIBRARY}
+					  ${PYTHON_LIBRARIES}
+					  ${SuiteSparse_LIBRARIES})
 
 add_executable(DualFeetIndividually GraphOptimization/src/DualFeetIndividually.cpp BayesStateEstimate/BayesFilter/KalmanFilter/KFComplexOpenShoe.h)
 target_link_libraries(DualFeetIndividually ${PYTHON_LIBRARIES}
 					  ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
+
+add_executable(ImuUwbRobustFusion GraphOptimization/src/ImuUwbRobustFusion.cpp)
+target_link_libraries(ImuUwbRobustFusion ${PYTHON_LIBRARIES}
+					  ${Sophus_LIBRARIES}
+					  ${G2O_LIBS}
+					  ${CSPARSE_LIBRARY}
+					  ${PYTHON_LIBRARIES}
+					  ${SuiteSparse_LIBRARIES})
 
 
 add_executable(KalmanFilterTester BayesStateEstimate/Test/KalmanFilterTester.cpp)
