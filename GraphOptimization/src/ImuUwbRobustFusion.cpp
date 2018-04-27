@@ -129,7 +129,60 @@ int main(int argc, char *argv[]) {
 
 	int uwb_index = 0.0;
 
-	for (int i(5); i < left_imu_data.rows() - 5 && i < right_imu_data.rows() - 5; ++i) {
+
+	/**
+	 * Initial graph
+	 */
+	g2o::SparseOptimizer globalOptimizer;
+
+
+//    // Initial solver
+
+
+	// create the linear solver
+	auto linearSolver = g2o::make_unique<g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType>>();
+
+	// create the block solver on top of the linear solver
+	auto blockSolver = g2o::make_unique<g2o::BlockSolverX>(std::move(linearSolver));
+
+	// create the algorithm to carry out the optimization
+	//OptimizationAlgorithmGaussNewton* optimizationAlgorithm = new OptimizationAlgorithmGaussNewton(blockSolver);
+	g2o::OptimizationAlgorithmLevenberg *optimizationAlgorithm = new g2o::OptimizationAlgorithmLevenberg(
+			std::move(blockSolver));
+
+
+//    g2o::OptimizationAlgorithmLevenberg *solver =
+//            new g2o::OptimizationAlgorithmLevenberg(blockSolver);
+
+	globalOptimizer.setAlgorithm(optimizationAlgorithm);
+
+	int beacon_index_offset(0);
+	std::vector<int> beacon_flag;
+	for (int k(0); k < beacon_set_data.rows(); k++) {
+		g2o::VertexSE3 *v = new g2o::VertexSE3();
+		v->setId(k);
+		beacon_flag.push_back(false);
+		double *d = new double[6];
+		for (int ki(0); ki < 3; ++ki) {
+			d[ki] = beacon_set_data(k, ki);
+		}
+		v->setEstimateData(d);
+		v->setFixed(true);
+		globalOptimizer.addVertex(v);
+
+	}
+
+
+	// set left vertex index and right vertex index
+	int left_vertex_index_init = 1000000;
+	int right_vertex_index_init = 2000000;
+	int uwb_vertex_index_init = 3000000;
+	int left_vertex_index = left_vertex_index_init;
+	int right_vertex_index = right_vertex_index_init;
+	int uwb_vertex_index = uwb_vertex_index_init;
+
+
+	for (int i(5); i < left_imu_data.rows() - 7 && i < right_imu_data.rows() - 7; ++i) {
 		/// state transaction equation
 		left_filter.StateTransIMU_jac(left_imu_data.block(i, 1, 1, 6).transpose(),
 		                              process_noise_matrix
@@ -143,7 +196,7 @@ int main(int argc, char *argv[]) {
 
 		/// uwb measurement
 		bool tmp_break_flag = false;
-		if (uwb_data(uwb_index, 0) < left_imu_data(i, 0) ) {
+		if (uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
 
 			for (int k(1); k < uwb_data.cols(); ++k) {
 				if (uwb_data(uwb_index, k) > 0
@@ -161,24 +214,37 @@ int main(int argc, char *argv[]) {
 					}
 
 
-
 				}
 			}
+
+			logger_ptr->addPlotEvent("trace","uwb_optimize",optimize_trace.block(i,1,1,3));
+			uwb_index++;
 		}
 
 
 		if (BSE::ImuTools::GLRT_Detector(left_imu_data.block(i - 5, 1, 10, 6))) {
 			/// zero velocity detector
-			left_filter.MeasurementStateZV(Eigen::Matrix3d::Identity()*0.001);
+			left_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.001);
+
+			if (BSE::ImuTools::GLRT_Detector(left_imu_data.block(i - 4, 1, 10, 6))) {
+				// add left foot vertex
+
+			}
 
 		}
 		if (BSE::ImuTools::GLRT_Detector(right_imu_data.block(i - 5, 1, 10, 6))) {
 			/// zero velocity detector
-			right_filter.MeasurementStateZV(Eigen::Matrix3d::Identity()*0.001);
+			right_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.001);
+			if (BSE::ImuTools::GLRT_Detector(right_imu_data.block(i - 4, 1, 10, 6))) {
+				// add right foot vertex
+
+			}
 
 		}
-		logger_ptr->addTraceEvent("trace","left",left_filter.state_x_.block(0,0,3,1));
-		logger_ptr->addTraceEvent("trace","right",right_filter.state_x_.block(0,0,3,1));
+		logger_ptr->addTraceEvent("trace", "left", left_filter.state_x_.block(0, 0, 2, 1));
+		logger_ptr->addTraceEvent("trace", "right", right_filter.state_x_.block(0, 0, 2, 1));
+		logger_ptr->addTrace3dEvent("trace", "left", left_filter.state_x_.block(0, 0, 3, 1));
+		logger_ptr->addTrace3dEvent("trace", "right", right_filter.state_x_.block(0, 0, 3, 1));
 
 
 	}

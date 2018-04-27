@@ -43,7 +43,7 @@ namespace BSE {
 		 */
 		bool GLRT_Detector(Eigen::MatrixXd u,
 		                   double sigma = 0.05,
-		double sigma_gyr = 0.05 * M_PI / 100.0) {
+		                   double sigma_gyr = 0.05 * M_PI / 100.0) {
 			if (u.cols() == 6 && u.rows() != 6) {
 				Eigen::MatrixXd tu = u * 1.0;
 //        u = u.transpose();
@@ -194,7 +194,7 @@ namespace BSE {
 			tmp_q(2) = q_in.y();
 			tmp_q(3) = q_in.z();
 
-			Eigen::Matrix<T, 3, 1> eta = update_angle * coeff *0.5;
+			Eigen::Matrix<T, 3, 1> eta = update_angle * coeff * 0.5;
 			T eta_norm = eta.norm();
 
 			Eigen::Matrix<T, 4, 1> mul_q;
@@ -482,6 +482,14 @@ namespace BSE {
 				          << "\n";
 			}
 			return ang;
+		}
+
+		template<typename T>
+		Eigen::Isometry3d build_transform_matrix(Eigen::Matrix<T, 3, 1> pos,
+		                                         Eigen::Quaternion<T> rotation_q) {
+			Eigen::Isometry3d t_mat;
+
+			return t_mat;
 		};
 
 
