@@ -163,7 +163,13 @@ int main(int argc, char *argv[]) {
 			d[ki] = beacon_set_data(k, ki);
 		}
 		v->setEstimateData(d);
-		v->setFixed(true);
+		if(beacon_set_data(k,0)<50000){
+
+			v->setFixed(true);
+		}else{
+			// the beacons's pose if unknown.
+			v->setFixed(false);
+		}
 		globalOptimizer.addVertex(v);
 
 	}

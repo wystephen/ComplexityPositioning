@@ -149,7 +149,7 @@ add_executable(DualFeetIndividually GraphOptimization/src/DualFeetIndividually.c
 target_link_libraries(DualFeetIndividually ${PYTHON_LIBRARIES}
 					  ${Sophus_LIBRARIES} ${G2O_LIBS} ${CSPARSE_LIBRARY} ${PYTHON_LIBRARIES} ${SuiteSparse_LIBRARIES})
 
-add_executable(ImuUwbRobustFusion GraphOptimization/src/ImuUwbRobustFusion.cpp)
+add_executable(ImuUwbRobustFusion GraphOptimization/src/ImuUwbRobustFusionGraph.cpp)
 target_link_libraries(ImuUwbRobustFusion ${PYTHON_LIBRARIES}
 					  ${Sophus_LIBRARIES}
 					  ${G2O_LIBS}
