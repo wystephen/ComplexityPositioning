@@ -42,8 +42,8 @@ namespace BSE {
 		 * @return
 		 */
 		bool GLRT_Detector(Eigen::MatrixXd u,
-		                   double sigma = 0.05,
-		                   double sigma_gyr = 0.05 * M_PI / 100.0) {
+		                   double sigma = 0.1,
+		                   double sigma_gyr = 0.1 * M_PI / 100.0) {
 			if (u.cols() == 6 && u.rows() != 6) {
 				Eigen::MatrixXd tu = u * 1.0;
 //        u = u.transpose();

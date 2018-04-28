@@ -110,7 +110,7 @@ namespace BSE {
             int vaild_counter = 0;
             double sum_err = 0.0;
             for (int i(1); i < uwb_data_.cols(); ++i) {
-                if (uwb_data_(uwb_index, i) > 0.0) {
+                if (uwb_data_(uwb_index, i) > 0.0 && beacon_set_(i-1,0)<5000) {
                     sum_err += std::pow(uwb_data_(uwb_index, i) -
                                         (pos - beacon_set_.block(i - 1, 0, 1, 3).transpose()).norm(),
                                         2.0);

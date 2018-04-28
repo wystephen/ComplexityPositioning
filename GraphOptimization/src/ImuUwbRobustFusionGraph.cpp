@@ -60,13 +60,21 @@ int main(int argc, char *argv[]) {
 
 	auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 
-	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+//	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+//	// load data
+//	AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
+//			right_foot_file(dir_name + "RIGHT_FOOT.data"),
+//			head_imu_file(dir_name + "HEAD.data"),
+//			uwb_file(dir_name + "uwb_result.csv"),
+//			beacon_set_file(dir_name + "beaconSet.csv");
+		std::string dir_name = "/home/steve/Data/NewFusingLocationData/0035/";
 	// load data
 	AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
 			right_foot_file(dir_name + "RIGHT_FOOT.data"),
 			head_imu_file(dir_name + "HEAD.data"),
-			uwb_file(dir_name + "uwb_result.csv"),
-			beacon_set_file(dir_name + "beaconSet.csv");
+			uwb_file(dir_name + "uwb_data.csv"),
+			beacon_set_file(dir_name + "beaconset_no_mac.csv");
+
 
 	Eigen::MatrixXd left_imu_data = left_foot_file.extractDoulbeMatrix(",");
 	Eigen::MatrixXd right_imu_data = right_foot_file.extractDoulbeMatrix(",");
@@ -186,7 +194,7 @@ int main(int argc, char *argv[]) {
 			d[ki] = beacon_set_data(k, ki);
 		}
 		v->setEstimateData(d);
-		if (beacon_set_data(k, 0) < 50000) {
+		if (beacon_set_data(k, 0) < 5000) {
 
 			v->setFixed(true);
 		} else {
@@ -262,7 +270,7 @@ int main(int argc, char *argv[]) {
 					Eigen::Matrix<double, 1, 1> info_matrix;
 					info_matrix(0, 0) = distance_info;
 
-					auto *left_dis_edge = new SimpleDistanceEdge();
+					auto *left_dis_edge = new DistanceEdge();
 					left_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
 					left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index-1);
 
@@ -276,7 +284,7 @@ int main(int argc, char *argv[]) {
 //					          << std::endl;
 
 
-					auto *right_dis_edge = new SimpleDistanceEdge();
+					auto *right_dis_edge = new DistanceEdge();
 					right_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
 					right_dis_edge->vertices()[1] = globalOptimizer.vertex(right_vertex_index-1);
 
@@ -391,6 +399,10 @@ int main(int argc, char *argv[]) {
 		logger_ptr->addTraceEvent("trace", "right", right_filter.state_x_.block(0, 0, 2, 1));
 		logger_ptr->addTrace3dEvent("trace", "left", left_filter.state_x_.block(0, 0, 3, 1));
 		logger_ptr->addTrace3dEvent("trace", "right", right_filter.state_x_.block(0, 0, 3, 1));
+		logger_ptr->addTraceEvent("traceimu", "left", left_filter.state_x_.block(0, 0, 2, 1));
+		logger_ptr->addTraceEvent("traceimu", "right", right_filter.state_x_.block(0, 0, 2, 1));
+		logger_ptr->addTrace3dEvent("traceimu", "left", left_filter.state_x_.block(0, 0, 3, 1));
+		logger_ptr->addTrace3dEvent("traceimu", "right", right_filter.state_x_.block(0, 0, 3, 1));
 
 
 	}
