@@ -205,7 +205,7 @@ int main(int argc, char *argv[]) {
 	double second_info = 1000.0;
 
 
-	double distance_info = 10.0;
+	double distance_info = 0.01;
 	double distance_sigma = 2.0;
 
 
@@ -248,8 +248,7 @@ int main(int argc, char *argv[]) {
 		if (uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
 
 			for (int k(1); k < uwb_data.cols(); ++k) {
-				if (uwb_data(uwb_index, k) > 0
-						) {
+				if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index,k) < 10.0) {
 //
 //					Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
 //					measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
@@ -270,6 +269,7 @@ int main(int argc, char *argv[]) {
 					left_dis_edge->setMeasurement(uwb_data(uwb_index, k));
 					left_dis_edge->setInformation(info_matrix);
 
+
 					globalOptimizer.addEdge(left_dis_edge);
 //					std::cout << " left_uwb measurement" << beacon_index_offset + k
 //					          << ":" << left_vertex_index << ":" << uwb_data(uwb_index, k)
@@ -282,7 +282,7 @@ int main(int argc, char *argv[]) {
 
 					right_dis_edge->setMeasurement(uwb_data(uwb_index, k));
 					right_dis_edge->setInformation(info_matrix);
-//					globalOptimizer.addEdge(right_dis_edge);
+					globalOptimizer.addEdge(right_dis_edge);
 
 
 //					std::cout << uwb_index << " right_uwb measurement" << beacon_index_offset + k
@@ -294,15 +294,15 @@ int main(int argc, char *argv[]) {
 			}
 
 //			logger_ptr->addPlotEvent("trace", "uwb_optimize", optimize_trace.block(i, 0, 1, 3));
-			std::cout << "uwb before time :" << uwb_data(uwb_index, 0);
+//			std::cout << "uwb before time :" << uwb_data(uwb_index, 0);
 			uwb_index++;
 
 
 			if (uwb_index > uwb_data.rows() - 1) {
 				break;
 			} else {
-				std::cout << "uwb after time:" << uwb_data(uwb_index, 0);
-				std::cout << "imue time :" << left_imu_data(i, 0) << std::endl;
+//				std::cout << "uwb after time:" << uwb_data(uwb_index, 0);
+//				std::cout << "imue time :" << left_imu_data(i, 0) << std::endl;
 
 			}
 		}
@@ -397,7 +397,7 @@ int main(int argc, char *argv[]) {
 
 	globalOptimizer.initializeOptimization();
 	globalOptimizer.setVerbose(true);
-	globalOptimizer.optimize(1000);
+	globalOptimizer.optimize(10000);
 
 
 	double *data_ptr = new double[10];
