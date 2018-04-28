@@ -245,8 +245,7 @@ int main(int argc, char *argv[]) {
 
 			for (int k(1); k < uwb_data.cols(); ++k) {
 				if (uwb_data(uwb_index, k) > 0
-				    && uwb_data(uwb_index, k) < 100.0
-				    && optimize_trace(uwb_index, 3) < 2.0) {
+				    ) {
 //
 //					Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
 //					measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
@@ -261,7 +260,7 @@ int main(int argc, char *argv[]) {
 					info_matrix(0, 0) = distance_info;
 
 					auto *left_dis_edge = new DistanceEdge();
-					left_dis_edge->vertices()[0] = globalOptimizer.vertex(k - 1);
+					left_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset+k - 1);
 					left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index);
 					left_dis_edge->setMeasurement(uwb_data(uwb_index, k));
 					left_dis_edge->setInformation(info_matrix);
@@ -269,11 +268,12 @@ int main(int argc, char *argv[]) {
 
 
 					auto *right_dis_edge = new DistanceEdge();
-					right_dis_edge->vertices()[0] = globalOptimizer.vertex(k - 1);
+					right_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset+k - 1);
 					right_dis_edge->vertices()[1] = globalOptimizer.vertex(right_vertex_index);
 					right_dis_edge->setMeasurement(uwb_data(uwb_index, k));
 					right_dis_edge->setInformation(info_matrix);
 					globalOptimizer.addEdge(right_dis_edge);
+					std::cout << " uwb measurement" << std::endl;
 
 
 				}
@@ -291,11 +291,11 @@ int main(int argc, char *argv[]) {
 			/// zero velocity detector
 			left_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.001);
 
-			if (BSE::ImuTools::GLRT_Detector(left_imu_data.block(i - 4, 1, 10, 6))) {
+			if (!BSE::ImuTools::GLRT_Detector(left_imu_data.block(i - 4, 1, 10, 6))) {
 				// add left foot vertex
 				auto *vertex_imu = new g2o::VertexSE3();
 				vertex_imu->setId(left_vertex_index);
-				left_vertex_index++;
+				left_vertex_index++;//
 				globalOptimizer.addVertex(vertex_imu);
 
 				auto *e = new g2o::EdgeSE3();
@@ -328,7 +328,7 @@ int main(int argc, char *argv[]) {
 		if (BSE::ImuTools::GLRT_Detector(right_imu_data.block(i - 5, 1, 10, 6))) {
 			/// zero velocity detector
 			right_filter.MeasurementStateZV(Eigen::Matrix3d::Identity() * 0.001);
-			if (BSE::ImuTools::GLRT_Detector(right_imu_data.block(i - 4, 1, 10, 6))) {
+			if (!BSE::ImuTools::GLRT_Detector(right_imu_data.block(i - 4, 1, 10, 6))) {
 				// add right foot vertex
 				auto *vertex_imu = new g2o::VertexSE3();
 				vertex_imu->setId(right_vertex_index);
@@ -378,12 +378,15 @@ int main(int argc, char *argv[]) {
 	double *data_ptr = new double[10];
 	for (int i(left_vertex_index_init); i < left_vertex_index; ++i) {
 		globalOptimizer.vertex(i)[0].getEstimateData(data_ptr);
-		logger_ptr->addPlotEvent("trace", "left_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
+		logger_ptr->addTrace3dEvent("trace", "left_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
+		logger_ptr->addTraceEvent("trace", "left_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
+		std::cout << "left:" << data_ptr[0] << ","<<data_ptr[1]<<","<<data_ptr[2]<<std::endl;
 
 	}
 	for (int i(right_vertex_index_init); i < right_vertex_index; ++i) {
 		globalOptimizer.vertex(i)[0].getEstimateData(data_ptr);
-		logger_ptr->addPlotEvent("trace", "right_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
+		logger_ptr->addTrace3dEvent("trace", "right_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
+		logger_ptr->addTraceEvent("trace", "right_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
 
 	}
 
