@@ -193,12 +193,13 @@ int main(int argc, char *argv[]) {
 		for (int ki(0); ki < 3; ++ki) {
 			d[ki] = beacon_set_data(k, ki);
 		}
-		v->setEstimateData(d);
+//		v->setEstimateData(d);
 		if (beacon_set_data(k, 0) < 5000) {
-
+			v->setEstimateData(d);
 			v->setFixed(true);
 		} else {
 			// the beacons's pose if unknown.
+//			v->setEstimateData()
 			v->setFixed(false);
 		}
 		std::cout << k + beacon_index_offset << "beacon vertex:" << v << std::endl;
@@ -253,7 +254,7 @@ int main(int argc, char *argv[]) {
 
 		/// uwb measurement
 		bool tmp_break_flag = false;
-		if (uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
+		if (uwb_index < uwb_data.rows() && uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
 
 			for (int k(1); k < uwb_data.cols(); ++k) {
 				if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index,k) < 10.0) {
@@ -279,9 +280,9 @@ int main(int argc, char *argv[]) {
 
 
 					globalOptimizer.addEdge(left_dis_edge);
-//					std::cout << " left_uwb measurement" << beacon_index_offset + k
-//					          << ":" << left_vertex_index << ":" << uwb_data(uwb_index, k)
-//					          << std::endl;
+					std::cout << " left_uwb measurement" << beacon_index_offset + k
+					          << ":" << left_vertex_index << ":" << uwb_data(uwb_index, k)
+					          << std::endl;
 
 
 					auto *right_dis_edge = new DistanceEdge();
@@ -306,17 +307,10 @@ int main(int argc, char *argv[]) {
 			uwb_index++;
 
 
-			if (uwb_index > uwb_data.rows() - 1) {
-				break;
-			} else {
-//				std::cout << "uwb after time:" << uwb_data(uwb_index, 0);
-//				std::cout << "imue time :" << left_imu_data(i, 0) << std::endl;
-
-			}
+//			if (uwb_index > uwb_data.rows() - 1) {
+//				break;
+//			}
 		}
-//		logger_ptr->addPlotEvent("time","uwb",uwb_data(uwb_index,0));
-//		logger_ptr->addPlotEvent("time","imu",left_imu_data(i,0));
-//		logger_ptr->addPlotEvent("time","diff",uwb_data(uwb_index,0)-left_imu_data(i,0));
 
 		// IMU Transaction
 
@@ -417,7 +411,7 @@ int main(int argc, char *argv[]) {
 		globalOptimizer.vertex(i)[0].getEstimateData(data_ptr);
 		logger_ptr->addTrace3dEvent("trace", "left_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
 		logger_ptr->addTraceEvent("trace", "left_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
-//		std::cout << "left:" << data_ptr[0] << "," << data_ptr[1] << "," << data_ptr[2] << std::endl;
+		std::cout << "left:"<<i <<  ":" << data_ptr[0] << "," << data_ptr[1] << "," << data_ptr[2] << std::endl;
 
 	}
 	for (int i(right_vertex_index_init); i < right_vertex_index; ++i) {

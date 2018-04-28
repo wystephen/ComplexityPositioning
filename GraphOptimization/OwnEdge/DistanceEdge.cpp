@@ -24,7 +24,11 @@ bool DistanceEdge::write(std::ostream &os) const {
     return os.good();
 }
 
+
+int counter = 0;
+
 void DistanceEdge::computeError() {
+//    counter ++;
 //    std::cout << "compute err L" << std::endl;
     g2o::VertexSE3 *from = static_cast<g2o::VertexSE3 *>(_vertices[0]);
     g2o::VertexSE3 *to = static_cast<g2o::VertexSE3 *>(_vertices[1]);
@@ -37,12 +41,16 @@ void DistanceEdge::computeError() {
                            (p1[1] - p2[1]) * (p1[1] - p2[1]) +
                            (p1[2] - p2[2]) * (p1[2] - p2[2]));
 
+
     if (std::isnan(dis)) {
         std::cout << "stop here" << std::endl;
     }
     try {
 
         _error(0, 0) = std::pow(dis - _measurement, 2.0);
+//        if(counter > 1000 && dis-_measurement>3.0){
+//            _error(0,0) = 0.0;
+//        }
         if (std::isnan(_error(0, 0)) || std::isinf(_error(0, 0))) {
             throw std::bad_cast();
         }
