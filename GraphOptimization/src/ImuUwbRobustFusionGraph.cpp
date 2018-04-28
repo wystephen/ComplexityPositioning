@@ -149,27 +149,7 @@ int main(int argc, char *argv[]) {
 
 	globalOptimizer.setAlgorithm(optimizationAlgorithm);
 
-	int beacon_index_offset(0);
-	std::vector<int> beacon_flag;
-	for (int k(0); k < beacon_set_data.rows(); k++) {
-		g2o::VertexSE3 *v = new g2o::VertexSE3();
-		v->setId(k);
-		beacon_flag.push_back(false);
-		double *d = new double[6];
-		for (int ki(0); ki < 3; ++ki) {
-			d[ki] = beacon_set_data(k, ki);
-		}
-		v->setEstimateData(d);
-		if (beacon_set_data(k, 0) < 50000) {
 
-			v->setFixed(true);
-		} else {
-			// the beacons's pose if unknown.
-			v->setFixed(false);
-		}
-		globalOptimizer.addVertex(v);
-
-	}
 
 
 	// set left vertex index and right vertex index
@@ -195,7 +175,28 @@ int main(int argc, char *argv[]) {
 	right_vertex_index++;
 	globalOptimizer.addVertex(right_first_vertex);
 
+	int beacon_index_offset(uwb_vertex_index_init);
+	std::vector<int> beacon_flag;
+	for (int k(0); k < beacon_set_data.rows(); k++) {
+		g2o::VertexSE3 *v = new g2o::VertexSE3();
+		v->setId(k + beacon_index_offset);
+		beacon_flag.push_back(false);
+		double *d = new double[6];
+		for (int ki(0); ki < 3; ++ki) {
+			d[ki] = beacon_set_data(k, ki);
+		}
+		v->setEstimateData(d);
+		if (beacon_set_data(k, 0) < 50000) {
 
+			v->setFixed(true);
+		} else {
+			// the beacons's pose if unknown.
+			v->setFixed(false);
+		}
+		std::cout << k + beacon_index_offset << "beacon vertex:" << v << std::endl;
+		globalOptimizer.addVertex(v);
+
+	}
 
 	/**graph parameter**/
 	/// g2o parameter
@@ -264,45 +265,50 @@ int main(int argc, char *argv[]) {
 
 					auto *left_dis_edge = new SimpleDistanceEdge();
 					left_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
-					left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index);
+					left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index-1);
+
 					left_dis_edge->setMeasurement(uwb_data(uwb_index, k));
 					left_dis_edge->setInformation(info_matrix);
+
 					globalOptimizer.addEdge(left_dis_edge);
-					std::cout << " left_uwb measurement" << beacon_index_offset +k
-					          << ":" << left_vertex_index << ":" << uwb_data(uwb_index,k)
-					          << std::endl;
+//					std::cout << " left_uwb measurement" << beacon_index_offset + k
+//					          << ":" << left_vertex_index << ":" << uwb_data(uwb_index, k)
+//					          << std::endl;
 
 
 					auto *right_dis_edge = new SimpleDistanceEdge();
 					right_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
-					right_dis_edge->vertices()[1] = globalOptimizer.vertex(right_vertex_index);
+					right_dis_edge->vertices()[1] = globalOptimizer.vertex(right_vertex_index-1);
+
 					right_dis_edge->setMeasurement(uwb_data(uwb_index, k));
 					right_dis_edge->setInformation(info_matrix);
 //					globalOptimizer.addEdge(right_dis_edge);
-					std::cout << uwb_index << " right_uwb measurement" << beacon_index_offset +k
-					          << ":" << right_vertex_index << ":" << uwb_data(uwb_index,k)
-					          << std::endl;
+
+
+//					std::cout << uwb_index << " right_uwb measurement" << beacon_index_offset + k
+//					          << ":" << right_vertex_index << ":" << uwb_data(uwb_index, k)
+//					          << std::endl;
 
 
 				}
 			}
 
 //			logger_ptr->addPlotEvent("trace", "uwb_optimize", optimize_trace.block(i, 0, 1, 3));
-			std::cout << "uwb before time :" << uwb_data(uwb_index,0);
+			std::cout << "uwb before time :" << uwb_data(uwb_index, 0);
 			uwb_index++;
 
 
 			if (uwb_index > uwb_data.rows() - 1) {
 				break;
-			}else{
-							std::cout << "uwb after time:"<< uwb_data(uwb_index,0);
-			std::cout << "imue time :" << left_imu_data(i,0)<<std::endl;
+			} else {
+				std::cout << "uwb after time:" << uwb_data(uwb_index, 0);
+				std::cout << "imue time :" << left_imu_data(i, 0) << std::endl;
 
 			}
 		}
-		logger_ptr->addPlotEvent("time","uwb",uwb_data(uwb_index,0));
-		logger_ptr->addPlotEvent("time","imu",left_imu_data(i,0));
-		logger_ptr->addPlotEvent("time","diff",uwb_data(uwb_index,0)-left_imu_data(i,0));
+//		logger_ptr->addPlotEvent("time","uwb",uwb_data(uwb_index,0));
+//		logger_ptr->addPlotEvent("time","imu",left_imu_data(i,0));
+//		logger_ptr->addPlotEvent("time","diff",uwb_data(uwb_index,0)-left_imu_data(i,0));
 
 		// IMU Transaction
 
