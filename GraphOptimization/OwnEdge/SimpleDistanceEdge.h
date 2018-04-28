@@ -28,6 +28,7 @@
 #define QUICKFUSING_SIMPLEDISTANCEEDGE_H
 
 #include "DistanceEdge.h"
+#include "DistanceEdge.cpp"
 
 
 class SimpleDistanceEdge : public DistanceEdge {
