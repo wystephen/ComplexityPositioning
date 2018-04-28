@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
 	double second_info = 1000.0;
 
 
-	double distance_info = 0.1;
+	double distance_info = 10.0;
 	double distance_sigma = 2.0;
 
 
@@ -285,7 +285,7 @@ int main(int argc, char *argv[]) {
 				}
 			}
 
-//			logger_ptr->addPlotEvent("trace", "uwb_optimize", optimize_trace.block(i, 0, 1, 3));
+			logger_ptr->addPlotEvent("trace", "uwb_optimize", optimize_trace.block(i, 0, 1, 3));
 			uwb_index++;
 			if(uwb_index>uwb_data.rows()-1){
 				break;
