@@ -260,7 +260,7 @@ int main(int argc, char *argv[]) {
 		if (uwb_index < uwb_data.rows() && uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
 
 			for (int k(1); k < uwb_data.cols(); ++k) {
-				if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index,k) < 100.0) {
+				if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index,k) < 100.0 && beacon_set_data(k-1,0)<5000) {
 //
 //					Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
 //					measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
@@ -417,6 +417,11 @@ int main(int argc, char *argv[]) {
 	for(auto e:dis_edge_stack){
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 2.0;
+	}
+	globalOptimizer.optimize(1000);
+	for(auto e:dis_edge_stack){
+//		e->ransac_flag_=true;
+		e->ransac_threshold_ = 1.0;
 	}
 	globalOptimizer.optimize(1000);
 
