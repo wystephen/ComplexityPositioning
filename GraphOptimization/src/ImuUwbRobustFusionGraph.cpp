@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 //			head_imu_file(dir_name + "HEAD.data"),
 //			uwb_file(dir_name + "uwb_result.csv"),
 //			beacon_set_file(dir_name + "beaconSet.csv");
-		std::string dir_name = "/home/steve/Data/NewFusingLocationData/0035/";
+		std::string dir_name = "/home/steve/Data/NewFusingLocationData/0034/";
 	// load data
 	AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
 			right_foot_file(dir_name + "RIGHT_FOOT.data"),
@@ -393,10 +393,10 @@ int main(int argc, char *argv[]) {
 			}
 
 		}
-		logger_ptr->addTraceEvent("trace", "left", left_filter.state_x_.block(0, 0, 2, 1));
-		logger_ptr->addTraceEvent("trace", "right", right_filter.state_x_.block(0, 0, 2, 1));
-		logger_ptr->addTrace3dEvent("trace", "left", left_filter.state_x_.block(0, 0, 3, 1));
-		logger_ptr->addTrace3dEvent("trace", "right", right_filter.state_x_.block(0, 0, 3, 1));
+//		logger_ptr->addTraceEvent("trace", "left", left_filter.state_x_.block(0, 0, 2, 1));
+//		logger_ptr->addTraceEvent("trace", "right", right_filter.state_x_.block(0, 0, 2, 1));
+//		logger_ptr->addTrace3dEvent("trace", "left", left_filter.state_x_.block(0, 0, 3, 1));
+//		logger_ptr->addTrace3dEvent("trace", "right", right_filter.state_x_.block(0, 0, 3, 1));
 //		logger_ptr->addTraceEvent("traceimu", "left", left_filter.state_x_.block(0, 0, 2, 1));
 //		logger_ptr->addTraceEvent("traceimu", "right", right_filter.state_x_.block(0, 0, 2, 1));
 //		logger_ptr->addTrace3dEvent("traceimu", "left", left_filter.state_x_.block(0, 0, 3, 1));
@@ -443,7 +443,9 @@ int main(int argc, char *argv[]) {
 
 	for (int i(0); i < optimize_trace.rows(); ++i) {
 
-		logger_ptr->addTrace3dEvent("trace", "uwb_optimize", optimize_trace.block(i, 0, 1, 3));
+		logger_ptr->addTrace3dEvent("trace", "uwb_optimiz"
+									   ""
+			"e", optimize_trace.block(i, 0, 1, 3));
 		logger_ptr->addTraceEvent("trace", "uwb_optimize", optimize_trace.block(i, 0, 1, 3));
 	}
 
