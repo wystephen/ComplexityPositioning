@@ -210,8 +210,8 @@ int main(int argc, char *argv[]) {
 	/**graph parameter**/
 	/// g2o parameter
 
-	double first_info = 1000.0;
-	double second_info = 1000.0;
+	double first_info = 10000.0;
+	double second_info = 10000.0;
 
 
 	double distance_info = 0.01;
