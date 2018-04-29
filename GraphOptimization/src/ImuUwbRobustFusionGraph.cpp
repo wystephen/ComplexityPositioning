@@ -54,6 +54,7 @@
 #include <OwnEdge/SimpleRobustDistanceEdge.h>
 #include <OwnEdge/SimpleDistanceEdge.h>
 #include <OwnEdge/SimpleDistanceEdge.cpp>
+#include <OwnEdge/PesudoRansacDistance.h>
 
 int main(int argc, char *argv[]) {
 	omp_set_num_threads(12);
@@ -236,6 +237,8 @@ int main(int argc, char *argv[]) {
 
 	int data_num = 5;
 
+	std::vector<PesudoRansacDistance*> dis_edge_stack;
+
 	/**
 	 * MAIN LOOP.!!
 	 */
@@ -271,13 +274,14 @@ int main(int argc, char *argv[]) {
 					Eigen::Matrix<double, 1, 1> info_matrix;
 					info_matrix(0, 0) = distance_info;
 
-					auto *left_dis_edge = new DistanceEdge();
+					auto *left_dis_edge = new PesudoRansacDistance();
 					left_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
 					left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index-1);
 
 					left_dis_edge->setMeasurement(uwb_data(uwb_index, k));
 					left_dis_edge->setInformation(info_matrix);
 
+					dis_edge_stack.push_back(left_dis_edge);
 
 					globalOptimizer.addEdge(left_dis_edge);
 					std::cout << " left_uwb measurement" << beacon_index_offset + k
@@ -404,6 +408,13 @@ int main(int argc, char *argv[]) {
 	globalOptimizer.initializeOptimization();
 	globalOptimizer.setVerbose(true);
 	globalOptimizer.optimize(10000);
+
+
+	for(auto e:dis_edge_stack){
+		e->ransac_flag_=true;
+	}
+	globalOptimizer.optimize(1000);
+
 
 
 	double *data_ptr = new double[10];
