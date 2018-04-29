@@ -5,7 +5,7 @@
 #ifndef COMPLEXITYPOSITIONING_PESUDORANSACDISTANCE_H
 #define COMPLEXITYPOSITIONING_PESUDORANSACDISTANCE_H
 #include "DistanceEdge.h"
-#include "DistanceEdge.cpp"
+//#include "DistanceEdge.cpp"
 
 class PesudoRansacDistance:public DistanceEdge {
 public:
