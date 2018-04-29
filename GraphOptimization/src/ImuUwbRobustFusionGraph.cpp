@@ -393,10 +393,10 @@ int main(int argc, char *argv[]) {
 		logger_ptr->addTraceEvent("trace", "right", right_filter.state_x_.block(0, 0, 2, 1));
 		logger_ptr->addTrace3dEvent("trace", "left", left_filter.state_x_.block(0, 0, 3, 1));
 		logger_ptr->addTrace3dEvent("trace", "right", right_filter.state_x_.block(0, 0, 3, 1));
-		logger_ptr->addTraceEvent("traceimu", "left", left_filter.state_x_.block(0, 0, 2, 1));
-		logger_ptr->addTraceEvent("traceimu", "right", right_filter.state_x_.block(0, 0, 2, 1));
-		logger_ptr->addTrace3dEvent("traceimu", "left", left_filter.state_x_.block(0, 0, 3, 1));
-		logger_ptr->addTrace3dEvent("traceimu", "right", right_filter.state_x_.block(0, 0, 3, 1));
+//		logger_ptr->addTraceEvent("traceimu", "left", left_filter.state_x_.block(0, 0, 2, 1));
+//		logger_ptr->addTraceEvent("traceimu", "right", right_filter.state_x_.block(0, 0, 2, 1));
+//		logger_ptr->addTrace3dEvent("traceimu", "left", left_filter.state_x_.block(0, 0, 3, 1));
+//		logger_ptr->addTrace3dEvent("traceimu", "right", right_filter.state_x_.block(0, 0, 3, 1));
 
 
 	}
