@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 //			head_imu_file(dir_name + "HEAD.data"),
 //			uwb_file(dir_name + "uwb_result.csv"),
 //			beacon_set_file(dir_name + "beaconSet.csv");
-		std::string dir_name = "/home/steve/Data/NewFusingLocationData/0034/";
+		std::string dir_name = "/home/steve/Data/NewFusingLocationData/0032/";
 	// load data
 	AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
 			right_foot_file(dir_name + "RIGHT_FOOT.data"),
@@ -215,7 +215,7 @@ int main(int argc, char *argv[]) {
 	double second_info = 10000.0;
 
 
-	double distance_info = 0.01;
+	double distance_info = 0.001;
 	double distance_sigma = 2.0;
 
 
@@ -408,7 +408,7 @@ int main(int argc, char *argv[]) {
 	globalOptimizer.initializeOptimization();
 	globalOptimizer.setVerbose(true);
 
-	globalOptimizer.optimize(100);
+	globalOptimizer.optimize(150);
 	for(auto e:dis_edge_stack){
 		e->ransac_flag_=true;
 	}
@@ -418,7 +418,17 @@ int main(int argc, char *argv[]) {
 	globalOptimizer.optimize(1000);
 	for(auto e:dis_edge_stack){
 //		e->ransac_flag_=true;
-		e->ransac_threshold_ = 5.0;
+		e->ransac_threshold_ = 8.0;
+	}
+	globalOptimizer.optimize(1000);
+		for(auto e:dis_edge_stack){
+//		e->ransac_flag_=true;
+		e->ransac_threshold_ = 6.0;
+	}
+		globalOptimizer.optimize(1000);
+		for(auto e:dis_edge_stack){
+//		e->ransac_flag_=true;
+		e->ransac_threshold_ = 3.0;
 	}
 	globalOptimizer.optimize(1000);
 	for(auto e:dis_edge_stack){

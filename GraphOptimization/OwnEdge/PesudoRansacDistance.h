@@ -28,7 +28,7 @@ public:
 			               (p1[1] - p2[1]) * (p1[1] - p2[1]) +
 			               (p1[2] - p2[2]) * (p1[2] - p2[2]);
 			double dis = sqrt(dis_2);
-			dis = sqrt(pow(dis-_measurement,2.0));
+			dis = (pow(dis-_measurement,2.0));
 //        std::cout << dis_2 << std::endl;
 		if(ransac_flag_){
 			// ransac model
