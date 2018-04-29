@@ -429,6 +429,7 @@ int main(int argc, char *argv[]) {
 		for(auto e:dis_edge_stack){
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 3.0;
+
 	}
 	globalOptimizer.optimize(1000);
 	for(auto e:dis_edge_stack){
