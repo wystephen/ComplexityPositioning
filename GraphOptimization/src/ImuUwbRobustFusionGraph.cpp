@@ -407,21 +407,28 @@ int main(int argc, char *argv[]) {
 
 	globalOptimizer.initializeOptimization();
 	globalOptimizer.setVerbose(true);
-	globalOptimizer.optimize(10000);
 
-
+	globalOptimizer.optimize(100);
 	for(auto e:dis_edge_stack){
 		e->ransac_flag_=true;
 	}
+	globalOptimizer.optimize(10000);
+
+
 	globalOptimizer.optimize(1000);
 	for(auto e:dis_edge_stack){
 //		e->ransac_flag_=true;
-		e->ransac_threshold_ = 2.0;
+		e->ransac_threshold_ = 5.0;
 	}
 	globalOptimizer.optimize(1000);
 	for(auto e:dis_edge_stack){
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 1.0;
+	}
+	globalOptimizer.optimize(1000);
+	for(auto e:dis_edge_stack){
+//		e->ransac_flag_=true;
+		e->ransac_threshold_ = 0.5;
 	}
 	globalOptimizer.optimize(1000);
 
