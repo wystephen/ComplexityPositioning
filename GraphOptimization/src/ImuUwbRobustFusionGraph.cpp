@@ -284,10 +284,10 @@ int main(int argc, char *argv[]) {
 					dis_edge_stack.push_back(left_dis_edge);
 
 					globalOptimizer.addEdge(left_dis_edge);
-					std::cout << " left_uwb measurement" << beacon_index_offset + k
-					          << ":" << left_vertex_index << ":" << uwb_data(uwb_index, k)
-					          << std::endl;
-
+//					std::cout << " left_uwb measurement" << beacon_index_offset + k
+//					          << ":" << left_vertex_index << ":" << uwb_data(uwb_index, k)
+//					          << std::endl;
+//
 
 					auto *right_dis_edge = new DistanceEdge();
 					right_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);

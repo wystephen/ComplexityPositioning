@@ -14,7 +14,7 @@ public:
 	}
 
 	bool ransac_flag_ = false;
-	double ransac_threshold_ = 5.0;
+	double ransac_threshold_ = 3.0;
 
 	virtual void computeError(){
 			g2o::VertexSE3 *from = static_cast<g2o::VertexSE3 *>(_vertices[0]);
@@ -28,6 +28,7 @@ public:
 			               (p1[1] - p2[1]) * (p1[1] - p2[1]) +
 			               (p1[2] - p2[2]) * (p1[2] - p2[2]);
 			double dis = sqrt(dis_2);
+			dis = sqrt(pow(dis-_measurement,2.0));
 //        std::cout << dis_2 << std::endl;
 		if(ransac_flag_){
 			// ransac model
