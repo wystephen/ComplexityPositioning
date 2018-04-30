@@ -442,7 +442,31 @@ int main(int argc, char *argv[]) {
 		e->ransac_threshold_ = 0.5;
 	}
 	globalOptimizer.optimize(1000);
-
+	for(auto e:dis_edge_stack){
+//		e->ransac_flag_=true;
+		e->ransac_threshold_ = 10.5;
+	}
+	globalOptimizer.optimize(1000);	for(auto e:dis_edge_stack){
+//		e->ransac_flag_=true;
+		e->ransac_threshold_ = 2.5;
+	}
+	globalOptimizer.optimize(1000);	for(auto e:dis_edge_stack){
+//		e->ransac_flag_=true;
+		e->ransac_threshold_ = 5.5;
+	}
+	globalOptimizer.optimize(1000);	for(auto e:dis_edge_stack){
+//		e->ransac_flag_=true;
+		e->ransac_threshold_ = 10.5;
+	}
+	globalOptimizer.optimize(1000);	for(auto e:dis_edge_stack){
+//		e->ransac_flag_=true;
+		e->ransac_threshold_ = 4.5;
+	}
+	globalOptimizer.optimize(1000);	for(auto e:dis_edge_stack){
+//		e->ransac_flag_=true;
+		e->ransac_threshold_ = 1.5;
+	}
+	globalOptimizer.optimize(1000);
 
 	double *data_ptr = new double[10];
 	for (int i(left_vertex_index_init); i < left_vertex_index; ++i) {
