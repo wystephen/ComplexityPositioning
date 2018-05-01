@@ -24,22 +24,44 @@ public:
 
 	}
 
-	virtual bool read(std::istream &is);
+	virtual bool read(std::istream &is){
+		return true;
+	}
 
-	virtual bool write(std::ostream &os) const;
+	virtual bool write(std::ostream &os) const{
+		return os.good();
+	}
 
-	virtual void computeError();
+	virtual void computeError(){
+
+	}
 
 	/**
-	 * distance
+	 *
 	 * @param m
 	 */
 	virtual void setMeasurement(const double &m) {
+//		_measurement = m;
+		Eigen::Matrix<double,6,1> m_v;
+		for(int i(0);i<6;++i){
+			m_v(i) = m[i];
+		}
+		_measurement = g2o::internal::fromVectorMQT(m_v);
+	}
+
+	void setMeasurement(Eigen::Isometry3d &m){
 		_measurement = m;
 	}
 
 	virtual bool getMeasurementData(double *d) const {
-		*d = _measurement;
+//		*d = ;
+//		*d = _measurement.data();
+
+		auto v = g2o::internal::toVectorQT(_measurement);
+		for(int i(0);i<6;++i){
+			d[i] = v(i);
+		}
+
 		return true;
 	}
 
@@ -52,7 +74,9 @@ public:
 		return 6;
 	}
 
-	virtual bool setMeasurementFromState();
+	virtual bool setMeasurementFromState(){
+		return false;
+	}
 
 	/**
 	 * pure virtual in meaning side actually~
