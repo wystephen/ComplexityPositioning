@@ -32,7 +32,11 @@ public:
 		return os.good();
 	}
 
+	/**
+	 * @brief compute error of current system state
+	 */
 	virtual void computeError() {
+		// TODO: 1-dof or 2-dof?
 
 	}
 
