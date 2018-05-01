@@ -11,7 +11,8 @@
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
 #include "g2o/types/slam3d/types_slam3d.h"
 #include "g2o/types/slam3d_addons/types_slam3d_addons.h"
-class HardConstraintIMU:public g2o::BaseBinaryEdge<1 ,double, g2o::VertexSE3, g2o::VertexSE3>{
+//
+class HardConstraintIMU:public g2o::BaseBinaryEdge<6 , Eigen::Isometry3d, g2o::VertexSE3, g2o::VertexSE3>{
 
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -21,8 +22,48 @@ public:
 
 	}
 
+	virtual bool read(std::istream &is);
+
+	virtual bool write(std::ostream &os) const;
+
+	virtual void computeError();
+
+	/**
+	 * distance
+	 * @param m
+	 */
+	virtual void setMeasurement(const double &m) {
+		_measurement = m;
+	}
+
+	virtual bool getMeasurementData(double *d) const {
+		*d = _measurement;
+		return true;
+	}
 
 
+/**
+ * ...
+ * @return
+ */
+	virtual int measurementDimension() const {
+		return 1;
+	}
+
+	virtual bool setMeasurementFromState();
+
+	/**
+	 * pure virtual in meaning side actually~
+	 * @return
+	 */
+	virtual double initialEstimatePossible(
+			const g2o::OptimizableGraph::VertexSet &/*from*/,
+			g2o::OptimizableGraph::Vertex */*to*/) {
+//        //TODO:
+//        std::cout << __FILE__ << __FUNCTION__
+//                  << __LINE__ << "this function not implement" << std::endl;
+		return 1.0;
+	}
 
 
 };
