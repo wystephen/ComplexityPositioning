@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 //			head_imu_file(dir_name + "HEAD.data"),
 //			uwb_file(dir_name + "uwb_result.csv"),
 //			beacon_set_file(dir_name + "beaconSet.csv");
-		std::string dir_name = "/home/steve/Data/NewFusingLocationData/0032/";
+	std::string dir_name = "/home/steve/Data/NewFusingLocationData/0032/";
 	// load data
 	AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
 			right_foot_file(dir_name + "RIGHT_FOOT.data"),
@@ -237,7 +237,7 @@ int main(int argc, char *argv[]) {
 
 	int data_num = 5;
 
-	std::vector<PesudoRansacDistance*> dis_edge_stack;
+	std::vector<PesudoRansacDistance *> dis_edge_stack;
 
 	/**
 	 * MAIN LOOP.!!
@@ -260,7 +260,7 @@ int main(int argc, char *argv[]) {
 		if (uwb_index < uwb_data.rows() && uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
 
 			for (int k(1); k < uwb_data.cols(); ++k) {
-				if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index,k) < 100.0 && beacon_set_data(k-1,0)<5000) {
+				if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 100.0 && beacon_set_data(k - 1, 0) < 5000) {
 //
 //					Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
 //					measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
@@ -276,7 +276,7 @@ int main(int argc, char *argv[]) {
 
 					auto *left_dis_edge = new PesudoRansacDistance();
 					left_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
-					left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index-1);
+					left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index - 1);
 
 					left_dis_edge->setMeasurement(uwb_data(uwb_index, k));
 					left_dis_edge->setInformation(info_matrix);
@@ -291,7 +291,7 @@ int main(int argc, char *argv[]) {
 
 					auto *right_dis_edge = new DistanceEdge();
 					right_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
-					right_dis_edge->vertices()[1] = globalOptimizer.vertex(right_vertex_index-1);
+					right_dis_edge->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
 
 					right_dis_edge->setMeasurement(uwb_data(uwb_index, k));
 					right_dis_edge->setInformation(info_matrix);
@@ -409,60 +409,65 @@ int main(int argc, char *argv[]) {
 	globalOptimizer.setVerbose(true);
 
 	globalOptimizer.optimize(150);
-	for(auto e:dis_edge_stack){
-		e->ransac_flag_=true;
+	for (auto e:dis_edge_stack) {
+		e->ransac_flag_ = true;
 	}
 	globalOptimizer.optimize(10000);
 
 
 	globalOptimizer.optimize(1000);
-	for(auto e:dis_edge_stack){
+	for (auto e:dis_edge_stack) {
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 8.0;
 	}
 	globalOptimizer.optimize(1000);
-		for(auto e:dis_edge_stack){
+	for (auto e:dis_edge_stack) {
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 6.0;
 	}
-		globalOptimizer.optimize(1000);
-		for(auto e:dis_edge_stack){
+	globalOptimizer.optimize(1000);
+	for (auto e:dis_edge_stack) {
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 3.0;
 
 	}
 	globalOptimizer.optimize(1000);
-	for(auto e:dis_edge_stack){
+	for (auto e:dis_edge_stack) {
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 1.0;
 	}
 	globalOptimizer.optimize(1000);
-	for(auto e:dis_edge_stack){
+	for (auto e:dis_edge_stack) {
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 0.5;
 	}
 	globalOptimizer.optimize(1000);
-	for(auto e:dis_edge_stack){
+	for (auto e:dis_edge_stack) {
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 10.5;
 	}
-	globalOptimizer.optimize(1000);	for(auto e:dis_edge_stack){
+	globalOptimizer.optimize(1000);
+	for (auto e:dis_edge_stack) {
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 2.5;
 	}
-	globalOptimizer.optimize(1000);	for(auto e:dis_edge_stack){
+	globalOptimizer.optimize(1000);
+	for (auto e:dis_edge_stack) {
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 5.5;
 	}
-	globalOptimizer.optimize(1000);	for(auto e:dis_edge_stack){
+	globalOptimizer.optimize(1000);
+	for (auto e:dis_edge_stack) {
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 10.5;
 	}
-	globalOptimizer.optimize(1000);	for(auto e:dis_edge_stack){
+	globalOptimizer.optimize(1000);
+	for (auto e:dis_edge_stack) {
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 4.5;
 	}
-	globalOptimizer.optimize(1000);	for(auto e:dis_edge_stack){
+	globalOptimizer.optimize(1000);
+	for (auto e:dis_edge_stack) {
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 1.5;
 	}
@@ -486,8 +491,8 @@ int main(int argc, char *argv[]) {
 	for (int i(0); i < optimize_trace.rows(); ++i) {
 
 		logger_ptr->addTrace3dEvent("trace", "uwb_optimiz"
-									   ""
-			"e", optimize_trace.block(i, 0, 1, 3));
+		                                     ""
+		                                     "e", optimize_trace.block(i, 0, 1, 3));
 		logger_ptr->addTraceEvent("trace", "uwb_optimize", optimize_trace.block(i, 0, 1, 3));
 	}
 
