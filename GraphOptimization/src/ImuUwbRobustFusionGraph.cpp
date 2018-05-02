@@ -358,7 +358,7 @@ int main(int argc, char *argv[]) {
 				ce->vertices()[1] = globalOptimizer.vertex(right_vertex_index-1);
 
 				Eigen::Matrix<double,1,1> info;
-				info(0,0) = 100.0;
+				info(0,0) = 1.0;
 				ce->setInformation(info);
 				ce->setMeasurement(last_left_transform.inverse() * tmp_transform);
 				globalOptimizer.addEdge(ce);
@@ -420,9 +420,9 @@ int main(int argc, char *argv[]) {
 	globalOptimizer.initializeOptimization();
 	globalOptimizer.setVerbose(true);
 
-	globalOptimizer.optimize(150);
+	globalOptimizer.optimize(15000);
 	for (auto e:dis_edge_stack) {
-		e->ransac_flag_ = true;
+//		e->ransac_flag_ = true;
 	}
 	globalOptimizer.optimize(10000);
 
