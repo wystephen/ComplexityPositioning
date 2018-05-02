@@ -361,7 +361,7 @@ int main(int argc, char *argv[]) {
 				info(0,0) = 1.0;
 				ce->setInformation(info);
 				ce->setMeasurement(last_left_transform.inverse() * tmp_transform);
-				globalOptimizer.addEdge(ce);
+//				globalOptimizer.addEdge(ce);
 
 				last_left_transform = tmp_transform;
 
@@ -423,6 +423,7 @@ int main(int argc, char *argv[]) {
 	globalOptimizer.optimize(15000);
 	for (auto e:dis_edge_stack) {
 		e->ransac_flag_ = true;
+		e->ransac_threshold_=14.0;
 	}
 	globalOptimizer.optimize(10000);
 
