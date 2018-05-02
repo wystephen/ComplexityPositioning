@@ -353,12 +353,12 @@ int main(int argc, char *argv[]) {
 				globalOptimizer.addEdge(e);
 
 
-				auto *ce  =new HardConstraintIMU();
-				ce->vertices()[0]  = globalOptimizer.vertex(left_vertex_index-2);
-				ce->vertices()[1] = globalOptimizer.vertex(right_vertex_index-1);
+				auto *ce = new HardConstraintIMU();
+				ce->vertices()[0] = globalOptimizer.vertex(left_vertex_index - 2);
+				ce->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
 
-				Eigen::Matrix<double,1,1> info;
-				info(0,0) = 1.0;
+				Eigen::Matrix<double, 1, 1> info;
+				info(0, 0) = 1.0;
 				ce->setInformation(info);
 				ce->setMeasurement(last_left_transform.inverse() * tmp_transform);
 //				globalOptimizer.addEdge(ce);
@@ -423,7 +423,7 @@ int main(int argc, char *argv[]) {
 	globalOptimizer.optimize(15000);
 	for (auto e:dis_edge_stack) {
 		e->ransac_flag_ = true;
-		e->ransac_threshold_=14.0;
+		e->ransac_threshold_ = 14.0;
 	}
 	globalOptimizer.optimize(10000);
 
@@ -485,7 +485,21 @@ int main(int argc, char *argv[]) {
 		e->ransac_threshold_ = 1.5;
 	}
 	globalOptimizer.optimize(1000);
-
+	for (auto e:dis_edge_stack) {
+//		e->ransac_flag_=true;
+		e->ransac_threshold_ = 1.0;
+	}
+	globalOptimizer.optimize(1000);
+	for (auto e:dis_edge_stack) {
+//		e->ransac_flag_=true;
+		e->ransac_threshold_ = 0.5;
+	}
+	globalOptimizer.optimize(1000);
+		for (auto e:dis_edge_stack) {
+//		e->ransac_flag_=true;
+		e->ransac_threshold_ = 0.2;
+	}
+	globalOptimizer.optimize(1000);
 	double *data_ptr = new double[10];
 	for (int i(left_vertex_index_init); i < left_vertex_index; ++i) {
 		globalOptimizer.vertex(i)[0].getEstimateData(data_ptr);
