@@ -68,7 +68,7 @@ public:
 		_measurement = g2o::internal::fromVectorMQT(m_v);
 	}
 
-	void setMeasurement(Eigen::Isometry3d &m) {
+	void setMeasurement(const Eigen::Isometry3d &m) {
 		_measurement = m;
 	}
 
