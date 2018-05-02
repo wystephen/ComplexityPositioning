@@ -361,7 +361,7 @@ int main(int argc, char *argv[]) {
 				info(0, 0) = 1.0;
 				ce->setInformation(info);
 				ce->setMeasurement(last_left_transform.inverse() * tmp_transform);
-				globalOptimizer.addEdge(ce);
+//				globalOptimizer.addEdge(ce);
 
 				last_left_transform = tmp_transform;
 
