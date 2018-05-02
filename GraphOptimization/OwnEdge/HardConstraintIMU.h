@@ -37,6 +37,21 @@ public:
 	 */
 	virtual void computeError() {
 		// TODO: 1-dof or 2-dof?
+		g2o::VertexSE3 *from = static_cast<g2o::VertexSE3 *>(_vertices[0]);
+		g2o::VertexSE3 *to = static_cast<g2o::VertexSE3 *>(_vertices[1]);
+
+		double p1[10], p2[10];
+		from->getEstimateData(p1);
+		to->getEstimateData(p2);
+
+		double dis = std::sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) +
+		                       (p1[1] - p2[1]) * (p1[1] - p2[1]) +
+		                       (p1[2] - p2[2]) * (p1[2] - p2[2]));
+
+		double measure_dis = _measurement.matrix().block(0, 3, 3, 1).norm();
+
+		_error(0, 0) = std::exp(std::sqrt(std::pow(dis - measure_dis, 2.0)) - 1.0);
+
 
 	}
 
