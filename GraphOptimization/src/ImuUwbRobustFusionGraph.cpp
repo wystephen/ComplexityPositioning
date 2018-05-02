@@ -422,7 +422,7 @@ int main(int argc, char *argv[]) {
 
 	globalOptimizer.optimize(15000);
 	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_ = true;
+		e->ransac_flag_ = true;
 	}
 	globalOptimizer.optimize(10000);
 
