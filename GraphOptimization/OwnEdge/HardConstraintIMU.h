@@ -59,7 +59,7 @@ public:
 	 *
 	 * @param m
 	 */
-	virtual void setMeasurement(const double &m) {
+	virtual void setMeasurement(const double *m) {
 //		_measurement = m;
 		Eigen::Matrix<double, 6, 1> m_v;
 		for (int i(0); i < 6; ++i) {
