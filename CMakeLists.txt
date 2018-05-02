@@ -158,6 +158,15 @@ target_link_libraries(ImuUwbRobustFusion ${PYTHON_LIBRARIES}
 					  ${SuiteSparse_LIBRARIES})
 
 
+add_executable(ImuUwbMEstimator GraphOptimization/src/ImuUwbMEstimationTest.cpp)
+target_link_libraries(ImuUwbMEstimator ${PYTHON_LIBRARIES}
+					  ${Sophus_LIBRARIES}
+					  ${G2O_LIBS}
+					  ${CSPARSE_LIBRARY}
+					  ${PYTHON_LIBRARIES}
+					  ${SuiteSparse_LIBRARIES})
+
+
 add_executable(KalmanFilterTester BayesStateEstimate/Test/KalmanFilterTester.cpp)
 target_link_libraries(KalmanFilterTester ${PYTHON_LIBRARIES})
 

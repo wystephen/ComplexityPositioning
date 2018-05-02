@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 //			head_imu_file(dir_name + "HEAD.data"),
 //			uwb_file(dir_name + "uwb_result.csv"),
 //			beacon_set_file(dir_name + "beaconSet.csv");
-	std::string dir_name = "/home/steve/Data/NewFusingLocationData/0032/";
+	std::string dir_name = "/home/steve/Data/NewFusingLocationData/0034/";
 	// load data
 	AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
 			right_foot_file(dir_name + "RIGHT_FOOT.data"),
@@ -361,7 +361,7 @@ int main(int argc, char *argv[]) {
 				info(0, 0) = 1.0;
 				ce->setInformation(info);
 				ce->setMeasurement(last_left_transform.inverse() * tmp_transform);
-				globalOptimizer.addEdge(ce);
+//				globalOptimizer.addEdge(ce);
 
 				last_left_transform = tmp_transform;
 
