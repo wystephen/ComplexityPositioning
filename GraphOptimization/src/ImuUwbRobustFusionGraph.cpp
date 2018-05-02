@@ -240,6 +240,8 @@ int main(int argc, char *argv[]) {
 
 	std::vector<PesudoRansacDistance *> dis_edge_stack;
 
+	std::vector<double> left_vector_time;
+
 	/**
 	 * MAIN LOOP.!!
 	 */
@@ -329,6 +331,7 @@ int main(int argc, char *argv[]) {
 				vertex_imu->setId(left_vertex_index);
 				left_vertex_index++;//
 				globalOptimizer.addVertex(vertex_imu);
+				left_vector_time.push_back(left_imu_data(i, 0));
 
 				auto *e = new g2o::EdgeSE3();
 
@@ -502,13 +505,15 @@ int main(int argc, char *argv[]) {
 	globalOptimizer.optimize(1000);
 	double *data_ptr = new double[10];
 
-	std::ofstream out_ref_trace(dir_name+"ref_trace.csv");
+	std::ofstream out_ref_trace(dir_name + "ref_trace.csv");
 	for (int i(left_vertex_index_init); i < left_vertex_index; ++i) {
 		globalOptimizer.vertex(i)[0].getEstimateData(data_ptr);
 		logger_ptr->addTrace3dEvent("trace", "left_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
 		logger_ptr->addTraceEvent("trace", "left_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
 //		std::cout << "left:"<<i <<  ":" << data_ptr[0] << "," << data_ptr[1] << "," << data_ptr[2] << std::endl;
-		out_ref_trace << data_ptr[0]
+		out_ref_trace << left_vector_time[i - left_vertex_index_init]
+		              << ","
+		              << data_ptr[0]
 		              << ","
 		              << data_ptr[1]
 		              << ","
