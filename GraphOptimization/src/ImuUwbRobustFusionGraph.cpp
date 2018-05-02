@@ -241,6 +241,7 @@ int main(int argc, char *argv[]) {
 	std::vector<PesudoRansacDistance *> dis_edge_stack;
 
 	std::vector<double> left_vector_time;
+	left_vector_time.push_back(left_imu_data(0,0));
 
 	/**
 	 * MAIN LOOP.!!
