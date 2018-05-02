@@ -495,19 +495,28 @@ int main(int argc, char *argv[]) {
 		e->ransac_threshold_ = 0.5;
 	}
 	globalOptimizer.optimize(1000);
-		for (auto e:dis_edge_stack) {
+	for (auto e:dis_edge_stack) {
 //		e->ransac_flag_=true;
 		e->ransac_threshold_ = 0.2;
 	}
 	globalOptimizer.optimize(1000);
 	double *data_ptr = new double[10];
+
+	std::ofstream out_ref_trace(dir_name+"ref_trace.csv");
 	for (int i(left_vertex_index_init); i < left_vertex_index; ++i) {
 		globalOptimizer.vertex(i)[0].getEstimateData(data_ptr);
 		logger_ptr->addTrace3dEvent("trace", "left_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
 		logger_ptr->addTraceEvent("trace", "left_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
 //		std::cout << "left:"<<i <<  ":" << data_ptr[0] << "," << data_ptr[1] << "," << data_ptr[2] << std::endl;
+		out_ref_trace << data_ptr[0]
+		              << ","
+		              << data_ptr[1]
+		              << ","
+		              << data_ptr[2]
+		              << "\n";
 
 	}
+	out_ref_trace.close();
 	for (int i(right_vertex_index_init); i < right_vertex_index; ++i) {
 		globalOptimizer.vertex(i)[0].getEstimateData(data_ptr);
 		logger_ptr->addTrace3dEvent("trace", "right_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
