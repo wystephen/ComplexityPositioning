@@ -397,6 +397,7 @@ int main(int argc, char *argv[]) {
 	double *data_ptr = new double[10];
 
 	std::ofstream out_ref_trace(dir_name + "ref_trace.csv");// out put ref trace based on uwb and foot-mounted imu.
+	out_ref_trace.precision(15);
 	for (int i(left_vertex_index_init); i < left_vertex_index; ++i) {
 		globalOptimizer.vertex(i)[0].getEstimateData(data_ptr);
 		logger_ptr->addTrace3dEvent("trace", "left_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
