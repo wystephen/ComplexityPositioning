@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 //			head_imu_file(dir_name + "HEAD.data"),
 //			uwb_file(dir_name + "uwb_result.csv"),
 //			beacon_set_file(dir_name + "beaconSet.csv");
-	std::string dir_name = "/home/steve/Data/NewFusingLocationData/0033/";
+	std::string dir_name = "/home/steve/Data/NewFusingLocationData/0032/";
 	// load data
 	AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
 			right_foot_file(dir_name + "RIGHT_FOOT.data"),
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
 	double second_info = 10000.0;
 
 
-	double distance_info = 0.001;
+	double distance_info = 2.0;
 	double distance_sigma = 2.0;
 
 
@@ -404,11 +404,11 @@ int main(int argc, char *argv[]) {
 	globalOptimizer.setVerbose(true);
 
 	globalOptimizer.optimize(15000);
-	for (auto e:dis_edge_stack) {
-		e->ransac_flag_ = true;
-		e->ransac_threshold_ = 0.5;
-	}
-	globalOptimizer.optimize(10000);
+//	for (auto e:dis_edge_stack) {
+//		e->ransac_flag_ = true;
+//		e->ransac_threshold_ = 0.3;
+//	}
+//	globalOptimizer.optimize(10000);
 
 
 	double *data_ptr = new double[10];
