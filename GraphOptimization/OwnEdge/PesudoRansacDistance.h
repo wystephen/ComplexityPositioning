@@ -41,7 +41,7 @@ public:
 
 		} else {
 			error = dis-_measurement;
-			error = error * 2.0;
+			error = error * 3.0;
 		}
 //        std::cout << dis_2 << std::endl;
 		if (ransac_flag_) {
