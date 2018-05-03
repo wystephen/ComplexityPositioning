@@ -29,6 +29,18 @@ public:
 			               (p1[2] - p2[2]) * (p1[2] - p2[2]);
 			double dis = sqrt(dis_2);
 			dis = (pow(dis-_measurement,2.0));
+
+
+			double error = dis;
+
+
+			if(dis-_measurement<0.0){
+				// measurements bigger than theory distance
+				error = dis;
+
+			}else{
+				error = dis *2.0;
+			}
 //        std::cout << dis_2 << std::endl;
 		if(ransac_flag_){
 			// ransac model
@@ -36,12 +48,12 @@ public:
 
 				_error(0,0) = 0.0;
 			}else{
-				_error(0,0)=dis;
+				_error(0,0)=error;
 			}
 
 		}else{
 
-			_error(0, 0) = dis;
+			_error(0, 0) = error;
 		}
 	}
 

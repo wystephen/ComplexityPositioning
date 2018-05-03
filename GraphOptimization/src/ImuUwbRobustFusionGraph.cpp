@@ -425,88 +425,89 @@ int main(int argc, char *argv[]) {
 	globalOptimizer.setVerbose(true);
 
 	globalOptimizer.optimize(15000);
-	for (auto e:dis_edge_stack) {
-		e->ransac_flag_ = true;
-		e->ransac_threshold_ = 14.0;
-	}
-	globalOptimizer.optimize(10000);
-
-
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 8.0;
-	}
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 6.0;
-	}
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 3.0;
-
-	}
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 1.0;
-	}
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 0.5;
-	}
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 10.5;
-	}
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 2.5;
-	}
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 5.5;
-	}
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 10.5;
-	}
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 4.5;
-	}
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 1.5;
-	}
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 1.0;
-	}
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 0.5;
-	}
-	globalOptimizer.optimize(1000);
-	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_=true;
-		e->ransac_threshold_ = 0.2;
-	}
-	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+//		e->ransac_flag_ = true;
+//		e->ransac_threshold_ = 14.0;
+//	}
+//	globalOptimizer.optimize(10000);
+//
+//
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 8.0;
+//	}
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 6.0;
+//	}
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 3.0;
+//
+//	}
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 1.0;
+//	}
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 0.5;
+//	}
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 10.5;
+//	}
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 2.5;
+//	}
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 5.5;
+//	}
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 10.5;
+//	}
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 4.5;
+//	}
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 1.5;
+//	}
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 1.0;
+//	}
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 0.5;
+//	}
+//	globalOptimizer.optimize(1000);
+//	for (auto e:dis_edge_stack) {
+////		e->ransac_flag_=true;
+//		e->ransac_threshold_ = 0.2;
+//	}
+//	globalOptimizer.optimize(1000);
 	double *data_ptr = new double[10];
 
 	std::ofstream out_ref_trace(dir_name + "ref_trace.csv");
+	out_ref_trace.precision(15);
 	for (int i(left_vertex_index_init); i < left_vertex_index; ++i) {
 		globalOptimizer.vertex(i)[0].getEstimateData(data_ptr);
 		logger_ptr->addTrace3dEvent("trace", "left_graph", Eigen::Vector3d(data_ptr[0], data_ptr[1], data_ptr[2]));
