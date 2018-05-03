@@ -56,6 +56,8 @@
 #include <OwnEdge/SimpleDistanceEdge.cpp>
 #include <OwnEdge/PesudoRansacDistance.h>
 #include <OwnEdge/HardConstraintIMU.h>
+#include <OwnEdge/ZoEdge.h>
+#include <OwnEdge/ZoEdge.cpp>
 
 int main(int argc, char *argv[]) {
 	omp_set_num_threads(12);
@@ -326,7 +328,7 @@ int main(int argc, char *argv[]) {
 
 				auto *ce = new HardConstraintIMU();
 				ce->vertices()[0] = globalOptimizer.vertex(left_vertex_index - 2);
-				ce->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
+				ce->vertices()[1] = globalOptimizer.vertex(left_vertex_index - 1);
 
 				Eigen::Matrix<double, 1, 1> info;
 				info(0, 0) = 1.0;
@@ -335,6 +337,16 @@ int main(int argc, char *argv[]) {
 //				globalOptimizer.addEdge(ce);
 
 				last_left_transform = tmp_transform;
+
+				auto* ze = new Z0Edge();
+				Eigen::Matrix<double,1,1> info_z;
+				info_z(0,0)=2.0;
+				ze->setMeasurement(select_trace.block(0,3,select_trace.rows(),1).mean());
+				ze->setInformation(info_z);
+				ze->vertices()[0] = globalOptimizer.vertex(left_vertex_index-2);
+				ze->vertices()[1] = globalOptimizer.vertex(left_vertex_index-1);
+
+				globalOptimizer.addEdge(ze);
 
 			}
 
