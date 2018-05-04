@@ -434,6 +434,8 @@ namespace BSE {
 				std::cout << "K is nan" << std::endl;
 			}
 
+			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
+			logger_ptr_->addPlotEvent("yaw effect", "p",prob_state_.block(6,3,3,3));
 			/*
 			 * update probability
 			 */
@@ -451,7 +453,6 @@ namespace BSE {
 			}
 
 
-			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
 			logger_ptr_->addPlotEvent("ukf_craft", "angle_before", rotation_q_.toRotationMatrix().eulerAngles(0, 1, 2));
 			Eigen::Quaterniond tmp_before_q = rotation_q_;
 			/*
@@ -470,6 +471,9 @@ namespace BSE {
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(ImuTools::q2dcm(rotation_q_));
 
 			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
+			
+			
+			logger_ptr_->addPlotEvent("yaw effect","dx",epsilon);
 
 //			logger_ptr_->addPlotEvent("complexfull", "offset_acc", state_x_.block(9, 0, 3, 1));
 //			logger_ptr_->addPlotEvent("complexfull", "offset_gyr", state_x_.block(12, 0, 3, 1));
