@@ -58,6 +58,7 @@
 #include <OwnEdge/HardConstraintIMU.h>
 #include <OwnEdge/ZoEdge.h>
 #include <OwnEdge/ZoEdge.cpp>
+#include <OwnEdge/MaxDistanceEdge.h>
 
 int main(int argc, char *argv[]) {
 	omp_set_num_threads(12);
@@ -71,7 +72,7 @@ int main(int argc, char *argv[]) {
 //			head_imu_file(dir_name + "HEAD.data"),
 //			uwb_file(dir_name + "uwb_result.csv"),
 //			beacon_set_file(dir_name + "beaconSet.csv");
-	std::string dir_name = "/home/steve/Data/NewFusingLocationData/0035/";
+	std::string dir_name = "/home/steve/Data/NewFusingLocationData/0034/";
 	// load data
 	AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
 			right_foot_file(dir_name + "RIGHT_FOOT.data"),
@@ -198,7 +199,7 @@ int main(int argc, char *argv[]) {
 	double second_info = 10000.0;
 
 
-	double distance_info = 2.0;
+	double distance_info = 0.5;
 	double distance_sigma = 2.0;
 
 
@@ -263,14 +264,16 @@ int main(int argc, char *argv[]) {
 			Eigen::Matrix<double, 1, 1> info_matrix;
 			info_matrix(0, 0) = distance_info;
 
-			auto *left_dis_edge = new PesudoRansacDistance();
+//			auto *left_dis_edge = new PesudoRansacDistance();
+			auto *left_dis_edge = new MaxDistanceEdge();
+			left_dis_edge->setMax_distance_(0.5);
 			left_dis_edge->vertices()[0] = globalOptimizer.vertex(uwb_vertex_index - 1);
 			left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index - 1);
 
 			left_dis_edge->setMeasurement(0.0);
 			left_dis_edge->setInformation(info_matrix);
 
-			dis_edge_stack.push_back(left_dis_edge);
+//			dis_edge_stack.push_back(left_dis_edge);
 
 			globalOptimizer.addEdge(left_dis_edge);
 
