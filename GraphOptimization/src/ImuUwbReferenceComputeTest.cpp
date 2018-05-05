@@ -341,13 +341,13 @@ int main(int argc, char *argv[]) {
 
 				last_left_transform = tmp_transform;
 
-				auto* ze = new Z0Edge();
-				Eigen::Matrix<double,1,1> info_z;
-				info_z(0,0)=2.0;
-				ze->setMeasurement(select_trace.block(0,3,select_trace.rows(),1).mean());
+				auto *ze = new Z0Edge();
+				Eigen::Matrix<double, 1, 1> info_z;
+				info_z(0, 0) = 2.0;
+				ze->setMeasurement(select_trace.block(0, 3, select_trace.rows(), 1).mean());
 				ze->setInformation(info_z);
-				ze->vertices()[0] = globalOptimizer.vertex(left_vertex_index-2);
-				ze->vertices()[1] = globalOptimizer.vertex(left_vertex_index-1);
+				ze->vertices()[0] = globalOptimizer.vertex(left_vertex_index - 2);
+				ze->vertices()[1] = globalOptimizer.vertex(left_vertex_index - 1);
 
 //				globalOptimizer.addEdge(ze);
 
