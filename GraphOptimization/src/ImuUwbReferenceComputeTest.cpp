@@ -260,6 +260,7 @@ int main(int argc, char *argv[]) {
 			sv->setFixed(true);
 			globalOptimizer.addVertex(sv);
 
+			logger_ptr->addTrace3dEvent("trace", "ref", Eigen::Vector3d(data[0], data[1], data[2]));
 
 			Eigen::Matrix<double, 1, 1> info_matrix;
 			info_matrix(0, 0) = distance_info;
