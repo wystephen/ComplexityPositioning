@@ -61,7 +61,12 @@ public:
 
 };
 
+
+/**
+ * @brief Use MEstimation technology to maintain a robust result.
+ */
 class MEstimationDistance : public DistanceEdge {
+
 public:
 	MEstimationDistance() {
 
@@ -85,7 +90,7 @@ public:
 		double dis = sqrt(dis_2);
 		double u2 = (pow(dis - _measurement, 2.0));
 
-		if(counter<5000){
+		if(counter<50){
 			_error(0,0) = sqrt(u2);
 			counter++;
 			return;
