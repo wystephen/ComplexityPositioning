@@ -8,6 +8,7 @@
 
 
 #include <thread>
+#include <OwnEdge/MaxDistanceEdge.h>
 //#include <AWF.h>
 
 
@@ -31,15 +32,15 @@
 
 #include "g2o/core/robust_kernel.h"
 #include "g2o/core/robust_kernel_factory.h"
-#include "../include/OwnEdge/DistanceEdge.h"
-#include "../include/OwnEdge/DistanceEdge.cpp"
+#include "OwnEdge/DistanceEdge.h"
+#include "OwnEdge/DistanceEdge.cpp"
 
-#include "../include/OwnEdge/MaxDistanceEdge.h"
-#include "../include/OwnEdge/ZoEdge.h"
-#include "../include/OwnEdge/ZoEdge.cpp"
+#include "OwnEdge/MaxDistanceEdge.h"
+#include "OwnEdge/ZoEdge.h"
+#include "OwnEdge/ZoEdge.cpp"
 
-#include "../include/OwnEdge/Plane3dVertex.h"
-#include "../include/OwnEdge/Plane3dVertex.cpp"
+#include "OwnEdge/Plane3dVertex.h"
+#include "OwnEdge/Plane3dVertex.cpp"
 
 
 namespace plt = matplotlibcpp;

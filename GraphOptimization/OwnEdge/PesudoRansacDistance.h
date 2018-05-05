@@ -90,7 +90,7 @@ public:
 		double dis = sqrt(dis_2);
 		double u2 = (pow(dis - _measurement, 2.0));
 
-		if(counter<50){
+		if(!ransac_flag_){
 			_error(0,0) = sqrt(u2);
 			counter++;
 			return;

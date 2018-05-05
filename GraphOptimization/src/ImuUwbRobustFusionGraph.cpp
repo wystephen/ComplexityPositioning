@@ -238,7 +238,7 @@ int main(int argc, char *argv[]) {
 
 	int data_num = 5;
 
-	std::vector<PesudoRansacDistance *> dis_edge_stack;
+	std::vector<MEstimationDistance*> dis_edge_stack;
 
 	std::vector<double> left_vector_time;
 	left_vector_time.push_back(left_imu_data(0,0));
@@ -278,7 +278,7 @@ int main(int argc, char *argv[]) {
 					Eigen::Matrix<double, 1, 1> info_matrix;
 					info_matrix(0, 0) = distance_info;
 
-					auto *left_dis_edge = new PesudoRansacDistance();
+					auto *left_dis_edge = new MEstimationDistance();
 					left_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
 					left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index - 1);
 
@@ -293,7 +293,7 @@ int main(int argc, char *argv[]) {
 //					          << std::endl;
 //
 
-					auto *right_dis_edge = new MEstimationDistance();
+					auto *right_dis_edge = new PesudoRansacDistance();
 					right_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
 					right_dis_edge->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
 
@@ -425,11 +425,11 @@ int main(int argc, char *argv[]) {
 	globalOptimizer.setVerbose(true);
 
 	globalOptimizer.optimize(15000);
-//	for (auto e:dis_edge_stack) {
-//		e->ransac_flag_ = true;
+	for (auto e:dis_edge_stack) {
+		e->ransac_flag_ = true;
 //		e->ransac_threshold_ = 14.0;
-//	}
-//	globalOptimizer.optimize(10000);
+	}
+	globalOptimizer.optimize(10000);
 //
 //
 //	globalOptimizer.optimize(1000);
