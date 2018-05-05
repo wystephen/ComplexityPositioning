@@ -293,7 +293,7 @@ int main(int argc, char *argv[]) {
 //					          << std::endl;
 //
 
-					auto *right_dis_edge = new DistanceEdge();
+					auto *right_dis_edge = new MEstimationDistance();
 					right_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
 					right_dis_edge->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
 

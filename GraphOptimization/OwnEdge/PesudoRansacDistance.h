@@ -37,10 +37,10 @@ public:
 
 		if (_measurement > dis) {
 			// measurements bigger than theory distance
-			error =  _measurement-dis;
+			error = _measurement - dis;
 
 		} else {
-			error = dis-_measurement;
+			error = dis - _measurement;
 			error = error * 3.0;
 		}
 //        std::cout << dis_2 << std::endl;
@@ -61,5 +61,37 @@ public:
 
 };
 
+class MEstimationDistance : public DistanceEdge {
+public:
+	MEstimationDistance() {
+
+	}
+
+	bool ransac_flag_ = false;
+	double ransac_threshold_ = 10.0;
+
+	virtual void computeError() {
+		g2o::VertexSE3 *from = static_cast<g2o::VertexSE3 *>(_vertices[0]);
+		g2o::VertexSE3 *to = static_cast<g2o::VertexSE3 *>(_vertices[1]);
+
+		double p1[10], p2[10];
+		from->getEstimateData(p1);
+		to->getEstimateData(p2);
+
+		double dis_2 = (p1[0] - p2[0]) * (p1[0] - p2[0]) +
+		               (p1[1] - p2[1]) * (p1[1] - p2[1]) +
+		               (p1[2] - p2[2]) * (p1[2] - p2[2]);
+		double dis = sqrt(dis_2);
+		double u2 = (pow(dis - _measurement, 2.0));
+
+		if (u2 < 0.25) {
+			_error(0, 0) = 0.5 * sqrt(u2);
+		} else {
+			_error(0, 0) = 2.0 * u2 / (1.0 + u2) - 0.5;
+		}
+
+	}
+
+};
 
 #endif //COMPLEXITYPOSITIONING_PESUDORANSACDISTANCE_H
