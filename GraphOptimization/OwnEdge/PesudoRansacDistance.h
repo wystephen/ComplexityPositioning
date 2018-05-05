@@ -69,6 +69,7 @@ public:
 
 	bool ransac_flag_ = false;
 	double ransac_threshold_ = 10.0;
+	int counter = 0;
 
 	virtual void computeError() {
 		g2o::VertexSE3 *from = static_cast<g2o::VertexSE3 *>(_vertices[0]);
@@ -84,6 +85,11 @@ public:
 		double dis = sqrt(dis_2);
 		double u2 = (pow(dis - _measurement, 2.0));
 
+		if(counter<5000){
+			_error(0,0) = sqrt(u2);
+			counter++;
+			return;
+		}
 		if (u2 < 0.25) {
 			_error(0, 0) = 0.5 * sqrt(u2);
 		} else {
