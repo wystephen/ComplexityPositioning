@@ -56,6 +56,8 @@
 #include <OwnEdge/SimpleDistanceEdge.cpp>
 #include <OwnEdge/PesudoRansacDistance.h>
 #include <OwnEdge/HardConstraintIMU.h>
+#include <OwnEdge/ZoEdge.h>
+#include <OwnEdge/ZoEdge.cpp>
 
 int main(int argc, char *argv[]) {
 	omp_set_num_threads(12);
@@ -264,7 +266,7 @@ int main(int argc, char *argv[]) {
 		if (uwb_index < uwb_data.rows() && uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
 
 			for (int k(1); k < uwb_data.cols(); ++k) {
-				if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 100.0 && beacon_set_data(k - 1, 0) < 5000) {
+				if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 100.0 ){//&& beacon_set_data(k - 1, 0) < 5000) {
 //
 //					Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
 //					measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
@@ -367,6 +369,17 @@ int main(int argc, char *argv[]) {
 				ce->setInformation(info);
 				ce->setMeasurement(last_left_transform.inverse() * tmp_transform);
 //				globalOptimizer.addEdge(ce);
+
+				auto *ze = new Z0Edge();
+				ze->vertices()[0] = globalOptimizer.vertex(left_vertex_index - 2);
+				ze->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
+
+//				Eigen::Matrix<double, 1, 1> info;
+//				info(0, 0) = 1.0;
+				ze->setInformation(info);
+				globalOptimizer.addEdge(ze);
+
+
 
 				last_left_transform = tmp_transform;
 
