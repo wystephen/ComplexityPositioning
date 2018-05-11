@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
 			v->setFixed(true);
 		} else {
 			// the beacons's pose if unknown.
-//			v->setEstimateData()
+//			v->setEstimateData(d)
 			v->setFixed(false);
 		}
 		std::cout << k + beacon_index_offset << "beacon vertex:" << v << std::endl;
@@ -218,11 +218,11 @@ int main(int argc, char *argv[]) {
 	double second_info = 10000.0;
 
 
-	double distance_info = 0.001;
+	double distance_info = 1;
 	double distance_sigma = 2.0;
 
 
-	double z_offset = 1.90 - 1.12;
+//	double z_offset = 1.90 - 1.12;
 
 	double turn_threshold = 1.0;
 	double corner_ratio = 10.0;
@@ -240,7 +240,7 @@ int main(int argc, char *argv[]) {
 
 	int data_num = 5;
 
-	std::vector<MEstimationDistance*> dis_edge_stack;
+	std::vector<PesudoRansacDistance*> dis_edge_stack;
 
 	std::vector<double> left_vector_time;
 	left_vector_time.push_back(left_imu_data(0,0));
@@ -266,8 +266,8 @@ int main(int argc, char *argv[]) {
 		if (uwb_index < uwb_data.rows() && uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
 
 			for (int k(1); k < uwb_data.cols(); ++k) {
-				if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 100.0 ){//&& beacon_set_data(k - 1, 0) < 5000) {
-//
+				if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 100.0 && beacon_set_data(k - 1, 0) < 5000) {
+
 //					Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
 //					measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
 //					measurement_noise_matrix.resize(1, 1);
@@ -280,7 +280,8 @@ int main(int argc, char *argv[]) {
 					Eigen::Matrix<double, 1, 1> info_matrix;
 					info_matrix(0, 0) = distance_info;
 
-					auto *left_dis_edge = new MEstimationDistance();
+//					auto *left_dis_edge = new MEstimationDistance();
+					auto *left_dis_edge = new PesudoRansacDistance();
 					left_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
 					left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index - 1);
 
@@ -376,6 +377,8 @@ int main(int argc, char *argv[]) {
 
 //				Eigen::Matrix<double, 1, 1> info;
 //				info(0, 0) = 1.0;
+				ze->setMeasurement(2.0);
+
 				ze->setInformation(info);
 				globalOptimizer.addEdge(ze);
 
@@ -443,7 +446,7 @@ int main(int argc, char *argv[]) {
 		e->ransac_flag_ = true;
 //		e->ransac_threshold_ = 14.0;
 	}
-	globalOptimizer.optimize(10000);
+//	globalOptimizer.optimize(10000);
 //
 //
 //	globalOptimizer.optimize(1000);

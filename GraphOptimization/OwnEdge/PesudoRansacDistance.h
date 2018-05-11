@@ -41,7 +41,7 @@ public:
 
 		} else {
 			error = dis - _measurement;
-			error = error * 3.0;
+			error = error ;
 		}
 //        std::cout << dis_2 << std::endl;
 		if (ransac_flag_) {
@@ -90,11 +90,11 @@ public:
 		double dis = sqrt(dis_2);
 		double u2 = (pow(dis - _measurement, 2.0));
 
-//		if(!ransac_flag_){
-//			_error(0,0) = sqrt(u2);
-//			counter++;
-//			return;
-//		}
+		if(!ransac_flag_){
+			_error(0,0) = sqrt(u2);
+			counter++;
+			return;
+		}
 		if (u2 < 0.25) {
 			_error(0, 0) = 0.5 * sqrt(u2);
 		} else {
