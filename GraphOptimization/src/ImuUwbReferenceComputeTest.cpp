@@ -72,7 +72,11 @@ int main(int argc, char *argv[]) {
 //			head_imu_file(dir_name + "HEAD.data"),
 //			uwb_file(dir_name + "uwb_result.csv"),
 //			beacon_set_file(dir_name + "beaconSet.csv");
-	std::string dir_name = "/home/steve/Data/NewFusingLocationData/0038/";
+
+	std::string dir_name = "/home/steve/Data/NewFusingLocationData/0036/";
+	if(argc>1){
+		dir_name=std::string(argv[1]);
+	}
 	// load data
 	AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
 			right_foot_file(dir_name + "RIGHT_FOOT.data"),
@@ -199,7 +203,7 @@ int main(int argc, char *argv[]) {
 	double second_info = 10000.0;
 
 
-	double distance_info = 0.5;
+	double distance_info = 2.0;
 	double distance_sigma = 2.0;
 
 

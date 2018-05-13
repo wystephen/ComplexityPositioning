@@ -371,6 +371,7 @@ int main(int argc, char *argv[]) {
 				ce->setMeasurement(last_left_transform.inverse() * tmp_transform);
 //				globalOptimizer.addEdge(ce);
 
+
 				auto *ze = new Z0Edge();
 				ze->vertices()[0] = globalOptimizer.vertex(left_vertex_index - 2);
 				ze->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
