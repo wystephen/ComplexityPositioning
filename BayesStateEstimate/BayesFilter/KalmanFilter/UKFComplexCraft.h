@@ -24,6 +24,15 @@ namespace BSE {
 
 		}
 
+		/**
+		 *  state update function. for imu
+		 *   only.
+		 * @param state
+		 * @param q
+		 * @param input
+		 * @param time_interval_
+		 * @param local_g_
+		 */
 		void update_function(Eigen::Matrix<double, 15, 1> &state,
 		                     Eigen::Quaterniond &q,
 		                     Eigen::Matrix<double, 6, 1> &input,
