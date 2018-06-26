@@ -281,6 +281,9 @@ namespace BSE {
 			return q_out;
 
 
+			/**
+			 * @brief Note a good way (tested by cumulate samll draft)
+			 */
 //			Eigen::Matrix<T, 3, 1> eta = angle_velocity * 0.5;
 //			T eta_norm = eta.norm();
 //
