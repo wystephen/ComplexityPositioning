@@ -121,6 +121,9 @@ namespace BSE {
 			                       Eigen::AngleAxisd(ang(1), Eigen::Vector3d::UnitY()) *
 			                       Eigen::AngleAxisd(ang(2), Eigen::Vector3d::UnitZ());
 
+
+			q = q.inverse();
+
 //            Eigen::Quaterniond q = Eigen::Quaterniond::Identity();
 //            double bank = ang(0);
 //            double attitude = ang(1);
