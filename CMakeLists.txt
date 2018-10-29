@@ -175,6 +175,12 @@ target_link_libraries(KalmanFilterTester ${PYTHON_LIBRARIES})
 add_executable(KFComplexityTester BayesStateEstimate/Test/KFComplexityTest.cpp)
 target_link_libraries(KFComplexityTester ${PYTHON_LIBRARIES})
 
+
+# For more complexity version of KF.
+#add_executable(KFComplexityTester BayesStateEstimate/Test/KFComplexityTest.cpp)
+#target_link_libraries(KFComplexityTester ${PYTHON_LIBRARIES})
+
+
 add_executable(KFCImuTester BayesStateEstimate/Test/KFComplexityImuOnlyTest.cpp BayesStateEstimate/BayesFilter/KalmanFilter/UKFComplexCraft.h)
 target_link_libraries(KFCImuTester ${PYTHON_LIBRARIES})
 

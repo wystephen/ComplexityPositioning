@@ -121,6 +121,9 @@ namespace BSE {
 			                       Eigen::AngleAxisd(ang(1), Eigen::Vector3d::UnitY()) *
 			                       Eigen::AngleAxisd(ang(2), Eigen::Vector3d::UnitZ());
 
+
+			q = q.inverse();
+
 //            Eigen::Quaterniond q = Eigen::Quaterniond::Identity();
 //            double bank = ang(0);
 //            double attitude = ang(1);
@@ -281,6 +284,9 @@ namespace BSE {
 			return q_out;
 
 
+			/**
+			 * @brief Note a good way (tested by cumulate samll draft)
+			 */
 //			Eigen::Matrix<T, 3, 1> eta = angle_velocity * 0.5;
 //			T eta_norm = eta.norm();
 //

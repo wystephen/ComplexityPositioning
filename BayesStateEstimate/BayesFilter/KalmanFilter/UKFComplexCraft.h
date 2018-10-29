@@ -24,6 +24,15 @@ namespace BSE {
 
 		}
 
+		/**
+		 *  state update function. for imu
+		 *   only.
+		 * @param state
+		 * @param q
+		 * @param input
+		 * @param time_interval_
+		 * @param local_g_
+		 */
 		void update_function(Eigen::Matrix<double, 15, 1> &state,
 		                     Eigen::Quaterniond &q,
 		                     Eigen::Matrix<double, 6, 1> &input,
@@ -308,6 +317,8 @@ namespace BSE {
 				Q.col(i) = weight * rotation_stack[i].coeffs();
 			}
 
+//            auto Q = Eigen::Matrix<double,12,12>();
+
 			Eigen::Matrix<double, 4, 4> QQt = Q * Q.transpose();
 
 			Eigen::EigenSolver<Eigen::Matrix<double, 4, 4>> es(QQt);
@@ -368,6 +379,7 @@ namespace BSE {
 
 			}
 
+			// the following two lines code shown similar result.
 			prob_state_ = 0.5 * (prob_state_ * prob_state_.transpose());
 //			prob_state_ = 0.5 * (prob_state_.eval() + prob_state_.transpose().eval());
 
@@ -435,7 +447,7 @@ namespace BSE {
 			}
 
 			auto logger_ptr_ = AWF::AlgorithmLogger::getInstance();
-			logger_ptr_->addPlotEvent("yaw effect", "p",prob_state_.block(6,3,3,3));
+			logger_ptr_->addPlotEvent("yaw effect", "p", prob_state_.block(6, 3, 3, 3));
 			/*
 			 * update probability
 			 */
@@ -471,9 +483,9 @@ namespace BSE {
 			state_x_.block(6, 0, 3, 1) = ImuTools::dcm2ang<double>(ImuTools::q2dcm(rotation_q_));
 
 			state_x_.block(9, 0, 6, 1) = state_x_.block(9, 0, 6, 1) + dX_.block(9, 0, 6, 1);
-			
-			
-			logger_ptr_->addPlotEvent("yaw effect","dx",epsilon);
+
+
+			logger_ptr_->addPlotEvent("yaw effect", "dx", epsilon);
 
 //			logger_ptr_->addPlotEvent("complexfull", "offset_acc", state_x_.block(9, 0, 3, 1));
 //			logger_ptr_->addPlotEvent("complexfull", "offset_gyr", state_x_.block(12, 0, 3, 1));
@@ -583,8 +595,8 @@ namespace BSE {
 		 */
 		void MeasurementUwbRobust(Eigen::Matrix<double, 4, 1> input,
 		                          Eigen::Matrix<double, 1, 1> cov_m, int id = 0,
-		double ka_squard=18.0,
-		double T_d = 15.0) {
+		                          double ka_squard = 18.0,
+		                          double T_d = 15.0) {
 
 			while (id > eta_vector.size() - 1) {
 				eta_vector.push_back(std::vector<Eigen::MatrixXd>());
@@ -640,14 +652,14 @@ namespace BSE {
 							lambda_k += (val_vec(t, 0) - mean_of_val) * (val_vec(t, 0) - mean_of_val);
 						}
 						lambda_k = lambda_k / double(val_vec.rows());
-						logger_ptr->addPlotEvent("robust","lambda"+std::to_string(id),lambda_k);
+						logger_ptr->addPlotEvent("robust", "lambda" + std::to_string(id), lambda_k);
 
 						if (lambda_k > T_d) {
 							robust_loop_flag = true;
 							R_k = eta_k / ka_squard * R_k;
 						}
 
-					}else{
+					} else {
 //						R_k = eta_k / ka_squard * R_k;
 					}
 
