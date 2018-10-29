@@ -269,9 +269,9 @@ int main(int argc, char *argv[]) {
 			Eigen::Matrix<double, 1, 1> info_matrix;
 			info_matrix(0, 0) = distance_info;
 
-//			auto *left_dis_edge = new PesudoRansacDistance();
-			auto *left_dis_edge = new MaxDistanceEdge();
-			left_dis_edge->setMax_distance_(0.5);
+			auto *left_dis_edge = new PesudoRansacDistance();
+//			auto *left_dis_edge = new MaxDistanceEdge();
+//			left_dis_edge->setMax_distance_(0.5);
 			left_dis_edge->vertices()[0] = globalOptimizer.vertex(uwb_vertex_index - 1);
 			left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index - 1);
 

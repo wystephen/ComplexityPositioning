@@ -38,8 +38,8 @@ if (OPENMP_FOUND)
 endif ()
 
 #python dev
-find_package(PythonLibs 3.5)
-
+find_package(PythonLibs 3.6)
+#find_package(PythonLibs 3.5)
 #Eigen
 find_package(Eigen3 REQUIRED)
 
@@ -54,17 +54,17 @@ set(Sophus_LIBRARIES)
 
 
 #GTSAM
-#find_package(GTSAM REQUIRED) # Uses installed package
-#include_directories(${GTSAM_INCLUDE_DIR})
-#set(GTSAM_LIBRARIES gtsam)   # TODO: automatic search libs
+find_package(GTSAM REQUIRED) # Uses installed package
+include_directories(${GTSAM_INCLUDE_DIR})
+set(GTSAM_LIBRARIES gtsam)   # TODO: automatic search libs
 
-#find_package(GTSAMCMakeTools)
-#include(GtsamMakeConfigFile)
-#include(GtsamBuildTypes)
-#include(GtsamTesting)
+find_package(GTSAMCMakeTools)
+include(GtsamMakeConfigFile)
+include(GtsamBuildTypes)
+include(GtsamTesting)
 
 # G2O
-SET(G2O_ROOT /usr/local/include/g2o)
+#SET(G2O_ROOT /usr/local/include/g2o)
 FIND_PACKAGE(G2O)
 FIND_PACKAGE(CSparse)
 FIND_PACKAGE(Cholmod)
@@ -93,7 +93,7 @@ include_directories(
 		${G2O_INCLUDE_DIR}
 		${Cholmod_INCLUDE_DIR}
 		${SuiteSparse_INCLUDE_DIR}
-		#		${GTSAM_INCLUDE_DIR}
+				${GTSAM_INCLUDE_DIR}
 		/home/steve/Code/AlgorithmWorkFlowTools/
 		${PYTHON_INCLUDE_DIRS}
 		${Boost_INCLUDE_DIRS}
@@ -118,7 +118,7 @@ link_directories(
 		${OpenCL_LIBRARY}
 		/opt/intel/mkl/lib/intel64/
 		${Sophus_LIBRARIES}
-		#        /opt/intel/mkl/lib/intel64_lin/
+		/opt/intel/mkl/lib/intel64_lin/
 )
 
 #link_libraries(
@@ -135,6 +135,8 @@ link_libraries(
 
 #add_subdirectory(BayesStateEstimate)
 #add_subdirectory(GraphOptimization)
+MESSAGE(					  ${PYTHON_LIBRARIES})
+MESSAGE(${PYTHON_INCLUDE_DIRS})
 
 
 add_executable(DualFeetLocalization GraphOptimization/src/DualFeetLocalization.cpp)
@@ -195,6 +197,12 @@ target_link_libraries(KalmanFilterSimulatorTester ${PYTHON_LIBRARIES})
 
 add_executable(MonteCarloTester BayesStateEstimate/Test/MonteCarloTester.cpp)
 target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${OpenCL_LIBRARY})
+
+
+
+#############################
+add_executable(gtsam_INS_test GraphOptimization/gtsam_src/gtsam_GPS_INS_test.cpp)
+target_link_libraries(gtsam_INS_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES} )
 
 #cuda_add_executable(MonteCarloThrustTester
 #        BayesStateEstimate/Test/MonteCarloTesterCuda.cpp)
