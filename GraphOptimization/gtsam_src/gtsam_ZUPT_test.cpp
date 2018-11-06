@@ -75,6 +75,9 @@ int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 
+
+	auto logger_ptr = AWF::AlgorithmLogger::getInstance();
+
 	// load data
 	AWF::FileReader left_foot_file(dir_name + "LEFT_FOOT.data"),
 			right_foot_file(dir_name + "RIGHT_FOOT.data"),
@@ -118,6 +121,10 @@ int main(int argc, char *argv[]) {
 	BSE::ImuTools::processImuData(left_imu_data);
 	BSE::ImuTools::processImuData(right_imu_data);
 	BSE::ImuTools::processImuData(head_imu_data);
+
+
+
+
 
 
 

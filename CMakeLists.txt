@@ -210,6 +210,8 @@ target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${
 add_executable(gtsam_INS_test GraphOptimization/gtsam_src/gtsam_GPS_INS_test.cpp)
 target_link_libraries(gtsam_INS_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES} )
 
+add_executable(gtsam_ZUPT_test GraphOptimization/gtsam_src/gtsam_ZUPT_test.cpp)
+target_link_libraries(gtsam_ZUPT_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES} )
 #cuda_add_executable(MonteCarloThrustTester
 #        BayesStateEstimate/Test/MonteCarloTesterCuda.cpp)
 #target_link_libraries(MonteCarloThrustTester )
