@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
 
 	//Initial state
 
-	auto tmp_q = BSE::ImuTools::initial_quaternion(left_imu_data.block(50,3,0,1),0.0,true);
+	auto tmp_q = BSE::ImuTools::initial_quaternion(left_imu_data.block(0,1,50,3),0.0,true);
 
 	Rot3 prior_rotation  = Rot3::Quaternion(1.0,0.0,0.0,0.0);
 

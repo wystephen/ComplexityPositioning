@@ -534,6 +534,10 @@ namespace BSE {
 				auto rotate_matrix = (Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX())
 				                      * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
 				                      * Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()));
+				if(debug_flag)
+				{
+					std::cout<< "rotated acc:" << (rotate_matrix * acc).transpose() << std::endl;
+				}
 				return std::abs(std::abs(g) * 1.0 * local_g_ / std::abs(local_g_) + (rotate_matrix * acc)(2));
 			};
 			auto ge(0.0);
