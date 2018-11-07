@@ -155,7 +155,7 @@ namespace BSE {
                 double step_length = 0.00001;
                 double update_rate = 0.15;
 
-                while (ite_times < 10000) {
+                while (ite_times < 10000 && last_uwb_err > 0.1) {
                     last_uwb_err = uwb_err_function(initial_pos);
                     Eigen::Vector3d tmp_gradient(0, 0, 0);
                     for (int i(0); i < 3; ++i) {
