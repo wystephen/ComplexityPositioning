@@ -162,9 +162,22 @@ int main(int argc, char *argv[]) {
 
 	//Initial state
 
-	auto tmp_q = BSE::ImuTools::initial_quaternion(left_imu_data.block(0,1,50,3),0.0,true);
+	auto tmp_q = BSE::ImuTools::initial_quaternion(left_imu_data.block(0,1,50,3),initial_ori,false);
 
-	Rot3 prior_rotation  = Rot3::Quaternion(1.0,0.0,0.0,0.0);
+	Rot3 prior_rotation  = Rot3::Quaternion(tmp_q.w(),tmp_q.x(),tmp_q.y(),tmp_q.z());
+	Point3 prior_point = initial_pos;
+	Pose3  prior_pose(prior_rotation,prior_point);
+	Vector3 prior_velocity(0.0,0.0,0.0);
+
+	Values initial_values;
+	int left_counter = 0;
+
+
+
+
+
+
+	logger_ptr->outputAllEvent(true);
 
 
 }
