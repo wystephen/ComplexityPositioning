@@ -521,6 +521,8 @@ namespace BSE {
 		Eigen::Quaterniond initial_quaternion(Eigen::MatrixXd imu_data,
 		                                      double initial_ori,
 		                                      bool debug_flag = false) {
+			std::cout << "imu data size:" << imu_data.rows()
+			          << "," << imu_data.cols() << std::endl;
 			Eigen::Vector3d acc = imu_data.block(0, 0, imu_data.rows(), 3).colwise().mean().transpose();
 			auto g = acc.norm();
 
