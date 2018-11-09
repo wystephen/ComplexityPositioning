@@ -169,9 +169,18 @@ int main(int argc, char *argv[]) {
 	Point3 prior_point = initial_pos;
 	Pose3  prior_pose(prior_rotation,prior_point);
 	Vector3 prior_velocity(0.0,0.0,0.0);
+	imuBias::ConstantBias prior_imu_bias; // assume zero initial bias.
 
 	Values initial_values;
 	int left_counter = 0;
+
+	initial_values.insert(X(left_counter),prior_pose);
+	initial_values.insert(V(left_counter),prior_velocity);
+	initial_values.insert(B(left_counter),prior_imu_bias);
+
+
+
+
 
 
 
