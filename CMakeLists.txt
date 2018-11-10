@@ -93,7 +93,7 @@ include_directories(
 		${G2O_INCLUDE_DIR}
 		${Cholmod_INCLUDE_DIR}
 		${SuiteSparse_INCLUDE_DIR}
-				${GTSAM_INCLUDE_DIR}
+		${GTSAM_INCLUDE_DIR}
 		/home/steve/Code/AlgorithmWorkFlowTools/
 		${PYTHON_INCLUDE_DIRS}
 		${Boost_INCLUDE_DIRS}
@@ -135,7 +135,7 @@ link_libraries(
 
 #add_subdirectory(BayesStateEstimate)
 #add_subdirectory(GraphOptimization)
-MESSAGE(					  ${PYTHON_LIBRARIES})
+MESSAGE(${PYTHON_LIBRARIES})
 MESSAGE(${PYTHON_INCLUDE_DIRS})
 
 
@@ -205,13 +205,20 @@ add_executable(MonteCarloTester BayesStateEstimate/Test/MonteCarloTester.cpp)
 target_link_libraries(MonteCarloTester ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${OpenCL_LIBRARY})
 
 
-
 #############################
 add_executable(gtsam_INS_test GraphOptimization/gtsam_src/gtsam_GPS_INS_test.cpp)
-target_link_libraries(gtsam_INS_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES} )
+target_link_libraries(gtsam_INS_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES})
 
 add_executable(gtsam_ZUPT_test GraphOptimization/gtsam_src/gtsam_ZUPT_test.cpp)
-target_link_libraries(gtsam_ZUPT_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES} )
+target_link_libraries(gtsam_ZUPT_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES})
+
+
+add_executable(gtsam_Dual_Feet_test GraphOptimization/gtsam_src/gtsam_Dual_Feet_test.cpp)
+target_link_libraries(gtsam_Dual_Feet_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES})
+
+
+add_executable(gtsam_ZUPT_UWB_test GraphOptimization/gtsam_src/gtsam_ZUPT_UWB_test.cpp)
+target_link_libraries(gtsam_ZUPT_UWB_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES})
 #cuda_add_executable(MonteCarloThrustTester
 #        BayesStateEstimate/Test/MonteCarloTesterCuda.cpp)
 #target_link_libraries(MonteCarloThrustTester )
