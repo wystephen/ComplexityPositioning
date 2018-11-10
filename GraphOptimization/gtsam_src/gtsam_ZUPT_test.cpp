@@ -212,6 +212,7 @@ int main(int argc, char *argv[]) {
 
 	graph.add(PriorFactor<Pose3>(X(left_counter),prior_pose,pose_noise_model));
 	graph.add(PriorFactor<Vector3>(V(left_counter),prior_velocity,velocity_noise_model));
+	graph.add(PriorFactor<imuBias::ConstantBias>(B(left_counter),prior_imu_bias,bias_noise_model));
 
 
 	// initial isam2
