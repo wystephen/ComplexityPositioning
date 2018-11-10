@@ -51,6 +51,10 @@
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/inference/Symbol.h>
+
+#include <gtsam/nonlinear/ISAM2.h>
+
+
 #include <fstream>
 #include <iostream>
 
@@ -70,6 +74,8 @@ using symbol_shorthand::Z; // zero velocity
 
 namespace plt = matplotlibcpp;
 
+
+PreintegrationType *imu_preintegrated_;
 int main(int argc, char *argv[]) {
 
 	std::cout.precision(30);
@@ -123,6 +129,29 @@ int main(int argc, char *argv[]) {
 	BSE::ImuTools::processImuData(left_imu_data);
 	BSE::ImuTools::processImuData(right_imu_data);
 	BSE::ImuTools::processImuData(head_imu_data);
+	double left_dt = (left_imu_data(left_imu_data.rows()-1,0)-left_imu_data(0,0))/double(left_imu_data.rows());
+
+
+	Eigen::MatrixXd left_zv_state = Eigen::MatrixXd::Ones(left_imu_data.rows(),1);
+	Eigen::MatrixXd right_zv_state = Eigen::MatrixXd::Ones(right_imu_data.rows(),1);
+	Eigen::MatrixXd head_zv_state = Eigen::MatrixXd::Ones(head_imu_data.rows(),1);
+
+	auto zv_cal_function = [](Eigen::MatrixXd & zv_state, Eigen::MatrixXd & imu_data){
+		assert(zv_state.rows() == imu_data.rows());
+		for(int i(6);i<imu_data.rows()-6;++i){
+			if(BSE::ImuTools::GLRT_Detector(imu_data.block(i-5,1,10,6)))
+			{
+				zv_state(i) = 1.0;
+			}else{
+				zv_state(i) = 0.0;
+			}
+		}
+
+	};
+	zv_cal_function(left_zv_state,left_imu_data);
+	zv_cal_function(right_zv_state,right_imu_data);
+	zv_cal_function(head_zv_state,head_imu_data);
+
 
 
 	// noise model
@@ -172,11 +201,114 @@ int main(int argc, char *argv[]) {
 	imuBias::ConstantBias prior_imu_bias; // assume zero initial bias.
 
 	Values initial_values;
+	NonlinearFactorGraph graph;
 	int left_counter = 0;
+	int left_normal_counter = 0;
+	int left_zv_counter = 0;
 
 	initial_values.insert(X(left_counter),prior_pose);
 	initial_values.insert(V(left_counter),prior_velocity);
 	initial_values.insert(B(left_counter),prior_imu_bias);
+
+	graph.add(PriorFactor<Pose3>(X(left_counter),prior_pose,pose_noise_model));
+	graph.add(PriorFactor<Vector3>(V(left_counter),prior_velocity,velocity_noise_model));
+
+
+	// initial isam2
+	ISAM2Params parameters;
+	parameters.relinearizeThreshold = 0.01;
+	parameters.relinearizeSkip=  1;
+	ISAM2 isam(parameters);
+
+	isam.update(graph, initial_values);
+	isam.update();
+
+	graph.resize(0);
+	initial_values.clear();
+
+
+	imu_preintegrated_ = new PreintegratedImuMeasurements(p,prior_imu_bias);
+
+
+
+
+	for(int i(0);i<left_imu_data.rows();++i){
+		Eigen::Vector3d acc(left_imu_data(i,1),left_imu_data(i,2),left_imu_data(i,3));
+		Eigen::Vector3d gyr(left_imu_data(i,4),left_imu_data(i,5),left_imu_data(i,6));
+//		imu_preintegrated_->integrateMeasurement(left_imu_data.block(i,1,1,3),
+//				left_imu_data.block(i,4,1,3),left_dt);
+		imu_preintegrated_->integrateMeasurement(acc,gyr,left_dt);
+
+		auto add_new_factor = [&](int &counter, double zv_flag){
+
+			counter +=1;
+			std::cout << "counter ;"<<counter << std::endl;
+
+//			auto prev_state = new NavState(prior_pose,prior_velocity);
+//			imuBias::ConstantBias prev_bias = prior_imu_bias;
+//			auto prop_state = imu_preintegrated_->predict(prev_state,prev_bias);
+			initial_values.insert(X(counter),prior_pose);
+			initial_values.insert(V(counter),prior_velocity);
+			initial_values.insert(B(counter),prior_imu_bias);
+
+			PreintegratedImuMeasurements *preint_imu = dynamic_cast<PreintegratedImuMeasurements*>(imu_preintegrated_);
+			ImuFactor imu_factor(X(counter-1),V(counter-1),
+					X(counter),V(counter),
+					B(counter-1),*preint_imu);
+			graph.push_back(imu_factor);
+
+			imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
+			graph.push_back(BetweenFactor<imuBias::ConstantBias>(B(counter-1),
+					B(counter),
+					zero_bias,bias_noise_model));
+
+			if(zv_flag>0.5){
+				graph.push_back(PriorFactor<Vector3>(
+						V(counter),Eigen::Vector3d(0.0,0.0,0.0),zero_velocity_noise_model
+						));
+			}
+
+			isam.update(graph,initial_values);
+			isam.update();
+
+			Values currentEstimate = isam.calculateEstimate();
+			currentEstimate.print("current state:");
+
+			prior_pose = currentEstimate.at<Pose3>(X(counter));
+			prior_velocity = currentEstimate.at<Vector3>(V(counter));
+			prior_imu_bias = currentEstimate.at<imuBias::ConstantBias>(B(counter));
+
+			logger_ptr->addTrace3dEvent("trace","real_time_gtsam",
+					Eigen::Vector3d(prior_pose.x(),prior_pose.y(),prior_pose.z()));
+
+			graph.resize(0);
+			initial_values.clear();
+			imu_preintegrated_->resetIntegration();
+
+
+
+
+		};
+
+		if(left_zv_state(i)>1.0)
+		{
+			left_zv_counter ++;
+			if(left_zv_counter>6){
+				add_new_factor(left_counter,1.0);
+				left_zv_counter = 0;
+			}
+
+		}else{
+			left_normal_counter++;
+			if(left_normal_counter>30){
+				add_new_factor(left_counter,0.0);
+				left_normal_counter = 0;
+
+			}
+
+		}
+	}
+
 
 
 
