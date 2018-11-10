@@ -82,8 +82,8 @@ int main(int argc, char *argv[]) {
 	std::cout.precision(30);
 	// parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-//	std::string dir_name = "/home/steve/Data/ZUPTPDR/0000/";
+//	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+	std::string dir_name = "/home/steve/Data/ZUPTPDR/0000/";
 
 
 	auto logger_ptr = AWF::AlgorithmLogger::getInstance();
@@ -138,41 +138,41 @@ int main(int argc, char *argv[]) {
 	Eigen::MatrixXd right_zv_state = Eigen::MatrixXd::Ones(right_imu_data.rows(), 1);
 	Eigen::MatrixXd head_zv_state = Eigen::MatrixXd::Ones(head_imu_data.rows(), 1);
 
-//	auto zv_cal_function = [](Eigen::MatrixXd &zv_state, Eigen::MatrixXd &imu_data) {
-//		assert(zv_state.rows() == imu_data.rows());
-		for (int i(6); i < left_imu_data.rows() - 6; ++i) {
-			if (BSE::ImuTools::GLRT_Detector(left_imu_data.block(i - 5, 1, 10, 6))) {
-				left_zv_state(i) = 1.0;
+	auto zv_cal_function = [](Eigen::MatrixXd &zv_state, Eigen::MatrixXd &imu_data) {
+		assert(zv_state.rows() == imu_data.rows());
+		for (int i(6); i < imu_data.rows() - 6; ++i) {
+			if (BSE::ImuTools::GLRT_Detector(imu_data.block(i - 5, 1, 10, 6))) {
+				zv_state(i) = 1.0;
 //				std::cout << "zv state" << std::endl;
 			} else {
-				left_zv_state(i) = 0.0;
+				zv_state(i) = 0.0;
 //				std::cout << "non zv state" << std::endl;
 			}
 		}
 
-//	};
-//	zv_cal_function(left_zv_state, left_imu_data);
-//	zv_cal_function(right_zv_state, right_imu_data);
-//	zv_cal_function(head_zv_state, head_imu_data);
+	};
+	zv_cal_function(left_zv_state, left_imu_data);
+	zv_cal_function(right_zv_state, right_imu_data);
+	zv_cal_function(head_zv_state, head_imu_data);
 
 
 
 	// noise model
 	noiseModel::Diagonal::shared_ptr pose_noise_model = noiseModel::Diagonal::Sigmas(
 			(Vector(6) << 0.0001, 0.0001, 0.0001, 0.005, 0.005, 0.005).finished());
-	noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.0000001);
+	noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.0001);
 	noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-13);
 
-	noiseModel::Diagonal::shared_ptr zero_velocity_noise_model = noiseModel::Isotropic::Sigma(3, 1e-5);
+	noiseModel::Diagonal::shared_ptr zero_velocity_noise_model = noiseModel::Isotropic::Sigma(3, 1e-3);
 //	noiseModel::Constrained::shared_ptr zero_velocity_noise_model =
 //			noiseModel::Constrained::;
 
 
 	// We use the sensor specs to build the noise model for the IMU factor.
-	double accel_noise_sigma = 0.0213924;
-	double gyro_noise_sigma = 0.021205689024915;
+	double accel_noise_sigma = 0.001;
+	double gyro_noise_sigma = 0.001 * M_PI / 180.0;
 	double accel_bias_rw_sigma = 0.004905;
-	double gyro_bias_rw_sigma = 0.000001454441043;
+	double gyro_bias_rw_sigma = 0.0001454441043;
 	Matrix33 measured_acc_cov = Matrix33::Identity(3, 3) * pow(accel_noise_sigma, 2);
 	Matrix33 measured_omega_cov = Matrix33::Identity(3, 3) * pow(gyro_noise_sigma, 2);
 	Matrix33 integration_error_cov =
@@ -238,17 +238,25 @@ int main(int argc, char *argv[]) {
 	imu_preintegrated_ = new PreintegratedImuMeasurements(p, prior_imu_bias);
 
 
-	for (int i(0); i < left_imu_data.rows(); ++i) {
+	double last_rate = 0.0;
+	for (int i(0); i < left_imu_data.rows() - 2; ++i) {
 		Eigen::Vector3d acc(left_imu_data(i, 1), left_imu_data(i, 2), left_imu_data(i, 3));
 		Eigen::Vector3d gyr(left_imu_data(i, 4), left_imu_data(i, 5), left_imu_data(i, 6));
 //		imu_preintegrated_->integrateMeasurement(left_imu_data.block(i,1,1,3),
 //				left_imu_data.block(i,4,1,3),left_dt);
 		imu_preintegrated_->integrateMeasurement(acc, gyr, left_dt);
 
+		double rate = double(i) / double(left_imu_data.rows());
+		if (rate - last_rate > 0.05) {
+			std::cout << "finished:" << rate * 100.0 << "%" << std::endl;
+			last_rate = rate;
+		}
 		auto add_new_factor = [&](int &counter, double the_zv_flag) {
 
 			counter += 1;
-			std::cout << "counter ;" << counter << std::endl;
+//			std::cout << "counter ;" << counter << std::endl;
+
+
 
 //			auto prev_state = new NavState(prior_pose,prior_velocity);
 //			imuBias::ConstantBias prev_bias = prior_imu_bias;
@@ -270,11 +278,10 @@ int main(int argc, char *argv[]) {
 			                                                     zero_bias, bias_noise_model));
 
 			if (the_zv_flag > 0.5) {
-				std::cout << "zv flag" << std::endl;
+//				std::cout << "zv flag" << std::endl;
 				graph.push_back(PriorFactor<Vector3>(
 						V(counter), Eigen::Vector3d(0.0, 0.0, 0.0), zero_velocity_noise_model
 				));
-
 
 
 			}
@@ -290,7 +297,7 @@ int main(int argc, char *argv[]) {
 				prior_velocity = currentEstimate.at<Vector3>(V(counter));
 				prior_imu_bias = currentEstimate.at<imuBias::ConstantBias>(B(counter));
 
-				std::cout << prior_pose << std::endl;
+//				std::cout << prior_pose << std::endl;
 
 				logger_ptr->addTrace3dEvent("trace", "real_time_gtsam",
 				                            Eigen::Vector3d(prior_pose.x(), prior_pose.y(), prior_pose.z()));
@@ -312,26 +319,27 @@ int main(int argc, char *argv[]) {
 
 		if (left_zv_state(i) > 0.5) {
 			left_zv_counter++;
-			if (left_zv_counter > 10) {
+			if (left_zv_counter > 10 || (left_zv_state(i + 1) < 0.5)) {
 				add_new_factor(left_counter, 1.0);
 				left_zv_counter = 0;
-				std::cout << "zv hitted." << std::endl;
+//				std::cout << "zv hitted." << std::endl;
 			}
 
 		} else {
 			left_normal_counter++;
-			if (left_normal_counter > 50) {
+			if (left_normal_counter > 70 || left_zv_state(i + 1) > 0.5) {
 				add_new_factor(left_counter, 0.0);
 				left_normal_counter = 0;
-				std::cout << "unzv hitted" << std::endl;
+//				std::cout << "unzv hitted" << std::endl;
 
 			}
 
 		}
 	}
 
+
 	Values currentEstimate = isam.calculateEstimate();
-	for(int i(0);i<left_counter;++i){
+	for (int i(0); i < left_counter; ++i) {
 
 		prior_pose = currentEstimate.at<Pose3>(X(i));
 		prior_velocity = currentEstimate.at<Vector3>(V(i));
