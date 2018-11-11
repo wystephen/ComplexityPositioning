@@ -238,7 +238,7 @@ int main(int argc, char *argv[]) {
 
 
 	double last_rate = 0.0;
-	for (int i(0); i < left_imu_data.rows() - 2; ++i) {
+	for (int i(0); i < left_imu_data.rows() - 2 && i < right_imu_data.rows(); ++i) {
 		Eigen::Vector3d acc(left_imu_data(i, 1), left_imu_data(i, 2), left_imu_data(i, 3));
 		Eigen::Vector3d gyr(left_imu_data(i, 4), left_imu_data(i, 5), left_imu_data(i, 6));
 //		imu_preintegrated_->integrateMeasurement(left_imu_data.block(i,1,1,3),
@@ -250,7 +250,12 @@ int main(int argc, char *argv[]) {
 			std::cout << "finished:" << rate * 100.0 << "%" << std::endl;
 			last_rate = rate;
 		}
-		auto add_new_factor = [&](int &counter, double the_zv_flag) {
+		/**
+		 * @brief offset=0 (left foot) else: offset = 1(right foot)
+		 */
+		auto add_new_factor = [&](int &counter,
+		                          double the_zv_flag,
+		                          int offset = 0) {
 
 			counter += 1;
 //			std::cout << "counter ;" << counter << std::endl;
@@ -334,6 +339,9 @@ int main(int argc, char *argv[]) {
 			}
 
 		}
+
+
+		if (right_zv)
 	}
 
 
@@ -355,7 +363,7 @@ int main(int argc, char *argv[]) {
 	}
 
 
-	std::cout << "imu total time" << left_imu_data(left_imu_data.rows()-1,0)-left_imu_data(0,0) << std::endl;
+	std::cout << "imu total time" << left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0) << std::endl;
 
 
 	logger_ptr->outputAllEvent(true);
