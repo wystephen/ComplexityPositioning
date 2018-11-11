@@ -319,7 +319,7 @@ int main(int argc, char *argv[]) {
 
 		if (left_zv_state(i) > 0.5) {
 			left_zv_counter++;
-			if (left_zv_counter > 10 || (left_zv_state(i + 1) < 0.5)) {
+			if (left_zv_counter > 20 || (left_zv_state(i + 1) < 0.5)) {
 				add_new_factor(left_counter, 1.0);
 				left_zv_counter = 0;
 //				std::cout << "zv hitted." << std::endl;
@@ -327,7 +327,7 @@ int main(int argc, char *argv[]) {
 
 		} else {
 			left_normal_counter++;
-			if (left_normal_counter > 70 || left_zv_state(i + 1) > 0.5) {
+			if (left_normal_counter > 100 || left_zv_state(i + 1) > 0.5) {
 				add_new_factor(left_counter, 0.0);
 				left_normal_counter = 0;
 //				std::cout << "unzv hitted" << std::endl;
@@ -355,6 +355,8 @@ int main(int argc, char *argv[]) {
 		logger_ptr->addPlotEvent("velocity", "final_velocity", prior_velocity);
 	}
 
+
+	std::cout << "imu total time" << left_imu_data(left_imu_data.rows()-1,0)-left_imu_data(0,0) << std::endl;
 
 	logger_ptr->outputAllEvent(true);
 
