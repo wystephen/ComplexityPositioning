@@ -356,7 +356,7 @@ int main(int argc, char *argv[]) {
 	}
 
 
-	std::cout << "imu total time" << left_imu_data(left_imu_data.rows()-1,0)-left_imu_data(0,0) << std::endl;
+	std::cout << "imu total time" << left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0) << std::endl;
 
 	logger_ptr->outputAllEvent(true);
 

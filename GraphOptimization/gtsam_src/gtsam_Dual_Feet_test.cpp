@@ -83,8 +83,8 @@ int main(int argc, char *argv[]) {
 	std::cout.precision(30);
 	// parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-//	std::string dir_name = "/home/steve/Data/ZUPTPDR/0000/";
+//	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+	std::string dir_name = "/home/steve/Data/ZUPTPDR/0001/";
 
 
 	auto logger_ptr = AWF::AlgorithmLogger::getInstance();
@@ -226,7 +226,7 @@ int main(int argc, char *argv[]) {
 	int right_normal_counter = 0;
 	int right_zv_counter = 0;
 
-	int right_offset = 100000000;
+	long right_offset = 500000000;
 
 	initial_values.insert(X(left_counter), prior_pose_left);
 	initial_values.insert(V(left_counter), prior_velocity_left);
@@ -234,7 +234,7 @@ int main(int argc, char *argv[]) {
 
 	initial_values.insert(X(right_offset + right_counter), prior_pose_left);
 	initial_values.insert(V(right_offset + right_counter), prior_velocity_right);
-	initial_values.insert(B(right_offset + right_counter), prior_imu_right_right);
+	initial_values.insert(B(right_offset + right_counter), prior_imu_bias_right);
 
 	graph.add(PriorFactor<Pose3>(X(left_counter), prior_pose_left, pose_noise_model));
 	graph.add(PriorFactor<Vector3>(V(left_counter), prior_velocity_left, velocity_noise_model));
@@ -274,7 +274,8 @@ int main(int argc, char *argv[]) {
 
 		Eigen::Vector3d acc_right(right_imu_data(i, 1), right_imu_data(i, 2), right_imu_data(i, 3));
 		Eigen::Vector3d gyr_right(right_imu_data(i, 4), right_imu_data(i, 5), right_imu_data(i, 6));
-		imu_preintegrated_right_->integrateMeasurement(acc_right,gry_right,left_dt);//TODO: use right dt rather than left dt.
+		imu_preintegrated_right_->integrateMeasurement(acc_right, gyr_right,
+		                                               left_dt);//TODO: use right dt rather than left dt.
 
 		double rate = double(i) / double(left_imu_data.rows());
 		if (rate - last_rate > 0.05) {
@@ -339,6 +340,7 @@ int main(int argc, char *argv[]) {
 			} catch (std::exception &e) {
 				std::cout << e.what() << std::endl;
 				std::cout << "isam without the ability to recovery from ill-posed problem" << std::endl;
+				std::cout << "error at left part:" << left_counter << "," << right_counter << std::endl;
 			}
 
 
@@ -350,137 +352,151 @@ int main(int argc, char *argv[]) {
 
 		if (left_zv_state(i) > 0.5) {
 			left_zv_counter++;
-			if (left_zv_counter > 10 || (left_zv_state(i + 1) < 0.5)) {
+			if (left_zv_counter > 20 || (left_zv_state(i + 1) < 0.5)) {
 				add_new_factor_left(left_counter, 1.0);
 				left_zv_counter = 0; //				std::cout << "zv hitted." << std::endl; }
+			}
 
-			} else {
-				left_normal_counter++;
-				if (left_normal_counter > 70 || left_zv_state(i + 1) > 0.5) {
-					add_new_factor_left(left_counter, 0.0);
-					left_normal_counter = 0;
+		} else {
+			left_normal_counter++;
+			if (left_normal_counter > 100 || left_zv_state(i + 1) > 0.5) {
+				add_new_factor_left(left_counter, 0.0);
+				left_normal_counter = 0;
 //				std::cout << "unzv hitted" << std::endl;
 
-				}
-
 			}
+
 		}
 
 
 
 
-			/**
- * @brief offset=0 (left foot) else: offset = 1(right foot)
- */
-			auto add_new_factor_right = [&](int &counter,
-			                                double the_zv_flag,
-			                                int offset = 0) {
 
-				counter += 1;
+		/**
+		* @brief offset=0 (left foot) else: offset = 1(right foot)
+		*/
+		auto add_new_factor_right = [&](int &counter,
+		                                double the_zv_flag,
+		                                int offset = 0) {
 
-				initial_values.insert(X(counter), prior_pose_right);
-				initial_values.insert(V(counter), prior_velocity_right);
-				initial_values.insert(B(counter), prior_imu_bias_right);
+			counter += 1;
 
-				PreintegratedImuMeasurements *preint_imu =
-						dynamic_cast<PreintegratedImuMeasurements *>(imu_preintegrated_right);
-				ImuFactor imu_factor(X(counter - 1+right_offset), V(counter - 1+right_offset),
-				                     X(counter+right_offset), V(counter+right_offset),
-				                     B(counter - 1+right_offset), *preint_imu);
-				graph.push_back(imu_factor);
+			initial_values.insert(X(counter+right_offset), prior_pose_right);
+			initial_values.insert(V(counter+right_offset), prior_velocity_right);
+			initial_values.insert(B(counter+right_offset), prior_imu_bias_right);
 
-				imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
-				graph.push_back(BetweenFactor<imuBias::ConstantBias>(B(counter - 1+right_offset),
-				                                                     B(counter+right_offset),
-				                                                     zero_bias, bias_noise_model));
+			PreintegratedImuMeasurements *preint_imu =
+					dynamic_cast<PreintegratedImuMeasurements *>(imu_preintegrated_right_);
+			ImuFactor imu_factor(X(counter - 1 + right_offset), V(counter - 1 + right_offset),
+			                     X(counter + right_offset), V(counter + right_offset),
+			                     B(counter - 1 + right_offset), *preint_imu);
+			graph.push_back(imu_factor);
 
-				if (the_zv_flag > 0.5) {
+			imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
+			graph.push_back(BetweenFactor<imuBias::ConstantBias>(B(counter - 1 + right_offset),
+			                                                     B(counter + right_offset),
+			                                                     zero_bias, bias_noise_model));
+
+			if (the_zv_flag > 0.5) {
 //				std::cout << "zv flag" << std::endl;
-					graph.push_back(PriorFactor<Vector3>(
-							V(counter+right_offset), Eigen::Vector3d(0.0, 0.0, 0.0), zero_velocity_noise_model
-					));
+				graph.push_back(PriorFactor<Vector3>(
+						V(counter + right_offset), Eigen::Vector3d(0.0, 0.0, 0.0), zero_velocity_noise_model
+				));
 
 
-				}
+			}
 
-				//
-				try {
+			//
+			try {
 
-					// add graph and new values to isam and update prior_pose_left prior velocity and prior bias.
-					isam.update(graph, initial_values);
-					isam.update();
-					Values currentEstimate = isam.calculateEstimate();
-					//			currentEstimate.print("current state:");
-					prior_pose_left = currentEstimate.at<Pose3>(X(counter+right_offset));
-					prior_velocity_right = currentEstimate.at<Vector3>(V(counter+right_offset));
-					prior_imu_bias_right = currentEstimate.at<imuBias::ConstantBias>(
-							B(counter+right_offset));
+				// add graph and new values to isam and update prior_pose_left prior velocity and prior bias.
+				isam.update(graph, initial_values);
+				isam.update();
+				Values currentEstimate = isam.calculateEstimate();
+				//			currentEstimate.print("current state:");
+				prior_pose_right = currentEstimate.at<Pose3>(X(counter + right_offset));
+				prior_velocity_right = currentEstimate.at<Vector3>(V(counter + right_offset));
+				prior_imu_bias_right = currentEstimate.at<imuBias::ConstantBias>(
+						B(counter + right_offset));
 //				std::cout << prior_pose_left << std::endl;
 
-					logger_ptr->addTrace3dEvent("trace", "real_time_gtsam_right",
-					                            Eigen::Vector3d(prior_pose_right.x(), prior_pose_right.y(),
-					                                            prior_pose_right.z()));
-					logger_ptr->addTraceEvent("trace", "real_time_gtsam_right",
-					                          Eigen::Vector2d(prior_pose_right.x(), prior_pose_right.y()));
+				logger_ptr->addTrace3dEvent("trace", "real_time_gtsam_right",
+				                            Eigen::Vector3d(prior_pose_right.x(), prior_pose_right.y(),
+				                                            prior_pose_right.z()));
+				logger_ptr->addTraceEvent("trace", "real_time_gtsam_right",
+				                          Eigen::Vector2d(prior_pose_right.x(), prior_pose_right.y()));
 
-					logger_ptr->addPlotEvent("velocity", "velocity_right", prior_velocity_right);
-				} catch (std::exception &e) {
-					std::cout << e.what() << std::endl;
-					std::cout << "isam without the ability to recovery from ill-posed problem" << std::endl;
-				}
+				logger_ptr->addPlotEvent("velocity", "velocity_right", prior_velocity_right);
+			} catch (std::exception &e) {
+				std::cout << e.what() << std::endl;
+				std::cout << "isam without the ability to recovery from ill-posed problem" << std::endl;
 
-
-				// Add max distance constraint
-
-
-				graph.resize(0);
-				initial_values.clear();
-				imu_preintegrated_left_->resetIntegrationAndSetBias(prior_imu_bias_right);
-
-			};
+				std::cout << "error at right part:" << left_counter << "," << right_counter << std::endl;
+			}
 
 
-			if (right_zv_state(i) > 0.5) {
+			// Add max distance constraint
 
-			}else{
 
+			graph.resize(0);
+			initial_values.clear();
+			imu_preintegrated_left_->resetIntegrationAndSetBias(prior_imu_bias_right);
+
+		};
+
+
+		if (right_zv_state(i) > 0.5) {
+			right_zv_counter++;
+			if(right_zv_counter>20||right_zv_state(i+1)< 0.5){
+				add_new_factor_right(right_counter,1.0);
+				right_counter = 0;
+			}
+
+		} else {
+			right_normal_counter++;
+			if(right_normal_counter>100||right_zv_state(i+1)>0.5){
+				add_new_factor_right(right_counter,0.0);
+				right_normal_counter=0;
 			}
 
 		}
 
-
-		Values currentEstimate = isam.calculateEstimate();
-		for (int i(0); i < left_counter; ++i) {
-
-			prior_pose_left = currentEstimate.at<Pose3>(X(i));
-			prior_velocity_left = currentEstimate.at<Vector3>(V(i));
-			prior_imu_bias_left = currentEstimate.at<imuBias::ConstantBias>(B(i));
-
-			std::cout << prior_pose_left << std::endl;
-
-			logger_ptr->addTrace3dEvent("trace", "final_gtsam",
-			                            Eigen::Vector3d(prior_pose_left.x(), prior_pose_left.y(), prior_pose_left.z()));
-			logger_ptr->addTraceEvent("trace", "final_gtsam",
-			                          Eigen::Vector2d(prior_pose_left.x(), prior_pose_left.y()));
-
-			logger_ptr->addPlotEvent("velocity", "final_velocity", prior_velocity_left);
-		}
-		for(int i(right_offset);i<right_counter+right_offset;++i){
-			prior_pose_right = currentEstimate.at<Pose3>(X(i));
-			prior_velocity_right = currentEstimate.at<Vector3>(V(i));
-			prior_imu_bias_right = currentEstimate.at<imuBias::ConstantBias>(B(i));
-
-			logger_ptr->addTrace3dEvent("trace","final_gtsam_right",
-					Eigen::Vector3d(prior_pose_right.x(),prior_pose_right.y(),prior_pose_right.z()));
-			logger_ptr->addTraceEvent("trace","final_gtsam_right",Eigen::Vector2d(prior_pose_right.x(),prior_pose_right.y()));
-			logger_ptr->addPlotEvent("trace","final_gtsam_velocity_right",prior_velocity_right);
-		}
-
-
-		std::cout << "imu total time" << left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0) << std::endl;
-
-
-		logger_ptr->outputAllEvent(true);
-
-
 	}
+
+
+	Values currentEstimate = isam.calculateEstimate();
+	for (int i(0); i < left_counter; ++i) {
+
+		prior_pose_left = currentEstimate.at<Pose3>(X(i));
+		prior_velocity_left = currentEstimate.at<Vector3>(V(i));
+		prior_imu_bias_left = currentEstimate.at<imuBias::ConstantBias>(B(i));
+
+//		std::cout << prior_pose_left << std::endl;
+
+		logger_ptr->addTrace3dEvent("trace", "final_gtsam",
+		                            Eigen::Vector3d(prior_pose_left.x(), prior_pose_left.y(), prior_pose_left.z()));
+		logger_ptr->addTraceEvent("trace", "final_gtsam",
+		                          Eigen::Vector2d(prior_pose_left.x(), prior_pose_left.y()));
+
+		logger_ptr->addPlotEvent("velocity", "final_velocity", prior_velocity_left);
+	}
+	for (int i(right_offset); i < right_counter + right_offset; ++i) {
+		prior_pose_right = currentEstimate.at<Pose3>(X(i));
+		prior_velocity_right = currentEstimate.at<Vector3>(V(i));
+		prior_imu_bias_right = currentEstimate.at<imuBias::ConstantBias>(B(i));
+
+		logger_ptr->addTrace3dEvent("trace", "final_gtsam_right",
+		                            Eigen::Vector3d(prior_pose_right.x(), prior_pose_right.y(), prior_pose_right.z()));
+		logger_ptr->addTraceEvent("trace", "final_gtsam_right",
+		                          Eigen::Vector2d(prior_pose_right.x(), prior_pose_right.y()));
+		logger_ptr->addPlotEvent("trace", "final_gtsam_velocity_right", prior_velocity_right);
+	}
+
+
+	std::cout << "imu total time" << left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0) << std::endl;
+
+
+	logger_ptr->outputAllEvent(true);
+
+
+}
