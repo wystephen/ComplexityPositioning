@@ -297,13 +297,15 @@ int main(int argc, char *argv[]) {
 
 
 			}
+
+			//
 			try {
 
 				// add graph and new values to isam and update prior_pose prior velocity and prior bias.
 				isam.update(graph, initial_values);
 				isam.update();
 				Values currentEstimate = isam.calculateEstimate();
-				//			currentEstimate.print("current state:"); 
+				//			currentEstimate.print("current state:");
 				prior_pose = currentEstimate.at<Pose3>(X(counter));
 				prior_velocity = currentEstimate.at<Vector3>(V(counter));
 				prior_imu_bias = currentEstimate.at<imuBias::ConstantBias>(
@@ -317,6 +319,7 @@ int main(int argc, char *argv[]) {
 				logger_ptr->addPlotEvent("velocity", "velocity", prior_velocity);
 			} catch (std::exception &e) {
 				std::cout << e.what() << std::endl;
+				std::cout << "isam without the ability to recovery from ill-posed problem" << std::endl;
 			}
 
 
@@ -342,6 +345,75 @@ int main(int argc, char *argv[]) {
 				}
 
 			}
+
+
+
+
+			/**
+ * @brief offset=0 (left foot) else: offset = 1(right foot)
+ */
+			auto add_new_factor_right = [&](int &counter,
+			                               double the_zv_flag,
+			                               int offset = 0) {
+
+				counter += 1;
+
+				initial_values.insert(X(counter), prior_pose);
+				initial_values.insert(V(counter), prior_velocity);
+				initial_values.insert(B(counter), prior_imu_bias);
+
+				PreintegratedImuMeasurements *preint_imu =
+						dynamic_cast<PreintegratedImuMeasurements *>(imu_preintegrated_);
+				ImuFactor imu_factor(X(counter - 1), V(counter - 1),
+				                     X(counter), V(counter),
+				                     B(counter - 1), *preint_imu);
+				graph.push_back(imu_factor);
+
+				imuBias::ConstantBias zero_bias(Vector3(0, 0, 0), Vector3(0, 0, 0));
+				graph.push_back(BetweenFactor<imuBias::ConstantBias>(B(counter - 1),
+				                                                     B(counter),
+				                                                     zero_bias, bias_noise_model));
+
+				if (the_zv_flag > 0.5) {
+//				std::cout << "zv flag" << std::endl;
+					graph.push_back(PriorFactor<Vector3>(
+							V(counter), Eigen::Vector3d(0.0, 0.0, 0.0), zero_velocity_noise_model
+					));
+
+
+				}
+
+				//
+				try {
+
+					// add graph and new values to isam and update prior_pose prior velocity and prior bias.
+					isam.update(graph, initial_values);
+					isam.update();
+					Values currentEstimate = isam.calculateEstimate();
+					//			currentEstimate.print("current state:");
+					prior_pose = currentEstimate.at<Pose3>(X(counter));
+					prior_velocity = currentEstimate.at<Vector3>(V(counter));
+					prior_imu_bias = currentEstimate.at<imuBias::ConstantBias>(
+							B(counter));
+//				std::cout << prior_pose << std::endl;
+
+					logger_ptr->addTrace3dEvent("trace", "real_time_gtsam",
+					                            Eigen::Vector3d(prior_pose.x(), prior_pose.y(), prior_pose.z()));
+					logger_ptr->addTraceEvent("trace", "real_time_gtsam",
+					                          Eigen::Vector2d(prior_pose.x(), prior_pose.y()));
+
+					logger_ptr->addPlotEvent("velocity", "velocity", prior_velocity);
+				} catch (std::exception &e) {
+					std::cout << e.what() << std::endl;
+					std::cout << "isam without the ability to recovery from ill-posed problem" << std::endl;
+				}
+
+
+				graph.resize(0);
+				initial_values.clear();
+				imu_preintegrated_->resetIntegrationAndSetBias(prior_imu_bias);
+
+			};
 
 
 			if (right_zv_state(i) > 0.5) {
