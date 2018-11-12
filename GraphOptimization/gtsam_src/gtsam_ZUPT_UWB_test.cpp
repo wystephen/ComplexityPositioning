@@ -336,6 +336,8 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
+	
+	// Plot final result.
 
 	Values currentEstimate = isam.calculateEstimate();
 	for (int i(0); i < left_counter; ++i) {

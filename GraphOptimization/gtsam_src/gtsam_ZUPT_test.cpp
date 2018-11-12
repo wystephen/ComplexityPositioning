@@ -101,6 +101,9 @@ int main(int argc, char *argv[]) {
 //	Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
 //	Eigen::MatrixXd beacon_set_data = beacon_set_file.extractDoulbeMatrix(",");
 
+
+	left_imu_data = right_imu_data * 1.0;
+
 	assert(beacon_set_data.rows() == (uwb_data.cols() - 1));
 
 	// get the initial pose based on uwb data.

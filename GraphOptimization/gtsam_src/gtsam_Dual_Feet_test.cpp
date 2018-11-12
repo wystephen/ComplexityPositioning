@@ -54,6 +54,8 @@
 #include <gtsam/nonlinear/ISAM2.h>
 
 
+#include <gtsam_include/MaxDistanceConstraint.h>
+
 #include <fstream>
 #include <iostream>
 
@@ -379,11 +381,13 @@ int main(int argc, char *argv[]) {
 		                                double the_zv_flag,
 		                                int offset = 0) {
 
+//			std::cout << right_counter << std::endl;
 			counter += 1;
+//			std::cout << right_counter << std::endl;
 
-			initial_values.insert(X(counter+right_offset), prior_pose_right);
-			initial_values.insert(V(counter+right_offset), prior_velocity_right);
-			initial_values.insert(B(counter+right_offset), prior_imu_bias_right);
+			initial_values.insert(X(counter + right_offset), prior_pose_right);
+			initial_values.insert(V(counter + right_offset), prior_velocity_right);
+			initial_values.insert(B(counter + right_offset), prior_imu_bias_right);
 
 			PreintegratedImuMeasurements *preint_imu =
 					dynamic_cast<PreintegratedImuMeasurements *>(imu_preintegrated_right_);
@@ -436,6 +440,11 @@ int main(int argc, char *argv[]) {
 
 
 			// Add max distance constraint
+			if (true) {
+				MaxDistanceConstraint max_distance_factor(X(left_counter),X(right_counter+right_offset),
+						1.5,false);
+				graph.push_back(max_distance_factor);
+			}
 
 
 			graph.resize(0);
@@ -447,16 +456,16 @@ int main(int argc, char *argv[]) {
 
 		if (right_zv_state(i) > 0.5) {
 			right_zv_counter++;
-			if(right_zv_counter>20||right_zv_state(i+1)< 0.5){
-				add_new_factor_right(right_counter,1.0);
-				right_counter = 0;
+			if (right_zv_counter > 20 || right_zv_state(i + 1) < 0.5) {
+				add_new_factor_right(right_counter, 1.0);
+				right_zv_counter = 0;
 			}
 
 		} else {
 			right_normal_counter++;
-			if(right_normal_counter>100||right_zv_state(i+1)>0.5){
-				add_new_factor_right(right_counter,0.0);
-				right_normal_counter=0;
+			if (right_normal_counter > 100 || right_zv_state(i + 1) > 0.5) {
+				add_new_factor_right(right_counter, 0.0);
+				right_normal_counter = 0;
 			}
 
 		}
