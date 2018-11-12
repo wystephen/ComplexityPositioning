@@ -81,8 +81,8 @@ int main(int argc, char *argv[]) {
 	std::cout.precision(30);
 	// parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-//	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-	std::string dir_name = "/home/steve/Data/ZUPTPDR/0000/";
+	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
+//	std::string dir_name = "/home/steve/Data/ZUPTPDR/0000/";
 
 
 	auto logger_ptr = AWF::AlgorithmLogger::getInstance();
@@ -211,19 +211,33 @@ int main(int argc, char *argv[]) {
 	int left_normal_counter = 0;
 	int left_zv_counter = 0;
 
+	int right_counter = 0;
+	int right_normal_counter = 0;
+	int right_zv_counter = 0;
+
+	int right_offset = 100000000;
+
 	initial_values.insert(X(left_counter), prior_pose);
 	initial_values.insert(V(left_counter), prior_velocity);
 	initial_values.insert(B(left_counter), prior_imu_bias);
 
+	initial_values.insert(X(right_offset + right_counter), prior_pose);
+	initial_values.insert(V(right_offset + right_counter), prior_velocity);
+	initial_values.insert(B(right_offset + right_counter), prior_imu_bias);
+
 	graph.add(PriorFactor<Pose3>(X(left_counter), prior_pose, pose_noise_model));
-//	graph.add()
 	graph.add(PriorFactor<Vector3>(V(left_counter), prior_velocity, velocity_noise_model));
 	graph.add(PriorFactor<imuBias::ConstantBias>(B(left_counter), prior_imu_bias, bias_noise_model));
 
 
+	graph.add(PriorFactor<Pose3>(X(right_offset + right_counter), prior_pose, pose_noise_model));
+	graph.add(PriorFactor<Vector3>(V(right_offset + right_counter), prior_velocity, velocity_noise_model));
+	graph.add(PriorFactor<imuBias::ConstantBias>(B(right_offset + right_counter), prior_imu_bias, bias_noise_model));
+
+
 	// initial isam2
 	ISAM2Params parameters;
-	parameters.relinearizeThreshold = 0.001;
+	parameters.relinearizeThreshold = 0.01;
 	parameters.relinearizeSkip = 1;
 	ISAM2 isam(parameters);
 
@@ -253,18 +267,12 @@ int main(int argc, char *argv[]) {
 		/**
 		 * @brief offset=0 (left foot) else: offset = 1(right foot)
 		 */
-		auto add_new_factor = [&](int &counter,
-		                          double the_zv_flag,
-		                          int offset = 0) {
+		auto add_new_factor_left = [&](int &counter,
+		                               double the_zv_flag,
+		                               int offset = 0) {
 
 			counter += 1;
-//			std::cout << "counter ;" << counter << std::endl;
 
-
-
-//			auto prev_state = new NavState(prior_pose,prior_velocity);
-//			imuBias::ConstantBias prev_bias = prior_imu_bias;
-//			auto prop_state = imu_preintegrated_->predict(prev_state,prev_bias);
 			initial_values.insert(X(counter), prior_pose);
 			initial_values.insert(V(counter), prior_velocity);
 			initial_values.insert(B(counter), prior_imu_bias);
@@ -290,28 +298,25 @@ int main(int argc, char *argv[]) {
 
 			}
 			try {
+
+				// add graph and new values to isam and update prior_pose prior velocity and prior bias.
 				isam.update(graph, initial_values);
 				isam.update();
-
-
 				Values currentEstimate = isam.calculateEstimate();
-//			currentEstimate.print("current state:");
-
+				//			currentEstimate.print("current state:"); 
 				prior_pose = currentEstimate.at<Pose3>(X(counter));
 				prior_velocity = currentEstimate.at<Vector3>(V(counter));
-				prior_imu_bias = currentEstimate.at<imuBias::ConstantBias>(B(counter));
-
+				prior_imu_bias = currentEstimate.at<imuBias::ConstantBias>(
+						B(counter));
 //				std::cout << prior_pose << std::endl;
 
 				logger_ptr->addTrace3dEvent("trace", "real_time_gtsam",
 				                            Eigen::Vector3d(prior_pose.x(), prior_pose.y(), prior_pose.z()));
-				logger_ptr->addTraceEvent("trace", "real_time_gtsam",
-				                          Eigen::Vector2d(prior_pose.x(), prior_pose.y()));
+				logger_ptr->addTraceEvent("trace", "real_time_gtsam", Eigen::Vector2d(prior_pose.x(), prior_pose.y()));
 
 				logger_ptr->addPlotEvent("velocity", "velocity", prior_velocity);
 			} catch (std::exception &e) {
 				std::cout << e.what() << std::endl;
-//				isam.
 			}
 
 
@@ -324,49 +329,49 @@ int main(int argc, char *argv[]) {
 		if (left_zv_state(i) > 0.5) {
 			left_zv_counter++;
 			if (left_zv_counter > 10 || (left_zv_state(i + 1) < 0.5)) {
-				add_new_factor(left_counter, 1.0);
-				left_zv_counter = 0;
-//				std::cout << "zv hitted." << std::endl;
-			}
+				add_new_factor_left(left_counter, 1.0);
+				left_zv_counter = 0; //				std::cout << "zv hitted." << std::endl; }
 
-		} else {
-			left_normal_counter++;
-			if (left_normal_counter > 70 || left_zv_state(i + 1) > 0.5) {
-				add_new_factor(left_counter, 0.0);
-				left_normal_counter = 0;
+			} else {
+				left_normal_counter++;
+				if (left_normal_counter > 70 || left_zv_state(i + 1) > 0.5) {
+					add_new_factor_left(left_counter, 0.0);
+					left_normal_counter = 0;
 //				std::cout << "unzv hitted" << std::endl;
 
+				}
+
 			}
 
+
+			if (right_zv_state(i) > 0.5) {
+
+			}
 		}
 
 
-		if (right_zv)
+		Values currentEstimate = isam.calculateEstimate();
+		for (int i(0); i < left_counter; ++i) {
+
+			prior_pose = currentEstimate.at<Pose3>(X(i));
+			prior_velocity = currentEstimate.at<Vector3>(V(i));
+			prior_imu_bias = currentEstimate.at<imuBias::ConstantBias>(B(i));
+
+			std::cout << prior_pose << std::endl;
+
+			logger_ptr->addTrace3dEvent("trace", "final_gtsam",
+			                            Eigen::Vector3d(prior_pose.x(), prior_pose.y(), prior_pose.z()));
+			logger_ptr->addTraceEvent("trace", "final_gtsam",
+			                          Eigen::Vector2d(prior_pose.x(), prior_pose.y()));
+
+			logger_ptr->addPlotEvent("velocity", "final_velocity", prior_velocity);
+		}
+
+
+		std::cout << "imu total time" << left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0) << std::endl;
+
+
+		logger_ptr->outputAllEvent(true);
+
+
 	}
-
-
-	Values currentEstimate = isam.calculateEstimate();
-	for (int i(0); i < left_counter; ++i) {
-
-		prior_pose = currentEstimate.at<Pose3>(X(i));
-		prior_velocity = currentEstimate.at<Vector3>(V(i));
-		prior_imu_bias = currentEstimate.at<imuBias::ConstantBias>(B(i));
-
-		std::cout << prior_pose << std::endl;
-
-		logger_ptr->addTrace3dEvent("trace", "final_gtsam",
-		                            Eigen::Vector3d(prior_pose.x(), prior_pose.y(), prior_pose.z()));
-		logger_ptr->addTraceEvent("trace", "final_gtsam",
-		                          Eigen::Vector2d(prior_pose.x(), prior_pose.y()));
-
-		logger_ptr->addPlotEvent("velocity", "final_velocity", prior_velocity);
-	}
-
-
-	std::cout << "imu total time" << left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0) << std::endl;
-
-
-	logger_ptr->outputAllEvent(true);
-
-
-}

@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 	// parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 //	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-	std::string dir_name = "/home/steve/Data/ZUPTPDR/0000/";
+	std::string dir_name = "/home/steve/Data/ZUPTPDR/0001/";
 
 
 	auto logger_ptr = AWF::AlgorithmLogger::getInstance();
@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
 	// noise model
 	noiseModel::Diagonal::shared_ptr pose_noise_model = noiseModel::Diagonal::Sigmas(
 			(Vector(6) << 0.0001, 0.0001, 0.0001, 0.005, 0.005, 0.005).finished());
-	noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.0001);
+	noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.00001);
 	noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-13);
 
 	noiseModel::Diagonal::shared_ptr zero_velocity_noise_model = noiseModel::Isotropic::Sigma(3, 1e-3);
@@ -171,8 +171,8 @@ int main(int argc, char *argv[]) {
 	// We use the sensor specs to build the noise model for the IMU factor.
 	double accel_noise_sigma = 0.001;
 	double gyro_noise_sigma = 0.001 * M_PI / 180.0;
-	double accel_bias_rw_sigma = 0.004905;
-	double gyro_bias_rw_sigma = 0.0001454441043;
+	double accel_bias_rw_sigma = 0.0004905;
+	double gyro_bias_rw_sigma = 0.00001454441043;
 	Matrix33 measured_acc_cov = Matrix33::Identity(3, 3) * pow(accel_noise_sigma, 2);
 	Matrix33 measured_omega_cov = Matrix33::Identity(3, 3) * pow(gyro_noise_sigma, 2);
 	Matrix33 integration_error_cov =
@@ -224,7 +224,7 @@ int main(int argc, char *argv[]) {
 
 	// initial isam2
 	ISAM2Params parameters;
-	parameters.relinearizeThreshold = 0.001;
+	parameters.relinearizeThreshold = 0.01;
 	parameters.relinearizeSkip = 1;
 	ISAM2 isam(parameters);
 
