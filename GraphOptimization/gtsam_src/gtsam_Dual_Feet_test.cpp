@@ -270,8 +270,6 @@ int main(int argc, char *argv[]) {
 	for (int i(0); i < left_imu_data.rows() - 2 && i < right_imu_data.rows(); ++i) {
 		Eigen::Vector3d acc_left(left_imu_data(i, 1), left_imu_data(i, 2), left_imu_data(i, 3));
 		Eigen::Vector3d gyr_left(left_imu_data(i, 4), left_imu_data(i, 5), left_imu_data(i, 6));
-//		imu_preintegrated_->integrateMeasurement(left_imu_data.block(i,1,1,3),
-//				left_imu_data.block(i,4,1,3),left_dt);
 		imu_preintegrated_left_->integrateMeasurement(acc_left, gyr_left, left_dt);
 
 		Eigen::Vector3d acc_right(right_imu_data(i, 1), right_imu_data(i, 2), right_imu_data(i, 3));

@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 	// parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 //	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-	std::string dir_name = "/home/steve/Data/ZUPTPDR/0001/";
+	std::string dir_name = "/home/steve/Data/ZUPTPDR/0002/";
 
 
 	auto logger_ptr = AWF::AlgorithmLogger::getInstance();

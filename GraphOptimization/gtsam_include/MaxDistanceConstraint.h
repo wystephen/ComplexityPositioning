@@ -37,40 +37,54 @@ namespace gtsam {
 	struct MaxDistanceConstraint : public BoundingConstraint2<Pose3, Pose3> {
 
 
-		MaxDistanceConstraint(Key key1, Key key2, double threshold = 1.5, bool isGreaterThan = false,
-		                      double mu = 1000.0) :
+		explicit MaxDistanceConstraint(Key key1, Key key2, double threshold = 1.5, bool isGreaterThan = false,
+		                               double mu = 1000.0) :
 				BoundingConstraint2(key1, key2, threshold, isGreaterThan, mu) {
 			int a = 0;
-		
+
 		}
 
 		/**
-		 * @brief Distance between two pose.
-		 * @param x1
-		 * @param x2
-		 * @param H1
-		 * @param H2
+		 * @brief Distance between two pose. Note:Const.....!!!!
+		 * @param x1: pose3
+		 * @param x2: pose3
+		 * @param H1: jacobian of x1
+		 * @param H2: jacobian of x2
 		 * @return
 		 */
-		double value(const X1 &x1, const X2 &x2,
-		             Eigen::MatrixXd &H1, Eigen::MatrixXd &H2) {
+		double value(const Pose3 &x1, const Pose3 &x2,
+		             boost::optional<Matrix &> H1 = boost::none,
+		             boost::optional<Matrix &> H2 = boost::none) const {
 			double d = pow(pow(x1.x() - x2.x(), 2.0) +
 			               pow(x1.y() - x2.y(), 2.0) +
-			               pow(x1.z() - x2.z(), 2.0), 2.0);
+			               pow(x1.z() - x2.z(), 2.0), 0.5);
+			Eigen::Matrix<double, 1, 6> J1, J2;
 
-			H1.resize(1, 6);
-			H2.resize(1, 6);
-
-			for (int i(0); i < 6; ++i) {
-				H1(0, i) = 0.0;
-				H2(0, i) = 0.0;
+			J1(0, 0) = (x1.x() - x2.y()) / d;
+			J1(0, 1) = (x1.y() - x2.y()) / d;
+			J1(0, 2) = (x1.z() - x2.z()) / d;
+			for (int i(0); i < 3; ++i) {
+				J2(0, i) = -1.0 * J1(0, i);
+			}
+			for (int i(3); i < 6; ++i) {
+				J1(0, i) = 0.0;
+				J2(0, i) = 0.0;
 			}
 
-			H1(0, 0) = (x1.x() - x2.x()) / d;
-			H1(0, 1) = (x1.y() - x2.y()) / d;
-			H1(0, 2) = (x1.z() - x2.z()) / d;
+			*H1 = J1;
+			*H2 = J2;
 
-			H2 = -1.0 * H1;
+//			H1->resize(1, 6);
+//			H2->resize(1, 6);
+//
+//			for (int i(0); i < 6; ++i) {
+//				H1->(0, i) = 0.0;
+//				H2->(0, i) = 0.0;
+//			}
+//			H1->(0, 0) = (x1.x() - x2.x()) / d;
+//			H1->(0, 1) = (x1.y() - x2.y()) / d;
+//			H1->(0, 2) = (x1.z() - x2.z()) / d;
+//			*H2 = -1.0 * (*H1);
 			return d;
 
 		}
