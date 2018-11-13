@@ -269,6 +269,20 @@ int main(int argc, char *argv[]) {
 	imu_preintegrated_left_ = new PreintegratedImuMeasurements(p, prior_imu_bias_left);
 	imu_preintegrated_right_ = new PreintegratedImuMeasurements(p, prior_imu_bias_right);
 
+	auto show_latest_state_func = [&]() {
+		Values state_values = isam.calculateEstimate();
+		std::cout << "last left:" << left_counter << "---------"
+		          << state_values.at<Pose3>(X(left_counter)) << std::endl;
+		std::cout << "last right:" << right_counter << "-=-----"
+		          << state_values.at<Pose3>(X(right_counter + right_offset)) << std::endl;
+		auto p1 = state_values.at<Pose3>(X(left_counter));
+		auto p2 = state_values.at<Pose3>(X(right_counter + right_offset));
+		std::cout << "distance between latest pose:"
+		          << pow(pow(p1.x() - p2.x(), 2.0) + pow(p1.y() - p2.y(), 2.0) + pow(p1.z() - p2.z(), 2.0), 0.5)
+		          << std::endl;
+
+	};
+
 
 	double last_rate = 0.0;
 	for (int i(0); i < left_imu_data.rows() - 2 && i < right_imu_data.rows(); ++i) {
@@ -295,6 +309,9 @@ int main(int argc, char *argv[]) {
 			std::cout << "finished:" << rate * 100.0 << "%" << std::endl;
 			last_rate = rate;
 		}
+
+
+
 		/**
 		 * @brief offset=0 (left foot) else: offset = 1(right foot)
 		 */
@@ -359,6 +376,8 @@ int main(int argc, char *argv[]) {
 				          << std::endl;
 				std::cout << "error at left part:" << left_counter
 				          << "," << right_counter << std::endl;
+
+				show_latest_state_func();
 			}
 
 
@@ -428,10 +447,12 @@ int main(int argc, char *argv[]) {
 
 			// Add max distance constraint
 			if (true && right_counter > 1 && left_counter > 1) {
-				MaxDistanceConstraint max_distance_factor(X(left_counter),
+
+
+				MaxDistanceConstraint max_distance_factor(X(left_counter - 1),
 				                                          X(counter + right_offset),
 				                                          1.5, false);
-//				graph.push_back(max_distance_factor);
+				graph.push_back(max_distance_factor);
 			}
 
 
@@ -460,6 +481,7 @@ int main(int argc, char *argv[]) {
 				std::cout << "isam without the ability to recovery from ill-posed problem" << std::endl;
 
 				std::cout << "error at right part:" << left_counter << "," << right_counter << std::endl;
+				show_latest_state_func();
 			}
 
 
@@ -543,6 +565,7 @@ int main(int argc, char *argv[]) {
 
 		} catch (std::exception &e) {
 			std::cout << e.what() << std::endl;
+
 			break;
 		}
 
