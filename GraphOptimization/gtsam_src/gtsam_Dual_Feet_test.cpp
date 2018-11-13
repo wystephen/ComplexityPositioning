@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
 	// parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 //	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-	std::string dir_name = "/home/steve/Data/ZUPTPDR/0001/";
+	std::string dir_name = "/home/steve/Data/ZUPTPDR/0002/";
 
 
 	auto logger_ptr = AWF::AlgorithmLogger::getInstance();
@@ -103,6 +103,9 @@ int main(int argc, char *argv[]) {
 	Eigen::MatrixXd head_imu_data = head_imu_file.extractDoulbeMatrix(",");
 //	Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
 //	Eigen::MatrixXd beacon_set_data = beacon_set_file.extractDoulbeMatrix(",");
+
+
+	right_imu_data = left_imu_data * 1.0;
 
 	assert(beacon_set_data.rows() == (uwb_data.cols() - 1));
 
@@ -135,6 +138,8 @@ int main(int argc, char *argv[]) {
 	BSE::ImuTools::processImuData(right_imu_data);
 	BSE::ImuTools::processImuData(head_imu_data);
 	double left_dt = (left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0)) / double(left_imu_data.rows());
+	double right_dt =
+			(right_imu_data(left_imu_data.rows() - 1, 0) - right_imu_data(0, 0)) / double(right_imu_data.rows());
 
 
 	Eigen::MatrixXd left_zv_state = Eigen::MatrixXd::Ones(left_imu_data.rows(), 1);
@@ -164,9 +169,10 @@ int main(int argc, char *argv[]) {
 	noiseModel::Diagonal::shared_ptr pose_noise_model = noiseModel::Diagonal::Sigmas(
 			(Vector(6) << 0.0001, 0.0001, 0.0001, 0.005, 0.005, 0.005).finished());
 	noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.0001);
-	noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-13);
+	noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-1);
 
-	noiseModel::Diagonal::shared_ptr zero_velocity_noise_model = noiseModel::Isotropic::Sigma(3, 1e-3);
+	noiseModel::Diagonal::shared_ptr zero_velocity_noise_model =
+			noiseModel::Isotropic::Sigma(3, 1e-5);
 //	noiseModel::Constrained::shared_ptr zero_velocity_noise_model =
 //			noiseModel::Constrained::;
 
@@ -174,7 +180,7 @@ int main(int argc, char *argv[]) {
 	// We use the sensor specs to build the noise model for the IMU factor.
 	double accel_noise_sigma = 0.001;
 	double gyro_noise_sigma = 0.001 * M_PI / 180.0;
-	double accel_bias_rw_sigma = 0.004905;
+	double accel_bias_rw_sigma = 0.0004905;
 	double gyro_bias_rw_sigma = 0.0001454441043;
 	Matrix33 measured_acc_cov = Matrix33::Identity(3, 3) * pow(accel_noise_sigma, 2);
 	Matrix33 measured_omega_cov = Matrix33::Identity(3, 3) * pow(gyro_noise_sigma, 2);
@@ -202,7 +208,6 @@ int main(int argc, char *argv[]) {
 	//Initial state
 
 	auto tmp_q = BSE::ImuTools::initial_quaternion(left_imu_data.block(0, 1, 50, 3), initial_ori, false);
-
 	Rot3 prior_rotation_left = Rot3::Quaternion(tmp_q.w(), tmp_q.x(), tmp_q.y(), tmp_q.z());
 	Point3 prior_point_left = initial_pos;
 	Pose3 prior_pose_left(prior_rotation_left, prior_point_left);
@@ -211,7 +216,6 @@ int main(int argc, char *argv[]) {
 
 
 	tmp_q = BSE::ImuTools::initial_quaternion(right_imu_data.block(0, 1, 50, 3), initial_ori, false);
-
 	Rot3 prior_rotation_right = Rot3::Quaternion(tmp_q.w(), tmp_q.x(), tmp_q.y(), tmp_q.z());
 	Point3 prior_point_right = initial_pos;
 	Pose3 prior_pose_right(prior_rotation_right, prior_point_right);
@@ -234,7 +238,7 @@ int main(int argc, char *argv[]) {
 	initial_values.insert(V(left_counter), prior_velocity_left);
 	initial_values.insert(B(left_counter), prior_imu_bias_left);
 
-	initial_values.insert(X(right_offset + right_counter), prior_pose_left);
+	initial_values.insert(X(right_offset + right_counter), prior_pose_right);
 	initial_values.insert(V(right_offset + right_counter), prior_velocity_right);
 	initial_values.insert(B(right_offset + right_counter), prior_imu_bias_right);
 
@@ -243,7 +247,7 @@ int main(int argc, char *argv[]) {
 	graph.add(PriorFactor<imuBias::ConstantBias>(B(left_counter), prior_imu_bias_left, bias_noise_model));
 
 
-	graph.add(PriorFactor<Pose3>(X(right_offset + right_counter), prior_pose_left, pose_noise_model));
+	graph.add(PriorFactor<Pose3>(X(right_offset + right_counter), prior_pose_right, pose_noise_model));
 	graph.add(PriorFactor<Vector3>(V(right_offset + right_counter), prior_velocity_right, velocity_noise_model));
 	graph.add(PriorFactor<imuBias::ConstantBias>(B(right_offset + right_counter), prior_imu_bias_right,
 	                                             bias_noise_model));
@@ -268,14 +272,22 @@ int main(int argc, char *argv[]) {
 
 	double last_rate = 0.0;
 	for (int i(0); i < left_imu_data.rows() - 2 && i < right_imu_data.rows(); ++i) {
-		Eigen::Vector3d acc_left(left_imu_data(i, 1), left_imu_data(i, 2), left_imu_data(i, 3));
-		Eigen::Vector3d gyr_left(left_imu_data(i, 4), left_imu_data(i, 5), left_imu_data(i, 6));
+		Eigen::Vector3d acc_left(left_imu_data(i, 1),
+		                         left_imu_data(i, 2),
+		                         left_imu_data(i, 3));
+		Eigen::Vector3d gyr_left(left_imu_data(i, 4),
+		                         left_imu_data(i, 5),
+		                         left_imu_data(i, 6));
 		imu_preintegrated_left_->integrateMeasurement(acc_left, gyr_left, left_dt);
 
-		Eigen::Vector3d acc_right(right_imu_data(i, 1), right_imu_data(i, 2), right_imu_data(i, 3));
-		Eigen::Vector3d gyr_right(right_imu_data(i, 4), right_imu_data(i, 5), right_imu_data(i, 6));
+		Eigen::Vector3d acc_right(right_imu_data(i, 1),
+		                          right_imu_data(i, 2),
+		                          right_imu_data(i, 3));
+		Eigen::Vector3d gyr_right(right_imu_data(i, 4),
+		                          right_imu_data(i, 5),
+		                          right_imu_data(i, 6));
 		imu_preintegrated_right_->integrateMeasurement(acc_right, gyr_right,
-		                                               left_dt);//TODO: use right dt rather than left dt.
+		                                               right_dt);//TODO: use right dt rather than left dt.
 
 		double rate = double(i) / double(left_imu_data.rows());
 		if (rate - last_rate > 0.05) {
@@ -319,7 +331,8 @@ int main(int argc, char *argv[]) {
 			//
 			try {
 
-				// add graph and new values to isam and update prior_pose_left prior velocity and prior bias.
+				// add graph and new values to isam and
+				// update prior_pose_left prior velocity and prior bias.
 				isam.update(graph, initial_values);
 				isam.update();
 				Values currentEstimate = isam.calculateEstimate();
@@ -331,16 +344,20 @@ int main(int argc, char *argv[]) {
 //				std::cout << prior_pose_left << std::endl;
 
 				logger_ptr->addTrace3dEvent("trace", "real_time_gtsam",
-				                            Eigen::Vector3d(prior_pose_left.x(), prior_pose_left.y(),
+				                            Eigen::Vector3d(prior_pose_left.x(),
+				                                            prior_pose_left.y(),
 				                                            prior_pose_left.z()));
 				logger_ptr->addTraceEvent("trace", "real_time_gtsam",
-				                          Eigen::Vector2d(prior_pose_left.x(), prior_pose_left.y()));
+				                          Eigen::Vector2d(prior_pose_left.x(),
+				                                          prior_pose_left.y()));
 
 				logger_ptr->addPlotEvent("velocity", "velocity", prior_velocity_left);
 			} catch (std::exception &e) {
 				std::cout << e.what() << std::endl;
-				std::cout << "isam without the ability to recovery from ill-posed problem" << std::endl;
-				std::cout << "error at left part:" << left_counter << "," << right_counter << std::endl;
+				std::cout << "isam without the ability to recovery from ill-posed problem"
+				          << std::endl;
+				std::cout << "error at left part:" << left_counter
+				          << "," << right_counter << std::endl;
 			}
 
 
@@ -379,9 +396,8 @@ int main(int argc, char *argv[]) {
 		                                double the_zv_flag,
 		                                int offset = 0) {
 
-//			std::cout << right_counter << std::endl;
 			counter += 1;
-//			std::cout << right_counter << std::endl;
+
 
 			initial_values.insert(X(counter + right_offset), prior_pose_right);
 			initial_values.insert(V(counter + right_offset), prior_velocity_right);
@@ -402,10 +418,10 @@ int main(int argc, char *argv[]) {
 			if (the_zv_flag > 0.5) {
 //				std::cout << "zv flag" << std::endl;
 				graph.push_back(PriorFactor<Vector3>(
-						V(counter + right_offset), Eigen::Vector3d(0.0, 0.0, 0.0), zero_velocity_noise_model
+						V(counter + right_offset),
+						Eigen::Vector3d(0.0, 0.0, 0.0),
+						zero_velocity_noise_model
 				));
-
-
 			}
 
 			//
@@ -439,8 +455,8 @@ int main(int argc, char *argv[]) {
 
 			// Add max distance constraint
 			if (true) {
-				MaxDistanceConstraint max_distance_factor(X(left_counter),X(right_counter+right_offset),
-						1.5,false);
+				MaxDistanceConstraint max_distance_factor(X(left_counter), X(right_counter + right_offset),
+				                                          1.5, false);
 				graph.push_back(max_distance_factor);
 			}
 
@@ -455,14 +471,14 @@ int main(int argc, char *argv[]) {
 		if (right_zv_state(i) > 0.5) {
 			right_zv_counter++;
 			if (right_zv_counter > 20 || right_zv_state(i + 1) < 0.5) {
-				add_new_factor_right(right_counter, 1.0);
+//				add_new_factor_right(right_counter, 1.0);
 				right_zv_counter = 0;
 			}
 
 		} else {
 			right_normal_counter++;
 			if (right_normal_counter > 100 || right_zv_state(i + 1) > 0.5) {
-				add_new_factor_right(right_counter, 0.0);
+//				add_new_factor_right(right_counter, 0.0);
 				right_normal_counter = 0;
 			}
 
@@ -481,9 +497,12 @@ int main(int argc, char *argv[]) {
 //		std::cout << prior_pose_left << std::endl;
 
 		logger_ptr->addTrace3dEvent("trace", "final_gtsam",
-		                            Eigen::Vector3d(prior_pose_left.x(), prior_pose_left.y(), prior_pose_left.z()));
+		                            Eigen::Vector3d(prior_pose_left.x(),
+		                                            prior_pose_left.y(),
+		                                            prior_pose_left.z()));
 		logger_ptr->addTraceEvent("trace", "final_gtsam",
-		                          Eigen::Vector2d(prior_pose_left.x(), prior_pose_left.y()));
+		                          Eigen::Vector2d(prior_pose_left.x(),
+		                                          prior_pose_left.y()));
 
 		logger_ptr->addPlotEvent("velocity", "final_velocity", prior_velocity_left);
 	}
@@ -496,7 +515,7 @@ int main(int argc, char *argv[]) {
 		                            Eigen::Vector3d(prior_pose_right.x(), prior_pose_right.y(), prior_pose_right.z()));
 		logger_ptr->addTraceEvent("trace", "final_gtsam_right",
 		                          Eigen::Vector2d(prior_pose_right.x(), prior_pose_right.y()));
-		logger_ptr->addPlotEvent("trace", "final_gtsam_velocity_right", prior_velocity_right);
+		logger_ptr->addPlotEvent("velocity", "final_gtsam_velocity_right", prior_velocity_right);
 	}
 
 
