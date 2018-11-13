@@ -456,8 +456,8 @@ int main(int argc, char *argv[]) {
 //				                                          X(counter + right_offset),
 //				                                          1.5, false);
 //				graph.push_back(max_distance_factor);
-				graph.push_back(DualFeetConstraint(X(left_counter - 1),
-						X(right_counter + right_offset),
+				graph.push_back(DualFeetConstraint(X(left_counter ),
+				                                   X(right_counter + right_offset),
 				                                   1.5));
 
 			}

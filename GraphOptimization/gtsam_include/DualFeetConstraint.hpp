@@ -40,7 +40,7 @@ namespace gtsam {
 
 		double threshold_;
 
-		DualFeetConstraint(Key key1, Key key2, double threshold = 1.0, double sigma = 1000.0) :
+		DualFeetConstraint(Key key1, Key key2, double threshold = 1.0, double sigma = 10000) :
 				NoiseModelFactor2<Pose3, Pose3>(noiseModel::Constrained::All(1, sigma), key1, key2),
 				threshold_(threshold) {
 
@@ -51,6 +51,12 @@ namespace gtsam {
 		}
 
 
+		/**
+		 * @brief Function called by optimizer
+		 * @param x
+		 * @param H
+		 * @return
+		 */
 		Vector unwhitenedError(const Values &x, boost::optional<std::vector<Matrix> &> H = boost::none) const {
 			if (this->active(x)) {
 				const Pose3 &x1 = x.at<Pose3>(keys_[0]);
@@ -85,10 +91,14 @@ namespace gtsam {
 				J1(0, i) = 0.0;
 				J2(0, i) = 0.0;
 			}
+
+			J1 = J1.transpose();
+			J2 = J2.transpose();
 			if( d > threshold_){
 				// constrained
 
 				if(H1){
+					std::cout << "H1 :" << H1->rows() << "-----" << H1->cols() << std::endl;
 					*H1 = J1 * 1.0;
 				}
 				if(H2){
