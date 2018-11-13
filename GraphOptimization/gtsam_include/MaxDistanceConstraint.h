@@ -60,7 +60,7 @@ namespace gtsam {
 			               pow(x1.z() - x2.z(), 2.0), 0.5);
 			Eigen::Matrix<double, 1, 6> J1, J2;
 
-			J1(0, 0) = (x1.x() - x2.y()) / d;
+			J1(0, 0) = (x1.x() - x2.x()) / d;
 			J1(0, 1) = (x1.y() - x2.y()) / d;
 			J1(0, 2) = (x1.z() - x2.z()) / d;
 			for (int i(0); i < 3; ++i) {
@@ -71,9 +71,21 @@ namespace gtsam {
 				J2(0, i) = 0.0;
 			}
 
-			*H1 = J1;
-			*H2 = J2;
+//			*H1 = J1;
+//			*H2 = J2;
+			if(H1){
+				std::cout << "H1 is not empty" << std::endl;
+				std::cout << H1->rows() << "," << H1->cols() << std::endl;
+				*H1 = J1;
+			}
 
+			if(H2){
+				std::cout << "H2 is not empty" << std::endl;
+				*H2=J2;
+			}
+
+
+			std::cout << "value:" << d << std::endl;
 //			H1->resize(1, 6);
 //			H2->resize(1, 6);
 //
