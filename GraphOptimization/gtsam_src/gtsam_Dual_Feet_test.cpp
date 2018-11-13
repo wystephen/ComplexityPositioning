@@ -55,6 +55,7 @@
 
 
 #include <gtsam_include/MaxDistanceConstraint.h>
+#include <gtsam_include/DualFeetConstraint.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -81,6 +82,8 @@ PreintegrationType *imu_preintegrated_right_;
 
 
 int main(int argc, char *argv[]) {
+
+	omp_set_num_threads(1);
 
 	std::cout.precision(30);
 	// parameters
@@ -449,10 +452,14 @@ int main(int argc, char *argv[]) {
 			if (true && right_counter > 1 && left_counter > 1) {
 
 
-				MaxDistanceConstraint max_distance_factor(X(left_counter - 1),
-				                                          X(counter + right_offset),
-				                                          1.5, false);
-				graph.push_back(max_distance_factor);
+//				MaxDistanceConstraint max_distance_factor(X(left_counter - 1),
+//				                                          X(counter + right_offset),
+//				                                          1.5, false);
+//				graph.push_back(max_distance_factor);
+				graph.push_back(DualFeetConstraint(X(left_counter - 1),
+						X(right_counter + right_offset),
+				                                   1.5));
+
 			}
 
 
@@ -460,6 +467,7 @@ int main(int argc, char *argv[]) {
 			try {
 
 				// add graph and new values to isam and update prior_pose_left prior velocity and prior bias.
+				std::cout << "left:" << left_counter << "  right:" << right_counter << std::endl;
 				isam.update(graph, initial_values);
 				isam.update();
 				Values currentEstimate = isam.calculateEstimate();

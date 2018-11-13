@@ -74,18 +74,18 @@ namespace gtsam {
 			if(H1){
 //				std::cout << "H1 is not empty" << std::endl;
 				std::cout << H1->rows() << "," << H1->cols() << std::endl;
-				*H1 = J1;
+				*H1 = J1*1.0;
 			}
 
 			if(H2){
 //				std::cout << "H2 is not empty" << std::endl;
-				*H2=J2;
+				*H2=J2*1.0;
 			}
 
 
-			std::cout<< "x1:" << x1.matrix() <<"\n";
-			std::cout << "x2:" << x2.matrix() << "\n";
-			std::cout << "distancce:" << d << std::endl;
+//			std::cout<< "x1:" << x1.matrix() <<"\n";
+//			std::cout << "x2:" << x2.matrix() << "\n";
+//			std::cout << "distancce:" << d << std::endl;
 
 
 //			std::cout << "value:" << d << std::endl;
