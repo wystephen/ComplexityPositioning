@@ -41,7 +41,7 @@ namespace gtsam {
 		double threshold_;
 
 		DualFeetConstraint(Key key1, Key key2, double threshold = 1.0, double sigma = 10000) :
-				NoiseModelFactor2<Pose3, Pose3>(noiseModel::Constrained::All(1, sigma), key1, key2),
+				NoiseModelFactor2<Pose3, Pose3>(noiseModel::Isotropic::Sigma(1,0.1), key1, key2),
 				threshold_(threshold) {
 
 		}
@@ -77,17 +77,13 @@ namespace gtsam {
 		 * @param v
 		 * @return
 		 */
-		bool active(const Values& v) const{
+		bool active(const Values &v) const {
 			const Pose3 &x1 = v.at<Pose3>(keys_[0]);
 			const Pose3 &x2 = v.at<Pose3>(keys_[1]);
 
-			double d = pow(pow(x1.x() - x2.x(), 2.0) +
-			               pow(x1.y() - x2.y(), 2.0) +
-			               pow(x1.z() - x2.z(), 2.0), 0.5);
-
-			if(d < threshold_){
+			if (x1.range(x2) < threshold_) {
 				return false;
-			}else{
+			} else {
 				return true;
 			}
 		}
@@ -95,68 +91,9 @@ namespace gtsam {
 		Vector evaluateError(const Pose3 &x1, const Pose3 &x2,
 		                     boost::optional<Matrix &> H1 = boost::none,
 		                     boost::optional<Matrix &> H2 = boost::none) const {
+			double range_value = x1.range(x2,H1,H2);
+			return (Vector(1) << range_value).finished();
 
-			double d = pow(pow(x1.x() - x2.x(), 2.0) +
-			               pow(x1.y() - x2.y(), 2.0) +
-			               pow(x1.z() - x2.z(), 2.0), 0.5);
-			Eigen::Matrix<double, 1, 6> J1, J2;
-
-			J1(0, 0) = (x1.x() - x2.x()) / d;
-			J1(0, 1) = (x1.y() - x2.y()) / d;
-			J1(0, 2) = (x1.z() - x2.z()) / d;
-			for (int i(0); i < 3; ++i) {
-				J2(0, i) = -1.0 * J1(0, i);
-			}
-			for (int i(3); i < 6; ++i) {
-				J1(0, i) = 0.0;
-				J2(0, i) = 0.0;
-			}
-
-//			J1 = J1.transpose();
-//			J2 = J2.transpose();
-			if( d > threshold_){
-				// constrained
-
-				if(H1){
-					std::cout << "H1 :" << H1->rows() << "-----" << H1->cols() << std::endl;
-					H1->resize(J1.rows(),J1.cols());
-					*H1 = J1 * 1.0;
-					std::cout << "H1 :" << H1->rows() << "-----" << H1->cols() << std::endl;
-//					H1 =new Eigen::MatrixXd(J1);
-				}
-				if(H2){
-					std::cout <<"H2:" << H2->rows() << "--------" << H2->cols() << std::endl;
-					H2->resize(J2.rows(),J2.cols());
-					*H2 = J2 * 1.0;
-					std::cout <<"H2:" << H2->rows() << "--------" << H2->cols() << std::endl;
-//					H2 = new Eigen::MatrixXd(J2);
-
-				}
-				return (Vector(1) << (d-threshold_)).finished();
-
-			}else{
-				if(H1){
-					std::cout << "H1 :" << H1->rows() << "-----" << H1->cols() << std::endl;
-					H1->resize(J1.rows(),J1.cols());
-					*H1 = J1 * 0.0;
-					std::cout << "H1 :" << H1->rows() << "-----" << H1->cols() << std::endl;
-					std::cout <<"H1:"<< *H1 << std::endl;
-//					H1 = new Eigen::MatrixXd(J1);
-
-				}
-				if(H2){
-					std::cout <<"H2:" << H2->rows() << "--------" << H2->cols() << std::endl;
-					H2->resize(J2.rows(),J2.cols());
-					*H2 = J2 * 0.0;
-					std::cout <<"H2:" << H2->rows() << "--------" << H2->cols() << std::endl;
-					std::cout << "H2:" << *H2 << std::endl;
-//					H2 = new Eigen::MatrixXd(J2);
-				}
-
-				return (Vector(1) << 0.0).finished();
-
-
-			}
 
 		}
 
