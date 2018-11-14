@@ -93,8 +93,8 @@ int main(int argc, char *argv[]) {
 	std::cout.precision(30);
 	// parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-//	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
-	std::string dir_name = "/home/steve/Data/ZUPTPDR/0002/";
+//	std::string dir_name = "/home/steve/Data/FusingLocationData/0012/";
+	std::string dir_name = "/home/steve/Data/ZUPTPDR/0003/";
 
 
 	auto logger_ptr = AWF::AlgorithmLogger::getInstance();
@@ -174,11 +174,13 @@ int main(int argc, char *argv[]) {
 
 
 	// noise model
+	double point_sigma = 1e-3;
+	double theta_sigma = 1.0;
 	noiseModel::Diagonal::shared_ptr pose_noise_model = noiseModel::Diagonal::Sigmas(
-			(Vector(6) << 0.0001, 0.0001, 0.0001, 0.005, 0.005, 0.5).finished());
+			(Vector(6) << point_sigma, point_sigma, point_sigma, theta_sigma, theta_sigma, theta_sigma).finished());
 	noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.0001);
 	noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-13);
-	noiseModel::Diagonal::shared_ptr max_distance_model = noiseModel::Isotropic::Sigma(1, 1.0);
+	noiseModel::Diagonal::shared_ptr max_distance_model = noiseModel::Isotropic::Sigma(1, 1.0e-3);
 
 	noiseModel::Diagonal::shared_ptr zero_velocity_noise_model =
 			noiseModel::Isotropic::Sigma(3, 1e-3);
@@ -455,7 +457,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			// Add max distance constraint
-			if (true && right_counter > 1 && left_counter > 1) {
+			if (true && right_counter > 1 && left_counter > 1 && the_zv_flag > 0.5) {
 
 
 				//  Deleted Max distance constraint
@@ -471,12 +473,12 @@ int main(int argc, char *argv[]) {
 //			graph.push_back(DualFeetConstraint(X(1),X(1+right_offset),1.0));
 
 
-//				graph.push_back(MaxRangeExpressionFactor(X(left_counter),
-//				                                         X(right_counter + right_offset),
-//				                                         0.0, max_distance_model));
+				graph.push_back(MaxRangeExpressionFactor(X(left_counter),
+				                                         X(right_counter + right_offset),
+				                                         0.0, max_distance_model));
 
-				graph.push_back(RangeFactor<Pose3>(X(left_counter),
-						X(right_counter+right_offset),0.0,max_distance_model));
+//				graph.push_back(RangeFactor<Pose3>(X(left_counter),
+//						X(right_counter+right_offset),0.0,max_distance_model));
 
 
 			}

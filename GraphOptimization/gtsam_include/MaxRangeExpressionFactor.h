@@ -42,10 +42,25 @@ namespace gtsam {
 		                       const Pose3 &x2,
 		                       OptionalJacobian<1, 6> H1,
 		                       OptionalJacobian<1, 6> H2) {
-			double dis = x1.range(x2);
+
+			double dis = x1.range(x2, H1, H2);
 			if (dis < threshold_) {
+				if (H1) {
+
+					*H1 = *H1 * 0.0;
+
+				}
+
+				if (H2) {
+
+					*H2 = *H2 * 0.0;
+				}
+
+
 				return (Vector(1) << 0.0).finished();
 			} else {
+//				*H1 = *H1 * 2.0;
+//				*H2 = *H2 * 2.0;
 				return (Vector(1) << (dis - threshold_)).finished();
 			}
 		}
@@ -90,7 +105,7 @@ namespace gtsam {
 		/// print
 		void print(const std::string &s = "",
 		           const KeyFormatter &kf = DefaultKeyFormatter) const {
-			std::cout << s << "RangeFactor" << std::endl;
+			std::cout << s << "MaxRangeFactor" << std::endl;
 			Base::print(s, kf);
 		};
 	};
