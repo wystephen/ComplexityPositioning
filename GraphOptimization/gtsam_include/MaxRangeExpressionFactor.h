@@ -38,8 +38,11 @@ namespace gtsam {
 		typedef Vector1 result_type;
 		double threshold_ = 1.0;
 
-		result_type operator()(const Pose3 &x1, const Pose3 &x2, OptionalJacobian<1, 6> H1, OptionalJacobian<1, 6> H2) {
-			double dis = x1.range(x2, H1, H2);
+		result_type operator()(const Pose3 &x1,
+		                       const Pose3 &x2,
+		                       OptionalJacobian<1, 6> H1,
+		                       OptionalJacobian<1, 6> H2) {
+			double dis = x1.range(x2);
 			if (dis < threshold_) {
 				return (Vector(1) << 0.0).finished();
 			} else {
@@ -52,33 +55,44 @@ namespace gtsam {
 	class MaxRangeExpressionFactor : public ExpressionFactor2<Vector1, Pose3, Pose3> {
 	private:
 		typedef MaxRangeExpressionFactor This;
-		typedef ExpressionFactor2<Vector1, Pose3, Pose3> Base;
+		typedef ExpressionFactor2 <Vector1, Pose3, Pose3> Base;
 
 		double threshold_ = 1.0;
 
 	public:
+
 
 		MaxRangeExpressionFactor() {}
 
 		MaxRangeExpressionFactor(Key key1, Key key2,
 		                         double threshold, const SharedNoiseModel &model)
 				: Base(key1, key2, model, (Vector(1) << 0.0).finished()) {
-
+			this->initialize(expression(key1, key2));
 		}
 
 
-		Expression<Vector1> expression(Key key1, Key key2) const {
-			Expression < Pose3 > a1_(key1);
-			Expression < Pose3 > a2_(key2);
-
-//			auto MaxRange = [](const Pose3& x1,const Pose3& x2){
-//
-//			};
-//
-			return Expression < Vector1 > (MaxRange(), a1_, a2_);
+		/// @return a deep copy of this factor
+		virtual gtsam::NonlinearFactor::shared_ptr clone() const {
+			return boost::static_pointer_cast<gtsam::NonlinearFactor>(
+					gtsam::NonlinearFactor::shared_ptr(new This(*this)));
 		}
 
 
+		Expression <Vector1> expression(Key key1, Key key2) const {
+			Expression<Pose3> a1_(key1);
+			Expression<Pose3> a2_(key2);
+
+//
+			return Expression<Vector1>(MaxRange(), a1_, a2_);
+		}
+
+
+		/// print
+		void print(const std::string &s = "",
+		           const KeyFormatter &kf = DefaultKeyFormatter) const {
+			std::cout << s << "RangeFactor" << std::endl;
+			Base::print(s, kf);
+		};
 	};
 
 

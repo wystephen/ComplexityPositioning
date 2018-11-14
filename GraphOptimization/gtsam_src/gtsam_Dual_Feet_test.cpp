@@ -54,6 +54,9 @@
 #include <gtsam/nonlinear/ISAM2.h>
 
 
+#include <gtsam/sam/RangeFactor.h>
+
+
 #include <gtsam_include/MaxDistanceConstraint.h>
 #include <gtsam_include/DualFeetConstraint.hpp>
 
@@ -175,7 +178,7 @@ int main(int argc, char *argv[]) {
 			(Vector(6) << 0.0001, 0.0001, 0.0001, 0.005, 0.005, 0.5).finished());
 	noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.0001);
 	noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-13);
-	noiseModel::Diagonal::shared_ptr max_distance_model = noiseModel::Isotropic::Sigma(1, 1e-10);
+	noiseModel::Diagonal::shared_ptr max_distance_model = noiseModel::Isotropic::Sigma(1, 1.0);
 
 	noiseModel::Diagonal::shared_ptr zero_velocity_noise_model =
 			noiseModel::Isotropic::Sigma(3, 1e-3);
@@ -468,8 +471,13 @@ int main(int argc, char *argv[]) {
 //			graph.push_back(DualFeetConstraint(X(1),X(1+right_offset),1.0));
 
 
-				graph.push_back(MaxRangeExpressionFactor(X(left_counter), X(right_counter + right_offset),
-				                                         0.0, max_distance_model));
+//				graph.push_back(MaxRangeExpressionFactor(X(left_counter),
+//				                                         X(right_counter + right_offset),
+//				                                         0.0, max_distance_model));
+
+				graph.push_back(RangeFactor<Pose3>(X(left_counter),
+						X(right_counter+right_offset),0.0,max_distance_model));
+
 
 			}
 
