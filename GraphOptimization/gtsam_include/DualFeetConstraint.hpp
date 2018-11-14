@@ -92,26 +92,45 @@ namespace gtsam {
 				J2(0, i) = 0.0;
 			}
 
-			J1 = J1.transpose();
-			J2 = J2.transpose();
+//			J1 = J1.transpose();
+//			J2 = J2.transpose();
 			if( d > threshold_){
 				// constrained
 
 				if(H1){
 					std::cout << "H1 :" << H1->rows() << "-----" << H1->cols() << std::endl;
+					H1->resize(J1.rows(),J1.cols());
 					*H1 = J1 * 1.0;
+					std::cout << "H1 :" << H1->rows() << "-----" << H1->cols() << std::endl;
+//					H1 =new Eigen::MatrixXd(J1);
 				}
 				if(H2){
+					std::cout <<"H2:" << H2->rows() << "--------" << H2->cols() << std::endl;
+					H2->resize(J2.rows(),J2.cols());
 					*H2 = J2 * 1.0;
+					std::cout <<"H2:" << H2->rows() << "--------" << H2->cols() << std::endl;
+//					H2 = new Eigen::MatrixXd(J2);
+
 				}
 				return (Vector(1) << (d-threshold_)).finished();
 
 			}else{
 				if(H1){
+					std::cout << "H1 :" << H1->rows() << "-----" << H1->cols() << std::endl;
+					H1->resize(J1.rows(),J1.cols());
 					*H1 = J1 * 0.0;
+					std::cout << "H1 :" << H1->rows() << "-----" << H1->cols() << std::endl;
+					std::cout <<"H1:"<< *H1 << std::endl;
+//					H1 = new Eigen::MatrixXd(J1);
+
 				}
 				if(H2){
+					std::cout <<"H2:" << H2->rows() << "--------" << H2->cols() << std::endl;
+					H2->resize(J2.rows(),J2.cols());
 					*H2 = J2 * 0.0;
+					std::cout <<"H2:" << H2->rows() << "--------" << H2->cols() << std::endl;
+					std::cout << "H2:" << *H2 << std::endl;
+//					H2 = new Eigen::MatrixXd(J2);
 				}
 
 				return (Vector(1) << 0.0).finished();
