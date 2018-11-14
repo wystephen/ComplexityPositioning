@@ -213,7 +213,7 @@ add_executable(gtsam_ZUPT_test GraphOptimization/gtsam_src/gtsam_ZUPT_test.cpp)
 target_link_libraries(gtsam_ZUPT_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES})
 
 
-add_executable(gtsam_Dual_Feet_test GraphOptimization/gtsam_src/gtsam_Dual_Feet_test.cpp GraphOptimization/gtsam_include/DualFeetConstraint.hpp)
+add_executable(gtsam_Dual_Feet_test GraphOptimization/gtsam_src/gtsam_Dual_Feet_test.cpp GraphOptimization/gtsam_include/DualFeetConstraint.hpp GraphOptimization/gtsam_include/BetweenFactorMaxDistance.h)
 target_link_libraries(gtsam_Dual_Feet_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES})
 
 
