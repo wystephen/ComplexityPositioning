@@ -453,15 +453,15 @@ int main(int argc, char *argv[]) {
 
 
 				//  Deleted Max distance constraint
-//				MaxDistanceConstraint max_distance_factor(X(left_counter - 1),
-//				                                          X(counter + right_offset),
-//				                                          1.5, false);
-//				graph.push_back(max_distance_factor);
+				MaxDistanceConstraint max_distance_factor(X(left_counter ),
+				                                          X(counter + right_offset),
+				                                          1.5, false);
+				graph.push_back(max_distance_factor);
 
 //				graph.push_back(DualFeetConstraint(X(left_counter -1),
 //				                                   X(right_counter + right_offset-1),
 //				                                   1.0));
-			graph.push_back(DualFeetConstraint(X(1),X(1+right_offset),1.0));
+//			graph.push_back(DualFeetConstraint(X(1),X(1+right_offset),1.0));
 
 			}
 

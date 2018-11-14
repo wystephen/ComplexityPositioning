@@ -58,42 +58,8 @@ namespace gtsam {
 		double value(const Pose3 &x1, const Pose3 &x2,
 		             boost::optional<Matrix &> H1 = boost::none,
 		             boost::optional<Matrix &> H2 = boost::none) const {
-			double d = pow(pow(x1.x() - x2.x(), 2.0) +
-			               pow(x1.y() - x2.y(), 2.0) +
-			               pow(x1.z() - x2.z(), 2.0), 0.5);
-			Eigen::Matrix<double, 1, 6> J1, J2;
 
-			J1(0, 0) = (x1.x() - x2.x()) / d;
-			J1(0, 1) = (x1.y() - x2.y()) / d;
-			J1(0, 2) = (x1.z() - x2.z()) / d;
-			for (int i(0); i < 3; ++i) {
-				J2(0, i) = -1.0 * J1(0, i);
-			}
-			for (int i(3); i < 6; ++i) {
-				J1(0, i) = 0.0;
-				J2(0, i) = 0.0;
-			}
-
-			if(H1){
-//				std::cout << "H1 is not empty" << std::endl;
-				std::cout << H1->rows() << "," << H1->cols() << std::endl;
-				*H1 = J1*1.0;
-			}
-
-			if(H2){
-//				std::cout << "H2 is not empty" << std::endl;
-				*H2=J2*1.0;
-			}
-
-
-//			std::cout<< "x1:" << x1.matrix() <<"\n";
-//			std::cout << "x2:" << x2.matrix() << "\n";
-//			std::cout << "distancce:" << d << std::endl;
-
-
-//			std::cout << "value:" << d << std::endl;
-
-			return d;
+			return x1.range(x2,H1,H2);
 
 		}
 
