@@ -62,6 +62,7 @@ namespace gtsam {
 				const Pose3 &x1 = x.at<Pose3>(keys_[0]);
 				const Pose3 &x2 = x.at<Pose3>(keys_[1]);
 				if (H) {
+					std::cout << "evalue unwhitened error" << std::endl;
 					return evaluateError(x1, x2, (*H)[0], (*H)[1]);
 				} else {
 					return evaluateError(x1, x2);
@@ -71,6 +72,25 @@ namespace gtsam {
 			}
 		}
 
+		/**
+		 * @brief return true when distance between two pose lager than threshold_.
+		 * @param v
+		 * @return
+		 */
+		bool active(const Values& v) const{
+			const Pose3 &x1 = v.at<Pose3>(keys_[0]);
+			const Pose3 &x2 = v.at<Pose3>(keys_[1]);
+
+			double d = pow(pow(x1.x() - x2.x(), 2.0) +
+			               pow(x1.y() - x2.y(), 2.0) +
+			               pow(x1.z() - x2.z(), 2.0), 0.5);
+
+			if(d < threshold_){
+				return false;
+			}else{
+				return true;
+			}
+		}
 
 		Vector evaluateError(const Pose3 &x1, const Pose3 &x2,
 		                     boost::optional<Matrix &> H1 = boost::none,

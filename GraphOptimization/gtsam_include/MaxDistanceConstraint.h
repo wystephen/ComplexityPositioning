@@ -44,6 +44,9 @@ namespace gtsam {
 
 		}
 
+
+
+
 		/**
 		 * @brief Distance between two pose. Note:Const.....!!!!
 		 * @param x1: pose3
