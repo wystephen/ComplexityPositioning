@@ -36,7 +36,7 @@ namespace gtsam {
 	struct MaxRange {
 
 		typedef Vector1 result_type;
-		double threshold_ = 1.0;
+		double threshold_ = 1.5;
 
 		result_type operator()(const Pose3 &x1,
 		                       const Pose3 &x2,

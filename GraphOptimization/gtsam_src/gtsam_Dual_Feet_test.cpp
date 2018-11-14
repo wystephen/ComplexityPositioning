@@ -365,6 +365,11 @@ int main(int argc, char *argv[]) {
 				isam.update(graph, initial_values);
 				isam.update();
 				Values currentEstimate = isam.calculateEstimate();
+
+				if(counter %100 == 0){
+					currentEstimate = isam.calculateBestEstimate();
+				}
+
 				//			currentEstimate.print("current state:");
 				prior_pose_left = currentEstimate.at<Pose3>(X(counter));
 				prior_velocity_left = currentEstimate.at<Vector3>(V(counter));
