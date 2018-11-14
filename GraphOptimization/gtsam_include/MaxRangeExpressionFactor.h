@@ -33,11 +33,22 @@
 
 namespace gtsam {
 
+	/**
+	 * @brief return distance - threshold, or 0 when distance < threshold.
+	 */
 	struct MaxRange {
 
 		typedef Vector1 result_type;
-		double threshold_ = 1.5;
+		double threshold_ = 1.5; // TODO: read threshold from MaxRangeExpressionFactor.
 
+		/**
+		 * @brief return 0.0 if distance smaller than threshold_.
+		 * @param x1
+		 * @param x2
+		 * @param H1 Matrix<double,1,6> Jacobian matrix of x1
+		 * @param H2 Matrix<double,1,6> Jacobian matrix of x2
+		 * @return
+		 */
 		result_type operator()(const Pose3 &x1,
 		                       const Pose3 &x2,
 		                       OptionalJacobian<1, 6> H1,
@@ -45,28 +56,26 @@ namespace gtsam {
 
 			double dis = x1.range(x2, H1, H2);
 			if (dis < threshold_) {
+				// set return value to zero and Jacobian matrix also should be zero vector.
+
 				if (H1) {
-
 					*H1 = *H1 * 0.0;
-
 				}
 
 				if (H2) {
-
 					*H2 = *H2 * 0.0;
 				}
-
-
 				return (Vector(1) << 0.0).finished();
 			} else {
-//				*H1 = *H1 * 2.0;
-//				*H2 = *H2 * 2.0;
 				return (Vector(1) << (dis - threshold_)).finished();
 			}
 		}
 	};
 
 
+	/**
+	 * @brief
+	 */
 	class MaxRangeExpressionFactor : public ExpressionFactor2<Vector1, Pose3, Pose3> {
 	private:
 		typedef MaxRangeExpressionFactor This;
@@ -86,7 +95,7 @@ namespace gtsam {
 		}
 
 
-		/// @return a deep copy of this factor
+		/// @return a deep copy of this factor(VERY IMPORTANT!!!!)
 		virtual gtsam::NonlinearFactor::shared_ptr clone() const {
 			return boost::static_pointer_cast<gtsam::NonlinearFactor>(
 					gtsam::NonlinearFactor::shared_ptr(new This(*this)));
@@ -97,7 +106,7 @@ namespace gtsam {
 			Expression<Pose3> a1_(key1);
 			Expression<Pose3> a2_(key2);
 
-//
+
 			return Expression<Vector1>(MaxRange(), a1_, a2_);
 		}
 

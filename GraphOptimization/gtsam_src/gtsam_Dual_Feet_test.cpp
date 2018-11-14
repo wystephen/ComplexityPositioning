@@ -181,6 +181,7 @@ int main(int argc, char *argv[]) {
 	noiseModel::Diagonal::shared_ptr velocity_noise_model = noiseModel::Isotropic::Sigma(3, 0.0001);
 	noiseModel::Diagonal::shared_ptr bias_noise_model = noiseModel::Isotropic::Sigma(6, 1e-13);
 	noiseModel::Diagonal::shared_ptr max_distance_model = noiseModel::Isotropic::Sigma(1, 1.0e-3);
+//	noiseModel::Diagonal::shared_ptr max_distance_model = noiseModel::Constrained::All(1);
 
 	noiseModel::Diagonal::shared_ptr zero_velocity_noise_model =
 			noiseModel::Isotropic::Sigma(3, 1e-3);
