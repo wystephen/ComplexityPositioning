@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) {
 
 	// initial isam2
 	ISAM2Params parameters;
-	parameters.relinearizeThreshold = 0.01;
+	parameters.relinearizeThreshold = 0.001;
 	parameters.relinearizeSkip = 1;
 	ISAM2 isam(parameters);
 
@@ -364,10 +364,10 @@ int main(int argc, char *argv[]) {
 				// add graph and new values to isam and
 				// update prior_pose_left prior velocity and prior bias.
 				isam.update(graph, initial_values);
-				isam.update();
+//				isam.update();
 				Values currentEstimate = isam.calculateEstimate();
 
-				if(counter %100 == 0){
+				if (counter % 100 == 0) {
 					currentEstimate = isam.calculateBestEstimate();
 				}
 
@@ -496,7 +496,7 @@ int main(int argc, char *argv[]) {
 				// add graph and new values to isam and update prior_pose_left prior velocity and prior bias.
 				std::cout << "left:" << left_counter << "  right:" << right_counter << std::endl;
 				isam.update(graph, initial_values);
-				isam.update();
+//				isam.update();
 				Values currentEstimate = isam.calculateEstimate();
 				//			currentEstimate.print("current state:");
 				prior_pose_right = currentEstimate.at<Pose3>(X(counter + right_offset));
