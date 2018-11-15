@@ -67,7 +67,16 @@ namespace gtsam {
 				}
 				return (Vector(1) << 0.0).finished();
 			} else {
-				return (Vector(1) << (dis - threshold_)).finished();
+//				if (H1) {
+//					*H1 = exp(dis - threshold_)*dis * *H1;
+//				}
+
+//				if (H2) {
+//					*H2 = exp(dis - threshold_)*dis * *H2;
+//				}
+//				return (Vector(1) << exp(dis - threshold_) - 1).finished();
+				return (Vector(1) << (dis-threshold_)).finished();
+
 			}
 		}
 	};

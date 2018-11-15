@@ -57,7 +57,7 @@
 #include <gtsam/sam/RangeFactor.h>
 
 
-#include <gtsam_include/MaxDistanceConstraint.h>
+#include <gtsam_include/MaxDistanceConstraintPose3.h>
 #include <gtsam_include/DualFeetConstraint.hpp>
 
 #include <gtsam_include/MaxRangeExpressionFactor.h>
@@ -88,13 +88,13 @@ PreintegrationType *imu_preintegrated_right_;
 
 int main(int argc, char *argv[]) {
 
-	omp_set_num_threads(1);
+//	omp_set_num_threads(1);
 
 	std::cout.precision(30);
 	// parameters
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 //	std::string dir_name = "/home/steve/Data/FusingLocationData/0012/";
-	std::string dir_name = "/home/steve/Data/ZUPTPDR/0003/";
+	std::string dir_name = "/home/steve/Data/ZUPTPDR/0006/";
 
 
 	auto logger_ptr = AWF::AlgorithmLogger::getInstance();
@@ -467,9 +467,14 @@ int main(int argc, char *argv[]) {
 
 
 				//  Deleted Max distance constraint
-//				MaxDistanceConstraint max_factor(X(left_counter ),
+//				MaxDistanceConstraintPose3 max_factor(X(left_counter ),
 //				                                          X(counter + right_offset),
-//				                                          1.5, false);
+//				                                          1.5);
+
+//				MaxDistanceConstraint<Pose3> max_factor(X(left_counter),
+//				                                        X(counter + right_offset),
+//				                                        1.0);
+
 //				graph.push_back(max_factor);
 
 
