@@ -236,16 +236,18 @@ int main(int argc, char *argv[]) {
 
 	Values initial_values;
 	NonlinearFactorGraph graph;
-	int left_counter = 0;
+	int left_counter = 0; // index used in graph
 	int left_normal_counter = 0;
 	int left_zv_counter = 0;
 
-	int right_counter = 0;
+	int right_counter = 0;// index used in graph
 	int right_normal_counter = 0;
 	int right_zv_counter = 0;
 
 	long right_offset = 500000000;
 
+
+	// initial state.
 	initial_values.insert(X(left_counter), prior_pose_left);
 	initial_values.insert(V(left_counter), prior_velocity_left);
 	initial_values.insert(B(left_counter), prior_imu_bias_left);
