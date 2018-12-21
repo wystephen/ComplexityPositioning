@@ -111,6 +111,13 @@ namespace gtsam {
 		}
 
 
+		/**
+		 * @brief Hacked distance calculate function...very slow!!!!!
+		 *
+		 * @param key1
+		 * @param key2
+		 * @return
+		 */
 		Expression <Vector1> expression(Key key1, Key key2) const {
 			Expression<Pose3> a1_(key1);
 			Expression<Pose3> a2_(key2);

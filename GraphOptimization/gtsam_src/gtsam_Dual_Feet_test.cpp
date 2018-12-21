@@ -240,7 +240,7 @@ int main(int argc, char *argv[]) {
 	int left_normal_counter = 0;
 	int left_zv_counter = 0;
 
-	int right_counter = 0;// index used in graph
+
 	int right_normal_counter = 0;
 	int right_zv_counter = 0;
 
