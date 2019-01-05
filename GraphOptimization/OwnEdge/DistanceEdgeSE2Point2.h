@@ -18,15 +18,41 @@ public:
 
 	DistanceEdge2D();
 
-	virtual bool read(std::istream &is){
+	virtual bool read(std::istream &is) {
 		return true;
 	}
 
-	virtual bool write(std::ostream &os) const{
+	virtual bool write(std::ostream &os) const {
 		return true;
 	}
 
-	void computeError();
+	virtual void computeError() {
+
+		g2o::VertexSE2 *v = static_cast<g2o::VertexSE2 *>(_vertices[0]);
+
+		double p[3];
+		v->getEstimateData(p);
+
+		_error(0, 0) = 0.0;
+
+
+		for (int i = 0; i < dis_vec_.size(); ++i) {
+			double dis = std::sqrt(pow(p[0] - beacon_set_vec_[i].x(), 2.0)
+			                       + pow(p[1] - beacon_set_vec_[i].y(), 2.0));
+
+			double error_value = std::pow(dis - dis_vec_[i], 2.0);
+			double eta = 1.0;
+			if (error_value < eta) {
+				_error(0, 0) += (0.5 * error_value * error_value);
+
+			} else {
+				_error(0, 0) += (eta * (abs(error_value) - 0.5 * eta));
+
+			}
+
+//			printf("range error:%f\n",dis-dis_vec_[i]);
+		}
+	}
 
 	/**
 	 * distance

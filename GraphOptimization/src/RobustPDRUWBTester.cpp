@@ -89,9 +89,9 @@ int main() {
 
 
 	// add prior constraint
-	g2o::VertexSE2 *initial_vertex  = new g2o::VertexSE2();
+	g2o::VertexSE2 *initial_vertex = new g2o::VertexSE2();
 	initial_vertex->setId(pose_counter);
-	initial_vertex->setEstimate(Eigen::Vector3d(0.15,5.0,0.0));
+	initial_vertex->setEstimate(Eigen::Vector3d(0.15, 5.0, 0.0));
 	initial_vertex->setFixed(true);
 
 	globalOptimizer.addVertex(initial_vertex);
@@ -99,9 +99,9 @@ int main() {
 
 	//add beacon vertex
 	for (int i = 0; i < beacon_set.rows(); ++i) {
-		g2o::VertexPointXY* pointXY = new g2o::VertexPointXY();
-		pointXY->setId(beacon_offset+i);
-		pointXY->setEstimate(Eigen::Vector2d(beacon_set(i,0),beacon_set(i,1)));
+		g2o::VertexPointXY *pointXY = new g2o::VertexPointXY();
+		pointXY->setId(beacon_offset + i);
+		pointXY->setEstimate(Eigen::Vector2d(beacon_set(i, 0), beacon_set(i, 1)));
 		pointXY->setFixed(true);
 
 		globalOptimizer.addVertex(pointXY);
@@ -111,66 +111,80 @@ int main() {
 	initial_vertex->getEstimateData(latest_pose_2d);
 
 
-
 	int uwb_index = 0;
-	for(int i=0;i<pdr_data.rows();++i){
+	for (int i = 0; i < pdr_data.rows(); ++i) {
 		pose_counter++;
 		g2o::VertexSE2 *pose_vertex = new g2o::VertexSE2();
 
 		pose_vertex->setId(pose_counter);
-		pose_vertex->setEstimate(Eigen::Vector3d(latest_pose_2d[0],latest_pose_2d[1],latest_pose_2d[2]));
+		pose_vertex->setEstimate(Eigen::Vector3d(latest_pose_2d[0], latest_pose_2d[1], latest_pose_2d[2]));
 
 		globalOptimizer.addVertex(pose_vertex);
 
 
 		g2o::EdgeSE2 *edgeSE2 = new g2o::EdgeSE2();
-		edgeSE2->vertices()[0] = globalOptimizer.vertex(pose_counter-1);
+		edgeSE2->vertices()[0] = globalOptimizer.vertex(pose_counter - 1);
 		edgeSE2->vertices()[1] = globalOptimizer.vertex(pose_counter);
-		edgeSE2->setMeasurement(Eigen::Vector3d(pdr_data(i,1),0.0,pdr_data(i,3)));
+		edgeSE2->setMeasurement(Eigen::Vector3d(pdr_data(i, 1), 0.0, pdr_data(i, 3)));
 
-		Eigen::Matrix3d info = Eigen::Matrix3d::Identity()/0.5;
-		info(2,2) = 1.0/(0.1);
+		Eigen::Matrix3d info = Eigen::Matrix3d::Identity() / 0.5;
+		info(2, 2) = 1.0 / (0.1);
 		edgeSE2->setInformation(info);
 
 		globalOptimizer.addEdge(edgeSE2);
 
-		while(uwb_data(uwb_index,0) < pdr_data(i,0)){
-			DistanceEdge2D* edge_dis_2d = new DistanceEdge2D();
+		while (uwb_index < uwb_data.rows() and uwb_data(uwb_index, 0) < pdr_data(i, 0)) {
+			DistanceEdge2D *edge_dis_2d = new DistanceEdge2D();
 			edge_dis_2d->vertices()[0] = globalOptimizer.vertex(pose_counter);
-			edge_dis_2d->vertices()[1] = globalOptimizer.vertex(pose_counter);
+			edge_dis_2d->vertices()[1] = globalOptimizer.vertex(pose_counter-1);
+			edge_dis_2d->setMeasurementFromState();
+			Eigen::Matrix<double,1,1> info_dis;
+			info_dis(0,0) = 2.0;
 
-			edge_dis_2d->setInformation(Eigen::Matrix<double,1,1>::Identity() * 10.0);
+			edge_dis_2d->setInformation(info_dis);
 
 
-			std::vector < Eigen::Vector2d> beacon_vec;
+			std::vector<Eigen::Vector2d> beacon_vec;
 			std::vector<double> range_vec;
-			for(int k=0;k<beacon_set.rows();++k){
-				if(uwb_data(uwb_index,k+1)>0.0){
-					beacon_vec.push_back(Eigen::Vector2d(beacon_set(k,0),beacon_set(k ,1)));
-					range_vec.push_back(uwb_data(uwb_index,k+1));
+			for (int k = 0; k < beacon_set.rows(); ++k) {
+				if (uwb_data(uwb_index, k + 1) > 0.0) {
+					printf("beacon set:[%f,%f], range:[%f]\n",beacon_set(k,0),beacon_set(k,1),uwb_data(uwb_index,k+1));
+					beacon_vec.push_back(Eigen::Vector2d(beacon_set(k, 0), beacon_set(k, 1)));
+					range_vec.push_back(uwb_data(uwb_index, k + 1));
 				}
 			}
-			edge_dis_2d->setRealMeasurements(range_vec,beacon_vec);
+			printf("range vec size: %d\n",range_vec.size());
+			edge_dis_2d->setRealMeasurements(range_vec, beacon_vec);
+
 
 			globalOptimizer.addEdge(edge_dis_2d);
+			printf("uwb time %f, imu time: %f\n",uwb_data(uwb_index,0),pdr_data(i,0));
 
 
-
+			uwb_index++;
 
 		}
+		printf("-------------------\n");
+
+		globalOptimizer.initializeOptimization();
+		globalOptimizer.optimize(10);
+			g2o::VertexSE2 *v = static_cast<g2o::VertexSE2 *>(globalOptimizer.vertex(pose_counter));
+		double data[3];
+		v->getEstimateData(data);
+		logger_ptr->addTraceEvent("trace", "real time", Eigen::Vector2d(data[0], data[1]));
 
 
 	}
+	globalOptimizer.setVerbose(true);
 	globalOptimizer.initializeOptimization();
 	globalOptimizer.optimize(100);
 
-	for(int i=0;i<pose_counter;++i){
-		g2o::VertexSE2 *v = static_cast<g2o::VertexSE2*>(globalOptimizer.vertex(i));
+	for (int i = 0; i < pose_counter; ++i) {
+		g2o::VertexSE2 *v = static_cast<g2o::VertexSE2 *>(globalOptimizer.vertex(i));
 		double data[3];
 		v->getEstimateData(data);
-		logger_ptr->addTraceEvent("trace","final",Eigen::Vector2d(data[0],data[1]));
+		logger_ptr->addTraceEvent("trace", "final", Eigen::Vector2d(data[0], data[1]));
 	}
-
 
 
 	logger_ptr->outputAllEvent(true);
