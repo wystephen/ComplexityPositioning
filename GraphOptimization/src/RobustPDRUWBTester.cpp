@@ -38,6 +38,7 @@
 
 
 #include "OwnEdge/DistanceEdgeSE2Point2.h"
+//#include "OwnEdge/DistanceEdgeSE2Point2.cpp"
 
 using namespace std;
 
@@ -128,7 +129,7 @@ int main() {
 		edgeSE2->setMeasurement(Eigen::Vector3d(pdr_data(i,1),0.0,pdr_data(i,3)));
 
 		Eigen::Matrix3d info = Eigen::Matrix3d::Identity()/0.5;
-		info(3,3) = 1.0/(0.1);
+		info(2,2) = 1.0/(0.1);
 		edgeSE2->setInformation(info);
 
 		globalOptimizer.addEdge(edgeSE2);
@@ -137,10 +138,10 @@ int main() {
 			DistanceEdge2D* edge_dis_2d = new DistanceEdge2D();
 			edge_dis_2d->vertices()[0] = globalOptimizer.vertex(pose_counter);
 			edge_dis_2d->vertices()[1] = globalOptimizer.vertex(pose_counter);
-			
+
 			edge_dis_2d->setInformation(Eigen::Matrix<double,1,1>::Identity() * 10.0);
-			
-			
+
+
 			std::vector < Eigen::Vector2d> beacon_vec;
 			std::vector<double> range_vec;
 			for(int k=0;k<beacon_set.rows();++k){
@@ -150,28 +151,28 @@ int main() {
 				}
 			}
 			edge_dis_2d->setRealMeasurements(range_vec,beacon_vec);
-			
+
 			globalOptimizer.addEdge(edge_dis_2d);
-			
-			
-			
-			
+
+
+
+
 		}
 
 
 	}
 	globalOptimizer.initializeOptimization();
 	globalOptimizer.optimize(100);
-	
+
 	for(int i=0;i<pose_counter;++i){
 		g2o::VertexSE2 *v = static_cast<g2o::VertexSE2*>(globalOptimizer.vertex(i));
 		double data[3];
 		v->getEstimateData(data);
 		logger_ptr->addTraceEvent("trace","final",Eigen::Vector2d(data[0],data[1]));
 	}
-	
-	
-	
+
+
+
 	logger_ptr->outputAllEvent(true);
 
 

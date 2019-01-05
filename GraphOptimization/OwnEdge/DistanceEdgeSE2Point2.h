@@ -16,15 +16,17 @@ class DistanceEdge2D :
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-	DistanceEdge2D(){
-		_information.setIdentity();
+	DistanceEdge2D();
+
+	virtual bool read(std::istream &is){
+		return true;
 	}
 
-	virtual bool read(std::istream &is);
+	virtual bool write(std::ostream &os) const{
+		return true;
+	}
 
-	virtual bool write(std::ostream &os) const;
-
-	virtual void computeError();
+	void computeError();
 
 	/**
 	 * distance
@@ -40,7 +42,7 @@ public:
 	}
 
 
-	bool setRealMeasurements(std::vector<double> range_vec, std::vector<Eigen::Vector2d> beacon_vec){
+	bool setRealMeasurements(std::vector<double> range_vec, std::vector<Eigen::Vector2d> beacon_vec) {
 		dis_vec_ = range_vec;
 		beacon_set_vec_ = beacon_vec;
 		return true;
@@ -60,8 +62,9 @@ public:
 		return 1;
 	}
 
-	virtual bool setMeasurementFromState(){
-		
+	virtual bool setMeasurementFromState() {
+
+		return true;
 	}
 
 	/**
@@ -84,52 +87,8 @@ public:
 	 * @param to
 	 */
 	virtual void initialEstimate(const g2o::OptimizableGraph::VertexSet &from,
-	                             g2o::OptimizableGraph::Vertex *to){
-		
-	}
+	                             g2o::OptimizableGraph::Vertex *to) {
 
-
-	double sigma_ = 1.0;
-
-	bool setSigma(double sigma) {
-		if (sigma > 0) {
-			sigma_ = sigma;
-			return true;
-		} else {
-			return false;
-		}
-
-	}
-
-	/**
-	 *
-	 * @return sigma in error function.
-	 */
-	double getSigma() {
-		return sigma_;
-	}
-
-	inline double logNormalPdf(double x, double miu, double sigma) {
-		double para1((x - miu) * (x - miu) / 2 / sigma / sigma);
-		double para2(1 / std::sqrt(2 * sigma * sigma * M_PI));
-
-		return std::log(para2 + 1e-10) / (para1 + 1e-10);
-	}
-
-	inline double NormalPdf(double x,
-	                        double miu,
-	                        double sigma) {
-//    std::cout << "dis :" << x << " range:" << miu << std::endl;
-		double para1((x - miu) * (x - miu) / 2 / sigma / sigma);
-		double para2(1 / std::sqrt(2 * sigma * sigma * M_PI));
-//
-//        if(!(!std::isinf(para1)&&!std::isnan(para1)&&!std::isinf(para2)&&!std::isnan(para2)))
-//        {
-//            std::cout << para1<< " " << para2 << std::endl;
-//            std::cout << "x:" << x << "miu:" << miu << "sigma:" << sigma << std::endl;
-//        }
-		assert(!std::isinf(para1) && !std::isnan(para1) && !std::isinf(para2) && !std::isnan(para2));
-		return para2 * std::exp(-para1);
 	}
 
 
