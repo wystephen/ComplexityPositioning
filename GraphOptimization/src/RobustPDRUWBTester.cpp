@@ -97,15 +97,15 @@ int main() {
 	globalOptimizer.addVertex(initial_vertex);
 
 
-	//add beacon vertex
-	for (int i = 0; i < beacon_set.rows(); ++i) {
-		g2o::VertexPointXY *pointXY = new g2o::VertexPointXY();
-		pointXY->setId(beacon_offset + i);
-		pointXY->setEstimate(Eigen::Vector2d(beacon_set(i, 0), beacon_set(i, 1)));
-		pointXY->setFixed(true);
-
-		globalOptimizer.addVertex(pointXY);
-	}
+//	//add beacon vertex
+//	for (int i = 0; i < beacon_set.rows(); ++i) {
+//		g2o::VertexPointXY *pointXY = new g2o::VertexPointXY();
+//		pointXY->setId(beacon_offset + i);
+//		pointXY->setEstimate(Eigen::Vector2d(beacon_set(i, 0), beacon_set(i, 1)));
+//		pointXY->setFixed(true);
+//
+//		globalOptimizer.addVertex(pointXY);
+//	}
 
 	double latest_pose_2d[3];
 	initial_vertex->getEstimateData(latest_pose_2d);
@@ -127,7 +127,7 @@ int main() {
 		edgeSE2->vertices()[1] = globalOptimizer.vertex(pose_counter);
 		edgeSE2->setMeasurement(Eigen::Vector3d(pdr_data(i, 1), 0.0, pdr_data(i, 3)));
 
-		Eigen::Matrix3d info = Eigen::Matrix3d::Identity() / 0.5;
+		Eigen::Matrix3d info = Eigen::Matrix3d::Identity() / 0.3;
 		info(2, 2) = 1.0 / (0.1);
 		edgeSE2->setInformation(info);
 
@@ -139,7 +139,7 @@ int main() {
 			edge_dis_2d->vertices()[1] = globalOptimizer.vertex(pose_counter-1);
 			edge_dis_2d->setMeasurementFromState();
 			Eigen::Matrix<double,1,1> info_dis;
-			info_dis(0,0) = 2.0;
+			info_dis(0,0) = 1.0;
 
 			edge_dis_2d->setInformation(info_dis);
 
@@ -148,17 +148,24 @@ int main() {
 			std::vector<double> range_vec;
 			for (int k = 0; k < beacon_set.rows(); ++k) {
 				if (uwb_data(uwb_index, k + 1) > 0.0) {
-					printf("beacon set:[%f,%f], range:[%f]\n",beacon_set(k,0),beacon_set(k,1),uwb_data(uwb_index,k+1));
+
+					printf("beacon set:[%f,%f], range:[%f]\n", beacon_set(k, 0), beacon_set(k, 1),
+					       uwb_data(uwb_index, k + 1));
 					beacon_vec.push_back(Eigen::Vector2d(beacon_set(k, 0), beacon_set(k, 1)));
 					range_vec.push_back(uwb_data(uwb_index, k + 1));
+
+
+
+
+
 				}
 			}
-			printf("range vec size: %d\n",range_vec.size());
+			printf("range vec size: %d\n", range_vec.size());
 			edge_dis_2d->setRealMeasurements(range_vec, beacon_vec);
 
 
 			globalOptimizer.addEdge(edge_dis_2d);
-			printf("uwb time %f, imu time: %f\n",uwb_data(uwb_index,0),pdr_data(i,0));
+			printf("uwb time %f, imu time: %f\n", uwb_data(uwb_index, 0), pdr_data(i, 0));
 
 
 			uwb_index++;
@@ -168,7 +175,7 @@ int main() {
 
 		globalOptimizer.initializeOptimization();
 		globalOptimizer.optimize(10);
-			g2o::VertexSE2 *v = static_cast<g2o::VertexSE2 *>(globalOptimizer.vertex(pose_counter));
+		g2o::VertexSE2 *v = static_cast<g2o::VertexSE2 *>(globalOptimizer.vertex(pose_counter));
 		double data[3];
 		v->getEstimateData(data);
 		logger_ptr->addTraceEvent("trace", "real time", Eigen::Vector2d(data[0], data[1]));

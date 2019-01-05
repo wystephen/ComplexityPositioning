@@ -28,10 +28,17 @@ public:
 
 	virtual void computeError() {
 
-		g2o::VertexSE2 *v = static_cast<g2o::VertexSE2 *>(_vertices[0]);
+		g2o::VertexSE2 *v1 = static_cast<g2o::VertexSE2 *>(_vertices[0]);
+		g2o::VertexSE2 *v2 = static_cast<g2o::VertexSE2 *>(_vertices[1]);
+
+		double p1[3],p2[3];
+		v1->getEstimateData(p1);
+		v2->getEstimateData(p2);
 
 		double p[3];
-		v->getEstimateData(p);
+		for(int i=0;i<3;++i){
+			p[i] = .5 * (p1[i] + p1[i]);
+		}
 
 		_error(0, 0) = 0.0;
 
@@ -40,15 +47,23 @@ public:
 			double dis = std::sqrt(pow(p[0] - beacon_set_vec_[i].x(), 2.0)
 			                       + pow(p[1] - beacon_set_vec_[i].y(), 2.0));
 
-			double error_value = std::pow(dis - dis_vec_[i], 2.0);
-			double eta = 1.0;
-			if (error_value < eta) {
-				_error(0, 0) += (0.5 * error_value * error_value);
+//			double error_value = std::pow(dis - dis_vec_[i], 2.0);
+//			double eta = 1.0;
+//			if (error_value < eta) {
+//				_error(0, 0) += (0.5 * error_value * error_value);
+//
+//			} else {
+//				_error(0, 0) += (eta * (abs(error_value) - 0.5 * eta));
+//
+//			}
+			if(abs(dis-dis_vec_[i])>3.0){
+				_error(0,0)+= 0.0;
+			}else{
 
-			} else {
-				_error(0, 0) += (eta * (abs(error_value) - 0.5 * eta));
-
+				_error(0,0)+= abs(dis-dis_vec_[i]);
 			}
+
+
 
 //			printf("range error:%f\n",dis-dis_vec_[i]);
 		}
