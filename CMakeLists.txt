@@ -219,6 +219,10 @@ target_link_libraries(gtsam_Dual_Feet_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES
 
 add_executable(gtsam_ZUPT_UWB_test GraphOptimization/gtsam_src/gtsam_ZUPT_UWB_test.cpp)
 target_link_libraries(gtsam_ZUPT_UWB_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES})
+
+
+add_executable(gtsam_Vehicle_INS_UWB_test GraphOptimization/gtsam_src/gtsam_Vehicle_INS_UWB_test.cpp)
+target_link_libraries(gtsam_Vehicle_INS_UWB_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES})
 #cuda_add_executable(MonteCarloThrustTester
 #        BayesStateEstimate/Test/MonteCarloTesterCuda.cpp)
 #target_link_libraries(MonteCarloThrustTester )

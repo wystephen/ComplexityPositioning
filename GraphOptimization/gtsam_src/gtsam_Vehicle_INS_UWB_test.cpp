@@ -51,6 +51,7 @@
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/inference/Symbol.h>
 
+#include <gtsam/slam/RangeFactor.h>
 #include <gtsam/nonlinear/ISAM2.h>
 
 
@@ -83,22 +84,22 @@ int main(int argc, char *argv[]) {
 //    std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 //	std::string dir_name = "/home/steve/Data/FusingLocationData/0013/";
 //	std::string dir_name = "/home/steve/Data/ZUPTPDR/0000/";
-	std::string dir_name = "/home/steve/Data/VehicleUWBINS/0000/";
+	std::string dir_name = "/home/steve/Data/VehicleUWBINS/0003/";
 
 
 	auto logger_ptr = AWF::AlgorithmLogger::getInstance();
 
 	// load data
 	AWF::FileReader
-			head_imu_file(dir_name + "HEAD.data");
-//			uwb_file(dir_name + "uwb_result.csv"),
-//			beacon_set_file(dir_name + "beaconSet.csv");
+			head_imu_file(dir_name + "HEAD.data"),
+			uwb_file(dir_name + "uwb_data.csv"),
+			beacon_set_file(dir_name + "beaconset_no_mac.csv");
 
 //	Eigen::MatrixXd left_imu_data = left_foot_file.extractDoulbeMatrix(",");
 //	Eigen::MatrixXd right_imu_data = right_foot_file.extractDoulbeMatrix(",");
 	Eigen::MatrixXd head_imu_data = head_imu_file.extractDoulbeMatrix(",");
-//	Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
-//	Eigen::MatrixXd beacon_set_data = beacon_set_file.extractDoulbeMatrix(",");
+	Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
+	Eigen::MatrixXd beacon_set_data = beacon_set_file.extractDoulbeMatrix(",");
 
 	assert(beacon_set_data.rows() == (uwb_data.cols() - 1));
 
@@ -106,21 +107,21 @@ int main(int argc, char *argv[]) {
 
 //	std::cout << uwb_data.block(0, 0, 1, uwb_data.cols()) << std::endl;
 
-//	auto uwb_tool = BSE::UwbTools(uwb_data,
-//	                              beacon_set_data);
+	auto uwb_tool = BSE::UwbTools(uwb_data,
+	                              beacon_set_data);
 
-//	Eigen::MatrixXd optimize_trace = uwb_tool.uwb_position_function();
-	Eigen::Vector3d initial_pos(0.8, 0.8,0.0);// = optimize_trace.block(0, 0, 1, 3).transpose();
+	Eigen::MatrixXd optimize_trace = uwb_tool.uwb_position_function();
+	Eigen::Vector3d initial_pos(0.8, 0.8, 1.0);// = optimize_trace.block(0, 0, 1, 3).transpose();
 	double initial_ori = 0.0;//uwb_tool.computeInitialOri(optimize_trace);
 
 	std::vector<std::vector<double>> optimize_trace_vec = {{},
 	                                                       {},
 	                                                       {}};
-//	for (int i(0); i < optimize_trace.rows(); ++i) {
-//		for (int j(0); j < 3; ++j) {
-//			optimize_trace_vec[j].push_back(optimize_trace(i, j));
-//		}
-//	}
+	for (int i(0); i < optimize_trace.rows(); ++i) {
+		for (int j(0); j < 3; ++j) {
+			optimize_trace_vec[j].push_back(optimize_trace(i, j));
+		}
+	}
 
 
 //    auto imu_tool = BSE::ImuTools();
@@ -130,8 +131,9 @@ int main(int argc, char *argv[]) {
 //	BSE::ImuTools::processImuData(left_imu_data);
 //	BSE::ImuTools::processImuData(right_imu_data);
 	BSE::ImuTools::processImuData(head_imu_data);
+	std::cout << "example imu data:" << head_imu_data.block(0,0,3,head_imu_data.cols()) << std::endl;
 //	double imu_dt = (left_imu_data(left_imu_data.rows() - 1, 0) - left_imu_data(0, 0)) / double(left_imu_data.rows());
-	double imu_dt = (left_imu_data(head_imu_data.rows() - 1, 0) - head_imu_data(0, 0)) / double(head_imu_data.rows());
+	double imu_dt = (head_imu_data(head_imu_data.rows() - 1, 0) - head_imu_data(0, 0)) / double(head_imu_data.rows());
 
 
 
@@ -170,10 +172,10 @@ int main(int argc, char *argv[]) {
 
 
 	// We use the sensor specs to build the noise model for the IMU factor.
-	double accel_noise_sigma = 0.001;
-	double gyro_noise_sigma = 0.001 * M_PI / 180.0;
-	double accel_bias_rw_sigma = 0.004905;
-	double gyro_bias_rw_sigma = 0.0001454441043;
+	double accel_noise_sigma = 0.0001;
+	double gyro_noise_sigma = 0.0001 * M_PI / 180.0;
+	double accel_bias_rw_sigma = 0.0004905;
+	double gyro_bias_rw_sigma = 0.00001454441043;
 	Matrix33 measured_acc_cov = Matrix33::Identity(3, 3) * pow(accel_noise_sigma, 2);
 	Matrix33 measured_omega_cov = Matrix33::Identity(3, 3) * pow(gyro_noise_sigma, 2);
 	Matrix33 integration_error_cov =
@@ -209,24 +211,33 @@ int main(int argc, char *argv[]) {
 
 	Values initial_values;
 	NonlinearFactorGraph graph;
-	int left_counter = 0;
-	int left_normal_counter = 0;
-	int left_zv_counter = 0;
+	int counter = 0;
+	int normal_counter = 0;
+	int zv_counter = 0;
 
-	initial_values.insert(X(left_counter), prior_pose);
-	initial_values.insert(V(left_counter), prior_velocity);
-	initial_values.insert(B(left_counter), prior_imu_bias);
+	initial_values.insert(X(counter), prior_pose);
+	initial_values.insert(V(counter), prior_velocity);
+	initial_values.insert(B(counter), prior_imu_bias);
 
-	graph.add(PriorFactor<Pose3>(X(left_counter), prior_pose, pose_noise_model));
+	graph.add(PriorFactor<Pose3>(X(counter), prior_pose, pose_noise_model));
 //	graph.add()
-	graph.add(PriorFactor<Vector3>(V(left_counter), prior_velocity, velocity_noise_model));
-	graph.add(PriorFactor<imuBias::ConstantBias>(B(left_counter), prior_imu_bias, bias_noise_model));
+	graph.add(PriorFactor<Vector3>(V(counter), prior_velocity, velocity_noise_model));
+	graph.add(PriorFactor<imuBias::ConstantBias>(B(counter), prior_imu_bias, bias_noise_model));
+
+	for(int i=0;i<beacon_set_data.rows();++i){
+		if(beacon_set_data(i,0)>-1000.0 and beacon_set_data(i,0)<1000.0){
+			Point3 beacon_point = Point3(Eigen::Vector3d(beacon_set_data(i,0),beacon_set_data(i,1),beacon_set_data(i,2)));
+			initial_values.insert(Symbol('l',i),beacon_point);
+
+			graph.add(PriorFactor<Point3>(Symbol('l',i), beacon_point,noiseModel::Isotropic::Sigmas(Eigen::Vector3d(1e-10,1e-10,1e-10))));
+		}
+	}
 
 
 	// initial isam2
 	ISAM2Params parameters;
-	parameters.relinearizeThreshold = 0.001;
-	parameters.relinearizeSkip = 1;
+//	parameters.relinearizeThreshold = 0.001;
+	parameters.relinearizeSkip = 10;
 	ISAM2 isam(parameters);
 
 	isam.update(graph, initial_values);
@@ -240,6 +251,7 @@ int main(int argc, char *argv[]) {
 
 
 	double last_rate = 0.0;
+	int uwb_index =0;
 	for (int i(0); i < head_imu_data.rows() - 2; ++i) {
 		Eigen::Vector3d acc(head_imu_data(i, 1), head_imu_data(i, 2), head_imu_data(i, 3));
 		Eigen::Vector3d gyr(head_imu_data(i, 4), head_imu_data(i, 5), head_imu_data(i, 6));
@@ -252,12 +264,9 @@ int main(int argc, char *argv[]) {
 			std::cout << "finished:" << rate * 100.0 << "%" << std::endl;
 			last_rate = rate;
 		}
-		auto add_new_factor = [&](int &counter, double the_zv_flag) {
+		if (uwb_index<uwb_data.rows() and   uwb_data(uwb_index,0)<head_imu_data(i,0)) {
 
 			counter += 1;
-//			std::cout << "counter ;" << counter << std::endl;
-
-
 
 //			auto prev_state = new NavState(prior_pose,prior_velocity);
 //			imuBias::ConstantBias prev_bias = prior_imu_bias;
@@ -278,27 +287,25 @@ int main(int argc, char *argv[]) {
 			                                                     B(counter),
 			                                                     zero_bias, bias_noise_model));
 
-//			if (the_zv_flag > 0.5) {
-////				std::cout << "zv flag" << std::endl;
-//				graph.push_back(PriorFactor<Vector3>(
-//						V(counter), Eigen::Vector3d(0.0, 0.0, 0.0), zero_velocity_noise_model
-//				));
+			for(int k=0;k<beacon_set_data.rows();++k){
+				if(beacon_set_data(k,0)>-1000.0 and beacon_set_data(k,0)<1000.0 and uwb_data(uwb_index,k+1)>0.0){
+					printf("beaconset: %d,range%f\n",k,uwb_data(uwb_index,k+1));
+					graph.add(
+							RangeFactor<Pose3,Point3>(X(counter),Symbol('l',k),uwb_data(uwb_index,k+1),noiseModel::Diagonal::Sigmas((Vector(1)<<0.1).finished()))
+							);
+				}
+			}
 
-//
-//			}
 			try {
 				isam.update(graph, initial_values);
 				isam.update();
 
 
 				Values currentEstimate = isam.calculateEstimate();
-//			currentEstimate.print("current state:");
 
 				prior_pose = currentEstimate.at<Pose3>(X(counter));
 				prior_velocity = currentEstimate.at<Vector3>(V(counter));
 				prior_imu_bias = currentEstimate.at<imuBias::ConstantBias>(B(counter));
-
-//				std::cout << prior_pose << std::endl;
 
 				logger_ptr->addTrace3dEvent("trace", "real_time_gtsam",
 				                            Eigen::Vector3d(prior_pose.x(), prior_pose.y(), prior_pose.z()));
@@ -308,43 +315,24 @@ int main(int argc, char *argv[]) {
 				logger_ptr->addPlotEvent("velocity", "velocity", prior_velocity);
 			} catch (std::exception &e) {
 				std::cout << e.what() << std::endl;
-//				isam.
 			}
 
+			uwb_index++;
 
 			graph.resize(0);
 			initial_values.clear();
 			imu_preintegrated_->resetIntegrationAndSetBias(prior_imu_bias);
+		}
 
-		};
-//
-//		if (left_zv_state(i) > 0.5) {
-//			left_zv_counter++;
-//			if (left_zv_counter > 10 || (left_zv_state(i + 1) < 0.5)) {
-//				add_new_factor(left_counter, 1.0);
-//				left_zv_counter = 0;
-////				std::cout << "zv hitted." << std::endl;
-//			}
-//
-//		} else {
-//			left_normal_counter++;
-//			if (left_normal_counter > 70 || left_zv_state(i + 1) > 0.5) {
-//				add_new_factor(left_counter, 0.0);
-//				left_normal_counter = 0;
-////				std::cout << "unzv hitted" << std::endl;
-//
-//			}
-//
-//		}
-		add_new_factor(head)
+
 	}
 
 
-	
+
 	// Plot final result.
 
 	Values currentEstimate = isam.calculateEstimate();
-	for (int i(0); i < left_counter; ++i) {
+	for (int i(0); i < counter; ++i) {
 
 		prior_pose = currentEstimate.at<Pose3>(X(i));
 		prior_velocity = currentEstimate.at<Vector3>(V(i));
