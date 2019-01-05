@@ -168,6 +168,13 @@ target_link_libraries(ImuUwbMEstimator ${PYTHON_LIBRARIES}
 					  ${PYTHON_LIBRARIES}
 					  ${SuiteSparse_LIBRARIES})
 
+add_executable(RobustPDRUWBTester GraphOptimization/src/RobustPDRUWBTester.cpp GraphOptimization/OwnEdge/DistanceEdgeSE2Point2.cpp GraphOptimization/OwnEdge/DistanceEdgeSE2Point2.h)
+target_link_libraries(RobustPDRUWBTester ${PYTHON_LIBRARIES}
+					  ${Sophus_LIBRARIES}
+					  ${G2O_LIBS}
+					  ${CSPARSE_LIBRARY}
+					  ${PYTHON_LIBRARIES}
+					  ${SuiteSparse_LIBRARIES})
 
 add_executable(KalmanFilterTester BayesStateEstimate/Test/KalmanFilterTester.cpp)
 target_link_libraries(KalmanFilterTester ${PYTHON_LIBRARIES})
