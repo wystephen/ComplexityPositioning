@@ -223,6 +223,10 @@ target_link_libraries(gtsam_ZUPT_UWB_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES}
 
 add_executable(gtsam_Vehicle_INS_UWB_test GraphOptimization/gtsam_src/gtsam_Vehicle_INS_UWB_test.cpp)
 target_link_libraries(gtsam_Vehicle_INS_UWB_test ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES})
+
+
+add_executable(gtsam_PDR_UWB_Robust GraphOptimization/gtsam_src/PDR_UWB_Robust.cpp)
+target_link_libraries(gtsam_PDR_UWB_Robust ${PYTHON_LIBRARIES} ${GTSAM_LIBRARIES} ${Boost_LIBRARIES})
 #cuda_add_executable(MonteCarloThrustTester
 #        BayesStateEstimate/Test/MonteCarloTesterCuda.cpp)
 #target_link_libraries(MonteCarloThrustTester )
@@ -235,3 +239,4 @@ target_link_libraries(gtsam_Vehicle_INS_UWB_test ${PYTHON_LIBRARIES} ${GTSAM_LIB
 #set_property(TARGET test_cu PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 
 #CUDA_ADD_EXECUTABLE(CUDA_Test ${CPP_LIST} ${CU_LIST})
+
