@@ -190,15 +190,15 @@ int main() {
 		g2o::VertexSE2 *v = static_cast<g2o::VertexSE2 *>(globalOptimizer.vertex(pose_counter));
 		double data[3];
 		v->getEstimateData(data);
-		logger_ptr->addTraceEvent("trace", "real time", Eigen::Vector2d(data[0], data[1]));
+		logger_ptr->addTraceEvent("g2otrace", "real time", Eigen::Vector2d(data[0], data[1]));
 		for (int i = 0; i < 3; ++i) {
 			latest_pose_2d[i] = data[i];
 		}
-		logger_ptr->addPlotEvent("trace 2d","real time", Eigen::Vector2d(data[0],data[1]));
+//		logger_ptr->addPlotEvent("trace 2d","real time", Eigen::Vector2d(data[0],data[1]));
 
-		for(int u=1;u<uwb_data.cols();++u){
-			logger_ptr->addPlotEvent("uwb","uwb"+std::to_string(u),uwb_data(uwb_index,u));
-		}
+//		for(int u=1;u<uwb_data.cols();++u){
+//			logger_ptr->addPlotEvent("uwb","uwb"+std::to_string(u),uwb_data(uwb_index,u));
+//		}
 
 
 	}
@@ -210,7 +210,7 @@ int main() {
 		g2o::VertexSE2 *v = static_cast<g2o::VertexSE2 *>(globalOptimizer.vertex(i));
 		double data[3];
 		v->getEstimateData(data);
-		logger_ptr->addTraceEvent("trace", "final", Eigen::Vector2d(data[0], data[1]));
+		logger_ptr->addTraceEvent("g2otrace", "final", Eigen::Vector2d(data[0], data[1]));
 	}
 
 

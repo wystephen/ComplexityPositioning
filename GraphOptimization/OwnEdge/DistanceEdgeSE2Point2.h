@@ -29,9 +29,10 @@ public:
 
 //		int VERSION_ID = 0;//SIMPLEST VERSION
 //	int VERSION_ID = 1;// RANSAC
-	int VERSION_ID = 2;// robust kernel when system state calculated distance smaller than measurement.
+	int VERSION_ID = 2;// Robust Tukey
+//	int VERSION_ID = 3;//Robust Huber
 
-	double robust_threshold_ = 1.5;
+	double robust_threshold_ = 2.0;
 
 	virtual void computeError() {
 
@@ -69,7 +70,7 @@ public:
 				}
 			}
 
-			if (VERSION_ID == 1) {
+			if (VERSION_ID == 1) {//hard-RANSAC
 				if ((dis_vec_[i] - dis) > robust_threshold_) {
 					_error(0, 0) += 0.0;
 					ransac_flag_vec_[i] = false;
@@ -84,7 +85,7 @@ public:
 				if (abs(value) < eta) {
 					return 0.5 * value * value;
 				} else {
-					return eta * (abs(eta) - 0.5 * eta);
+					return eta * (abs(value) - 0.5 * eta);
 				}
 			};
 
@@ -98,12 +99,22 @@ public:
 			};
 
 			//tukey funct.
-			if (VERSION_ID == 2) {
+			if (VERSION_ID == 2) {//Tukey Robust function.
 				if ((dis_vec_[i] > dis)) {
 					_error(0, 0) += tukey_func(dis - dis_vec_[i], robust_threshold_);
 				} else {
 					_error(0, 0) += (dis - dis_vec_[i]) * (dis - dis_vec_[i]);
 //					_error(0,0) += huber_func(dis-dis_vec_[i],3.0);
+				}
+			}
+
+
+			if (VERSION_ID == 3) {
+				if ((dis_vec_[i] > dis)) {
+					_error(0, 0) += huber_func(dis - dis_vec_[i], robust_threshold_);
+
+				} else {
+					_error(0, 0) += (dis - dis_vec_[i]) * (dis - dis_vec_[i]);
 				}
 			}
 //			printf("range error:%f\n",dis-dis_vec_[i]);
@@ -125,7 +136,10 @@ public:
 		}
 	}
 
-//
+	/**
+	 * @brief Using to calculate jacobian matrix. Save jacobian matrix to _jacobianOplusXi which is a (1,3).
+	 * @note _jacobianOplusXj should always be zero-matrix.
+	 */
 	void linearizeOplus() {
 		_jacobianOplusXj.setZero();
 		_jacobianOplusXi.setZero();// 1x3 matrix.
@@ -201,6 +215,29 @@ public:
 				}
 			}
 
+			if (VERSION_ID == 3) {
+				//huber jacobian matrix
+				if ((dis_vec_[i] > dis)) {
+					if (dis_vec_[i] > dis + robust_threshold_) {
+						_jacobianOplusXi(0, 0) += (1.0);
+						_jacobianOplusXi(0, 1) += (1.0);
+
+					} else {
+						_jacobianOplusXi(0, 0) +=
+								(1.0 * (dis - dis_vec_[i]) * (p[0] - beacon_set_vec_[i].x()) / dis);
+						_jacobianOplusXi(0, 1) +=
+								(1.0 * (dis - dis_vec_[i]) * (p[1] - beacon_set_vec_[i].y()) / dis);
+					}
+
+				} else {
+					_jacobianOplusXi(0, 0) +=
+							(2.0 * (dis - dis_vec_[i]) * (p[0] - beacon_set_vec_[i].x()) / dis);
+					_jacobianOplusXi(0, 1) +=
+							(2.0 * (dis - dis_vec_[i]) * (p[1] - beacon_set_vec_[i].y()) / dis);
+				}
+
+			}
+
 
 		}
 
@@ -232,11 +269,6 @@ public:
 		return true;
 	}
 
-
-	/**
-	 * Try achieve this function manually.
-	 */
-//    void linearizeOplus();
 
 /**
  * ...
