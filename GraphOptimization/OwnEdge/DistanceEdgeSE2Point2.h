@@ -170,8 +170,6 @@ public:
 						_jacobianOplusXi(0, 1) += 0.0;
 						_jacobianOplusXi(0, 2) += 0.0;
 					} else {
-
-
 //						_jacobianOplusXi(0, 0) += (dis - dis_vec_[i])
 //						                          *
 //						                          pow(1.0 - (dis - dis_vec_[i]) * (dis - dis_vec_[i]) / 0.5 / 0.5, 2.0)

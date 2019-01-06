@@ -22,8 +22,8 @@ if __name__ == '__main__':
 		while trace[i, 2] < -np.pi:
 			trace[i, 2] += (2.0 * np.pi)
 
-		dx = pdr_data[i, 1] * math.sin(trace[i, 2])
-		dy = pdr_data[i, 1] * math.cos(trace[i, 2])
+		dx = pdr_data[i, 1] * math.cos(trace[i, 2])
+		dy = pdr_data[i, 1] * math.sin(trace[i, 2])
 		# dx = pdr_data[]
 
 		trace[i, 0] = initial_pos[0] + dx
