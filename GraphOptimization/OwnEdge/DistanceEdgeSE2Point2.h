@@ -28,8 +28,10 @@ public:
 
 
 //		int VERSION_ID = 0;//SIMPLEST VERSION
-	int VERSION_ID = 1;// RANSAC
-//	int VERSION_ID = 2;// robust kernel when system state calculated distance smaller than measurement.
+//	int VERSION_ID = 1;// RANSAC
+	int VERSION_ID = 2;// robust kernel when system state calculated distance smaller than measurement.
+
+	double robust_threshold_ = 1.0;
 
 	virtual void computeError() {
 
@@ -68,7 +70,7 @@ public:
 			}
 
 			if (VERSION_ID == 1) {
-				if ((dis_vec_[i] - dis) > 1.0) {
+				if ((dis_vec_[i] - dis) > robust_threshold_) {
 					_error(0, 0) += 0.0;
 					ransac_flag_vec_[i] = false;
 				} else {
@@ -95,9 +97,10 @@ public:
 
 			};
 
+			//tukey funct.
 			if (VERSION_ID == 2) {
 				if ((dis_vec_[i] > dis)) {
-					_error(0, 0) += tukey_func(dis - dis_vec_[i], 0.5);
+					_error(0, 0) += tukey_func(dis - dis_vec_[i], 1.0);
 				} else {
 					_error(0, 0) += (dis - dis_vec_[i]) * (dis - dis_vec_[i]);
 //					_error(0,0) += huber_func(dis-dis_vec_[i],3.0);
@@ -106,6 +109,7 @@ public:
 //			printf("range error:%f\n",dis-dis_vec_[i]);
 		}
 
+		//
 		if (VERSION_ID == 1) {
 			int true_counter = 0;
 			for (int i = 0; i < ransac_flag_vec_.size(); ++i) {
@@ -118,8 +122,6 @@ public:
 				_error(0, 0) = min_error * min_error;
 
 			}
-
-
 		}
 	}
 
@@ -186,8 +188,6 @@ public:
 					}
 
 				} else {
-//				_jacobianOplusXi(0,1) =0.0;
-//				_jacobianOplusXi(0,2) = 0.0;
 					_jacobianOplusXi(0, 0) +=
 							(2.0 * (dis - dis_vec_[i]) * (p[0] - beacon_set_vec_[i].x()) / dis);
 					_jacobianOplusXi(0, 1) +=
