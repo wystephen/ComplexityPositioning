@@ -53,7 +53,8 @@ int main() {
 
 	AWF::FileReader beacon_set_file(dir_name + "beacon_coordinate.csv"),
 			pdr_file(dir_name + "pdr_result.csv"),
-			uwb_file(dir_name + "uwb_noise.csv");
+//			uwb_file(dir_name + "uwb_noise.csv");
+	uwb_file(dir_name + "noised_uwb_datapy.csv");
 
 	Eigen::MatrixXd pdr_data = pdr_file.extractDoulbeMatrix(",");
 	Eigen::MatrixXd beacon_set = beacon_set_file.extractDoulbeMatrix(",");
@@ -119,12 +120,13 @@ int main() {
 		pose_vertex->setId(pose_counter);
 
 		// estimate using odometry
-//		latest_pose_2d[2] += pdr_data(i, 3);
-//		latest_pose_2d[1] += cos(latest_pose_2d[2]) * pdr_data(i, 1);
-//		latest_pose_2d[0] += sin(latest_pose_2d[2]) * pdr_data(i, 1);
+		latest_pose_2d[2] += pdr_data(i, 3);
+		latest_pose_2d[0] += cos(latest_pose_2d[2]) * pdr_data(i, 1);
+		latest_pose_2d[1] += sin(latest_pose_2d[2]) * pdr_data(i, 1);
 
 
-		pose_vertex->setEstimate(Eigen::Vector3d(latest_pose_2d[0], latest_pose_2d[1],
+		pose_vertex->setEstimate(Eigen::Vector3d(latest_pose_2d[0],
+		                                         latest_pose_2d[1],
 		                                         latest_pose_2d[2]));
 
 		globalOptimizer.addVertex(pose_vertex);
@@ -147,7 +149,7 @@ int main() {
 			edge_dis_2d->vertices()[1] = globalOptimizer.vertex(pose_counter - 1);
 			edge_dis_2d->setMeasurementFromState();
 			Eigen::Matrix<double, 1, 1> info_dis;
-			info_dis(0, 0) = 1.0;
+			info_dis(0, 0) = 2.0;
 
 			edge_dis_2d->setInformation(info_dis);
 
@@ -179,7 +181,7 @@ int main() {
 		printf("-------------------\n");
 
 		globalOptimizer.initializeOptimization();
-		globalOptimizer.optimize(2);
+		globalOptimizer.optimize(10);
 		g2o::VertexSE2 *v = static_cast<g2o::VertexSE2 *>(globalOptimizer.vertex(pose_counter));
 		double data[3];
 		v->getEstimateData(data);

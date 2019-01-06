@@ -49,7 +49,8 @@ int main() {
 
 	AWF::FileReader beacon_set_file(dir_name + "beacon_coordinate.csv"),
 			pdr_file(dir_name + "pdr_result.csv"),
-			uwb_file(dir_name + "uwb_noise.csv");
+//			uwb_file(dir_name + "uwb_noise.csv");
+	uwb_file(dir_name + "noised_uwb_datapy.csv");
 
 	Eigen::MatrixXd pdr_data = pdr_file.extractDoulbeMatrix(",");
 	Eigen::MatrixXd beacon_set = beacon_set_file.extractDoulbeMatrix(",");
