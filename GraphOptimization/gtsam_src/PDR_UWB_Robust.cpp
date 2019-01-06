@@ -214,7 +214,7 @@ int main() {
 		robust_initial_pose = robust_isam2.calculateEstimate().at<Pose2>(X(pose_counter));
 //		logger_ptr->addTraceEvent("trace", "robust_real_time", Eigen::Vector2d(
 //				robust_initial_pose.x(), robust_initial_pose.y()
-		));
+//		));
 
 
 	}
