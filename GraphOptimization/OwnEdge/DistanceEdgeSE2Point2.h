@@ -68,7 +68,7 @@ public:
 			}
 
 			if (VERSION_ID == 1) {
-				if ((dis_vec_[i] - dis) > 1.5) {
+				if ((dis_vec_[i] - dis) > 1.0) {
 					_error(0, 0) += 0.0;
 					ransac_flag_vec_[i] = false;
 				} else {

@@ -121,8 +121,8 @@ int main() {
 
 		// estimate using odometry
 		latest_pose_2d[2] += pdr_data(i, 3);
-		latest_pose_2d[0] += cos(latest_pose_2d[2]) * pdr_data(i, 1);
-		latest_pose_2d[1] += sin(latest_pose_2d[2]) * pdr_data(i, 1);
+		latest_pose_2d[1] += cos(latest_pose_2d[2]) * pdr_data(i, 1);
+		latest_pose_2d[0] += sin(latest_pose_2d[2]) * pdr_data(i, 1);
 
 
 		pose_vertex->setEstimate(Eigen::Vector3d(latest_pose_2d[0],
