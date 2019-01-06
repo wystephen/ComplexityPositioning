@@ -137,8 +137,13 @@ int main() {
 		edgeSE2->vertices()[1] = globalOptimizer.vertex(pose_counter);
 		edgeSE2->setMeasurement(Eigen::Vector3d(pdr_data(i, 1), 0.0, pdr_data(i, 3)));
 
-		Eigen::Matrix3d info = Eigen::Matrix3d::Identity() / 0.3;
-		info(2, 2) = 1.0 / (0.1);
+//		Eigen::Matrix3d info = Eigen::Matrix3d::Identity() / 0.3;
+//		info(2, 2) = 1.0 / (0.1);
+		Eigen::Matrix3d info= Eigen::Matrix3d::Identity();
+		info(0,0) = 1.0 / (0.5);
+		info(1,1) = 1.0 / (0.5);
+		info(2,2) = (1.0 / 0.21);
+
 		edgeSE2->setInformation(info);
 
 		globalOptimizer.addEdge(edgeSE2);

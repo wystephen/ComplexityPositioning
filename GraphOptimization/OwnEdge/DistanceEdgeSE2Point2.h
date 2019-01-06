@@ -31,7 +31,7 @@ public:
 //	int VERSION_ID = 1;// RANSAC
 	int VERSION_ID = 2;// robust kernel when system state calculated distance smaller than measurement.
 
-	double robust_threshold_ = 1.0;
+	double robust_threshold_ = 1.5;
 
 	virtual void computeError() {
 
