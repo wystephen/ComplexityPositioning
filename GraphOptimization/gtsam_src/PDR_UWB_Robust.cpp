@@ -212,8 +212,8 @@ int main() {
 		                          Eigen::Vector2d(initial_pose.x(), initial_pose.y()));
 
 		robust_initial_pose = robust_isam2.calculateEstimate().at<Pose2>(X(pose_counter));
-		logger_ptr->addTraceEvent("trace", "robust_real_time", Eigen::Vector2d(
-				robust_initial_pose.x(), robust_initial_pose.y()
+//		logger_ptr->addTraceEvent("trace", "robust_real_time", Eigen::Vector2d(
+//				robust_initial_pose.x(), robust_initial_pose.y()
 		));
 
 
@@ -224,8 +224,8 @@ int main() {
 		logger_ptr->addTraceEvent("trace", "final_result",
 		                          Eigen::Vector2d(initial_pose.x(), initial_pose.y()));
 		initial_pose = robust_isam2.calculateBestEstimate().at<Pose2>(X(i));
-		logger_ptr->addTraceEvent("trace", "robust_final_result",
-		                          Eigen::Vector2d(initial_pose.x(), initial_pose.y()));
+//		logger_ptr->addTraceEvent("trace", "robust_final_result",
+//		                          Eigen::Vector2d(initial_pose.x(), initial_pose.y()));
 
 
 	}

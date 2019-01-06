@@ -117,7 +117,15 @@ int main() {
 		g2o::VertexSE2 *pose_vertex = new g2o::VertexSE2();
 
 		pose_vertex->setId(pose_counter);
-		pose_vertex->setEstimate(Eigen::Vector3d(latest_pose_2d[0], latest_pose_2d[1], latest_pose_2d[2]));
+
+		// estimate using odometry
+//		latest_pose_2d[2] += pdr_data(i, 3);
+//		latest_pose_2d[1] += cos(latest_pose_2d[2]) * pdr_data(i, 1);
+//		latest_pose_2d[0] += sin(latest_pose_2d[2]) * pdr_data(i, 1);
+
+
+		pose_vertex->setEstimate(Eigen::Vector3d(latest_pose_2d[0], latest_pose_2d[1],
+		                                         latest_pose_2d[2]));
 
 		globalOptimizer.addVertex(pose_vertex);
 
@@ -136,10 +144,10 @@ int main() {
 		while (uwb_index < uwb_data.rows() and uwb_data(uwb_index, 0) < pdr_data(i, 0)) {
 			DistanceEdge2D *edge_dis_2d = new DistanceEdge2D();
 			edge_dis_2d->vertices()[0] = globalOptimizer.vertex(pose_counter);
-			edge_dis_2d->vertices()[1] = globalOptimizer.vertex(pose_counter-1);
+			edge_dis_2d->vertices()[1] = globalOptimizer.vertex(pose_counter - 1);
 			edge_dis_2d->setMeasurementFromState();
-			Eigen::Matrix<double,1,1> info_dis;
-			info_dis(0,0) = 0.1;
+			Eigen::Matrix<double, 1, 1> info_dis;
+			info_dis(0, 0) = 0.1;
 
 			edge_dis_2d->setInformation(info_dis);
 
@@ -153,9 +161,6 @@ int main() {
 					       uwb_data(uwb_index, k + 1));
 					beacon_vec.push_back(Eigen::Vector2d(beacon_set(k, 0), beacon_set(k, 1)));
 					range_vec.push_back(uwb_data(uwb_index, k + 1));
-
-
-
 
 
 				}
@@ -174,11 +179,14 @@ int main() {
 		printf("-------------------\n");
 
 		globalOptimizer.initializeOptimization();
-		globalOptimizer.optimize(10);
+		globalOptimizer.optimize(2);
 		g2o::VertexSE2 *v = static_cast<g2o::VertexSE2 *>(globalOptimizer.vertex(pose_counter));
 		double data[3];
 		v->getEstimateData(data);
 		logger_ptr->addTraceEvent("trace", "real time", Eigen::Vector2d(data[0], data[1]));
+		for (int i = 0; i < 3; ++i) {
+			latest_pose_2d[i] = data[i];
+		}
 
 
 	}

@@ -61,7 +61,7 @@ public:
 			}
 
 			if (VERSION_ID == 1) {
-				if ((dis_vec_[i] - dis) > 0.5) {
+				if ((dis_vec_[i] - dis) > 1.5) {
 					_error(0, 0) += 0.0;
 				} else {
 
