@@ -29,8 +29,7 @@ if __name__ == '__main__':
 		# new_uwb_data[i, 1:] = uwb_data[i, 1:] + noise_data[i, 1:5]
 		# new_uwb_data[i, 1:] = uwb_data[i, 1:] + noise_data[i+200, 0:4]
 		new_uwb_data[i, 1:] = uwb_data[i, 1:] + noise_data[i, 2:6]
-		new_uwb_data[i,1:4] = uwb_data[i,1:4] + noise_data[i+100,0:3]
-
+		new_uwb_data[i, 1:4] = uwb_data[i, 1:4] + noise_data[i + 100, 0:3]
 
 	plt.subplot(212)
 	plt.title('noised uwb data')
@@ -40,6 +39,7 @@ if __name__ == '__main__':
 	plt.grid()
 
 	np.savetxt('/home/steve/Data/PDRUWBRobust/noised_uwb_datapy.csv', new_uwb_data, delimiter=',')
-	import os,subprocess
+	import os, subprocess
+
 	os.system('/home/steve/Code/ComplexityPositioning/cmake-build-debug/RobustPDRUWBTester')
 	plt.show()

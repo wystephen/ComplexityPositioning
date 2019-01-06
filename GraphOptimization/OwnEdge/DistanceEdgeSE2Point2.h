@@ -104,7 +104,6 @@ public:
 					_error(0, 0) += tukey_func(dis - dis_vec_[i], robust_threshold_);
 				} else {
 					_error(0, 0) += (dis - dis_vec_[i]) * (dis - dis_vec_[i]);
-//					_error(0,0) += huber_func(dis-dis_vec_[i],3.0);
 				}
 			}
 
