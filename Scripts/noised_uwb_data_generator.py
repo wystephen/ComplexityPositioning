@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 if __name__ == '__main__':
 	uwb_data = np.loadtxt('/home/steve/Data/PDRUWBRobust/uwb_noise.csv', delimiter=',')
 
-	noise_data = np.loadtxt('/home/steve/temp/uwb_noise_data.csv', delimiter=',')
+	noise_data = np.loadtxt('/home/steve/Data/PDRUWBRobust/uwb_noise_data.csv', delimiter=',')
 
 	plt.figure()
 	for i in range(noise_data.shape[1]):
