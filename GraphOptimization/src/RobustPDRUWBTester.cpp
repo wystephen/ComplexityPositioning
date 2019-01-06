@@ -147,7 +147,7 @@ int main() {
 			edge_dis_2d->vertices()[1] = globalOptimizer.vertex(pose_counter - 1);
 			edge_dis_2d->setMeasurementFromState();
 			Eigen::Matrix<double, 1, 1> info_dis;
-			info_dis(0, 0) = 0.5;
+			info_dis(0, 0) = 1.0;
 
 			edge_dis_2d->setInformation(info_dis);
 

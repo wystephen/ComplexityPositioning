@@ -70,7 +70,7 @@ public:
 
 				}
 			}
-			auto huber_func = [](double value, double eta)->double {
+			auto huber_func = [](double value, double eta) -> double {
 				if (abs(value) < eta) {
 					return 0.5 * value * value;
 				} else {
@@ -78,15 +78,20 @@ public:
 				}
 			};
 
-			auto tukey_func = [](double value, double eta)->double{
+			auto tukey_func = [](double u, double d) -> double {
+				if (abs(u) < d) {
+					return d * d / 6.0 * (1.0 - pow(1.0 - (u * u / d / d), 3.0));
+				} else {
+					return d * d / 6.0;
+				}
 
 			};
 
 			if (VERSION_ID == 2) {
 				if ((dis_vec_[i] > dis)) {
-					_error(0,0) += huber_func(dis-dis_vec_[i],1.5);
+					_error(0, 0) += tukey_func(dis - dis_vec_[i], 1.0);
 				} else {
-					_error(0,0) += (dis-dis_vec_[i])*(dis-dis_vec_[i]);
+					_error(0, 0) += (dis - dis_vec_[i]) * (dis - dis_vec_[i]);
 				}
 			}
 //			printf("range error:%f\n",dis-dis_vec_[i]);
