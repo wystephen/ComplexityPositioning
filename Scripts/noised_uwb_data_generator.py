@@ -26,8 +26,8 @@ if __name__ == '__main__':
 
 	new_uwb_data = uwb_data
 	for i in range(uwb_data.shape[0]):
-		new_uwb_data[i, 1:] = uwb_data[i, 1:] + noise_data[i, 1:5]
-		# new_uwb_data[i, 1:] = uwb_data[i, 1:] + noise_data[i, 0:4]
+		# new_uwb_data[i, 1:] = uwb_data[i, 1:] + noise_data[i, 1:5]
+		new_uwb_data[i, 1:] = uwb_data[i, 1:] + noise_data[i, 0:4]
 		# new_uwb_data[i, 1:] = uwb_data[i, 1:] + noise_data[i, 2:6]
 
 	plt.subplot(212)

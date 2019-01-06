@@ -61,7 +61,7 @@ public:
 			}
 
 			if (VERSION_ID == 0) {
-				if (abs(dis - dis_vec_[i]) > 3.0) {
+				if (abs(dis - dis_vec_[i]) > robust_threshold_) {
 					_error(0, 0) += 0.0;
 				} else {
 
@@ -100,7 +100,7 @@ public:
 			//tukey funct.
 			if (VERSION_ID == 2) {
 				if ((dis_vec_[i] > dis)) {
-					_error(0, 0) += tukey_func(dis - dis_vec_[i], 1.0);
+					_error(0, 0) += tukey_func(dis - dis_vec_[i], robust_threshold_);
 				} else {
 					_error(0, 0) += (dis - dis_vec_[i]) * (dis - dis_vec_[i]);
 //					_error(0,0) += huber_func(dis-dis_vec_[i],3.0);
@@ -150,10 +150,6 @@ public:
 			if (VERSION_ID == 1) {
 				//RANSAC VERSION
 				if (ransac_flag_vec_[i] == true) {
-//					_jacobianOplusXi(0, 0) += (p[0] - beacon_set_vec_[i].x()) / dis;
-//					_jacobianOplusXi(0, 1) += (p[1] - beacon_set_vec_[i].y()) / dis;
-
-
 					_jacobianOplusXi(0, 0) +=
 							(2.0 * (dis - dis_vec_[i]) * (p[0] - beacon_set_vec_[i].x()) / dis);
 					_jacobianOplusXi(0, 1) +=
@@ -170,20 +166,30 @@ public:
 				//tukey jacobian matrix.
 				if ((dis_vec_[i] > dis)) {
 					//tukey
-					if (dis_vec_[i] > dis + 0.5) {
+					if (dis_vec_[i] > dis + robust_threshold_) {
 						_jacobianOplusXi(0, 1) += 0.0;
 						_jacobianOplusXi(0, 2) += 0.0;
 					} else {
 
 
-						_jacobianOplusXi(0, 0) += (dis - dis_vec_[i])
-						                          *
-						                          pow(1.0 - (dis - dis_vec_[i]) * (dis - dis_vec_[i]) / 0.5 / 0.5, 2.0)
-						                          * (2.0 * (dis - dis_vec_[i]) * (p[0] - beacon_set_vec_[i].x()) / dis);
-						_jacobianOplusXi(0, 1) += (dis - dis_vec_[i])
-						                          *
-						                          pow(1.0 - (dis - dis_vec_[i]) * (dis - dis_vec_[i]) / 0.5 / 0.5, 2.0)
-						                          * (2.0 * (dis - dis_vec_[i]) * (p[1] - beacon_set_vec_[i].y()) / dis);
+//						_jacobianOplusXi(0, 0) += (dis - dis_vec_[i])
+//						                          *
+//						                          pow(1.0 - (dis - dis_vec_[i]) * (dis - dis_vec_[i]) / 0.5 / 0.5, 2.0)
+//						                          * (2.0 * (dis - dis_vec_[i]) * (p[0] - beacon_set_vec_[i].x()) / dis);
+//						_jacobianOplusXi(0, 1) += (dis - dis_vec_[i])
+//						                          *
+//						                          pow(1.0 - (dis - dis_vec_[i]) * (dis - dis_vec_[i]) / 0.5 / 0.5, 2.0)
+//						                          * (2.0 * (dis - dis_vec_[i]) * (p[1] - beacon_set_vec_[i].y()) / dis);
+						_jacobianOplusXi(0, 0) += (pow(1.0 -
+						                               (dis - dis_vec_[i]) * (dis - dis_vec_[i]) / robust_threshold_ /
+						                               robust_threshold_, 2.0)
+						                           * (dis - dis_vec_[i]) * (p[0] - beacon_set_vec_[i].x()) / dis
+						);
+						_jacobianOplusXi(0, 1) += (pow(1.0 -
+						                               (dis - dis_vec_[i]) * (dis - dis_vec_[i]) / robust_threshold_ /
+						                               robust_threshold_, 2.0)
+						                           * (dis - dis_vec_[i]) * (p[1] - beacon_set_vec_[i].y()) / dis
+						);
 
 					}
 
