@@ -43,7 +43,8 @@ public:
 		_error(0, 0) = 0.0;
 
 //		int VERSION_ID = 0;//SIMPLEST VERSION
-		int VERSION_ID = 1;// differen
+//		int VERSION_ID = 1;// differen
+		int VERSION_ID = 2;// robust kernel when system state calculated distance smaller than measurement.
 
 
 
@@ -69,10 +70,25 @@ public:
 
 				}
 			}
+			auto huber_func = [](double value, double eta)->double {
+				if (abs(value) < eta) {
+					return 0.5 * value * value;
+				} else {
+					return eta * (abs(eta) - 0.5 * eta);
+				}
+			};
 
+			auto tukey_func = [](double value, double eta)->double{
 
+			};
 
-
+			if (VERSION_ID == 2) {
+				if ((dis_vec_[i] > dis)) {
+					_error(0,0) += huber_func(dis-dis_vec_[i],1.5);
+				} else {
+					_error(0,0) += (dis-dis_vec_[i])*(dis-dis_vec_[i]);
+				}
+			}
 //			printf("range error:%f\n",dis-dis_vec_[i]);
 		}
 	}
