@@ -218,7 +218,7 @@ int main(int argc, char *argv[]) {
 	double second_info = 10000.0;
 
 
-	double distance_info = 1;
+	double distance_info = 10.0;
 	double distance_sigma = 2.0;
 
 
@@ -266,6 +266,18 @@ int main(int argc, char *argv[]) {
 			if (!BSE::ImuTools::GLRT_Detector(left_imu_data.block(i - 4, 1, 10, 6))) {
 				// add left foot vertex
 				auto *vertex_imu = new g2o::VertexSE3();
+
+				double pos_array[10]={0};
+				//
+				for(int rr=0;rr<3;++rr){
+					if(uwb_index < optimize_trace.rows()){
+
+						pos_array[rr] = optimize_trace(uwb_index,rr);
+					}
+				}
+
+				vertex_imu->setEstimateData(pos_array);
+
 				vertex_imu->setId(left_vertex_index);
 				left_vertex_index++;//
 				double *data = new double[6];
@@ -333,7 +345,10 @@ int main(int argc, char *argv[]) {
 				double pos_array[10]={0};
 				//
 				for(int rr=0;rr<3;++rr){
-					pos_array[rr] = optimize_trace(uwb_index,i);
+					if(uwb_index < optimize_trace.rows()){
+
+						pos_array[rr] = optimize_trace(uwb_index,rr);
+					}
 				}
 
 				vertex_imu->setEstimateData(pos_array);
@@ -427,7 +442,7 @@ int main(int argc, char *argv[]) {
 
 
 		globalOptimizer.initializeOptimization();
-		globalOptimizer.optimize(10);
+		globalOptimizer.optimize(1);
 
 
 	}
