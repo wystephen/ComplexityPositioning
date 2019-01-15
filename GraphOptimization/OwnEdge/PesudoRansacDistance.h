@@ -17,7 +17,7 @@ public:
 	}
 
 	bool ransac_flag_ = false;
-	double ransac_threshold_ = 1.0;
+	double ransac_threshold_ = 1.5;
 
 	virtual void computeError() {
 		g2o::VertexSE3 *from = static_cast<g2o::VertexSE3 *>(_vertices[0]);
