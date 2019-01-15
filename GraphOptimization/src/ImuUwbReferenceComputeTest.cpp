@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
 //			uwb_file(dir_name + "uwb_result.csv"),
 //			beacon_set_file(dir_name + "beaconSet.csv");
 
-	std::string dir_name = "/home/steve/Data/NewFusingLocationData/0036/";
+	std::string dir_name = "/home/steve/Data/NewFusingLocationData/0039/";
 	if(argc>1){
 		dir_name=std::string(argv[1]);
 	}

@@ -257,73 +257,7 @@ int main(int argc, char *argv[]) {
 		                               process_noise_matrix
 		);
 
-
-
-
-
-		/// uwb measurement
-		bool tmp_break_flag = false;
-		if (uwb_index < uwb_data.rows() && uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
-
-			for (int k(1); k < uwb_data.cols(); ++k) {
-				if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 100.0 && beacon_set_data(k - 1, 0) < 5000) {
-
-//					Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
-//					measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
-//					measurement_noise_matrix.resize(1, 1);
-//					if (uwb_index < 15) {
-//
-//						measurement_noise_matrix(0, 0) = 0.01;
-//					} else {
-//						measurement_noise_matrix(0, 0) = 0.1;
-//					}
-					Eigen::Matrix<double, 1, 1> info_matrix;
-					info_matrix(0, 0) = distance_info;
-
-//					auto *left_dis_edge = new MEstimationDistance();
-					auto *left_dis_edge = new PesudoRansacDistance();
-					left_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
-					left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index - 1);
-
-					left_dis_edge->setMeasurement(uwb_data(uwb_index, k));
-					left_dis_edge->setInformation(info_matrix);
-
-					dis_edge_stack.push_back(left_dis_edge);
-
-					globalOptimizer.addEdge(left_dis_edge);
-//					std::cout << " left_uwb measurement" << beacon_index_offset + k
-//					          << ":" << left_vertex_index << ":" << uwb_data(uwb_index, k)
-//					          << std::endl;
-//
-
-					auto *right_dis_edge = new PesudoRansacDistance();
-					right_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
-					right_dis_edge->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
-
-					right_dis_edge->setMeasurement(uwb_data(uwb_index, k));
-					right_dis_edge->setInformation(info_matrix);
-					globalOptimizer.addEdge(right_dis_edge);
-
-
-//					std::cout << uwb_index << " right_uwb measurement" << beacon_index_offset + k
-//					          << ":" << right_vertex_index << ":" << uwb_data(uwb_index, k)
-//					          << std::endl;
-
-
-				}
-			}
-
-//			logger_ptr->addPlotEvent("trace", "uwb_optimize", optimize_trace.block(i, 0, 1, 3));
-//			std::cout << "uwb before time :" << uwb_data(uwb_index, 0);
-			uwb_index++;
-
-
-//			if (uwb_index > uwb_data.rows() - 1) {
-//				break;
-//			}
-		}
-
-		// IMU Transaction
+// IMU Transaction
 
 		if (BSE::ImuTools::GLRT_Detector(left_imu_data.block(i - 5, 1, 10, 6))) {
 			/// zero velocity detector
@@ -396,6 +330,13 @@ int main(int argc, char *argv[]) {
 			if (!BSE::ImuTools::GLRT_Detector(right_imu_data.block(i - 4, 1, 10, 6))) {
 				// add right foot vertex
 				auto *vertex_imu = new g2o::VertexSE3();
+				double pos_array[10]={0};
+				//
+				for(int rr=0;rr<3;++rr){
+					pos_array[rr] = optimize_trace(uwb_index,i);
+				}
+
+				vertex_imu->setEstimateData(pos_array);
 				vertex_imu->setId(right_vertex_index);
 				right_vertex_index++;
 				globalOptimizer.addVertex(vertex_imu);
@@ -427,14 +368,66 @@ int main(int argc, char *argv[]) {
 			}
 
 		}
-//		logger_ptr->addTraceEvent("trace", "left", left_filter.state_x_.block(0, 0, 2, 1));
-//		logger_ptr->addTraceEvent("trace", "right", right_filter.state_x_.block(0, 0, 2, 1));
-//		logger_ptr->addTrace3dEvent("trace", "left", left_filter.state_x_.block(0, 0, 3, 1));
-//		logger_ptr->addTrace3dEvent("trace", "right", right_filter.state_x_.block(0, 0, 3, 1));
-//		logger_ptr->addTraceEvent("traceimu", "left", left_filter.state_x_.block(0, 0, 2, 1));
-//		logger_ptr->addTraceEvent("traceimu", "right", right_filter.state_x_.block(0, 0, 2, 1));
-//		logger_ptr->addTrace3dEvent("traceimu", "left", left_filter.state_x_.block(0, 0, 3, 1));
-//		logger_ptr->addTrace3dEvent("traceimu", "right", right_filter.state_x_.block(0, 0, 3, 1));
+
+
+
+		/// uwb measurement
+		bool tmp_break_flag = false;
+		if (uwb_index < uwb_data.rows() && uwb_data(uwb_index, 0) < left_imu_data(i, 0)) {
+
+			for (int k(1); k < uwb_data.cols(); ++k) {
+				if (uwb_data(uwb_index, k) > 0 && uwb_data(uwb_index, k) < 100.0 && beacon_set_data(k - 1, 0) < 5000) {
+
+//					Eigen::Vector4d measurement_data(0, 0, 0, uwb_data(uwb_index, k));
+//					measurement_data.block(0, 0, 3, 1) = beacon_set_data.block(k - 1, 0, 1, 3).transpose();
+//					measurement_noise_matrix.resize(1, 1);
+//					if (uwb_index < 15) {
+//
+//						measurement_noise_matrix(0, 0) = 0.01;
+//					} else {
+//						measurement_noise_matrix(0, 0) = 0.1;
+//					}
+					Eigen::Matrix<double, 1, 1> info_matrix;
+					info_matrix(0, 0) = distance_info;
+
+//					auto *left_dis_edge = new MEstimationDistance();
+//					auto *left_dis_edge = new PesudoRansacDistance();
+					auto *left_dis_edge = new TukeyRobustDistanceEdge();
+					left_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
+					left_dis_edge->vertices()[1] = globalOptimizer.vertex(left_vertex_index - 1);
+
+					left_dis_edge->setMeasurement(uwb_data(uwb_index, k));
+					left_dis_edge->setInformation(info_matrix);
+
+//					dis_edge_stack.push_back(left_dis_edge);
+
+					globalOptimizer.addEdge(left_dis_edge);
+//					std::cout << " left_uwb measurement" << beacon_index_offset + k
+//					          << ":" << left_vertex_index << ":" << uwb_data(uwb_index, k)
+//					          << std::endl;
+//
+
+					auto *right_dis_edge = new TukeyRobustDistanceEdge();
+					right_dis_edge->vertices()[0] = globalOptimizer.vertex(beacon_index_offset + k - 1);
+					right_dis_edge->vertices()[1] = globalOptimizer.vertex(right_vertex_index - 1);
+
+					right_dis_edge->setMeasurement(uwb_data(uwb_index, k));
+					right_dis_edge->setInformation(info_matrix);
+					globalOptimizer.addEdge(right_dis_edge);
+
+
+
+				}
+			}
+
+			uwb_index++;
+
+		}
+
+
+
+		globalOptimizer.initializeOptimization();
+		globalOptimizer.optimize(10);
 
 
 	}
@@ -447,81 +440,7 @@ int main(int argc, char *argv[]) {
 		e->ransac_flag_ = true;
 //		e->ransac_threshold_ = 14.0;
 	}
-//	globalOptimizer.optimize(10000);
-//
-//
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 8.0;
-//	}
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 6.0;
-//	}
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 3.0;
-//
-//	}
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 1.0;
-//	}
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 0.5;
-//	}
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 10.5;
-//	}
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 2.5;
-//	}
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 5.5;
-//	}
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 10.5;
-//	}
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 4.5;
-//	}
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 1.5;
-//	}
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 1.0;
-//	}
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 0.5;
-//	}
-//	globalOptimizer.optimize(1000);
-//	for (auto e:dis_edge_stack) {
-////		e->ransac_flag_=true;
-//		e->ransac_threshold_ = 0.2;
-//	}
-//	globalOptimizer.optimize(1000);
+
 	double *data_ptr = new double[10];
 
 	std::ofstream out_ref_trace(dir_name + "ref_trace.csv");
