@@ -54,8 +54,12 @@ namespace BSE {
                           Eigen::MatrixXd &state_prob,
                           const Eigen::MatrixXd &input,
                           const Eigen::MatrixXd &cov_input) {
-                         Eigen::Vector3d acc(input.block(0, 0, 3, 1));
-                         Eigen::Vector3d gyr(input.block(3, 0, 3, 1) * time_interval_);
+                         Eigen::Vector3d acc(input.block(0,
+                         		0,
+                         		3,
+                         		1));
+                         Eigen::Vector3d gyr(input.block(3, 0,
+                         		3, 1) * time_interval_);
                          if (IS_DEBUG) {
                              std::cout << "before rotate update imu:"
                                        << (rotate_q_ * acc).transpose() << std::endl;

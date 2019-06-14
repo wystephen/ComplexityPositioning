@@ -44,6 +44,7 @@ int main(int argc, char *argv[]) {
 	Eigen::Vector3d initial_pos = optimize_trace.block(0, 0, 1, 3).transpose();
 	double initial_ori = uwb_tool.computeInitialOri(optimize_trace);
 
+
 	//pre-process imu data
 	BSE::ImuTools::processImuData(imu_data);
 

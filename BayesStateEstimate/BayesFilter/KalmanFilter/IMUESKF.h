@@ -38,8 +38,9 @@ public:
 	                    const Eigen::Vector3d &gyr_cov,
 	                    double dt);
 
-	bool UwbMeasurement(double uwb_data, Eigen::Vector3d uwb_beacon,
-	                    Eigen::Matrix<double, 1, 1> uwb_cov);
+	bool UwbMeasurement(const double &uwb_data,
+	                    const Eigen::Vector3d &uwb_beacon,
+	                    const Eigen::Matrix<double, 1, 1> &uwb_cov);
 
 
 private:
@@ -53,7 +54,7 @@ private:
 	///// pos, vel, angle, acc_bias, gyr_bias   /////
 	Eigen::Matrix<double, 15, 1> error_state_ = Eigen::Matrix<double, 15, 1>::Zero();//  Error state
 
-	Eigen::Matrix<double, 15, 15> P_ = Eigen::Matrix<double,15,15>::Identity();// probability of error state
+	Eigen::Matrix<double, 15, 15> P_ = Eigen::Matrix<double, 15, 15>::Identity();// probability of error state
 
 	const Eigen::Matrix<double, 15, 15> I15_ = Eigen::Matrix<double, 15, 15>::Identity();
 
