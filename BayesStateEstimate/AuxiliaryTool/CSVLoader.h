@@ -1,0 +1,12 @@
+//
+// Created by steve on 6/14/19.
+//
+
+#ifndef COMPLEXITYPOSITIONING_CSVLOADER_H
+#define COMPLEXITYPOSITIONING_CSVLOADER_H
+
+#include <Eigen/Dense>
+
+
+
+#endif //COMPLEXITYPOSITIONING_CSVLOADER_H
