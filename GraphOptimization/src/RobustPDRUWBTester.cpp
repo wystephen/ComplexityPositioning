@@ -194,12 +194,6 @@ int main() {
 		for (int i = 0; i < 3; ++i) {
 			latest_pose_2d[i] = data[i];
 		}
-//		logger_ptr->addPlotEvent("trace 2d","real time", Eigen::Vector2d(data[0],data[1]));
-
-//		for(int u=1;u<uwb_data.cols();++u){
-//			logger_ptr->addPlotEvent("uwb","uwb"+std::to_string(u),uwb_data(uwb_index,u));
-//		}
-
 
 	}
 	globalOptimizer.setVerbose(true);
