@@ -53,11 +53,14 @@ int main(int argc, char *argv[]) {
 		if (imu_data(imu_index, 0) < uwb_data(uwb_index, 0)) {
 //			std::cout << imu_data.block(imu_index, 0,1, imu_data.cols()) << std::endl;
 
-			imu_index+=1;
+			imu_index += 1;
 		} else {
-			logger_ptr->addTrace3dEvent("Single", "UWB Optimize", optimize_trace.block(uwb_index, 0, 1, 3));
+			logger_ptr->addTrace3dEvent("Single",
+			                            "UWB Optimize",
+			                            optimize_trace.block(uwb_index,
+			                                                 0, 1, 3));
 
-			uwb_index+=1;
+			uwb_index += 1;
 		}
 	}
 
