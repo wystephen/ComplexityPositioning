@@ -57,6 +57,8 @@ bool IMUESKF::SetProbability(double pos_std, double qua_std, double vel_std, dou
 
 bool IMUESKF::StatePropagate(const Eigen::Vector3d &acc_data, const Eigen::Matrix3d &acc_cov,
                              const Eigen::Vector3d &gyr_data, const Eigen::Vector3d &gyr_cov, double dt) {
+	pos_ = pos_ + vel_ * dt + 0.5 * (qua_ *(acc_data - acc_bias_) + gravity_vec_ ) * dt * dt;
+	vel_ = vel_ + (qua_ * (acc_data - acc_bias_) + gravity_vec_) * dt;
 
 
 }

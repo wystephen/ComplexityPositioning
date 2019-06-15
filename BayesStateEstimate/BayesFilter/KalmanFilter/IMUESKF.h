@@ -51,6 +51,8 @@ private:
 	Eigen::Vector3d acc_bias_ = Eigen::Vector3d::Zero();
 	Eigen::Vector3d gyr_bias_ = Eigen::Vector3d::Zero();
 
+	Eigen::Vector3d gravity_vec_ = Eigen::Vector3d(0.0,0.0,9.81);
+
 	///// pos, vel, angle, acc_bias, gyr_bias   /////
 	Eigen::Matrix<double, 15, 1> error_state_ = Eigen::Matrix<double, 15, 1>::Zero();//  Error state
 
