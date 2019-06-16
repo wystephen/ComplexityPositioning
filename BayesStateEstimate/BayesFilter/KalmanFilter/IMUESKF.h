@@ -9,6 +9,9 @@
 #include <Eigen/Geometry>
 
 
+#include <AuxiliaryTool/ImuTools.h>
+
+
 // TODO: achieve using Template achieve runnable in embed device without huge modify.
 class IMUESKF {
 public:
