@@ -21,11 +21,23 @@
 #include "BayesFilter/KalmanFilter/IMUESKF.h"
 #include "BayesFilter/KalmanFilter/IMUESKF.cpp"
 
+#include <chrono>
+
+/**
+ * @brief Get current data in second[s].
+ * @return
+ */
+double get_time() {
+	return double(std::chrono::system_clock::now().time_since_epoch().count()) / 1e9;
+}
+
 
 int main(int argc, char *argv[]) {
 	std::cout.precision(30);
 
 	auto logger_ptr = AWF::AlgorithmLogger::getInstance();
+
+	double start_read_time = get_time();
 
 	std::string dir_name = "/home/steve/Data/VehicleUWBINS/0003/";
 
@@ -36,6 +48,12 @@ int main(int argc, char *argv[]) {
 	Eigen::MatrixXd imu_data = imu_file.extractDoulbeMatrix(",");
 	Eigen::MatrixXd uwb_data = uwb_file.extractDoulbeMatrix(",");
 	Eigen::MatrixXd beacon_set = beacon_file.extractDoulbeMatrix(",");
+
+	double after_read_time = get_time();
+	std::cout << "read file time:"
+	          << after_read_time - start_read_time
+	          << "[s]" << std::endl;
+
 	auto uwb_tool = BSE::UwbTools(uwb_data,
 	                              beacon_set);
 
@@ -43,6 +61,12 @@ int main(int argc, char *argv[]) {
 	Eigen::MatrixXd optimize_trace = uwb_tool.uwb_position_function();
 	Eigen::Vector3d initial_pos = optimize_trace.block(0, 0, 1, 3).transpose();
 	double initial_ori = uwb_tool.computeInitialOri(optimize_trace);
+
+
+	double uwb_opt_time = get_time();
+	std::cout << "cal uwb time:"
+	          << uwb_opt_time - after_read_time
+	          << "[s]" << std::endl;
 
 
 	//pre-process imu data
