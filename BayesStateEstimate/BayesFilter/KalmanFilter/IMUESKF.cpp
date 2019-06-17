@@ -11,6 +11,14 @@ IMUESKF::IMUESKF(Eigen::Vector3d pos,
                                              vel_(velocity) {
 }
 
+IMUESKF::IMUESKF(Eigen::Vector3d pos, double ori_angle){
+
+	//
+
+
+
+
+}
 
 bool IMUESKF::SetProbability(double pos_std, double qua_std, double vel_std, double ab_std, double gb_std) {
 	if (std::isfinite(pos_std) &&

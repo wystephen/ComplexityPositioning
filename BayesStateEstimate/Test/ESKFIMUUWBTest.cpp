@@ -28,7 +28,10 @@
  * @return
  */
 double get_time() {
-	return double(std::chrono::system_clock::now().time_since_epoch().count()) / 1e9;
+//	return double(std::chrono::system_clock::now().time_since_epoch().count()) / 1e9;
+	return std::chrono::duration<double>(
+			std::chrono::system_clock::now().time_since_epoch()
+	).count();
 }
 
 
@@ -71,6 +74,9 @@ int main(int argc, char *argv[]) {
 
 	//pre-process imu data
 	BSE::ImuTools::processImuData(imu_data);
+
+
+	auto eskf_filter = IMUESKF(initial_pos, initial_ori);
 
 	int imu_index = 0;
 	int uwb_index = 0;
