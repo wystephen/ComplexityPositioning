@@ -65,6 +65,8 @@ int main(int argc, char *argv[]) {
 	Eigen::Vector3d initial_pos = optimize_trace.block(0, 0, 1, 3).transpose();
 	double initial_ori = uwb_tool.computeInitialOri(optimize_trace);
 
+	Eigen::Quaterniond qua_init = BSE::ImuTools::initial_quaternion(imu_data.block(0, 1, 20, 6),
+	                                                                initial_ori, true);
 
 	double uwb_opt_time = get_time();
 	std::cout << "cal uwb time:"
@@ -76,7 +78,8 @@ int main(int argc, char *argv[]) {
 	BSE::ImuTools::processImuData(imu_data);
 
 
-	auto eskf_filter = IMUESKF(initial_pos, initial_ori);
+	auto eskf_filter = IMUESKF(initial_pos, qua_init, Eigen::Vector3d::Zero());
+	eskf_filter.SetProbability(0.1, 0.1, 0.01, 0.01, 0.01 / M_PI * 180.0);
 
 	int imu_index = 0;
 	int uwb_index = 0;

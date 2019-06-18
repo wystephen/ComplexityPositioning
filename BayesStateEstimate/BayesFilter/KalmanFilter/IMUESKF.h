@@ -24,7 +24,10 @@ public:
 	IMUESKF(Eigen::Vector3d pos, Eigen::Quaterniond qua, Eigen::Vector3d velocity);
 
 
-	IMUESKF(Eigen::Vector3d pos, double ori_angle);
+	/**
+	 * @brief DELETED METHOD.
+	 */
+//	IMUESKF(Eigen::Vector3d pos, double ori_angle);
 
 
 	/**

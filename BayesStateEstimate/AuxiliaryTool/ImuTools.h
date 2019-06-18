@@ -592,7 +592,6 @@ namespace BSE {
 
 
 			if (debug_flag) {
-
 				std::cout << "end gravity error function:" << tr
 				          << "," << tp << "," << initial_ori << "," << current_error << std::endl;
 
